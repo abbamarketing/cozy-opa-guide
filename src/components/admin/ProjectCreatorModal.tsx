@@ -115,7 +115,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
         include_script: editingProject.include_script,
         include_capture: editingProject.include_capture,
         capture_lead_days: (editingProject as any).capture_lead_days || 30,
-        monthly_value: Number(editingProject.monthly_value),
+        max_captures: (editingProject as any).max_captures || 1,
         payment_frequency: editingProject.payment_frequency,
         max_revisions: editingProject.max_revisions,
         deadline: editingProject.deadline,
