@@ -345,6 +345,10 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
                     <p className="text-sm text-card-foreground">{briefing.preferred_music_style}</p>
                   </div>
                 )}
+
+                {/* Subtasks */}
+                <Separator className="bg-border/50" />
+                <SubtaskList deliveryId={delivery.id} role="editor" />
               </TabsContent>
 
               {/* TAB 2: Marca */}
