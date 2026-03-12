@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useDebouncedValue } from '@/hooks/useDebounce';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -93,17 +94,19 @@ const AdminClients = () => {
 
   useEffect(() => { fetchClients(); }, []);
 
+  const debouncedSearch = useDebouncedValue(search, 300);
+
   const filtered = useMemo(() => {
     let result = clients;
     if (statusFilter !== 'all') {
       result = result.filter((c) => c.status === statusFilter);
     }
-    if (search.trim()) {
-      const q = search.toLowerCase();
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.toLowerCase();
       result = result.filter((c) => c.full_name?.toLowerCase().includes(q));
     }
     return result;
-  }, [clients, statusFilter, search]);
+  }, [clients, statusFilter, debouncedSearch]);
 
   const handleSuspend = async (userId: string) => {
     setActionLoading(userId);
