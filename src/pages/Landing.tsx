@@ -100,12 +100,13 @@ const FEATURES = [
 ];
 
 const FAQ = [
-  { q: 'Como funciona o processo de edição?', a: 'Solicite uma entrega, preencha o briefing e acompanhe pelo Kanban em tempo real.' },
-  { q: 'Quantas revisões estão incluídas?', a: 'Depende do seu plano. Solicite revisões com notas detalhadas e marcadores de tempo.' },
-  { q: 'Os prazos são em horas corridas?', a: 'Não! O SLA conta apenas horas úteis (8h–18h BRT, seg–sex). Fins de semana não contam.' },
-  { q: 'Como converso com meu editor?', a: 'Cada entrega tem chat integrado com marcadores de tempo para referências no vídeo.' },
-  { q: 'Existe app mobile?', a: 'A plataforma é responsiva e funciona perfeitamente no celular, sem instalar nada.' },
-  { q: 'Como começo a usar?', a: 'Entre em contato para um plano personalizado. Após configuração, preencha o briefing e comece.' },
+  { q: 'Por que eu deveria terceirizar minha edição?', a: 'Porque seu tempo vale mais criando conteúdo do que editando. Cada hora que você gasta cortando vídeo é uma hora a menos produzindo, vendendo ou vivendo. Deixe a edição com quem faz isso o dia todo.' },
+  { q: 'Quanto tempo eu economizo por mês?', a: 'Criadores que editam sozinhos gastam em média 8–15 horas por vídeo. Com a AbbaVideo, você só grava, envia o bruto e aprova. São dezenas de horas devolvidas todo mês.' },
+  { q: 'E se eu não gostar do resultado?', a: 'Revisões estão incluídas no seu plano. Peça ajustes com notas detalhadas e marcadores de tempo — o editor corrige exatamente o que você precisa, quantas vezes for necessário.' },
+  { q: 'Os prazos são em horas corridas?', a: 'Não! Contamos apenas horas úteis (8h–18h, seg–sex). Se você pedir na sexta à noite, o prazo só começa segunda de manhã. Justo e transparente.' },
+  { q: 'Funciona para empresas também?', a: 'Sim! Empresas usam a plataforma para gerenciar conteúdo de múltiplos canais. Cada projeto tem seu editor, briefing e cotas independentes.' },
+  { q: 'Preciso instalar alguma coisa?', a: 'Zero instalação. A plataforma roda no navegador — desktop ou celular. Você gerencia tudo do sofá, do Uber ou do escritório.' },
+  { q: 'Quanto custa?', a: 'Cada plano é montado sob medida. Você paga pelo que precisa — sem pacotes inflados, sem surpresas na fatura. Fale conosco para um orçamento em minutos.' },
 ];
 
 type DemoTab = 'dashboard' | 'entrega' | 'editor';
