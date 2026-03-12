@@ -95,32 +95,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
         .eq('id', delivery.id);
       if (error) throw error;
 
-      // Increment approved, decrement reserved
-      const fieldMap: Record<string, { approved: string; reserved: string }> = {
-        youtube_video: { approved: 'youtube_approved', reserved: 'youtube_reserved' },
-        instagram_video: { approved: 'instagram_approved', reserved: 'instagram_reserved' },
-        thumbnail: { approved: 'thumbnails_approved', reserved: 'thumbnails_reserved' },
-        cover: { approved: 'covers_approved', reserved: 'covers_reserved' },
-      };
-      const fields = fieldMap[delivery.delivery_type];
-      if (fields) {
-        // Fetch current values
-        const { data: up } = await supabase
-          .from('user_projects')
-          .select(`${fields.approved}, ${fields.reserved}`)
-          .eq('id', delivery.user_project_id)
-          .single();
-
-        if (up) {
-          await supabase
-            .from('user_projects')
-            .update({
-              [fields.approved]: ((up as any)[fields.approved] || 0) + 1,
-              [fields.reserved]: Math.max(0, ((up as any)[fields.reserved] || 0) - 1),
-            })
-            .eq('id', delivery.user_project_id);
-        }
-      }
+      // Quota is now automatically managed by the database trigger (approve_quota_on_approve)
 
       toast.success('Entrega aprovada com sucesso! 🎉');
       onOpenChange(false);

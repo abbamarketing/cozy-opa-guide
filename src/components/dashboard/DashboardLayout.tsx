@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
+import ScriptGenerator from '@/components/dashboard/ScriptGenerator';
+import SettingsComponent from '@/components/dashboard/Settings';
 import NotificationBell from '@/components/shared/NotificationBell';
 import ContextualTour, { restartTour } from '@/components/dashboard/ContextualTour';
 import { useNavigate } from 'react-router-dom';
@@ -233,17 +235,9 @@ const DashboardLayout = () => {
           </div>
         );
       case 'scripts':
-        return (
-          <div className="glass rounded-2xl p-8 text-center">
-            <p className="text-muted-foreground">Roteiros — em construção</p>
-          </div>
-        );
+        return <ScriptGenerator />;
       case 'settings':
-        return (
-          <div className="glass rounded-2xl p-8 text-center">
-            <p className="text-muted-foreground">Configurações — em construção</p>
-          </div>
-        );
+        return <SettingsComponent />;
       default:
         return null;
     }
