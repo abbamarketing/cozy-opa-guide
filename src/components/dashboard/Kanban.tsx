@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
+import NewDeliveryModal from './NewDeliveryModal';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -42,6 +43,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const [deliveries, setDeliveries] = useState<DeliveryData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
+  const [showNewModal, setShowNewModal] = useState(false);
 
   const fetchDeliveries = async () => {
     const { data, error } = await supabase
@@ -164,6 +166,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
                 size="sm"
                 disabled={!quotaAvailable}
                 className="gap-1.5"
+                onClick={() => setShowNewModal(true)}
               >
                 <Plus className="h-4 w-4" />
                 Nova Solicitação
@@ -307,6 +310,14 @@ const Kanban = ({ userProject }: KanbanProps) => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* New Delivery Modal */}
+      <NewDeliveryModal
+        open={showNewModal}
+        onOpenChange={setShowNewModal}
+        userProject={userProject}
+        onCreated={fetchDeliveries}
+      />
     </div>
   );
 };
