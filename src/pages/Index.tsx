@@ -149,7 +149,7 @@ function handleSingleRoleRedirect(
       return <Navigate to="/editor" replace />;
     default: {
       if (assignedProjectId === null) {
-        return <WaitingForProject />;
+        return <Navigate to="/waiting" replace />;
       }
       // Payment FIRST, then onboarding
       if (projectStatus === 'pending_payment') {
