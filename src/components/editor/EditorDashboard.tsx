@@ -463,8 +463,8 @@ const EditorDashboard = () => {
         )}
       </main>
 
-      {/* Detail Modal */}
-      <DeliveryDetailModal
+      {/* Editor Briefing Modal */}
+      <EditorBriefingModal
         open={!!selectedDelivery}
         onOpenChange={() => setSelectedDelivery(null)}
         delivery={selectedDelivery}
