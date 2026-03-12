@@ -40,6 +40,7 @@ const projectSchema = z.object({
   include_script: z.boolean(),
   include_capture: z.boolean(),
   capture_lead_days: z.number().min(1).max(90),
+  max_captures: z.number().min(1).max(10),
   monthly_value: z.number().min(0.01, 'Valor deve ser maior que 0'),
   payment_frequency: z.enum(['monthly', 'quarterly', 'annual']),
   max_revisions: z.number().min(1).max(5),
@@ -94,6 +95,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
       include_script: false,
       include_capture: false,
       capture_lead_days: 30,
+      max_captures: 1,
       monthly_value: 0,
       payment_frequency: 'monthly',
       max_revisions: 2,
@@ -115,6 +117,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
         include_script: editingProject.include_script,
         include_capture: editingProject.include_capture,
         capture_lead_days: (editingProject as any).capture_lead_days || 30,
+        max_captures: (editingProject as any).max_captures || 1,
         monthly_value: Number(editingProject.monthly_value),
         payment_frequency: editingProject.payment_frequency,
         max_revisions: editingProject.max_revisions,
@@ -433,32 +436,54 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
           {values.include_capture && (
             <section className="space-y-3 rounded-lg border border-border/50 bg-secondary/30 p-4">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
+               <MapPin className="h-4 w-4" />
                 Captação Presencial
               </h3>
               <p className="text-xs text-muted-foreground">
-                O cliente terá <span className="text-primary font-semibold">1 captação presencial por mês</span> com agendamento completo (data, horário e local).
+                O cliente poderá agendar captações presenciais de acordo com a cota definida abaixo.
               </p>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label>Antecedência mínima para agendamento</Label>
-                  <span className="font-mono-code text-sm text-primary">{values.capture_lead_days} dias</span>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Captações por mês</Label>
+                    <span className="font-mono-code text-sm text-primary">{values.max_captures}</span>
+                  </div>
+                  <Controller
+                    name="max_captures"
+                    control={control}
+                    render={({ field }) => (
+                      <Slider
+                        min={1} max={10} step={1}
+                        value={[field.value]}
+                        onValueChange={([v]) => field.onChange(v)}
+                      />
+                    )}
+                  />
                 </div>
-                <Controller
-                  name="capture_lead_days"
-                  control={control}
-                  render={({ field }) => (
-                    <Slider
-                      min={1} max={90} step={1}
-                      value={[field.value]}
-                      onValueChange={([v]) => field.onChange(v)}
-                    />
-                  )}
-                />
-                <p className="text-[10px] text-muted-foreground">
-                  O cliente só poderá agendar captações com pelo menos {values.capture_lead_days} dias de antecedência.
-                </p>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Antecedência mínima</Label>
+                    <span className="font-mono-code text-sm text-primary">{values.capture_lead_days}d</span>
+                  </div>
+                  <Controller
+                    name="capture_lead_days"
+                    control={control}
+                    render={({ field }) => (
+                      <Slider
+                        min={1} max={90} step={1}
+                        value={[field.value]}
+                        onValueChange={([v]) => field.onChange(v)}
+                      />
+                    )}
+                  />
+                </div>
               </div>
+
+              <p className="text-[10px] text-muted-foreground">
+                O cliente só poderá agendar captações com pelo menos {values.capture_lead_days} dias de antecedência.
+              </p>
             </section>
           )}
 
@@ -493,7 +518,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
                 {values.include_thumbnails && <Badge variant="secondary"><Image className="h-3 w-3 mr-1" />Thumbnails</Badge>}
                 {values.include_covers && <Badge variant="secondary"><FileImage className="h-3 w-3 mr-1" />Capas</Badge>}
                 {values.include_script && <Badge variant="secondary"><FileText className="h-3 w-3 mr-1" />Roteiro IA</Badge>}
-                {values.include_capture && <Badge variant="secondary"><Camera className="h-3 w-3 mr-1" />Captação ({values.capture_lead_days}d)</Badge>}
+                {values.include_capture && <Badge variant="secondary"><Camera className="h-3 w-3 mr-1" />Captação {values.max_captures}x/mês ({values.capture_lead_days}d)</Badge>}
               </div>
               <div className="flex gap-4 text-xs text-muted-foreground flex-wrap">
                 <span>SLA: {values.deadline}</span>
