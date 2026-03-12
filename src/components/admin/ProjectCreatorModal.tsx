@@ -93,6 +93,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
       include_covers: false,
       include_script: false,
       include_capture: false,
+      capture_lead_days: 30,
       monthly_value: 0,
       payment_frequency: 'monthly',
       max_revisions: 2,
