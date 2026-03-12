@@ -1,12 +1,9 @@
 import { useState } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Video, Camera, Image, Layers, ExternalLink, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Video, Camera, Image, Layers, ChevronDown, ChevronUp } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import type { UserProjectData } from '@/hooks/useUserProject';
 
@@ -52,7 +49,6 @@ const QuotaRow = ({ label, icon, used, total }: QuotaLine) => {
 };
 
 const QuotaCard = ({ userProject }: QuotaCardProps) => {
-  const [loadingPortal, setLoadingPortal] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const isMobile = useIsMobile();
   const project = userProject.custom_project;
@@ -96,24 +92,6 @@ const QuotaCard = ({ userProject }: QuotaCardProps) => {
       total: project.instagram_videos,
     });
   }
-
-  const handleManageSubscription = async () => {
-    setLoadingPortal(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('create-portal-session');
-      if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, '_blank');
-      } else {
-        throw new Error('URL do portal nao retornada');
-      }
-    } catch (err: any) {
-      console.error('Portal error:', err);
-      toast.error(err.message || 'Erro ao abrir portal de assinatura');
-    } finally {
-      setLoadingPortal(false);
-    }
-  };
 
   // On mobile, show compact version with expand toggle
   const showDetails = !isMobile || expanded;
@@ -162,20 +140,6 @@ const QuotaCard = ({ userProject }: QuotaCardProps) => {
                   Periodo: {format(new Date(userProject.current_period_start), 'dd/MM', { locale: ptBR })} – {format(periodEnd, 'dd/MM', { locale: ptBR })}
                 </span>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full gap-2 text-xs text-muted-foreground h-9"
-                onClick={handleManageSubscription}
-                disabled={loadingPortal || !userProject.stripe_subscription_id}
-              >
-                {loadingPortal ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <ExternalLink className="h-3.5 w-3.5" />
-                )}
-                Gerenciar Assinatura
-              </Button>
             </>
           )}
         </CardContent>

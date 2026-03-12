@@ -1,4 +1,5 @@
 import { Play } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const TERMS_SECTIONS = [
   { title: '1. Aceitação dos Termos', paragraphs: ['Ao acessar e utilizar a plataforma AbbaVideo ("Plataforma"), você concorda em cumprir e estar vinculado aos seguintes termos e condições. Caso não concorde com qualquer parte destes termos, não poderá acessar o serviço.'] },
@@ -54,6 +55,12 @@ const Terms = () => {
               </div>
             </section>
           ))}
+        </div>
+
+        <div className="mt-6 text-center text-xs text-muted-foreground font-mono space-x-4">
+          <Link to="/privacy" className="hover:text-primary transition-colors">Política de Privacidade</Link>
+          <span>·</span>
+          <Link to="/auth" className="hover:text-primary transition-colors">Voltar</Link>
         </div>
       </div>
     </div>

@@ -16,6 +16,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Editor = lazy(() => import("./pages/Editor"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Terms = lazy(() => import("./pages/Terms"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 const PaymentGate = lazy(() => import("./pages/PaymentGate"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -50,6 +51,8 @@ const App = () => (
               {/* Public routes */}
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
 
               {/* Admin only */}
