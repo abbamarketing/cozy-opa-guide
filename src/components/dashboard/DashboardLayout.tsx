@@ -235,17 +235,9 @@ const DashboardLayout = () => {
           </div>
         );
       case 'scripts':
-        return (
-          <div className="glass rounded-2xl p-8 text-center">
-            <p className="text-muted-foreground">Roteiros — em construção</p>
-          </div>
-        );
+        return <ScriptGenerator />;
       case 'settings':
-        return (
-          <div className="glass rounded-2xl p-8 text-center">
-            <p className="text-muted-foreground">Configurações — em construção</p>
-          </div>
-        );
+        return <SettingsComponent />;
       default:
         return null;
     }
