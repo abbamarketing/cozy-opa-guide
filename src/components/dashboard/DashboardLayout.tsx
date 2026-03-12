@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
 import NotificationBell from '@/components/shared/NotificationBell';
+import ContextualTour, { restartTour } from '@/components/dashboard/ContextualTour';
 import { useNavigate } from 'react-router-dom';
 import {
   Play,
