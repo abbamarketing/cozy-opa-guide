@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react';
 import EditorDashboard from '@/components/editor/EditorDashboard';
 
 const Editor = () => {
-  const { primaryRole, isLoading } = useProfile();
+  const { roles, isLoading } = useProfile();
 
   if (isLoading) {
     return (
@@ -14,7 +14,7 @@ const Editor = () => {
     );
   }
 
-  if (primaryRole !== 'editor') {
+  if (!roles.includes('editor')) {
     return <Navigate to="/" replace />;
   }
 
