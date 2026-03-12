@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { format, differenceInHours } from 'date-fns';
+import { format } from 'date-fns';
+import { remainingBusinessMinutes, formatBusinessCountdown } from '@/lib/business-hours';
 import { ptBR } from 'date-fns/locale';
 import {
   Play,
@@ -87,11 +88,13 @@ const typeLabels: Record<string, string> = {
 
 const getDeadlineInfo = (dueDate: string | null) => {
   if (!dueDate) return { hours: null, color: 'text-muted-foreground', label: 'Sem prazo' };
-  const h = differenceInHours(new Date(dueDate), new Date());
-  if (h < 0) return { hours: h, color: 'text-destructive', label: 'Atrasado' };
-  if (h <= 6) return { hours: h, color: 'text-destructive', label: `${h}h restantes` };
-  if (h <= 12) return { hours: h, color: 'text-[hsl(45,93%,47%)]', label: `${h}h restantes` };
-  return { hours: h, color: 'text-primary', label: `${h}h restantes` };
+  const bizMin = remainingBusinessMinutes(new Date(dueDate));
+  const bizHours = bizMin / 60;
+  const label = formatBusinessCountdown(bizMin);
+  if (bizMin < 0) return { hours: bizHours, color: 'text-destructive', label: 'Atrasado' };
+  if (bizHours <= 6) return { hours: bizHours, color: 'text-destructive', label };
+  if (bizHours <= 12) return { hours: bizHours, color: 'text-[hsl(45,93%,47%)]', label };
+  return { hours: bizHours, color: 'text-primary', label };
 };
 
 /* ─── Editor Card ─── */
@@ -343,7 +346,7 @@ const EditorDashboard = () => {
     if (lateOnly) {
       result = result.filter((d) => {
         if (!d.due_date) return false;
-        return differenceInHours(new Date(d.due_date), new Date()) < 0;
+        return remainingBusinessMinutes(new Date(d.due_date)) < 0;
       });
     }
     return result;
