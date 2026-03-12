@@ -13,11 +13,13 @@ import {
   GripVertical,
   ChevronDown,
   AlertTriangle,
+  X,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { useProfile } from '@/hooks/useProfile';
 import { useEditor } from '@/hooks/useEditor';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +27,7 @@ import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import {
   Select,
   SelectContent,
@@ -41,6 +44,7 @@ import {
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import EditorBriefingModal from '@/components/editor/EditorBriefingModal';
+import NotificationBell from '@/components/shared/NotificationBell';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 
 /* ─── Types ─── */
@@ -73,6 +77,13 @@ const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   cover: Layers,
 };
 
+const typeLabels: Record<string, string> = {
+  youtube_video: 'YouTube',
+  instagram_video: 'Instagram',
+  thumbnail: 'Thumbnail',
+  cover: 'Capa',
+};
+
 const getDeadlineInfo = (dueDate: string | null) => {
   if (!dueDate) return { hours: null, color: 'text-muted-foreground', label: 'Sem prazo' };
   const h = differenceInHours(new Date(dueDate), new Date());
@@ -91,17 +102,17 @@ const EditorDeliveryCard = ({
 }: {
   delivery: EditorDelivery;
   onClick: () => void;
-  onDragStart: (e: React.DragEvent) => void;
-  isDragging: boolean;
+  onDragStart?: (e: React.DragEvent) => void;
+  isDragging?: boolean;
 }) => {
   const Icon = typeIcons[delivery.delivery_type] || Video;
   const deadline = getDeadlineInfo(delivery.due_date);
 
   return (
     <Card
-      draggable
+      draggable={!!onDragStart}
       onDragStart={(e) => {
-        // Create a clean drag image
+        if (!onDragStart) return;
         const el = e.currentTarget.cloneNode(true) as HTMLElement;
         el.style.width = `${e.currentTarget.offsetWidth}px`;
         el.style.opacity = '0.9';
@@ -114,13 +125,13 @@ const EditorDeliveryCard = ({
         onDragStart(e);
       }}
       onClick={onClick}
-      className={`cursor-grab active:cursor-grabbing border-border/40 bg-card p-3 transition-all hover:border-primary/30 hover:shadow-[0_0_12px_hsl(var(--primary)/0.08)] ${
+      className={`cursor-pointer border-border/40 bg-card p-3 transition-all hover:border-primary/30 hover:shadow-[0_0_12px_hsl(var(--primary)/0.08)] active:bg-muted/50 ${
         isDragging ? 'opacity-30 scale-95' : ''
-      }`}
+      } ${onDragStart ? 'cursor-grab active:cursor-grabbing' : ''}`}
     >
-      {/* Header: drag handle + type icon + title */}
+      {/* Header */}
       <div className="flex items-center gap-2">
-        <GripVertical className="h-3.5 w-3.5 shrink-0 text-muted-foreground/30" />
+        {onDragStart && <GripVertical className="h-3.5 w-3.5 shrink-0 text-muted-foreground/30" />}
         <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10">
           <Icon className="h-3.5 w-3.5 text-primary" />
         </div>
@@ -131,30 +142,24 @@ const EditorDeliveryCard = ({
         </div>
       </div>
 
-      {/* Client name */}
-      <p className="mt-1.5 pl-[42px] text-[11px] text-muted-foreground truncate">
+      {/* Client */}
+      <p className={`mt-1.5 text-[11px] text-muted-foreground truncate ${onDragStart ? 'pl-[42px]' : 'pl-8'}`}>
         {delivery.client_name || '—'}
       </p>
 
-      {/* Brand preview */}
+      {/* Brand colors */}
       {(delivery.brand_colors.length > 0 || delivery.logo_url) && (
-        <div className="mt-2 flex items-center gap-1.5 pl-[42px]">
+        <div className={`mt-2 flex items-center gap-1.5 ${onDragStart ? 'pl-[42px]' : 'pl-8'}`}>
           {delivery.brand_colors.slice(0, 3).map((c, i) => (
-            <div
-              key={i}
-              className="h-3.5 w-3.5 rounded-full border border-border/50"
-              style={{ backgroundColor: c }}
-            />
+            <div key={i} className="h-3.5 w-3.5 rounded-full border border-border/50" style={{ backgroundColor: c }} />
           ))}
-          {delivery.logo_url && (
-            <img src={delivery.logo_url} alt="" className="h-3.5 w-3.5 rounded object-contain" />
-          )}
+          {delivery.logo_url && <img src={delivery.logo_url} alt="" className="h-3.5 w-3.5 rounded object-contain" />}
         </div>
       )}
 
       {/* Deadline */}
       {delivery.due_date && (
-        <div className="mt-2 flex items-center gap-1.5 pl-[42px] text-[11px]">
+        <div className={`mt-2 flex items-center gap-1.5 text-[11px] ${onDragStart ? 'pl-[42px]' : 'pl-8'}`}>
           <Clock className={`h-3 w-3 shrink-0 ${deadline.color}`} />
           <span className="text-muted-foreground">
             {format(new Date(delivery.due_date), "dd/MM 'às' HH'h'", { locale: ptBR })}
@@ -168,20 +173,75 @@ const EditorDeliveryCard = ({
   );
 };
 
+/* ─── Filters component ─── */
+const FilterControls = ({
+  clientFilter, setClientFilter, typeFilter, setTypeFilter, lateOnly, setLateOnly,
+  uniqueClients, uniqueTypes,
+}: {
+  clientFilter: string; setClientFilter: (v: string) => void;
+  typeFilter: string; setTypeFilter: (v: string) => void;
+  lateOnly: boolean; setLateOnly: (v: boolean) => void;
+  uniqueClients: string[]; uniqueTypes: string[];
+}) => (
+  <div className="space-y-4">
+    <div className="space-y-2">
+      <label className="text-xs font-medium text-muted-foreground">Cliente</label>
+      <Select value={clientFilter} onValueChange={setClientFilter}>
+        <SelectTrigger className="h-9 text-sm">
+          <SelectValue placeholder="Todos os clientes" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">Todos os clientes</SelectItem>
+          {uniqueClients.map((c) => (
+            <SelectItem key={c} value={c}>{c}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+
+    <div className="space-y-2">
+      <label className="text-xs font-medium text-muted-foreground">Tipo</label>
+      <Select value={typeFilter} onValueChange={setTypeFilter}>
+        <SelectTrigger className="h-9 text-sm">
+          <SelectValue placeholder="Todos os tipos" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">Todos os tipos</SelectItem>
+          {uniqueTypes.map((t) => (
+            <SelectItem key={t} value={t}>{typeLabels[t] || t}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+
+    <div className="flex items-center gap-2">
+      <Checkbox id="late-filter" checked={lateOnly} onCheckedChange={(v) => setLateOnly(!!v)} />
+      <label htmlFor="late-filter" className="text-sm text-muted-foreground cursor-pointer flex items-center gap-1.5">
+        <AlertTriangle className="h-3.5 w-3.5 text-destructive" /> Apenas atrasadas
+      </label>
+    </div>
+  </div>
+);
+
 /* ─── Main Dashboard ─── */
 const EditorDashboard = () => {
   const { signOut, user } = useAuth();
   const { profile } = useProfile();
   const { editor, isLoading: editorLoading } = useEditor();
+  const isMobile = useIsMobile();
   const [deliveries, setDeliveries] = useState<EditorDelivery[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [activeColumn, setActiveColumn] = useState('todo');
+  const [filterOpen, setFilterOpen] = useState(false);
 
   // Filters
   const [clientFilter, setClientFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [lateOnly, setLateOnly] = useState(false);
+
+  const activeFilterCount = [clientFilter !== 'all', typeFilter !== 'all', lateOnly].filter(Boolean).length;
 
   const fetchDeliveries = useCallback(async () => {
     if (!editor) return;
@@ -201,7 +261,6 @@ const EditorDashboard = () => {
       .order('due_date', { ascending: true });
 
     if (!error && data) {
-      // Fetch profiles and briefings for each unique user
       const userIds = [...new Set(data.map((d: any) => d.user_project?.user_id).filter(Boolean))];
 
       const [profilesRes, briefingsRes] = await Promise.all([
@@ -291,16 +350,10 @@ const EditorDashboard = () => {
 
   const pendingCount = deliveries.filter((d) => ['pending', 'in_progress', 'revision'].includes(d.status)).length;
 
-  const uniqueClients = [...new Set(deliveries.map((d) => d.client_name).filter(Boolean))];
+  const uniqueClients = [...new Set(deliveries.map((d) => d.client_name).filter(Boolean))] as string[];
   const uniqueTypes = [...new Set(deliveries.map((d) => d.delivery_type))];
-  const typeLabels: Record<string, string> = {
-    youtube_video: 'YouTube',
-    instagram_video: 'Instagram',
-    thumbnail: 'Thumbnail',
-    cover: 'Capa',
-  };
 
-  // Drag and drop
+  // Drag and drop (desktop only)
   const handleDragStart = (deliveryId: string) => (e: React.DragEvent) => {
     setDraggedId(deliveryId);
     e.dataTransfer.effectAllowed = 'move';
@@ -356,6 +409,149 @@ const EditorDashboard = () => {
     );
   }
 
+  /* ─── Mobile Layout ─── */
+  if (isMobile) {
+    const currentCol = COLUMNS.find((c) => c.id === activeColumn) || COLUMNS[0];
+    const items = filtered.filter((d) => currentCol.statuses.includes(d.status));
+
+    return (
+      <div className="flex min-h-screen flex-col bg-background">
+        {/* Header */}
+        <header className="sticky top-0 z-30 border-b border-border/50 bg-background/80 backdrop-blur-md">
+          <div className="flex h-14 items-center justify-between px-4">
+            <div className="flex items-center gap-2">
+              <div className="h-7 w-7 rounded-lg gradient-neon flex items-center justify-center">
+                <Play className="h-3.5 w-3.5 text-primary-foreground" />
+              </div>
+              <Badge variant="secondary" className="text-xs">
+                {pendingCount} pendente{pendingCount !== 1 ? 's' : ''}
+              </Badge>
+            </div>
+
+            <div className="flex items-center gap-1">
+              {/* Filter sheet */}
+              <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative h-8 w-8">
+                    <Filter className="h-4 w-4" />
+                    {activeFilterCount > 0 && (
+                      <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                        {activeFilterCount}
+                      </span>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="bottom" className="rounded-t-2xl">
+                  <SheetHeader>
+                    <SheetTitle className="text-left">Filtros</SheetTitle>
+                  </SheetHeader>
+                  <div className="py-4">
+                    <FilterControls
+                      clientFilter={clientFilter} setClientFilter={setClientFilter}
+                      typeFilter={typeFilter} setTypeFilter={setTypeFilter}
+                      lateOnly={lateOnly} setLateOnly={setLateOnly}
+                      uniqueClients={uniqueClients} uniqueTypes={uniqueTypes}
+                    />
+                    {activeFilterCount > 0 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mt-4 w-full text-muted-foreground"
+                        onClick={() => {
+                          setClientFilter('all');
+                          setTypeFilter('all');
+                          setLateOnly(false);
+                        }}
+                      >
+                        <X className="mr-1.5 h-3.5 w-3.5" /> Limpar filtros
+                      </Button>
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              <NotificationBell />
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-1 px-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={profile?.avatar_url || undefined} />
+                      <AvatarFallback className="bg-primary/20 text-[10px] text-primary">{initials}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem onClick={signOut} className="text-destructive">
+                    <LogOut className="mr-2 h-4 w-4" /> Sair
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </header>
+
+        {/* Column tabs */}
+        <div className="px-4 pt-3">
+          <div className="flex gap-1 rounded-lg bg-secondary p-1">
+            {COLUMNS.map((col) => {
+              const count = filtered.filter((d) => col.statuses.includes(d.status)).length;
+              const isActive = activeColumn === col.id;
+              return (
+                <button
+                  key={col.id}
+                  onClick={() => setActiveColumn(col.id)}
+                  className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-md text-[10px] font-mono font-medium tracking-wider transition-colors ${
+                    isActive ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+                  }`}
+                >
+                  {col.title.split(' ')[0]}
+                  {count > 0 && (
+                    <span className={`text-[9px] ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Cards */}
+        <main className="flex-1 px-4 py-3">
+          {isLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-24 rounded-lg" />
+              <Skeleton className="h-24 rounded-lg" />
+            </div>
+          ) : items.length === 0 ? (
+            <div className="rounded-lg border border-border bg-card p-8 text-center">
+              <p className="text-xs font-mono text-muted-foreground">Nenhuma entrega</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {items.map((d) => (
+                <EditorDeliveryCard
+                  key={d.id}
+                  delivery={d}
+                  onClick={() => setSelectedDelivery(d)}
+                />
+              ))}
+            </div>
+          )}
+        </main>
+
+        <EditorBriefingModal
+          open={!!selectedDelivery}
+          onOpenChange={() => setSelectedDelivery(null)}
+          delivery={selectedDelivery}
+          onUpdated={fetchDeliveries}
+        />
+      </div>
+    );
+  }
+
+  /* ─── Desktop Layout ─── */
   return (
     <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
@@ -374,7 +570,6 @@ const EditorDashboard = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Filters */}
             <Select value={clientFilter} onValueChange={setClientFilter}>
               <SelectTrigger className="h-8 w-[140px] text-xs">
                 <SelectValue placeholder="Todos os clientes" />
@@ -382,7 +577,7 @@ const EditorDashboard = () => {
               <SelectContent>
                 <SelectItem value="all">Todos os clientes</SelectItem>
                 {uniqueClients.map((c) => (
-                  <SelectItem key={c} value={c!}>{c}</SelectItem>
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -410,9 +605,11 @@ const EditorDashboard = () => {
               </label>
             </div>
 
+            <NotificationBell />
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="ml-2 gap-2 px-2">
+                <Button variant="ghost" size="sm" className="ml-1 gap-2 px-2">
                   <Avatar className="h-6 w-6">
                     <AvatarImage src={profile?.avatar_url || undefined} />
                     <AvatarFallback className="bg-primary/20 text-xs text-primary">{initials}</AvatarFallback>
@@ -430,14 +627,14 @@ const EditorDashboard = () => {
         </div>
       </header>
 
-      {/* Kanban */}
+      {/* Kanban desktop */}
       <main className="flex-1 overflow-x-auto p-4">
         {isLoading ? (
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+          <div className="grid grid-cols-4 gap-3">
             {COLUMNS.map((c) => <Skeleton key={c.id} className="h-64 rounded-xl" />)}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+          <div className="grid grid-cols-4 gap-3">
             {COLUMNS.map((col) => {
               const items = filtered.filter((d) => col.statuses.includes(d.status));
               return (
@@ -489,7 +686,6 @@ const EditorDashboard = () => {
         )}
       </main>
 
-      {/* Editor Briefing Modal */}
       <EditorBriefingModal
         open={!!selectedDelivery}
         onOpenChange={() => setSelectedDelivery(null)}
