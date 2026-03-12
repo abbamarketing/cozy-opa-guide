@@ -19,6 +19,7 @@ const Terms = lazy(() => import("./pages/Terms"));
 const PaymentGate = lazy(() => import("./pages/PaymentGate"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
