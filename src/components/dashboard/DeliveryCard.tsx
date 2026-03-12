@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { format, differenceInMinutes } from 'date-fns';
+import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Video, Camera, Image, Layers, Clock, AlertTriangle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { remainingBusinessMinutes, formatBusinessCountdown } from '@/lib/business-hours';
 
 export interface DeliveryData {
   id: string;
