@@ -54,7 +54,7 @@ export const useUserProject = () => {
         .from('user_projects')
         .select('*, custom_project:custom_projects(*)')
         .eq('user_id', user.id)
-        .eq('status', 'active')
+        .in('status', ['active', 'pending_payment'])
         .maybeSingle();
 
       if (err) {
