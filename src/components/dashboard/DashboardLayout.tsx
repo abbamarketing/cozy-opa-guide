@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Kanban from '@/components/dashboard/Kanban';
 import { useNavigate } from 'react-router-dom';
 import {
   Play,
