@@ -166,9 +166,11 @@ const Kanban = ({ userProject }: KanbanProps) => {
                 size="sm"
                 disabled={!quotaAvailable}
                 className="gap-1.5"
+                onClick={() => setShowNewModal(true)}
               >
                 <Plus className="h-4 w-4" />
                 Nova Solicitação
+              </Button>
               </Button>
             </span>
           </TooltipTrigger>
