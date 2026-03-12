@@ -14,9 +14,10 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  Video, Camera, Image, Layers, Clock, GripVertical, MoreHorizontal, UserCheck, XCircle, Loader2,
+  Video, Camera, Image, Layers, Clock, GripVertical, MoreHorizontal, UserCheck, XCircle, Loader2, Download,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { downloadCSV } from '@/lib/csv';
 
 interface AdminDelivery {
   id: string;
