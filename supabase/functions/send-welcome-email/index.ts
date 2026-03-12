@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
               <p>Estamos ansiosos para trabalhar com você!</p>
             </div>
             <div class="footer">
-              <p>VideoFlow - Sistema de Gestão de Edição de Vídeos</p>
+              <p>AbbaVideo - Sistema de Gestão de Edição de Vídeos</p>
             </div>
           </div>
         </body>
