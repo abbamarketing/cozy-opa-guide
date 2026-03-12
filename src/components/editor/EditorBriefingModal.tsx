@@ -46,6 +46,7 @@ import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 import { typeConfig, statusConfig } from '@/components/dashboard/DeliveryCard';
 import FileUpload from '@/components/editor/FileUpload';
 import DeliveryChat from '@/components/shared/DeliveryChat';
+import SubtaskList from '@/components/shared/SubtaskList';
 
 interface EditorBriefingModalProps {
   open: boolean;

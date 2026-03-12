@@ -198,6 +198,11 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
 
               <Separator className="bg-border/50" />
 
+              {/* Section: Subtasks */}
+              <SubtaskList deliveryId={delivery.id} role="client" />
+
+              <Separator className="bg-border/50" />
+
               {/* Section 2: Files */}
               {(delivery.file_url || delivery.thumbnail_url) && (
                 <>
