@@ -37,6 +37,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 /* ─── Animation ─── */
 const fadeUp = {
@@ -464,6 +465,7 @@ const EditorPanelView = () => (
 const Landing = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [activeDemo, setActiveDemo] = useState<DemoTab>('dashboard');
+  const [surveyOpen, setSurveyOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -482,11 +484,9 @@ const Landing = () => {
             <Link to="/auth">
               <Button variant="ghost" size="sm">Entrar</Button>
             </Link>
-            <a href="https://wa.me/5500000000000" target="_blank" rel="noopener noreferrer">
-              <Button size="sm" className="gap-1.5">
-                Fale Conosco <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </a>
+            <Button size="sm" className="gap-1.5" onClick={() => setSurveyOpen(true)}>
+              Fale Conosco <ArrowRight className="h-3.5 w-3.5" />
+            </Button>
           </div>
         </div>
       </nav>
@@ -521,11 +521,9 @@ const Landing = () => {
             initial="hidden" animate="visible" variants={fadeUp} custom={3}
             className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3"
           >
-            <a href="https://wa.me/5500000000000" target="_blank" rel="noopener noreferrer">
-              <Button size="lg" className="gap-2 text-sm px-8">
-                <Mail className="h-4 w-4" /> Quero um Orçamento Grátis
-              </Button>
-            </a>
+            <Button size="lg" className="gap-2 text-sm px-8" onClick={() => setSurveyOpen(true)}>
+              <Mail className="h-4 w-4" /> Quero um Orçamento Grátis
+            </Button>
             <Link to="/auth">
               <Button variant="outline" size="lg" className="gap-2 text-sm px-8">
                 Já sou cliente <ArrowRight className="h-4 w-4" />
@@ -771,11 +769,9 @@ const Landing = () => {
               Enquanto você cria, a gente edita. Plano sob medida, editor dedicado e zero dor de cabeça. Fale com a gente — o orçamento é grátis.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <a href="https://wa.me/5500000000000" target="_blank" rel="noopener noreferrer">
-                <Button size="lg" className="gap-2 px-10">
-                  <Mail className="h-4 w-4" /> Quero um Orçamento Grátis
-                </Button>
-              </a>
+              <Button size="lg" className="gap-2 px-10" onClick={() => setSurveyOpen(true)}>
+                <Mail className="h-4 w-4" /> Quero um Orçamento Grátis
+              </Button>
               <p className="text-[10px] text-muted-foreground font-body">Resposta em até 2 horas úteis</p>
             </div>
           </div>
@@ -802,6 +798,19 @@ const Landing = () => {
           </p>
         </div>
       </footer>
+
+      {/* Survey Modal */}
+      <Dialog open={surveyOpen} onOpenChange={setSurveyOpen}>
+        <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+          <iframe
+            src="https://api.leadconnectorhq.com/widget/survey/UJXHgLtbCNDB8DixdKLv"
+            style={{ border: 'none', width: '100%', minHeight: '500px' }}
+            scrolling="no"
+            id="UJXHgLtbCNDB8DixdKLv"
+            title="Formulário de contato"
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
