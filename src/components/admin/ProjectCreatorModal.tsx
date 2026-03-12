@@ -204,6 +204,14 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
     setSaving(false);
   };
 
+  // Available delivery types for subtask editor
+  const availableDeliveryTypes = [
+    ...(values.youtube_videos > 0 ? [{ value: 'youtube_video', label: 'YouTube' }] : []),
+    ...(values.instagram_videos > 0 ? [{ value: 'instagram_video', label: 'Instagram' }] : []),
+    ...(values.include_thumbnails ? [{ value: 'thumbnail', label: 'Thumbnail' }] : []),
+    ...(values.include_covers ? [{ value: 'cover', label: 'Capa' }] : []),
+  ];
+
   // Deliverables count for preview
   const deliverableCount = [
     values.youtube_videos > 0,
