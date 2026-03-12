@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const siteUrl = Deno.env.get("SITE_URL") || "https://app.videoflow.com.br";
+    const siteUrl = Deno.env.get("SITE_URL") || "https://app.abbavideo.com.br";
 
     const emailHtml = `
       <!DOCTYPE html>
@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🎬 VideoFlow</h1>
+              <h1>AbbaVideo</h1>
             </div>
             <div class="content">
               <h2>Olá, ${name || "Cliente"}!</h2>
@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
               <p>Estamos ansiosos para trabalhar com você!</p>
             </div>
             <div class="footer">
-              <p>VideoFlow - Sistema de Gestão de Edição de Vídeos</p>
+              <p>AbbaVideo - Sistema de Gestão de Edição de Vídeos</p>
             </div>
           </div>
         </body>
@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "VideoFlow <onboarding@videoflow.com.br>",
+        from: "AbbaVideo <onboarding@abbavideo.com.br>",
         to: [email],
         subject: `Seu projeto ${projectName} está pronto! 🎬`,
         html: emailHtml,

@@ -16,11 +16,11 @@ const AdminManual = () => (
   <article className="prose-doc space-y-8">
     <header>
       <h1 className="text-2xl font-bold text-foreground">Manual do Administrador</h1>
-      <p className="text-muted-foreground">Guia completo para gerenciar o VideoFlow.</p>
+      <p className="text-muted-foreground">Guia completo para gerenciar o AbbaVideo.</p>
     </header>
 
     <Section title="1. Visão Geral">
-      <p>O painel administrativo permite gerenciar clientes, editores, projetos, entregas e métricas do VideoFlow. Acesse em <code>/admin</code> com uma conta que possua a role <strong>admin</strong>.</p>
+      <p>O painel administrativo permite gerenciar clientes, editores, projetos, entregas e métricas do AbbaVideo. Acesse em <code>/admin</code> com uma conta que possua a role <strong>admin</strong>.</p>
     </Section>
 
     <Section title="2. Gestão de Projetos">
@@ -96,7 +96,7 @@ const EditorManual = () => (
   <article className="prose-doc space-y-8">
     <header>
       <h1 className="text-2xl font-bold text-foreground">Manual do Editor</h1>
-      <p className="text-muted-foreground">Guia para editores de vídeo do VideoFlow.</p>
+      <p className="text-muted-foreground">Guia para editores de vídeo do AbbaVideo.</p>
     </header>
 
     <Section title="1. Acesso">
@@ -152,7 +152,7 @@ const ClientManual = () => (
   <article className="prose-doc space-y-8">
     <header>
       <h1 className="text-2xl font-bold text-foreground">Manual do Cliente</h1>
-      <p className="text-muted-foreground">Guia completo para usar o VideoFlow como cliente.</p>
+      <p className="text-muted-foreground">Guia completo para usar o AbbaVideo como cliente.</p>
     </header>
 
     <Section title="1. Cadastro e Primeiro Acesso">
@@ -234,11 +234,11 @@ const TermsOfUse = () => (
     </header>
 
     <Section title="1. Aceitação dos Termos">
-      <p>Ao acessar e utilizar a plataforma VideoFlow ("Plataforma"), você concorda em cumprir e estar vinculado aos seguintes termos e condições. Caso não concorde com qualquer parte destes termos, não poderá acessar o serviço.</p>
+      <p>Ao acessar e utilizar a plataforma AbbaVideo ("Plataforma"), você concorda em cumprir e estar vinculado aos seguintes termos e condições. Caso não concorde com qualquer parte destes termos, não poderá acessar o serviço.</p>
     </Section>
 
     <Section title="2. Descrição do Serviço">
-      <p>O VideoFlow é uma plataforma SaaS de gestão de entregas de conteúdo audiovisual que conecta criadores de conteúdo (Clientes) a editores de vídeo (Editores) por meio de um sistema de assinatura mensal. Os serviços incluídos são:</p>
+      <p>O AbbaVideo é uma plataforma SaaS de gestão de entregas de conteúdo audiovisual que conecta criadores de conteúdo (Clientes) a editores de vídeo (Editores) por meio de um sistema de assinatura mensal. Os serviços incluídos são:</p>
       <ul className="list-disc pl-6 space-y-1">
         <li>Upload e gerenciamento de materiais brutos para edição.</li>
         <li>Configuração de preferências de edição e briefing de marca.</li>
@@ -297,9 +297,9 @@ const TermsOfUse = () => (
       <ul className="list-disc pl-6 space-y-1">
         <li>O cliente mantém todos os direitos sobre o conteúdo original enviado.</li>
         <li>O conteúdo entregue pelo editor é de propriedade do Cliente após aprovação.</li>
-        <li>O VideoFlow não reivindica propriedade sobre os vídeos editados ou brutos.</li>
+        <li>O AbbaVideo não reivindica propriedade sobre os vídeos editados ou brutos.</li>
         <li>O Cliente garante que possui os direitos sobre todo material enviado (brutos, logos, músicas).</li>
-        <li>O VideoFlow não se responsabiliza por violações de direitos autorais no material fornecido pelo Cliente.</li>
+        <li>O AbbaVideo não se responsabiliza por violações de direitos autorais no material fornecido pelo Cliente.</li>
       </ul>
     </Section>
 
@@ -317,7 +317,7 @@ const TermsOfUse = () => (
     </Section>
 
     <Section title="11. Suspensão e Rescisão">
-      <p>O VideoFlow reserva-se o direito de suspender ou encerrar contas em caso de:</p>
+      <p>O AbbaVideo reserva-se o direito de suspender ou encerrar contas em caso de:</p>
       <ul className="list-disc pl-6 space-y-1">
         <li>Inadimplência por mais de 7 dias.</li>
         <li>Uso abusivo ou fora dos fins previstos.</li>
@@ -326,7 +326,7 @@ const TermsOfUse = () => (
     </Section>
 
     <Section title="12. Limitação de Responsabilidade">
-      <p>O VideoFlow não garante disponibilidade ininterrupta da Plataforma. Não nos responsabilizamos por danos indiretos, lucros cessantes ou perda de dados decorrentes do uso da Plataforma ou por falhas fora de nosso controle.</p>
+      <p>O AbbaVideo não garante disponibilidade ininterrupta da Plataforma. Não nos responsabilizamos por danos indiretos, lucros cessantes ou perda de dados decorrentes do uso da Plataforma ou por falhas fora de nosso controle.</p>
     </Section>
 
     <Section title="13. Alterações nos Termos">
@@ -351,7 +351,7 @@ const PrivacyPolicy = () => (
     </header>
 
     <Section title="1. Introdução">
-      <p>Esta Política de Privacidade descreve como o VideoFlow ("nós", "nosso") coleta, utiliza, armazena e protege os dados pessoais dos usuários da Plataforma, em conformidade com a Lei Geral de Proteção de Dados (LGPD – Lei nº 13.709/2018).</p>
+      <p>Esta Política de Privacidade descreve como o AbbaVideo ("nós", "nosso") coleta, utiliza, armazena e protege os dados pessoais dos usuários da Plataforma, em conformidade com a Lei Geral de Proteção de Dados (LGPD – Lei nº 13.709/2018).</p>
     </Section>
 
     <Section title="2. Dados Coletados">
@@ -404,7 +404,7 @@ const PrivacyPolicy = () => (
         <li>Solicitar portabilidade dos dados.</li>
         <li>Revogar consentimento a qualquer momento.</li>
       </ul>
-      <p>Para exercer seus direitos, entre em contato pelo email: <strong>privacidade@videoflow.com.br</strong></p>
+      <p>Para exercer seus direitos, entre em contato pelo email: <strong>abbaestrategias@gmail.com</strong></p>
     </Section>
 
     <Section title="7. Retenção de Dados">
@@ -427,8 +427,8 @@ const PrivacyPolicy = () => (
     <Section title="10. Contato">
       <p>Para dúvidas sobre esta Política ou sobre o tratamento dos seus dados, entre em contato:</p>
       <ul className="list-disc pl-6 space-y-1">
-        <li><strong>Email:</strong> privacidade@videoflow.com.br</li>
-        <li><strong>Encarregado (DPO):</strong> dpo@videoflow.com.br</li>
+        <li><strong>Email:</strong> abbaestrategias@gmail.com</li>
+        <li><strong>Encarregado (DPO):</strong> abbaestrategias@gmail.com</li>
       </ul>
     </Section>
   </article>

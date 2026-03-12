@@ -1,4 +1,4 @@
-const CACHE_NAME = 'videoflow-v1';
+const CACHE_NAME = 'abbavideo-v1';
 const PRECACHE_URLS = [
   '/',
   '/dashboard',

@@ -79,7 +79,7 @@ const DashboardHeader = () => {
             <Play className="h-3 w-3 text-primary-foreground" />
           </div>
           <span className="text-sm font-mono font-semibold tracking-tight">
-            Video<span className="text-primary">Flow</span>
+            Abba<span className="text-primary">Video</span>
           </span>
         </div>
       </div>
