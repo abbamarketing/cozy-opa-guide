@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🎬 VideoFlow</h1>
+              <h1>AbbaVideo</h1>
             </div>
             <div class="content">
               <h2>Olá, ${name || "Cliente"}!</h2>
