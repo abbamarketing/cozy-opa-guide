@@ -351,7 +351,7 @@ const PrivacyPolicy = () => (
     </header>
 
     <Section title="1. Introdução">
-      <p>Esta Política de Privacidade descreve como o VideoFlow ("nós", "nosso") coleta, utiliza, armazena e protege os dados pessoais dos usuários da Plataforma, em conformidade com a Lei Geral de Proteção de Dados (LGPD – Lei nº 13.709/2018).</p>
+      <p>Esta Política de Privacidade descreve como o AbbaVideo ("nós", "nosso") coleta, utiliza, armazena e protege os dados pessoais dos usuários da Plataforma, em conformidade com a Lei Geral de Proteção de Dados (LGPD – Lei nº 13.709/2018).</p>
     </Section>
 
     <Section title="2. Dados Coletados">
