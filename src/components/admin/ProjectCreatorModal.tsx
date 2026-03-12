@@ -439,6 +439,26 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
               <p className="text-xs text-muted-foreground">
                 O cliente terá <span className="text-primary font-semibold">1 captação presencial por mês</span> com agendamento completo (data, horário e local).
               </p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label>Antecedência mínima para agendamento</Label>
+                  <span className="font-mono-code text-sm text-primary">{values.capture_lead_days} dias</span>
+                </div>
+                <Controller
+                  name="capture_lead_days"
+                  control={control}
+                  render={({ field }) => (
+                    <Slider
+                      min={1} max={90} step={1}
+                      value={[field.value]}
+                      onValueChange={([v]) => field.onChange(v)}
+                    />
+                  )}
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  O cliente só poderá agendar captações com pelo menos {values.capture_lead_days} dias de antecedência.
+                </p>
+              </div>
             </section>
           )}
 
