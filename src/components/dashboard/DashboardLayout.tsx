@@ -273,12 +273,14 @@ const DashboardLayout = () => {
   const mainContent = (
     <>
       <ContextualTour ready={tourReady} />
-      <DashboardHeader />
 
-      <div className="flex flex-1 overflow-hidden relative">
-        {!isMobile && (
-          <DashboardSidebar activeTab={activeTab} setActiveTab={setActiveTab} navItems={navItems} />
-        )}
+      {/* Desktop: sidebar + content side-by-side */}
+      {!isMobile && (
+        <DashboardSidebar activeTab={activeTab} setActiveTab={setActiveTab} navItems={navItems} />
+      )}
+
+      <div className="flex-1 flex flex-col min-h-screen">
+        <DashboardHeader />
 
         <main className={`flex-1 overflow-y-auto p-3 md:p-6 space-y-4 ${isMobile ? 'pb-20' : ''}`}>
           {/* Quota Card */}
@@ -308,7 +310,7 @@ const DashboardLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full flex-col bg-background border-0 [--header-height:3rem] md:[--header-height:3.5rem]">{mainContent}</div>
+      <div className="flex min-h-screen w-full bg-background">{mainContent}</div>
     </SidebarProvider>
   );
 };
