@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
+import ScriptGenerator from '@/components/dashboard/ScriptGenerator';
+import SettingsComponent from '@/components/dashboard/Settings';
 import NotificationBell from '@/components/shared/NotificationBell';
 import ContextualTour, { restartTour } from '@/components/dashboard/ContextualTour';
 import { useNavigate } from 'react-router-dom';
