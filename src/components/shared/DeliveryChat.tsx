@@ -111,8 +111,8 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
     }
 
     const { error } = await supabase
-      .from('delivery_messages' as any)
-      .insert(payload as any);
+      .from('delivery_messages')
+      .insert(payload);
 
     if (!error) {
       setNewMessage('');
