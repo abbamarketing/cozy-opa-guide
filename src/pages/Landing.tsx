@@ -741,16 +741,19 @@ const Landing = () => {
         <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
           <div className="rounded-2xl border border-primary/20 bg-primary/5 p-8 sm:p-12">
             <h2 className="text-2xl sm:text-3xl font-bold mb-3">
-              Pronto para profissionalizar seu conteúdo?
+              Seu próximo vídeo pode ser o melhor que você já publicou.
             </h2>
             <p className="text-muted-foreground font-body mb-6 max-w-lg mx-auto">
-              Entre em contato para montar um plano personalizado.
+              Enquanto você cria, a gente edita. Plano sob medida, editor dedicado e zero dor de cabeça. Fale com a gente — o orçamento é grátis.
             </p>
-            <a href="https://wa.me/5500000000000" target="_blank" rel="noopener noreferrer">
-              <Button size="lg" className="gap-2 px-10">
-                <Mail className="h-4 w-4" /> Fale Conosco
-              </Button>
-            </a>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a href="https://wa.me/5500000000000" target="_blank" rel="noopener noreferrer">
+                <Button size="lg" className="gap-2 px-10">
+                  <Mail className="h-4 w-4" /> Quero um Orçamento Grátis
+                </Button>
+              </a>
+              <p className="text-[10px] text-muted-foreground font-body">Resposta em até 2 horas úteis</p>
+            </div>
           </div>
         </div>
       </section>
