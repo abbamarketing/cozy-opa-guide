@@ -3,6 +3,7 @@ import { Play, LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, S
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import AdminOverview from '@/components/admin/AdminOverview';
+import ClientAssignment from '@/components/admin/ClientAssignment';
 import AdminClients from '@/components/admin/AdminClients';
 import AdminDeliveries from '@/components/admin/AdminDeliveries';
 import EditorManagement from '@/components/admin/EditorManagement';
@@ -63,7 +64,12 @@ const Admin = () => {
         </div>
 
         {activeTab === 'overview' && <AdminOverview />}
-        {activeTab === 'clientes' && <AdminClients />}
+        {activeTab === 'clientes' && (
+          <div className="space-y-10">
+            <ClientAssignment />
+            <AdminClients />
+          </div>
+        )}
         {activeTab === 'entregas' && <AdminDeliveries />}
         {activeTab === 'editores' && <EditorManagement />}
         {activeTab === 'metricas' && <AdminMetrics />}
