@@ -8,7 +8,9 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, BarChart, Bar,
 } from 'recharts';
-import { DollarSign, Users, Video, Clock, TrendingUp, TrendingDown } from 'lucide-react';
+import { DollarSign, Users, Video, Clock, TrendingUp, TrendingDown, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { downloadCSV } from '@/lib/csv';
 
 const COLORS = ['hsl(142, 72%, 73%)', 'hsl(200, 80%, 60%)', 'hsl(45, 93%, 47%)', 'hsl(280, 70%, 60%)'];
 
