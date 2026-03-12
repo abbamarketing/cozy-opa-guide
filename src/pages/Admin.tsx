@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { Play, LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, Settings } from 'lucide-react';
+import { Play, LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, BookOpen } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import AdminOverview from '@/components/admin/AdminOverview';
@@ -10,6 +10,7 @@ import EditorManagement from '@/components/admin/EditorManagement';
 import AdminMetrics from '@/components/admin/AdminMetrics';
 import ProjectManager from '@/components/admin/ProjectManager';
 import LogViewer from '@/components/admin/LogViewer';
+import AdminDocs from '@/components/admin/AdminDocs';
 
 const TABS = [
   { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard },
@@ -19,6 +20,7 @@ const TABS = [
   { id: 'metricas', label: 'Métricas', icon: BarChart3 },
   { id: 'projetos', label: 'Projetos', icon: FolderKanban },
   { id: 'logs', label: 'Logs', icon: ScrollText },
+  { id: 'docs', label: 'Docs', icon: BookOpen },
 ];
 
 const Admin = () => {
@@ -75,6 +77,7 @@ const Admin = () => {
         {activeTab === 'metricas' && <AdminMetrics />}
         {activeTab === 'projetos' && <ProjectManager />}
         {activeTab === 'logs' && <LogViewer />}
+        {activeTab === 'docs' && <AdminDocs />}
       </div>
     </div>
   );
