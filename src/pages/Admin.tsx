@@ -1,7 +1,10 @@
 import { useSearchParams } from 'react-router-dom';
-import { Play, LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, BookOpen } from 'lucide-react';
+import { Play, LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, BookOpen, Menu } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useState } from 'react';
 import AdminOverview from '@/components/admin/AdminOverview';
 import ClientAssignment from '@/components/admin/ClientAssignment';
 import AdminClients from '@/components/admin/AdminClients';
@@ -11,6 +14,7 @@ import AdminMetrics from '@/components/admin/AdminMetrics';
 import ProjectManager from '@/components/admin/ProjectManager';
 import LogViewer from '@/components/admin/LogViewer';
 import AdminDocs from '@/components/admin/AdminDocs';
+import NotificationBell from '@/components/shared/NotificationBell';
 
 const TABS = [
   { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard },
@@ -27,57 +31,122 @@ const Admin = () => {
   const { signOut } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'overview';
+  const isMobile = useIsMobile();
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const setTab = (tab: string) => setSearchParams({ tab });
+  const setTab = (tab: string) => {
+    setSearchParams({ tab });
+    setMenuOpen(false);
+  };
+
+  const activeTabConfig = TABS.find((t) => t.id === activeTab) || TABS[0];
+  const ActiveIcon = activeTabConfig.icon;
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'overview': return <AdminOverview />;
+      case 'clientes': return <div className="space-y-10"><ClientAssignment /><AdminClients /></div>;
+      case 'entregas': return <AdminDeliveries />;
+      case 'editores': return <EditorManagement />;
+      case 'metricas': return <AdminMetrics />;
+      case 'projetos': return <ProjectManager />;
+      case 'logs': return <LogViewer />;
+      case 'docs': return <AdminDocs />;
+      default: return <AdminOverview />;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 glass border-b border-border/50">
-        <div className="container mx-auto flex h-14 items-center justify-between px-6">
+        <div className="flex h-14 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-2">
+            {isMobile && (
+              <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 md:hidden">
+                    <Menu className="h-4 w-4" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-64 p-0">
+                  <div className="flex items-center gap-2 border-b border-border/50 px-4 py-4">
+                    <div className="h-7 w-7 rounded-lg gradient-neon flex items-center justify-center">
+                      <Play className="h-3.5 w-3.5 text-primary-foreground" />
+                    </div>
+                    <span className="text-sm font-bold">
+                      Abba<span className="text-primary">Video</span>
+                    </span>
+                    <span className="text-[10px] text-muted-foreground font-mono">Admin</span>
+                  </div>
+                  <nav className="flex flex-col gap-0.5 p-2">
+                    {TABS.map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setTab(tab.id)}
+                        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                          activeTab === tab.id
+                            ? 'bg-primary/10 text-primary'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                        }`}
+                      >
+                        <tab.icon className="h-4 w-4" />
+                        {tab.label}
+                      </button>
+                    ))}
+                  </nav>
+                  <div className="absolute bottom-0 left-0 right-0 border-t border-border/50 p-3">
+                    <Button variant="ghost" size="sm" onClick={signOut} className="w-full justify-start text-destructive">
+                      Sair
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
             <div className="h-8 w-8 rounded-lg gradient-neon flex items-center justify-center">
               <Play className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="text-lg font-bold">
+            <span className="text-lg font-bold hidden md:inline">
               Abba<span className="text-primary">Video</span>
             </span>
-            <span className="text-xs text-muted-foreground font-mono ml-1">Admin</span>
+            {isMobile && (
+              <div className="flex items-center gap-1.5 ml-1">
+                <ActiveIcon className="h-3.5 w-3.5 text-primary" />
+                <span className="text-sm font-medium text-foreground">{activeTabConfig.label}</span>
+              </div>
+            )}
+            <span className="text-xs text-muted-foreground font-mono ml-1 hidden md:inline">Admin</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={signOut}>Sair</Button>
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            <Button variant="ghost" size="sm" onClick={signOut} className="hidden md:flex">Sair</Button>
+          </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-6 py-6">
-        <div className="flex gap-1 mb-8 glass rounded-xl p-1 w-fit overflow-x-auto">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                activeTab === tab.id
-                  ? 'bg-primary text-primary-foreground neon-glow'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <tab.icon className="h-4 w-4" />
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {activeTab === 'overview' && <AdminOverview />}
-        {activeTab === 'clientes' && (
-          <div className="space-y-10">
-            <ClientAssignment />
-            <AdminClients />
+      {/* Desktop tabs */}
+      {!isMobile && (
+        <div className="container mx-auto px-6 pt-6">
+          <div className="flex gap-1 mb-6 glass rounded-xl p-1 w-fit overflow-x-auto">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? 'bg-primary text-primary-foreground neon-glow'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <tab.icon className="h-4 w-4" />
+                {tab.label}
+              </button>
+            ))}
           </div>
-        )}
-        {activeTab === 'entregas' && <AdminDeliveries />}
-        {activeTab === 'editores' && <EditorManagement />}
-        {activeTab === 'metricas' && <AdminMetrics />}
-        {activeTab === 'projetos' && <ProjectManager />}
-        {activeTab === 'logs' && <LogViewer />}
-        {activeTab === 'docs' && <AdminDocs />}
+        </div>
+      )}
+
+      <div className={`${isMobile ? 'px-4 py-4' : 'container mx-auto px-6 pb-6'}`}>
+        {renderContent()}
       </div>
     </div>
   );
