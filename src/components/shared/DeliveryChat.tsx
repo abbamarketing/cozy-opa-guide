@@ -37,7 +37,7 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
 
   const fetchMessages = useCallback(async () => {
     const { data } = await supabase
-      .from('delivery_messages' as any)
+      .from('delivery_messages')
       .select('*')
       .eq('delivery_id', deliveryId)
       .order('created_at', { ascending: true })
