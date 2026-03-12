@@ -308,7 +308,7 @@ const DashboardLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full flex-col bg-background">{mainContent}</div>
+      <div className="flex min-h-screen w-full flex-col bg-background border-0">{mainContent}</div>
     </SidebarProvider>
   );
 };
