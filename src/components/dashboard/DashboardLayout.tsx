@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
+import DeliveryHistory from '@/components/dashboard/DeliveryHistory';
 import ScriptGenerator from '@/components/dashboard/ScriptGenerator';
 import SettingsComponent from '@/components/dashboard/Settings';
 import NotificationBell from '@/components/shared/NotificationBell';
@@ -17,6 +18,7 @@ import {
   LogOut,
   ChevronDown,
   Menu,
+  CheckCircle2,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { useProfile } from '@/hooks/useProfile';
@@ -46,7 +48,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import QuotaCard from '@/components/dashboard/QuotaCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-type DashboardTab = 'deliveries' | 'calendar' | 'scripts' | 'settings';
+type DashboardTab = 'deliveries' | 'calendar' | 'history' | 'scripts' | 'settings';
 
 interface NavItem {
   id: DashboardTab;
@@ -210,6 +212,7 @@ const DashboardLayout = () => {
   const navItems: NavItem[] = [
     { id: 'deliveries', label: 'Minhas Entregas', icon: Video },
     { id: 'calendar', label: 'Calendário', icon: Calendar },
+    { id: 'history', label: 'Histórico', icon: CheckCircle2 },
     ...(userProject?.custom_project?.include_script
       ? [{ id: 'scripts' as DashboardTab, label: 'Roteiros', icon: FileText }]
       : []),
@@ -234,6 +237,8 @@ const DashboardLayout = () => {
             <p className="text-muted-foreground">Nenhum projeto ativo</p>
           </div>
         );
+      case 'history':
+        return <DeliveryHistory />;
       case 'scripts':
         return <ScriptGenerator />;
       case 'settings':
