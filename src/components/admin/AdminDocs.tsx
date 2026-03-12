@@ -297,9 +297,9 @@ const TermsOfUse = () => (
       <ul className="list-disc pl-6 space-y-1">
         <li>O cliente mantém todos os direitos sobre o conteúdo original enviado.</li>
         <li>O conteúdo entregue pelo editor é de propriedade do Cliente após aprovação.</li>
-        <li>O VideoFlow não reivindica propriedade sobre os vídeos editados ou brutos.</li>
+        <li>O AbbaVideo não reivindica propriedade sobre os vídeos editados ou brutos.</li>
         <li>O Cliente garante que possui os direitos sobre todo material enviado (brutos, logos, músicas).</li>
-        <li>O VideoFlow não se responsabiliza por violações de direitos autorais no material fornecido pelo Cliente.</li>
+        <li>O AbbaVideo não se responsabiliza por violações de direitos autorais no material fornecido pelo Cliente.</li>
       </ul>
     </Section>
 
