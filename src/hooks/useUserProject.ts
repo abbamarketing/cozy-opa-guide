@@ -14,6 +14,8 @@ export interface UserProjectData {
   thumbnails_approved: number;
   covers_reserved: number;
   covers_approved: number;
+  captures_reserved: number;
+  captures_approved: number;
   current_period_start: string;
   current_period_end: string;
   stripe_subscription_id: string | null;
@@ -28,6 +30,7 @@ export interface UserProjectData {
     include_covers: boolean;
     include_script: boolean;
     include_capture: boolean;
+    max_captures: number;
     monthly_value: number;
     payment_frequency: string;
     max_revisions: number;

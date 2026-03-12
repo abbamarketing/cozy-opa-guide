@@ -25,9 +25,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Youtube, Instagram, Image, FileImage, FileText, Camera, AlertTriangle } from 'lucide-react';
+import { Loader2, Youtube, Instagram, Image, FileImage, FileText, Camera, AlertTriangle, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import type { CustomProject } from '@/types/database';
+import SubtaskTemplateEditor, { type SubtaskTemplate } from './SubtaskTemplateEditor';
 
 const projectSchema = z.object({
   project_name: z.string().trim().min(1, 'Nome é obrigatório').max(100),
@@ -69,6 +70,7 @@ const FREQ_LABELS: Record<string, string> = {
 const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCount }: Props) => {
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
+  const [subtaskTemplates, setSubtaskTemplates] = useState<SubtaskTemplate[]>([]);
   const isEditing = editingProject && editingProject.id !== '';
 
   const {
@@ -115,10 +117,50 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
         max_revisions: editingProject.max_revisions,
         deadline: editingProject.deadline,
       });
+      // Load existing subtask templates
+      supabase
+        .from('project_subtask_templates')
+        .select('*')
+        .eq('custom_project_id', editingProject.id)
+        .order('sort_order')
+        .then(({ data }) => {
+          if (data) {
+            setSubtaskTemplates(data.map((t: any) => ({
+              id: t.id,
+              name: t.name,
+              delivery_types: t.delivery_types || [],
+              sort_order: t.sort_order,
+              requires_approval: t.requires_approval,
+              is_active: t.is_active,
+            })));
+          }
+        });
     } else if (open) {
       reset();
+      setSubtaskTemplates([]);
     }
   }, [open, editingProject, reset]);
+
+  const saveSubtaskTemplates = async (projectId: string) => {
+    // Delete existing templates for this project
+    await supabase
+      .from('project_subtask_templates')
+      .delete()
+      .eq('custom_project_id', projectId);
+
+    // Insert new templates
+    if (subtaskTemplates.length > 0) {
+      const inserts = subtaskTemplates.map((t, i) => ({
+        custom_project_id: projectId,
+        name: t.name,
+        delivery_types: t.delivery_types,
+        sort_order: i,
+        requires_approval: t.requires_approval,
+        is_active: t.is_active,
+      }));
+      await supabase.from('project_subtask_templates').insert(inserts as any);
+    }
+  };
 
   const onSubmit = async (data: ProjectFormData) => {
     if (!user) return;
@@ -131,6 +173,8 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
     };
 
     let error;
+    let projectId = editingProject?.id;
+
     if (isEditing) {
       const { created_by, ...updatePayload } = payload;
       ({ error } = await supabase
@@ -138,19 +182,35 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
         .update(updatePayload as any)
         .eq('id', editingProject!.id));
     } else {
-      ({ error } = await supabase
+      const { data: inserted, error: insertError } = await supabase
         .from('custom_projects')
-        .insert(payload as any));
+        .insert(payload as any)
+        .select('id')
+        .single();
+      error = insertError;
+      if (inserted) projectId = inserted.id;
     }
 
     if (error) {
       toast.error('Erro ao salvar projeto', { description: error.message });
     } else {
+      // Save subtask templates
+      if (projectId) {
+        await saveSubtaskTemplates(projectId);
+      }
       toast.success(isEditing ? 'Projeto atualizado!' : 'Projeto criado!');
       onSaved();
     }
     setSaving(false);
   };
+
+  // Available delivery types for subtask editor
+  const availableDeliveryTypes = [
+    ...(values.youtube_videos > 0 ? [{ value: 'youtube_video', label: 'YouTube' }] : []),
+    ...(values.instagram_videos > 0 ? [{ value: 'instagram_video', label: 'Instagram' }] : []),
+    ...(values.include_thumbnails ? [{ value: 'thumbnail', label: 'Thumbnail' }] : []),
+    ...(values.include_covers ? [{ value: 'cover', label: 'Capa' }] : []),
+  ];
 
   // Deliverables count for preview
   const deliverableCount = [
@@ -366,7 +426,29 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
             </div>
           </section>
 
-          {/* D) Preview */}
+          {/* D) Captação info */}
+          {values.include_capture && (
+            <section className="space-y-3 rounded-lg border border-border/50 bg-secondary/30 p-4">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                Captação Presencial
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                O cliente terá <span className="text-primary font-semibold">1 captação presencial por mês</span> com agendamento completo (data, horário e local).
+              </p>
+            </section>
+          )}
+
+          {/* E) Subtask Templates */}
+          {availableDeliveryTypes.length > 0 && (
+            <SubtaskTemplateEditor
+              templates={subtaskTemplates}
+              onChange={setSubtaskTemplates}
+              availableTypes={availableDeliveryTypes}
+            />
+          )}
+
+          {/* F) Preview */}
           <section className="space-y-3">
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Preview do Projeto</h3>
             <div className="glass rounded-xl p-5 border border-primary/20">
@@ -388,12 +470,13 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
                 {values.include_thumbnails && <Badge variant="secondary"><Image className="h-3 w-3 mr-1" />Thumbnails</Badge>}
                 {values.include_covers && <Badge variant="secondary"><FileImage className="h-3 w-3 mr-1" />Capas</Badge>}
                 {values.include_script && <Badge variant="secondary"><FileText className="h-3 w-3 mr-1" />Roteiro IA</Badge>}
-                {values.include_capture && <Badge variant="secondary"><Camera className="h-3 w-3 mr-1" />Captação</Badge>}
+                {values.include_capture && <Badge variant="secondary"><Camera className="h-3 w-3 mr-1" />1 Captação/mês</Badge>}
               </div>
-              <div className="flex gap-4 text-xs text-muted-foreground">
+              <div className="flex gap-4 text-xs text-muted-foreground flex-wrap">
                 <span>SLA: {values.deadline}</span>
                 <span>Revisões: {values.max_revisions}</span>
                 <span>{FREQ_LABELS[values.payment_frequency]}</span>
+                {subtaskTemplates.length > 0 && <span>{subtaskTemplates.length} subtask(s)</span>}
               </div>
             </div>
           </section>

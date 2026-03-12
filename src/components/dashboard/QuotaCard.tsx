@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Video, Camera, Image, Layers, ChevronDown, ChevronUp } from 'lucide-react';
+import { Video, Camera, Image, Layers, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -90,6 +90,15 @@ const QuotaCard = ({ userProject }: QuotaCardProps) => {
       icon: <Layers className="h-3.5 w-3.5 text-muted-foreground" />,
       used: userProject.covers_reserved + userProject.covers_approved,
       total: project.instagram_videos,
+    });
+  }
+
+  if (project.include_capture) {
+    quotas.push({
+      label: 'Captação',
+      icon: <MapPin className="h-3.5 w-3.5 text-primary" />,
+      used: (userProject.captures_reserved || 0) + (userProject.captures_approved || 0),
+      total: project.max_captures || 1,
     });
   }
 
