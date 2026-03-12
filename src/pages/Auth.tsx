@@ -112,7 +112,10 @@ const AuthPage = () => {
           </Button>
 
           <p className="text-[10px] text-muted-foreground">
-            Ao entrar, você concorda com nossos termos de uso e política de privacidade.
+            Ao entrar, você concorda com nossos{' '}
+            <a href="/terms" className="underline hover:text-foreground transition-colors">termos de uso</a>{' '}
+            e{' '}
+            <a href="/privacy" className="underline hover:text-foreground transition-colors">política de privacidade</a>.
           </p>
         </div>
       </motion.div>
