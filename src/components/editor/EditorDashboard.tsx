@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { format, differenceInHours } from 'date-fns';
+import { format } from 'date-fns';
+import { remainingBusinessMinutes, formatBusinessCountdown } from '@/lib/business-hours';
 import { ptBR } from 'date-fns/locale';
 import {
   Play,
