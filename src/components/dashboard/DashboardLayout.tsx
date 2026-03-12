@@ -48,7 +48,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import QuotaCard from '@/components/dashboard/QuotaCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-type DashboardTab = 'deliveries' | 'calendar' | 'scripts' | 'settings';
+type DashboardTab = 'deliveries' | 'calendar' | 'history' | 'scripts' | 'settings';
 
 interface NavItem {
   id: DashboardTab;
