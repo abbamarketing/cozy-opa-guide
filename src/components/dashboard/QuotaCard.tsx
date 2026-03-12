@@ -93,6 +93,15 @@ const QuotaCard = ({ userProject }: QuotaCardProps) => {
     });
   }
 
+  if (project.include_capture) {
+    quotas.push({
+      label: 'Captação',
+      icon: <MapPin className="h-3.5 w-3.5 text-primary" />,
+      used: (userProject.captures_reserved || 0) + (userProject.captures_approved || 0),
+      total: project.max_captures || 1,
+    });
+  }
+
   // On mobile, show compact version with expand toggle
   const showDetails = !isMobile || expanded;
 

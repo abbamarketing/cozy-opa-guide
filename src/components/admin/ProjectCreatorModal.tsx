@@ -470,12 +470,13 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
                 {values.include_thumbnails && <Badge variant="secondary"><Image className="h-3 w-3 mr-1" />Thumbnails</Badge>}
                 {values.include_covers && <Badge variant="secondary"><FileImage className="h-3 w-3 mr-1" />Capas</Badge>}
                 {values.include_script && <Badge variant="secondary"><FileText className="h-3 w-3 mr-1" />Roteiro IA</Badge>}
-                {values.include_capture && <Badge variant="secondary"><Camera className="h-3 w-3 mr-1" />Captação</Badge>}
+                {values.include_capture && <Badge variant="secondary"><Camera className="h-3 w-3 mr-1" />1 Captação/mês</Badge>}
               </div>
-              <div className="flex gap-4 text-xs text-muted-foreground">
+              <div className="flex gap-4 text-xs text-muted-foreground flex-wrap">
                 <span>SLA: {values.deadline}</span>
                 <span>Revisões: {values.max_revisions}</span>
                 <span>{FREQ_LABELS[values.payment_frequency]}</span>
+                {subtaskTemplates.length > 0 && <span>{subtaskTemplates.length} subtask(s)</span>}
               </div>
             </div>
           </section>
