@@ -45,6 +45,7 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import EditorBriefingModal from '@/components/editor/EditorBriefingModal';
 import NotificationBell from '@/components/shared/NotificationBell';
+import { logger } from '@/lib/logger';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 
 /* ─── Types ─── */
