@@ -275,7 +275,7 @@ const DashboardLayout = () => {
       <ContextualTour ready={tourReady} />
       <DashboardHeader />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {!isMobile && (
           <DashboardSidebar activeTab={activeTab} setActiveTab={setActiveTab} navItems={navItems} />
         )}
