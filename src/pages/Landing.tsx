@@ -658,7 +658,7 @@ const Landing = () => {
                 Conheça a <span className="text-primary">Olívia</span>
               </h2>
               <p className="text-muted-foreground font-body text-sm mb-4">
-                Suporte inteligente 24/7 — esperta, direta e disponível direto na plataforma.
+                Dúvida sobre cotas? Precisa de ajuda com o briefing? A Olívia resolve em segundos — sem esperar atendimento humano.
               </p>
 
               <div className="rounded-2xl border border-border/40 bg-card/60 overflow-hidden shadow-xl">
