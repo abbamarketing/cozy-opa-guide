@@ -427,8 +427,8 @@ const PrivacyPolicy = () => (
     <Section title="10. Contato">
       <p>Para dúvidas sobre esta Política ou sobre o tratamento dos seus dados, entre em contato:</p>
       <ul className="list-disc pl-6 space-y-1">
-        <li><strong>Email:</strong> privacidade@videoflow.com.br</li>
-        <li><strong>Encarregado (DPO):</strong> dpo@videoflow.com.br</li>
+        <li><strong>Email:</strong> abbaestrategias@gmail.com</li>
+        <li><strong>Encarregado (DPO):</strong> abbaestrategias@gmail.com</li>
       </ul>
     </Section>
   </article>

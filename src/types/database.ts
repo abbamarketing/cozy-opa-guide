@@ -1,5 +1,5 @@
 // =============================================
-// Custom TypeScript types for VideoFlow v5.0
+// Custom TypeScript types for AbbaVideo
 // These complement the auto-generated Supabase types
 // =============================================
 
