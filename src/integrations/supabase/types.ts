@@ -339,6 +339,36 @@ export type Database = {
           },
         ]
       }
+      system_logs: {
+        Row: {
+          context: Json | null
+          created_at: string
+          id: string
+          level: string
+          message: string
+          source: string | null
+          user_id: string | null
+        }
+        Insert: {
+          context?: Json | null
+          created_at?: string
+          id?: string
+          level?: string
+          message: string
+          source?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          context?: Json | null
+          created_at?: string
+          id?: string
+          level?: string
+          message?: string
+          source?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           id: string

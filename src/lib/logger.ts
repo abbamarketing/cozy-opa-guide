@@ -1,0 +1,79 @@
+import { supabase } from '@/integrations/supabase/client';
+
+type LogLevel = 'info' | 'warn' | 'error' | 'debug';
+
+interface LogEntry {
+  level: LogLevel;
+  message: string;
+  context?: Record<string, unknown>;
+  source?: string;
+}
+
+const LOG_BATCH_SIZE = 100;
+let logBuffer: LogEntry[] = [];
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+
+async function flushLogs() {
+  if (logBuffer.length === 0) return;
+
+  const batch = logBuffer.splice(0, LOG_BATCH_SIZE);
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const rows = batch.map((entry) => ({
+    level: entry.level,
+    message: entry.message,
+    context: entry.context || {},
+    source: entry.source || 'app',
+    user_id: user?.id || null,
+  }));
+
+  const { error } = await supabase.from('system_logs' as any).insert(rows);
+  if (error) {
+    console.error('[Logger] Failed to flush logs:', error.message);
+  }
+
+  // If there are remaining logs, schedule another flush
+  if (logBuffer.length > 0) {
+    scheduleFlush();
+  }
+}
+
+function scheduleFlush() {
+  if (flushTimer) return;
+  flushTimer = setTimeout(() => {
+    flushTimer = null;
+    flushLogs();
+  }, 5000); // Flush every 5 seconds
+}
+
+function addLog(entry: LogEntry) {
+  logBuffer.push(entry);
+  if (logBuffer.length >= LOG_BATCH_SIZE) {
+    flushLogs();
+  } else {
+    scheduleFlush();
+  }
+}
+
+export const logger = {
+  info: (message: string, context?: Record<string, unknown>, source?: string) =>
+    addLog({ level: 'info', message, context, source }),
+
+  warn: (message: string, context?: Record<string, unknown>, source?: string) =>
+    addLog({ level: 'warn', message, context, source }),
+
+  error: (message: string, context?: Record<string, unknown>, source?: string) =>
+    addLog({ level: 'error', message, context, source }),
+
+  debug: (message: string, context?: Record<string, unknown>, source?: string) =>
+    addLog({ level: 'debug', message, context, source }),
+
+  flush: flushLogs,
+};
+
+// Flush on page unload
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', () => {
+    flushLogs();
+  });
+}
