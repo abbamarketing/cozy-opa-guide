@@ -706,7 +706,7 @@ const Landing = () => {
                   </div>
                   <div className="flex justify-start">
                     <div className="max-w-[85%] rounded-xl rounded-bl-sm bg-muted/60 px-3 py-2 text-[10px] text-card-foreground leading-relaxed">
-                      Você usou <strong>3 de 6</strong> vídeos YouTube e <strong>5 de 8</strong> Reels. Ainda tem crédito! 📊
+                      Você usou <strong>3 de 6</strong> vídeos YouTube e <strong>5 de 8</strong> Reels. Ainda tem crédito!
                     </div>
                   </div>
                 </div>
