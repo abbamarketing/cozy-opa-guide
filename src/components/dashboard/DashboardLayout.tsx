@@ -221,17 +221,17 @@ const DashboardLayout = () => {
   const { userProject, isLoading } = useUserProject();
   const isMobile = useIsMobile();
 
-  // Redirect to root if no project (root handles WaitingForProject)
-  if (!isLoading && !userProject) {
-    return <Navigate to="/" replace />;
-  }
-
   // Sync tab from URL
   useEffect(() => {
     if (tabFromUrl && ['deliveries', 'calendar', 'history', 'scripts', 'settings'].includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl]);
+
+  // Redirect to root if no project (root handles WaitingForProject)
+  if (!isLoading && !userProject) {
+    return <Navigate to="/" replace />;
+  }
 
   const navItems: NavItem[] = [
     { id: 'deliveries', label: 'Minhas Entregas', shortLabel: 'ENTREGAS', icon: Video },
