@@ -155,6 +155,41 @@ export type Database = {
           },
         ]
       }
+      delivery_revisions: {
+        Row: {
+          created_at: string
+          delivery_id: string
+          id: string
+          notes: string
+          requested_by: string
+          timestamp_marker: string | null
+        }
+        Insert: {
+          created_at?: string
+          delivery_id: string
+          id?: string
+          notes: string
+          requested_by: string
+          timestamp_marker?: string | null
+        }
+        Update: {
+          created_at?: string
+          delivery_id?: string
+          id?: string
+          notes?: string
+          requested_by?: string
+          timestamp_marker?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_revisions_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "deliveries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       editors: {
         Row: {
           active_projects: number
