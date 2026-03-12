@@ -16,15 +16,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
 
 interface KPIs {
   activeClients: number;
