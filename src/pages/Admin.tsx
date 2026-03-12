@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Play, LayoutDashboard, FolderKanban, Users, Settings } from 'lucide-react';
+import ClientAssignment from '@/components/admin/ClientAssignment';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import ProjectManager from '@/components/admin/ProjectManager';
@@ -66,12 +67,7 @@ const Admin = () => {
             <p className="text-muted-foreground">Selecione uma aba para começar.</p>
           </div>
         )}
-        {activeTab === 'clientes' && (
-          <div className="glass rounded-2xl p-12 text-center">
-            <h1 className="text-2xl font-bold mb-4">Clientes</h1>
-            <p className="text-muted-foreground">Em construção.</p>
-          </div>
-        )}
+        {activeTab === 'clientes' && <ClientAssignment />}
         {activeTab === 'config' && (
           <div className="glass rounded-2xl p-12 text-center">
             <h1 className="text-2xl font-bold mb-4">Configurações</h1>

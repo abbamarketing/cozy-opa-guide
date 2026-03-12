@@ -270,6 +270,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          assigned_project_id: string | null
           avatar_url: string | null
           company: string | null
           created_at: string
@@ -282,6 +283,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assigned_project_id?: string | null
           avatar_url?: string | null
           company?: string | null
           created_at?: string
@@ -294,6 +296,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assigned_project_id?: string | null
           avatar_url?: string | null
           company?: string | null
           created_at?: string
@@ -305,7 +308,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_assigned_project_id_fkey"
+            columns: ["assigned_project_id"]
+            isOneToOne: false
+            referencedRelation: "custom_projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       system_settings: {
         Row: {
