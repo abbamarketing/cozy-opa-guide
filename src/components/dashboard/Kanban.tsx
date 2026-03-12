@@ -64,7 +64,14 @@ const Kanban = ({ userProject }: KanbanProps) => {
           revision_count: d.revision_count,
           max_revisions: d.max_revisions,
           file_url: d.file_url,
+          thumbnail_url: d.thumbnail_url,
           editor_name: d.editor?.display_name || null,
+          editor_id: d.editor_id,
+          created_at: d.created_at,
+          delivered_at: d.delivered_at,
+          approved_at: d.approved_at,
+          revision_notes: d.revision_notes,
+          user_project_id: d.user_project_id,
         })),
       );
     }
