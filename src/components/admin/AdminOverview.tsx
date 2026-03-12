@@ -208,17 +208,17 @@ const AdminOverview = () => {
         ) : (
           <div className="space-y-2">
             {urgentDeliveries.map((d) => {
-              const h = differenceInHours(new Date(d.due_date), new Date());
+              const bizMin = remainingBusinessMinutes(new Date(d.due_date));
               return (
-                <div key={d.id} className="flex items-center justify-between gap-2 rounded-lg bg-muted/20 px-3 py-2">
+                <div key={d.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 rounded-lg bg-muted/20 px-3 py-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="text-sm font-medium text-card-foreground truncate">{d.title}</span>
                     <Badge variant="outline" className="text-[10px] shrink-0">
                       {{ youtube_video: 'YouTube', instagram_video: 'Instagram', thumbnail: 'Thumbnail', cover: 'Capa' }[d.delivery_type] || d.delivery_type}
                     </Badge>
                   </div>
-                  <span className={`text-xs font-medium shrink-0 ${h < 0 ? 'text-destructive' : 'text-[hsl(45,93%,47%)]'}`}>
-                    {h < 0 ? 'Atrasado' : `${h}h restantes`}
+                  <span className={`text-xs font-medium shrink-0 ${bizMin < 0 ? 'text-destructive' : 'text-[hsl(45,93%,47%)]'}`}>
+                    {bizMin < 0 ? 'Atrasado' : formatBusinessCountdown(bizMin)}
                   </span>
                 </div>
               );
