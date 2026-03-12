@@ -95,7 +95,6 @@ const NewDeliveryModal = ({
   });
 
   const selectedType = form.watch('delivery_type');
-  const deadlineOption = form.watch('deadline_option');
   const isVideo = selectedType === 'youtube_video' || selectedType === 'instagram_video';
 
   // Build quota info
