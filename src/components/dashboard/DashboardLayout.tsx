@@ -212,6 +212,7 @@ const DashboardLayout = () => {
   const navItems: NavItem[] = [
     { id: 'deliveries', label: 'Minhas Entregas', icon: Video },
     { id: 'calendar', label: 'Calendário', icon: Calendar },
+    { id: 'history', label: 'Histórico', icon: CheckCircle2 },
     ...(userProject?.custom_project?.include_script
       ? [{ id: 'scripts' as DashboardTab, label: 'Roteiros', icon: FileText }]
       : []),
