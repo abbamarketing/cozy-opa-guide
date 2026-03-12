@@ -207,9 +207,11 @@ const DashboardLayout = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'deliveries':
-        return (
+        return userProject ? (
+          <Kanban userProject={userProject} />
+        ) : (
           <div className="glass rounded-2xl p-8 text-center">
-            <p className="text-muted-foreground">Minhas Entregas — em construção</p>
+            <p className="text-muted-foreground">Nenhum projeto ativo</p>
           </div>
         );
       case 'calendar':
