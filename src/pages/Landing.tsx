@@ -622,14 +622,14 @@ const Landing = () => {
             {/* How it works */}
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold mb-8">
-                Como <span className="text-primary">funciona</span>
+                Comece em <span className="text-primary">4 passos</span>
               </h2>
               <div className="space-y-4">
                 {[
-                  { step: '01', title: 'Plano personalizado', desc: 'Montamos sob medida para sua necessidade de conteúdo.' },
-                  { step: '02', title: 'Briefing de marca', desc: 'Preencha uma vez — cores, fontes, estilo e referências.' },
-                  { step: '03', title: 'Solicite entregas', desc: 'Vídeos, thumbnails e capas pelo Dashboard.' },
-                  { step: '04', title: 'Revise e aprove', desc: 'Acompanhe o SLA, peça revisões e aprove em tempo real.' },
+                  { step: '01', title: 'Monte seu plano', desc: 'Diga quantos vídeos, Reels, thumbs e capas precisa. Sem pacote fechado.' },
+                  { step: '02', title: 'Envie seu briefing', desc: 'Cores, fontes, estilo — preencha uma vez e seu editor já sabe tudo.' },
+                  { step: '03', title: 'Grave e envie', desc: 'Mande o bruto. Nós cuidamos de corte, legenda, música e entrega.' },
+                  { step: '04', title: 'Aprove e publique', desc: 'Revise, peça ajustes e aprove. Seu conteúdo pronto para bombar.' },
                 ].map((s, i) => (
                   <motion.div
                     key={s.step}
