@@ -34,6 +34,7 @@ import type { DeliveryData } from './DeliveryCard';
 import { typeConfig, statusConfig } from './DeliveryCard';
 import RevisionModal from './RevisionModal';
 import DeliveryChat from '@/components/shared/DeliveryChat';
+import SubtaskList from '@/components/shared/SubtaskList';
 
 interface DeliveryDetailModalProps {
   open: boolean;
@@ -194,6 +195,11 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
                   </div>
                 </div>
               </div>
+
+              <Separator className="bg-border/50" />
+
+              {/* Section: Subtasks */}
+              <SubtaskList deliveryId={delivery.id} role="client" />
 
               <Separator className="bg-border/50" />
 

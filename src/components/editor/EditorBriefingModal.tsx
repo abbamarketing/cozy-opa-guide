@@ -46,6 +46,7 @@ import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 import { typeConfig, statusConfig } from '@/components/dashboard/DeliveryCard';
 import FileUpload from '@/components/editor/FileUpload';
 import DeliveryChat from '@/components/shared/DeliveryChat';
+import SubtaskList from '@/components/shared/SubtaskList';
 
 interface EditorBriefingModalProps {
   open: boolean;
@@ -344,6 +345,10 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
                     <p className="text-sm text-card-foreground">{briefing.preferred_music_style}</p>
                   </div>
                 )}
+
+                {/* Subtasks */}
+                <Separator className="bg-border/50" />
+                <SubtaskList deliveryId={delivery.id} role="editor" />
               </TabsContent>
 
               {/* TAB 2: Marca */}

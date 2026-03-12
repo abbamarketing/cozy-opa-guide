@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Check, CheckCheck, Package, RefreshCw, Zap, Clock, UserPlus, MessageSquare, ThumbsUp } from 'lucide-react';
+import { Bell, Check, CheckCheck, Package, RefreshCw, Zap, Clock, UserPlus, MessageSquare, ThumbsUp, ListChecks, MapPin, Camera } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,12 @@ const typeIcons: Record<string, React.ReactNode> = {
   project_assigned: <UserPlus className="h-4 w-4 text-primary" />,
   client_approved: <ThumbsUp className="h-4 w-4 text-[hsl(142,76%,36%)]" />,
   delivery_approved: <ThumbsUp className="h-4 w-4 text-[hsl(142,76%,36%)]" />,
+  subtask_approved: <ListChecks className="h-4 w-4 text-[hsl(142,76%,36%)]" />,
+  subtask_completed: <ListChecks className="h-4 w-4 text-primary" />,
+  capture_scheduled: <Camera className="h-4 w-4 text-primary" />,
+  capture_confirmed: <MapPin className="h-4 w-4 text-[hsl(142,76%,36%)]" />,
+  capture_completed: <Camera className="h-4 w-4 text-[hsl(142,76%,36%)]" />,
+  capture_cancelled: <Camera className="h-4 w-4 text-destructive" />,
 };
 
 const INITIAL_POLL_INTERVAL = 5000; // 5s
