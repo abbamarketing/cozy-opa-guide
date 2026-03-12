@@ -150,7 +150,7 @@ const ProjectManager = () => {
         </div>
       ) : (
         /* Desktop: Table */
-        <div className="glass rounded-xl overflow-hidden">
+        <div className="glass rounded-xl overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="border-border/50">
