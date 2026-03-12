@@ -6,7 +6,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/lib/auth";
 import ProtectedRoute from "@/components/layout/ProtectedRoute";
-import RoleProtectedRoute from "@/components/layout/RoleProtectedRoute";
 import { Loader2 } from "lucide-react";
 
 // Lazy-loaded pages
@@ -51,23 +50,27 @@ const App = () => (
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/terms" element={<Terms />} />
 
-              {/* Protected routes (any authenticated user) */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/" element={<Index />} />
-                <Route path="/onboarding" element={<Onboarding />} />
-                <Route path="/onboarding/payment" element={<PaymentGate />} />
-                <Route path="/onboarding/payment-success" element={<PaymentSuccess />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-              </Route>
-
               {/* Admin only */}
-              <Route element={<RoleProtectedRoute allowedRoles={['admin']} />}>
+              <Route element={<ProtectedRoute requireRole="admin" />}>
                 <Route path="/admin" element={<Admin />} />
               </Route>
 
               {/* Editor only */}
-              <Route element={<RoleProtectedRoute allowedRoles={['editor', 'admin']} />}>
+              <Route element={<ProtectedRoute requireRole="editor" />}>
                 <Route path="/editor" element={<Editor />} />
+              </Route>
+
+              {/* Client routes */}
+              <Route element={<ProtectedRoute requireRole="client" />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/onboarding/payment" element={<PaymentGate />} />
+                <Route path="/onboarding/payment-success" element={<PaymentSuccess />} />
+              </Route>
+
+              {/* Any authenticated user */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<Index />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />

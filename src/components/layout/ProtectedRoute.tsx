@@ -1,19 +1,47 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '@/lib/auth';
-import { Loader2 } from 'lucide-react';
+import { Navigate, Outlet } from 'react-router-dom'
+import { useAuth } from '@/lib/auth'
+import { useRole } from '@/hooks/useRole'
 
-const ProtectedRoute = () => {
-  const { user, isLoading } = useAuth();
+type ProtectedRouteProps = {
+  requireRole?: 'admin' | 'editor' | 'client'
+}
 
-  if (isLoading) {
+export default function ProtectedRoute({ requireRole }: ProtectedRouteProps) {
+  const { user, isLoading: authLoading } = useAuth()
+  const { hasRole, loading: roleLoading } = useRole()
+
+  if (authLoading || roleLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-primary">Carregando...</div>
       </div>
-    );
+    )
   }
 
-  return user ? <Outlet /> : <Navigate to="/auth" replace />;
-};
+  if (!user) {
+    return <Navigate to="/auth" replace />
+  }
 
-export default ProtectedRoute;
+  if (requireRole && !hasRole(requireRole)) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-8">
+        <div className="glass p-8 rounded-lg max-w-md text-center">
+          <h1 className="text-2xl font-bold text-destructive mb-4">
+            Acesso Negado
+          </h1>
+          <p className="text-muted-foreground mb-6">
+            Você não tem permissão para acessar esta área.
+          </p>
+          <button
+            onClick={() => window.history.back()}
+            className="text-primary hover:underline"
+          >
+            Voltar
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return <Outlet />
+}
