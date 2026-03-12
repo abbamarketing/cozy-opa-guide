@@ -122,7 +122,7 @@ const PaymentSuccess = () => {
 
               <div className="space-y-2">
                 <h2 className="text-2xl font-bold text-foreground">
-                  ✨ Processando...
+                  Processando...
                 </h2>
                 <p className="text-muted-foreground">
                   Estamos confirmando seu pagamento. Isso leva apenas alguns segundos.

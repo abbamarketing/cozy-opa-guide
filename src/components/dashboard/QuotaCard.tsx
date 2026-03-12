@@ -146,7 +146,7 @@ const QuotaCard = ({ userProject }: QuotaCardProps) => {
               <Separator className="bg-border" />
               <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground">
                 <span>
-                  Periodo: {format(new Date(userProject.current_period_start), 'dd/MM', { locale: ptBR })} – {format(periodEnd, 'dd/MM', { locale: ptBR })}
+                  Período: {format(new Date(userProject.current_period_start), 'dd/MM', { locale: ptBR })} – {format(periodEnd, 'dd/MM', { locale: ptBR })}
                 </span>
               </div>
             </>

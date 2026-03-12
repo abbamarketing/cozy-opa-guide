@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, CreditCard, Lock, Loader2 } from 'lucide-react';
+import { ArrowLeft, CreditCard, Lock, Loader2, CheckCircle2 } from 'lucide-react';
 import { useUserProject } from '@/hooks/useUserProject';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -85,64 +85,64 @@ export default function PaymentGate() {
           {/* Resumo do Projeto */}
           <Card className="glass border-border/40">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">🎯 Seu Projeto</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-2xl">Seu Projeto</CardTitle>
               <CardDescription className="text-lg font-semibold text-foreground">
                 {project.project_name}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h3 className="mb-3 font-semibold">📦 O que está incluído:</h3>
+                <h3 className="mb-3 font-semibold">O que está incluído:</h3>
                 <ul className="space-y-2 text-sm">
                   {project.youtube_videos > 0 && (
                     <li className="flex items-center gap-2">
-                      <span className="text-primary">✅</span>
+                       <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                       {project.youtube_videos} vídeos YouTube/mês
                     </li>
                   )}
                   {project.instagram_videos > 0 && (
                     <li className="flex items-center gap-2">
-                      <span className="text-primary">✅</span>
+                       <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                       {project.instagram_videos} vídeos Instagram/mês
                     </li>
                   )}
                   {project.include_thumbnails && (
                     <li className="flex items-center gap-2">
-                      <span className="text-primary">✅</span>
+                       <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                       Thumbnails personalizadas
                     </li>
                   )}
                   {project.include_covers && (
                     <li className="flex items-center gap-2">
-                      <span className="text-primary">✅</span>
+                       <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                       Capas Instagram
                     </li>
                   )}
                   {project.include_script && (
                     <li className="flex items-center gap-2">
-                      <span className="text-primary">✅</span>
+                       <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                       Roteiros com IA
                     </li>
                   )}
                   {project.include_capture && (
                     <li className="flex items-center gap-2">
-                      <span className="text-primary">✅</span>
+                       <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                       Captação de vídeo
                     </li>
                   )}
                   <li className="flex items-center gap-2">
-                    <span className="text-primary">✅</span>
+                     <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                     Até {project.max_revisions} revisões por entrega
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-primary">✅</span>
+                    <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                     Entrega em {project.deadline}
                   </li>
                 </ul>
               </div>
 
               <div className="border-t border-border/50 pt-4">
-                <h3 className="mb-2 font-semibold">💰 Investimento</h3>
+                <h3 className="mb-2 font-semibold">Investimento</h3>
                 <div className="text-3xl font-bold text-primary">
                   R$ {Number(project.monthly_value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   <span className="text-sm text-muted-foreground">/mês</span>

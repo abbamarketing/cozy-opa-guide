@@ -341,7 +341,7 @@ const NewDeliveryModal = ({
                   <Label className="text-sm">Roteiro</Label>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">
-                      {aiScript ? '✨ IA' : '📝 Manual'}
+                      {aiScript ? 'IA' : 'Manual'}
                     </span>
                     <Switch checked={aiScript} onCheckedChange={setAiScript} />
                   </div>

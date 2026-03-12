@@ -370,9 +370,9 @@ const ClientAssignment = () => {
                 </div>
 
                 <div className="flex gap-6 text-sm">
-                  <p>💰 <span className="font-mono-code text-primary font-bold">R$ {Number(selectedProject.monthly_value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>/mês</p>
-                  <p>⚡ SLA: {selectedProject.deadline}</p>
-                  <p>🔄 Até {selectedProject.max_revisions} revisões</p>
+                  <p><span className="font-mono-code text-primary font-bold">R$ {Number(selectedProject.monthly_value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>/mês</p>
+                  <p>SLA: {selectedProject.deadline}</p>
+                  <p>Até {selectedProject.max_revisions} revisões</p>
                 </div>
               </div>
             )}
