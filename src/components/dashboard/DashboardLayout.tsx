@@ -239,9 +239,6 @@ const DashboardLayout = () => {
         );
       case 'history':
         return <DeliveryHistory />;
-          <div className="glass rounded-2xl p-8 text-center">
-            <p className="text-muted-foreground">Nenhum projeto ativo</p>
-          </div>
         );
       case 'scripts':
         return <ScriptGenerator />;
