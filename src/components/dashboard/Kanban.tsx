@@ -171,7 +171,6 @@ const Kanban = ({ userProject }: KanbanProps) => {
                 <Plus className="h-4 w-4" />
                 Nova Solicitação
               </Button>
-              </Button>
             </span>
           </TooltipTrigger>
           {!quotaAvailable && (
