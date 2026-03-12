@@ -555,9 +555,9 @@ const Landing = () => {
             {/* Context labels below demo */}
             <div className="grid grid-cols-3 gap-2 mt-4">
               {[
-                { tab: 'dashboard' as const, title: 'Dashboard do Cliente', desc: 'Cotas, Kanban e entregas em tempo real.' },
-                { tab: 'entrega' as const, title: 'Detalhe da Entrega', desc: 'SLA, revisões, chat e aprovação.' },
-                { tab: 'editor' as const, title: 'Painel do Editor', desc: 'Briefing, checklist e upload.' },
+                { tab: 'dashboard' as const, title: 'Seu Dashboard', desc: 'Veja cotas, acompanhe entregas e solicite novos vídeos em segundos.' },
+                { tab: 'entrega' as const, title: 'Revisão e Aprovação', desc: 'Peça ajustes com marcadores de tempo e aprove quando ficar perfeito.' },
+                { tab: 'editor' as const, title: 'Seu Editor Dedicado', desc: 'Ele já conhece sua marca, seus cortes e seu estilo.' },
               ].map((item) => (
                 <button
                   key={item.tab}
