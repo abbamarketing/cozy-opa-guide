@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.create-editor]
 verify_jwt = false
+
+[functions.support-chat]
+verify_jwt = false
