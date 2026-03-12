@@ -108,7 +108,7 @@ export default function PaymentGate() {
                   )}
                   {project.include_thumbnails && (
                     <li className="flex items-center gap-2">
-                      <span className="text-primary">✅</span>
+                       <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                       Thumbnails personalizadas
                     </li>
                   )}
