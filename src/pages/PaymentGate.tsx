@@ -142,7 +142,7 @@ export default function PaymentGate() {
               </div>
 
               <div className="border-t border-border/50 pt-4">
-                <h3 className="mb-2 font-semibold">💰 Investimento</h3>
+                <h3 className="mb-2 font-semibold">Investimento</h3>
                 <div className="text-3xl font-bold text-primary">
                   R$ {Number(project.monthly_value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   <span className="text-sm text-muted-foreground">/mês</span>

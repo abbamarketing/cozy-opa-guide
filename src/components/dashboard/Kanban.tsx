@@ -26,10 +26,10 @@ interface Column {
 }
 
 const COLUMNS: Column[] = [
-  { id: 'todo', title: 'A FAZER', statuses: ['pending'], description: 'Aguardando inicio' },
-  { id: 'production', title: 'PRODUCAO', statuses: ['in_progress', 'revision'], description: 'Editor trabalhando' },
-  { id: 'review', title: 'REVISAR', statuses: ['review'], description: 'Pronto para aprovacao' },
-  { id: 'done', title: 'CONCLUIDO', statuses: ['approved'], description: 'Aprovado e finalizado' },
+  { id: 'todo', title: 'A FAZER', statuses: ['pending'], description: 'Aguardando início' },
+  { id: 'production', title: 'PRODUÇÃO', statuses: ['in_progress', 'revision'], description: 'Editor trabalhando' },
+  { id: 'review', title: 'REVISAR', statuses: ['review'], description: 'Pronto para aprovação' },
+  { id: 'done', title: 'CONCLUÍDO', statuses: ['approved'], description: 'Aprovado e finalizado' },
 ];
 
 const PAGE_SIZE = 20;

@@ -125,7 +125,7 @@ const DeliveryCalendar = ({ userProject }: DeliveryCalendarProps) => {
         if (!showPendingOnly) {
           result.push({
             id: `completed-${d.id}`,
-            title: `✅ ${d.title}`,
+            title: d.title,
             date: new Date(d.approved_at),
             type: 'completed',
             delivery: d,
