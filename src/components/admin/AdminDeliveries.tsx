@@ -239,8 +239,8 @@ const AdminDeliveries = () => {
 
   if (loading) {
     return (
-      <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-4'} gap-3`}>
-        {(isMobile ? [1] : COLUMNS).map((_, i) => <Skeleton key={i} className="h-64 rounded-xl" />)}
+      <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 xl:grid-cols-4'} gap-3`}>
+        {(isMobile ? [1] : [1, 2, 3, 4]).map((_, i) => <Skeleton key={i} className="h-64 rounded-xl" />)}
       </div>
     );
   }
@@ -337,7 +337,7 @@ const AdminDeliveries = () => {
         </div>
       ) : (
         /* Desktop: 4-column Kanban */
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
           {COLUMNS.map((col) => {
             const items = filtered.filter((d) => col.statuses.includes(d.status));
             return (

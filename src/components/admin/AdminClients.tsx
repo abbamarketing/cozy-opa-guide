@@ -284,7 +284,7 @@ const AdminClients = () => {
         </div>
       ) : (
         /* Desktop: Table */
-        <Card className="glass border-border/40 overflow-hidden">
+        <Card className="glass border-border/40 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="border-border/50">

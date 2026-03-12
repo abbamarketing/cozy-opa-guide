@@ -365,13 +365,13 @@ const Kanban = ({ userProject }: KanbanProps) => {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
           {COLUMNS.map((c) => (
             <Skeleton key={c.id} className="h-64 rounded-lg" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-4 gap-3" data-tour="kanban-board">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3" data-tour="kanban-board">
           {COLUMNS.map((col) => {
             const allItems = getDeliveriesForColumn(col);
             const items = allItems.slice(0, visibleCount);
