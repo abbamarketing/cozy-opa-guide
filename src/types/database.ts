@@ -67,6 +67,8 @@ export interface UserProject {
   instagram_approved: number;
   thumbnails_approved: number;
   covers_approved: number;
+  captures_reserved: number;
+  captures_approved: number;
   current_period_start: string;
   current_period_end: string;
   assigned_at: string;
