@@ -148,7 +148,7 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
             <Play className="h-5 w-5 text-primary-foreground" />
           </div>
           <span className="text-2xl font-bold">
-            Video<span className="text-primary">Flow</span>
+            Abba<span className="text-primary">Video</span>
           </span>
         </div>
 

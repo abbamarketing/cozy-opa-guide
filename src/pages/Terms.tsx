@@ -27,7 +27,7 @@ const Terms = () => {
             <Play className="h-4 w-4 text-primary-foreground" />
           </div>
           <span className="text-lg font-bold">
-            Video<span className="text-primary">Flow</span>
+            Abba<span className="text-primary">Video</span>
           </span>
         </div>
         <div className="glass rounded-2xl p-8 md:p-12 space-y-8">

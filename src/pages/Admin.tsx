@@ -39,7 +39,7 @@ const Admin = () => {
               <Play className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="text-lg font-bold">
-              Video<span className="text-primary">Flow</span>
+              Abba<span className="text-primary">Video</span>
             </span>
             <span className="text-xs text-muted-foreground font-mono ml-1">Admin</span>
           </div>

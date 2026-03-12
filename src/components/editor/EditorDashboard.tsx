@@ -341,7 +341,7 @@ const EditorDashboard = () => {
               <Play className="h-3.5 w-3.5 text-primary-foreground" />
             </div>
             <span className="text-sm font-bold">
-              Video<span className="text-primary">Flow</span>
+              Abba<span className="text-primary">Video</span>
             </span>
             <Badge variant="secondary" className="text-xs">
               {pendingCount} pendente{pendingCount !== 1 ? 's' : ''}
