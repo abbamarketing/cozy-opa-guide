@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
 import NotificationBell from '@/components/shared/NotificationBell';
+import ContextualTour, { restartTour } from '@/components/dashboard/ContextualTour';
 import { useNavigate } from 'react-router-dom';
 import {
   Play,
@@ -84,9 +85,18 @@ const DashboardHeader = () => {
 
       <div className="flex items-center gap-1">
         <NotificationBell />
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-          <HelpCircle className="h-4 w-4" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+              <HelpCircle className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-44">
+            <DropdownMenuItem onClick={restartTour}>
+              Reiniciar Tour
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -239,8 +249,11 @@ const DashboardLayout = () => {
     }
   };
 
+  const tourReady = !isLoading && !!userProject;
+
   const mainContent = (
     <>
+      <ContextualTour ready={tourReady} />
       <DashboardHeader />
       {isMobile && <MobileNav activeTab={activeTab} setActiveTab={setActiveTab} navItems={navItems} />}
 

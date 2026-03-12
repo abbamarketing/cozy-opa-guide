@@ -120,6 +120,7 @@ const QuotaCard = ({ userProject }: QuotaCardProps) => {
   };
 
   return (
+    <div data-tour="quota-card">
     <Card className="border-border/50 bg-card">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base font-semibold text-card-foreground">
@@ -166,6 +167,7 @@ const QuotaCard = ({ userProject }: QuotaCardProps) => {
         </Button>
       </CardContent>
     </Card>
+    </div>
   );
 };
 

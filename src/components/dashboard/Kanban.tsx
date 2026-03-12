@@ -128,6 +128,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
                 disabled={!quotaAvailable}
                 className="gap-1.5"
                 onClick={() => setShowNewModal(true)}
+                data-tour="new-delivery-btn"
               >
                 <Plus className="h-4 w-4" />
                 Nova Solicitação
@@ -150,7 +151,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-4" data-tour="kanban-board">
           {COLUMNS.map((col) => {
             const items = getDeliveriesForColumn(col);
             return (
