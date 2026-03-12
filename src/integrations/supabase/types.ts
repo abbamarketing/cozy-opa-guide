@@ -207,12 +207,19 @@ export type Database = {
           created_at: string
           id: string
           intro_url: string | null
+          jump_cuts: boolean | null
+          legend_style: string | null
           logo_url: string | null
           outro_url: string | null
           preferred_music_style: string | null
+          primary_color: string | null
           reference_channels: string[] | null
+          remove_silences: boolean | null
+          secondary_color: string | null
           target_audience: string | null
           updated_at: string
+          use_emojis: boolean | null
+          use_icons: boolean | null
           user_id: string
           user_project_id: string | null
         }
@@ -228,12 +235,19 @@ export type Database = {
           created_at?: string
           id?: string
           intro_url?: string | null
+          jump_cuts?: boolean | null
+          legend_style?: string | null
           logo_url?: string | null
           outro_url?: string | null
           preferred_music_style?: string | null
+          primary_color?: string | null
           reference_channels?: string[] | null
+          remove_silences?: boolean | null
+          secondary_color?: string | null
           target_audience?: string | null
           updated_at?: string
+          use_emojis?: boolean | null
+          use_icons?: boolean | null
           user_id: string
           user_project_id?: string | null
         }
@@ -249,12 +263,19 @@ export type Database = {
           created_at?: string
           id?: string
           intro_url?: string | null
+          jump_cuts?: boolean | null
+          legend_style?: string | null
           logo_url?: string | null
           outro_url?: string | null
           preferred_music_style?: string | null
+          primary_color?: string | null
           reference_channels?: string[] | null
+          remove_silences?: boolean | null
+          secondary_color?: string | null
           target_audience?: string | null
           updated_at?: string
+          use_emojis?: boolean | null
+          use_icons?: boolean | null
           user_id?: string
           user_project_id?: string | null
         }
