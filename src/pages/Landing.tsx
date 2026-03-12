@@ -689,7 +689,7 @@ const Landing = () => {
                     <Sparkles className="h-3 w-3 text-primary" />
                   </div>
                   <div>
-                    <p className="text-[11px] font-semibold text-card-foreground">Olívia ✨</p>
+                    <p className="text-[11px] font-semibold text-card-foreground">Olívia</p>
                     <p className="text-[8px] text-muted-foreground">Online</p>
                   </div>
                 </div>
