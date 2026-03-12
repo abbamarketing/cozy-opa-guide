@@ -239,7 +239,6 @@ const DashboardLayout = () => {
         );
       case 'history':
         return <DeliveryHistory />;
-        );
       case 'scripts':
         return <ScriptGenerator />;
       case 'settings':
