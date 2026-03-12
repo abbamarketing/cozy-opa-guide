@@ -348,7 +348,7 @@ const DeliveryDetailView = () => (
           {[
             { role: 'client', text: 'Pode ajustar a legenda no 2:35?', time: '14:22' },
             { role: 'editor', text: 'Feito! Usei a fonte do briefing. Confere?', time: '14:28' },
-            { role: 'client', text: 'Ficou perfeito! Pode aprovar 👍', time: '14:30' },
+            { role: 'client', text: 'Ficou perfeito! Pode aprovar.', time: '14:30' },
           ].map((m, i) => (
             <div key={i} className={`flex ${m.role === 'client' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[80%] rounded-lg px-2 py-1 text-[9px] leading-relaxed ${
