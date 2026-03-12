@@ -381,6 +381,7 @@ const EditorDashboard = () => {
     if (error) {
       toast.error('Erro ao mover entrega');
     } else {
+      logger.info('Editor moveu entrega', { delivery_id: draggedId, to: col.title }, 'editor');
       toast.success(`Movido para ${col.title}`);
       fetchDeliveries();
     }
