@@ -1,24 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import NewDeliveryModal from './NewDeliveryModal';
+import DeliveryDetailModal from './DeliveryDetailModal';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import DeliveryCard, { type DeliveryData } from './DeliveryCard';
 import type { UserProjectData } from '@/hooks/useUserProject';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { Download, Check, RotateCcw } from 'lucide-react';
+import { toast } from 'sonner';
 import { toast } from 'sonner';
 
 interface KanbanProps {
