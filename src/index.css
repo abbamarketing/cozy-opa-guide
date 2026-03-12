@@ -2,76 +2,80 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 6%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 6%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 142 72% 73%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 142 72% 73%;
-    --radius: 0.75rem;
-    --sidebar-background: 0 0% 4%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 142 72% 73%;
-    --sidebar-primary-foreground: 0 0% 0%;
-    --sidebar-accent: 0 0% 12%;
-    --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 0 0% 16%;
-    --sidebar-ring: 142 72% 73%;
+    --background: 0 0% 94%;
+    --foreground: 0 0% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 13%;
+    --primary: 22 46% 44%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 90%;
+    --secondary-foreground: 0 0% 13%;
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 22 46% 44%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 65% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 85%;
+    --input: 0 0% 85%;
+    --ring: 22 46% 44%;
+    --radius: 0.375rem;
 
-    /* Custom tokens */
-    --neon: 142 72% 73%;
-    --neon-glow: 0 0 20px hsl(142 72% 73% / 0.4);
-    --neon-glow-strong: 0 0 40px hsl(142 72% 73% / 0.3), 0 0 80px hsl(142 72% 73% / 0.1);
-    --glass-bg: hsl(0 0% 100% / 0.04);
-    --glass-border: hsl(0 0% 100% / 0.08);
-    --glass-hover: hsl(0 0% 100% / 0.08);
+    --sidebar-background: 0 0% 97%;
+    --sidebar-foreground: 0 0% 13%;
+    --sidebar-primary: 22 46% 44%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 92%;
+    --sidebar-accent-foreground: 0 0% 13%;
+    --sidebar-border: 0 0% 85%;
+    --sidebar-ring: 22 46% 44%;
+
+    /* Semantic energy states */
+    --energy-foco: 22 46% 44%;
+    --energy-leve: 43 60% 55%;
+    --energy-basico: 0 0% 60%;
+
+    /* Priority queues */
+    --queue-red: 0 65% 51%;
+    --queue-yellow: 43 90% 55%;
+    --queue-green: 145 40% 45%;
   }
 
   .dark {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 95%;
-    --card: 0 0% 5%;
-    --card-foreground: 0 0% 95%;
-    --popover: 0 0% 4%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 142 72% 73%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 10%;
-    --secondary-foreground: 0 0% 90%;
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 50%;
-    --accent: 142 72% 73%;
-    --accent-foreground: 0 0% 0%;
-    --destructive: 0 62% 30%;
+    --background: 0 0% 20%;
+    --foreground: 0 0% 94%;
+    --card: 0 0% 16%;
+    --card-foreground: 0 0% 94%;
+    --popover: 0 0% 16%;
+    --popover-foreground: 0 0% 94%;
+    --primary: 22 46% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 24%;
+    --secondary-foreground: 0 0% 94%;
+    --muted: 0 0% 24%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 22 46% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 65% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 14%;
-    --input: 0 0% 14%;
-    --ring: 142 72% 73%;
-    --sidebar-background: 0 0% 2%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 142 72% 73%;
-    --sidebar-primary-foreground: 0 0% 0%;
-    --sidebar-accent: 0 0% 10%;
-    --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 0 0% 14%;
-    --sidebar-ring: 142 72% 73%;
+    --border: 0 0% 28%;
+    --input: 0 0% 28%;
+    --ring: 22 46% 50%;
+
+    --sidebar-background: 0 0% 14%;
+    --sidebar-foreground: 0 0% 94%;
+    --sidebar-primary: 22 46% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 22%;
+    --sidebar-accent-foreground: 0 0% 94%;
+    --sidebar-border: 0 0% 28%;
+    --sidebar-ring: 22 46% 50%;
   }
 }
 
@@ -80,48 +84,51 @@
     @apply border-border;
   }
 
-  html {
-    @apply dark;
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Lato', sans-serif;
   }
 
-  body {
-    @apply bg-background text-foreground font-sans antialiased;
+  h1, h2, h3, h4, h5, h6,
+  button, label, nav,
+  [data-ui-label] {
+    font-family: 'Roboto Mono', monospace;
+  }
+
+  input, select, textarea {
+    font-size: 16px !important;
   }
 }
 
 @layer utilities {
+  .font-mono-code {
+    font-family: 'Roboto Mono', monospace;
+  }
+
+  .font-body {
+    font-family: 'Lato', sans-serif;
+  }
+
+  /* Backward-compatible: glass now maps to card styling */
   .glass {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
   }
 
   .glass-hover:hover {
-    background: var(--glass-hover);
+    background: hsl(var(--accent));
   }
 
+  /* Legacy neon utilities mapped to primary */
   .neon-glow {
-    box-shadow: var(--neon-glow);
-  }
-
-  .neon-glow-strong {
-    box-shadow: var(--neon-glow-strong);
-  }
-
-  .text-neon-glow {
-    text-shadow: 0 0 20px hsl(142 72% 73% / 0.5);
-  }
-
-  .font-mono-code {
-    font-family: 'JetBrains Mono', monospace;
+    box-shadow: 0 1px 3px hsl(var(--primary) / 0.15);
   }
 
   .gradient-neon {
-    background: linear-gradient(135deg, hsl(142 72% 73%), hsl(160 72% 60%));
+    background: hsl(var(--primary));
   }
 
-  .gradient-dark {
-    background: linear-gradient(180deg, hsl(0 0% 0%), hsl(0 0% 4%));
+  .text-neon-glow {
+    color: hsl(var(--primary));
   }
 }
