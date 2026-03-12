@@ -465,6 +465,7 @@ const EditorPanelView = () => (
 const Landing = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [activeDemo, setActiveDemo] = useState<DemoTab>('dashboard');
+  const [surveyOpen, setSurveyOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
