@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { format, differenceInHours, differenceInMinutes } from 'date-fns';
+import { format, differenceInMinutes } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Video, Camera, Image, Layers, Clock, AlertTriangle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -34,10 +34,10 @@ export const typeConfig: Record<string, { icon: React.ComponentType<{ className?
 
 export const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
   pending: { label: 'A Fazer', variant: 'secondary' },
-  in_progress: { label: 'Em Produção', variant: 'outline' },
+  in_progress: { label: 'Em Producao', variant: 'outline' },
   review: { label: 'Revisar', variant: 'default' },
-  revision: { label: 'Revisão', variant: 'destructive' },
-  approved: { label: 'Concluído', variant: 'default' },
+  revision: { label: 'Revisao', variant: 'destructive' },
+  approved: { label: 'Concluido', variant: 'default' },
   cancelled: { label: 'Cancelado', variant: 'destructive' },
 };
 
@@ -45,7 +45,6 @@ export const statusConfig: Record<string, { label: string; variant: 'default' | 
 
 interface SlaIndicator {
   color: string;
-  bg: string;
   label: string;
   level: 'ok' | 'warning' | 'danger' | 'overdue' | 'none';
   progressPercent: number;
@@ -54,9 +53,9 @@ interface SlaIndicator {
 function formatCountdown(totalMinutes: number): string {
   if (totalMinutes < 0) {
     const absMin = Math.abs(totalMinutes);
-    if (absMin >= 1440) return `Atrasado ${Math.floor(absMin / 1440)}d ${Math.floor((absMin % 1440) / 60)}h`;
-    if (absMin >= 60) return `Atrasado ${Math.floor(absMin / 60)}h ${absMin % 60}m`;
-    return `Atrasado ${absMin}m`;
+    if (absMin >= 1440) return `−${Math.floor(absMin / 1440)}d ${Math.floor((absMin % 1440) / 60)}h`;
+    if (absMin >= 60) return `−${Math.floor(absMin / 60)}h ${absMin % 60}m`;
+    return `−${absMin}m`;
   }
   if (totalMinutes >= 1440) {
     const days = Math.floor(totalMinutes / 1440);
@@ -72,7 +71,7 @@ function formatCountdown(totalMinutes: number): string {
 }
 
 function getSlaIndicator(dueDate: string | null, createdAt: string): SlaIndicator {
-  if (!dueDate) return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Sem prazo', level: 'none', progressPercent: 0 };
+  if (!dueDate) return { color: 'text-muted-foreground', label: 'Sem prazo', level: 'none', progressPercent: 0 };
 
   const now = new Date();
   const due = new Date(dueDate);
@@ -85,15 +84,15 @@ function getSlaIndicator(dueDate: string | null, createdAt: string): SlaIndicato
   const countdown = formatCountdown(totalMinutes);
 
   if (totalMinutes < 0) {
-    return { color: 'text-red-400', bg: 'bg-red-500/20', label: countdown, level: 'overdue', progressPercent: 100 };
+    return { color: 'text-destructive', label: countdown, level: 'overdue', progressPercent: 100 };
   }
-  if (totalMinutes <= 360) { // ≤ 6h
-    return { color: 'text-red-400', bg: 'bg-red-500/20', label: countdown, level: 'danger', progressPercent };
+  if (totalMinutes <= 360) {
+    return { color: 'text-destructive', label: countdown, level: 'danger', progressPercent };
   }
-  if (totalMinutes <= 720) { // ≤ 12h
-    return { color: 'text-yellow-400', bg: 'bg-yellow-500/20', label: countdown, level: 'warning', progressPercent };
+  if (totalMinutes <= 720) {
+    return { color: 'text-[hsl(var(--queue-yellow))]', label: countdown, level: 'warning', progressPercent };
   }
-  return { color: 'text-emerald-400', bg: 'bg-emerald-500/20', label: countdown, level: 'ok', progressPercent };
+  return { color: 'text-[hsl(var(--queue-green))]', label: countdown, level: 'ok', progressPercent };
 }
 
 /* ───── Component ───── */
@@ -107,8 +106,8 @@ const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
   const config = typeConfig[delivery.delivery_type] || typeConfig.youtube_video;
   const Icon = config.icon;
 
-  // Live countdown – updates every 30s
-  const [now, setNow] = useState(Date.now());
+  // Live countdown
+  const [, setNow] = useState(Date.now());
   useEffect(() => {
     if (!delivery.due_date || delivery.status === 'approved' || delivery.status === 'cancelled') return;
     const interval = setInterval(() => setNow(Date.now()), 30_000);
@@ -121,47 +120,47 @@ const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
   return (
     <Card
       onClick={onClick}
-      className="cursor-pointer border-border/40 bg-card/80 p-3 transition-all hover:border-border hover:bg-card space-y-2"
+      className="cursor-pointer border-border bg-card p-3 transition-colors active:bg-muted hover:bg-muted/50 space-y-2 shadow-sm"
     >
+      {/* Title row */}
       <div className="flex items-start gap-2">
         <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-card-foreground">{delivery.title}</p>
+          <p className="truncate text-sm font-medium text-foreground">{delivery.title}</p>
           {delivery.editor_name && (
-            <p className="text-xs text-muted-foreground">Editor: {delivery.editor_name}</p>
+            <p className="text-[10px] font-mono text-muted-foreground mt-0.5">
+              {delivery.editor_name}
+            </p>
           )}
         </div>
       </div>
 
       {/* SLA section */}
       {delivery.due_date && !isCompleted && (
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5 text-xs">
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5 text-[10px] font-mono">
             {sla.level === 'overdue' ? (
               <AlertTriangle className={`h-3 w-3 ${sla.color}`} />
             ) : (
               <Clock className={`h-3 w-3 ${sla.color}`} />
             )}
             <span className="text-muted-foreground">
-              {format(new Date(delivery.due_date), "dd/MM 'às' HH'h'", { locale: ptBR })}
+              {format(new Date(delivery.due_date), "dd/MM HH'h'", { locale: ptBR })}
             </span>
-            <Badge
-              variant="outline"
-              className={`ml-auto text-[10px] px-1.5 py-0 ${sla.bg} ${sla.color} border-0 font-mono`}
-            >
+            <span className={`ml-auto font-medium ${sla.color}`}>
               {sla.label}
-            </Badge>
+            </span>
           </div>
 
           {/* Progress bar */}
-          <div className="h-1 w-full rounded-full bg-muted/50 overflow-hidden">
+          <div className="h-1 w-full rounded-full bg-muted overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 sla.level === 'overdue' || sla.level === 'danger'
-                  ? 'bg-red-500'
+                  ? 'bg-destructive'
                   : sla.level === 'warning'
-                  ? 'bg-yellow-500'
-                  : 'bg-emerald-500'
+                  ? 'bg-[hsl(var(--queue-yellow))]'
+                  : 'bg-[hsl(var(--queue-green))]'
               }`}
               style={{ width: `${sla.progressPercent}%` }}
             />
@@ -170,16 +169,16 @@ const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
       )}
 
       {delivery.due_date && isCompleted && (
-        <div className="flex items-center gap-1.5 text-xs">
+        <div className="flex items-center gap-1.5 text-[10px] font-mono">
           <Clock className="h-3 w-3 text-muted-foreground" />
           <span className="text-muted-foreground">
-            {format(new Date(delivery.due_date), "dd/MM 'às' HH'h'", { locale: ptBR })}
+            {format(new Date(delivery.due_date), "dd/MM HH'h'", { locale: ptBR })}
           </span>
         </div>
       )}
 
-      <p className="text-xs text-muted-foreground">
-        Revisões: {delivery.revision_count}/{delivery.max_revisions} usadas
+      <p className="text-[10px] font-mono text-muted-foreground">
+        Revisoes: {delivery.revision_count}/{delivery.max_revisions}
       </p>
     </Card>
   );
