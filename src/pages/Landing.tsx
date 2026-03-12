@@ -696,7 +696,7 @@ const Landing = () => {
                 <div className="p-3 space-y-2">
                   <div className="flex justify-start">
                     <div className="max-w-[85%] rounded-xl rounded-bl-sm bg-muted/60 px-3 py-2 text-[10px] text-card-foreground">
-                      Olá! Eu sou a Olívia 💃 Como posso te ajudar?
+                      Olá! Eu sou a Olívia. Como posso te ajudar?
                     </div>
                   </div>
                   <div className="flex justify-end">
