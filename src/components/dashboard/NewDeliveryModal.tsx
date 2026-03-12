@@ -56,7 +56,6 @@ const formSchema = z.object({
     .trim()
     .min(20, 'Por favor, forneça mais detalhes sobre o que você deseja (mínimo 20 caracteres)')
     .max(5000, 'Máximo de 5000 caracteres'),
-  deadline_option: z.enum(['normal', 'urgent']).default('normal'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
