@@ -331,6 +331,9 @@ const Kanban = ({ userProject }: KanbanProps) => {
   // Desktop: original 4-column grid
   return (
     <div className="space-y-4">
+      {/* Capture Banner */}
+      <CaptureBanner />
+
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-mono font-semibold text-foreground">Minhas Entregas</h2>
         <Tooltip>
@@ -338,19 +341,24 @@ const Kanban = ({ userProject }: KanbanProps) => {
             <span>
               <Button
                 size="sm"
-                disabled={!quotaAvailable}
+                disabled={!canCreateDelivery}
                 className="gap-1.5"
-                onClick={() => setShowNewModal(true)}
+                onClick={handleNewClick}
                 data-tour="new-delivery-btn"
               >
-                <Plus className="h-4 w-4" />
-                Nova Solicitacao
+                {needsCaptureFirst ? <Camera className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                {needsCaptureFirst ? 'Agendar Captação' : 'Nova Solicitacao'}
               </Button>
             </span>
           </TooltipTrigger>
-          {!quotaAvailable && (
+          {!canCreateDelivery && !needsCaptureFirst && (
             <TooltipContent>
               <p>Quota esgotada</p>
+            </TooltipContent>
+          )}
+          {needsCaptureFirst && (
+            <TooltipContent>
+              <p>Agende uma captação para liberar entregas</p>
             </TooltipContent>
           )}
         </Tooltip>
@@ -434,6 +442,15 @@ const Kanban = ({ userProject }: KanbanProps) => {
             onOpenChange={setShowNewModal}
             userProject={userProject}
             onCreated={fetchDeliveries}
+          />
+        )}
+        {showCaptureModal && (
+          <CaptureScheduleModal
+            open={showCaptureModal}
+            onOpenChange={setShowCaptureModal}
+            userProject={userProject}
+            onScheduled={checkCapture}
+            captureLeadDays={captureLeadDays}
           />
         )}
       </Suspense>
