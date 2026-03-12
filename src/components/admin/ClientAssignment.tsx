@@ -188,6 +188,29 @@ const ClientAssignment = () => {
         </div>
         <p className="text-sm text-muted-foreground">Clientes cadastrados que ainda não têm um projeto atribuído.</p>
 
+        {isMobile ? (
+          <div className="space-y-2">
+            {loading ? (
+              <p className="py-8 text-center text-muted-foreground">Carregando...</p>
+            ) : clients.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">Nenhum cliente aguardando.</p>
+            ) : (
+              clients.map((c) => (
+                <Card key={c.id} className="p-3 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{c.full_name || 'Sem nome'}</p>
+                      <p className="text-[11px] text-muted-foreground">{format(new Date(c.created_at), "dd/MM/yyyy", { locale: ptBR })}</p>
+                    </div>
+                    <Button variant="neon" size="sm" className="shrink-0 text-xs" onClick={() => openModal(c)}>
+                      <UserPlus className="h-3.5 w-3.5 mr-1" />Atribuir
+                    </Button>
+                  </div>
+                </Card>
+              ))
+            )}
+          </div>
+        ) : (
         <div className="glass rounded-xl overflow-hidden">
           <Table>
             <TableHeader>
@@ -224,6 +247,7 @@ const ClientAssignment = () => {
             </TableBody>
           </Table>
         </div>
+        )}
       </section>
 
       {/* Active Clients */}
