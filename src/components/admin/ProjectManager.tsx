@@ -83,6 +83,9 @@ const ProjectManager = () => {
     if (p.include_covers) items.push(
       <span key="cv" className="inline-flex items-center gap-1 text-xs"><FileImage className="h-3 w-3" />Capa</span>
     );
+    if (p.include_capture) items.push(
+      <span key="cap" className="inline-flex items-center gap-1 text-xs"><MapPin className="h-3 w-3" />Captação</span>
+    );
     return <div className="flex flex-wrap gap-2">{items}</div>;
   };
 
