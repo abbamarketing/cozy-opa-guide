@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/auth';
 import { useProfile } from '@/hooks/useProfile';
 import { Loader2, Shield, Film, User, Play } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import WaitingForProject from '@/components/shared/WaitingForProject';
+
 
 const ROLE_CONFIG: Record<string, { label: string; description: string; icon: React.ComponentType<{ className?: string }>; path: string }> = {
   admin: { label: 'Administrador', description: 'Gerencie projetos, clientes e editores', icon: Shield, path: '/admin' },

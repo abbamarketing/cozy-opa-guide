@@ -73,6 +73,7 @@ const App = () => (
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/payment" element={<PaymentGate />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
+                <Route path="/waiting" element={<Waiting />} />
               </Route>
 
               {/* Any authenticated user */}
