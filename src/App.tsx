@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/lib/auth";
 import ProtectedRoute from "@/components/layout/ProtectedRoute";
+import RoleProtectedRoute from "@/components/layout/RoleProtectedRoute";
 import { Loader2 } from "lucide-react";
 
 // Lazy-loaded pages
@@ -23,8 +24,8 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
       refetchOnWindowFocus: false,
       retry: 1,
     },
@@ -50,15 +51,23 @@ const App = () => (
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/terms" element={<Terms />} />
 
-              {/* Protected routes */}
+              {/* Protected routes (any authenticated user) */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Index />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/onboarding/payment" element={<PaymentGate />} />
                 <Route path="/onboarding/payment-success" element={<PaymentSuccess />} />
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/editor" element={<Editor />} />
+              </Route>
+
+              {/* Admin only */}
+              <Route element={<RoleProtectedRoute allowedRoles={['admin']} />}>
                 <Route path="/admin" element={<Admin />} />
+              </Route>
+
+              {/* Editor only */}
+              <Route element={<RoleProtectedRoute allowedRoles={['editor', 'admin']} />}>
+                <Route path="/editor" element={<Editor />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />
