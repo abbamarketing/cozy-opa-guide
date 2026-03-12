@@ -259,10 +259,11 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
 
             {/* Tabs */}
             <Tabs defaultValue="briefing" className="w-full">
-              <TabsList className="w-full grid grid-cols-5">
+              <TabsList className="w-full grid grid-cols-6">
                 <TabsTrigger value="briefing" className="text-xs">Briefing</TabsTrigger>
                 <TabsTrigger value="brand" className="text-xs">Marca</TabsTrigger>
                 <TabsTrigger value="files" className="text-xs">Arquivos</TabsTrigger>
+                <TabsTrigger value="chat" className="text-xs">Chat</TabsTrigger>
                 <TabsTrigger value="deliver" className="text-xs">Entregas</TabsTrigger>
                 <TabsTrigger value="history" className="text-xs">Histórico</TabsTrigger>
               </TabsList>
