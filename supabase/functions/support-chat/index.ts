@@ -47,16 +47,8 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const userRole = (role && rolePrompts[role]) ? role : "client";
-    const systemPrompt = `${rolePrompts[userRole]}
-
-Regras gerais de resposta:
-- Responda SEMPRE em português brasileiro
-- Seja conciso, amigável e direto
-- Use emojis moderadamente para tornar a conversa mais agradável
-- Se não souber a resposta, sugira que o usuário entre em contato com o suporte
-- Não invente funcionalidades que não existem
-- Formate respostas com markdown quando útil (listas, negrito, etc.)`;
+    const userRole = (role && roleContexts[role]) ? role : "client";
+    const systemPrompt = `${personality}\n\nContexto do usuário:\n${roleContexts[userRole]}`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
