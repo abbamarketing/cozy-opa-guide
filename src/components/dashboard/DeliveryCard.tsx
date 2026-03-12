@@ -1,6 +1,6 @@
-import { format, differenceInHours, isPast } from 'date-fns';
+import { format, differenceInHours } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Video, Camera, Image, Layers, Clock, Download } from 'lucide-react';
+import { Video, Camera, Image, Layers, Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -14,14 +14,30 @@ export interface DeliveryData {
   revision_count: number;
   max_revisions: number;
   file_url: string | null;
+  thumbnail_url: string | null;
   editor_name?: string;
+  editor_id: string | null;
+  created_at: string;
+  delivered_at: string | null;
+  approved_at: string | null;
+  revision_notes: string | null;
+  user_project_id: string;
 }
 
-const typeConfig: Record<string, { icon: React.ComponentType<{ className?: string }>; label: string }> = {
+export const typeConfig: Record<string, { icon: React.ComponentType<{ className?: string }>; label: string }> = {
   youtube_video: { icon: Video, label: 'YouTube' },
   instagram_video: { icon: Camera, label: 'Instagram' },
   thumbnail: { icon: Image, label: 'Thumbnail' },
   cover: { icon: Layers, label: 'Capa' },
+};
+
+export const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+  pending: { label: 'A Fazer', variant: 'secondary' },
+  in_progress: { label: 'Em Produção', variant: 'outline' },
+  review: { label: 'Revisar', variant: 'default' },
+  revision: { label: 'Revisão', variant: 'destructive' },
+  approved: { label: 'Concluído', variant: 'default' },
+  cancelled: { label: 'Cancelado', variant: 'destructive' },
 };
 
 const getDeadlineIndicator = (dueDate: string | null) => {
@@ -51,7 +67,6 @@ const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
       onClick={onClick}
       className="cursor-pointer border-border/40 bg-card/80 p-3 transition-all hover:border-border hover:bg-card space-y-2"
     >
-      {/* Header */}
       <div className="flex items-start gap-2">
         <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
         <div className="min-w-0 flex-1">
@@ -62,7 +77,6 @@ const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
         </div>
       </div>
 
-      {/* Deadline */}
       {delivery.due_date && (
         <div className="flex items-center gap-1.5 text-xs">
           <Clock className={`h-3 w-3 ${deadline.color}`} />
@@ -75,7 +89,6 @@ const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
         </div>
       )}
 
-      {/* Revisions */}
       <p className="text-xs text-muted-foreground">
         Revisões: {delivery.revision_count}/{delivery.max_revisions} usadas
       </p>
