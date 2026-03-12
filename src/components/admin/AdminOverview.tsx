@@ -4,8 +4,18 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Users, Package, AlertTriangle, DollarSign, Clock } from 'lucide-react';
-import { format, differenceInHours, subWeeks, startOfWeek, endOfWeek } from 'date-fns';
+import { format, subWeeks, startOfWeek, endOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { remainingBusinessMinutes, formatBusinessCountdown } from '@/lib/business-hours';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import {
   LineChart,
   Line,
