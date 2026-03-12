@@ -151,7 +151,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-4" data-tour="kanban-board">
           {COLUMNS.map((col) => {
             const items = getDeliveriesForColumn(col);
             return (
