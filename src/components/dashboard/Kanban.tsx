@@ -310,6 +310,14 @@ const Kanban = ({ userProject }: KanbanProps) => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* New Delivery Modal */}
+      <NewDeliveryModal
+        open={showNewModal}
+        onOpenChange={setShowNewModal}
+        userProject={userProject}
+        onCreated={fetchDeliveries}
+      />
     </div>
   );
 };
