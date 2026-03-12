@@ -49,12 +49,12 @@ const formSchema = z.object({
   title: z
     .string()
     .trim()
-    .min(1, 'Título é obrigatório')
+    .min(5, 'O título deve ter pelo menos 5 caracteres')
     .max(100, 'Máximo de 100 caracteres'),
   description: z
     .string()
     .trim()
-    .min(50, 'Mínimo de 50 caracteres no briefing')
+    .min(20, 'Por favor, forneça mais detalhes sobre o que você deseja (mínimo 20 caracteres)')
     .max(5000, 'Máximo de 5000 caracteres'),
   deadline_option: z.enum(['normal', 'urgent']).default('normal'),
 });
