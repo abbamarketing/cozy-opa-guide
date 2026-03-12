@@ -404,7 +404,7 @@ const PrivacyPolicy = () => (
         <li>Solicitar portabilidade dos dados.</li>
         <li>Revogar consentimento a qualquer momento.</li>
       </ul>
-      <p>Para exercer seus direitos, entre em contato pelo email: <strong>privacidade@videoflow.com.br</strong></p>
+      <p>Para exercer seus direitos, entre em contato pelo email: <strong>abbaestrategias@gmail.com</strong></p>
     </Section>
 
     <Section title="7. Retenção de Dados">
