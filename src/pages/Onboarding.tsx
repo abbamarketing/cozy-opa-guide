@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import BriefingForm from '@/components/onboarding/BriefingForm';
 import { Loader2 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export default function Onboarding() {
   const navigate = useNavigate();
