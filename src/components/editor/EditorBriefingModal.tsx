@@ -482,7 +482,15 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
                 )}
               </TabsContent>
 
-              {/* TAB 4: Entregas */}
+              {/* TAB 4: Chat */}
+              <TabsContent value="chat" className="mt-4">
+                <DeliveryChat
+                  deliveryId={delivery.id}
+                  showTimestampInput={delivery.delivery_type === 'youtube_video' || delivery.delivery_type === 'instagram_video'}
+                />
+              </TabsContent>
+
+              {/* TAB 5: Entregas */}
               <TabsContent value="deliver" className="space-y-4 mt-4">
                 <FileUpload
                   userProjectId={delivery.user_project_id}
