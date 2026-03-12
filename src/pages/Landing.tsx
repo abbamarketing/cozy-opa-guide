@@ -497,7 +497,7 @@ const Landing = () => {
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 text-center">
           <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
             <Badge variant="outline" className="mb-6 px-4 py-1.5 text-xs border-primary/30 text-primary">
-              <Zap className="h-3 w-3 mr-1.5" /> Plataforma de Edição Profissional
+              <Zap className="h-3 w-3 mr-1.5" /> Pare de editar. Comece a crescer.
             </Badge>
           </motion.div>
 
@@ -505,16 +505,16 @@ const Landing = () => {
             initial="hidden" animate="visible" variants={fadeUp} custom={1}
             className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight"
           >
-            Suas entregas de vídeo,{' '}
-            <span className="text-primary">organizadas e profissionais</span>
+            Vídeos profissionais{' '}
+            <span className="text-primary">sem você precisar editar</span>
           </motion.h1>
 
           <motion.p
             initial="hidden" animate="visible" variants={fadeUp} custom={2}
             className="mx-auto mt-5 max-w-2xl text-base sm:text-lg text-muted-foreground font-body"
           >
-            Gerencie edições, thumbnails, capas e captações em um só lugar.
-            Acompanhe prazos, converse com editores e aprove entregas — tudo em tempo real.
+            Você grava. A gente edita, entrega e surpreende. Thumbnails, Reels, capas — 
+            tudo com prazo garantido, revisões inclusas e um editor dedicado à sua marca.
           </motion.p>
 
           <motion.div
