@@ -581,6 +581,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      reset_monthly_quotas: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "editor" | "client"

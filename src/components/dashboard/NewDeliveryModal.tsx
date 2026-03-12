@@ -209,22 +209,7 @@ const NewDeliveryModal = ({
 
       if (deliveryError) throw deliveryError;
 
-      // 2. Increment reserved quota
-      const reservedField: Record<DeliveryType, string> = {
-        youtube_video: 'youtube_reserved',
-        instagram_video: 'instagram_reserved',
-        thumbnail: 'thumbnails_reserved',
-        cover: 'covers_reserved',
-      };
-      const field = reservedField[values.delivery_type];
-      const currentValue = (userProject as any)[field] as number;
-
-      const { error: quotaError } = await supabase
-        .from('user_projects')
-        .update({ [field]: currentValue + 1 })
-        .eq('id', userProject.id);
-
-      if (quotaError) throw quotaError;
+      // Quota is now automatically reserved by the database trigger (reserve_quota_on_create)
 
       toast.success('Solicitação criada com sucesso!');
       onOpenChange(false);
