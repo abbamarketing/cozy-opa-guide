@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Editor from "./pages/Editor";
 import Admin from "./pages/Admin";
 import Terms from "./pages/Terms";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<Index />} />
               <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/onboarding/payment-success" element={<PaymentSuccess />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/editor" element={<Editor />} />
               <Route path="/admin" element={<Admin />} />
