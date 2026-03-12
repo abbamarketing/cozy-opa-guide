@@ -234,7 +234,7 @@ const TermsOfUse = () => (
     </header>
 
     <Section title="1. Aceitação dos Termos">
-      <p>Ao acessar e utilizar a plataforma VideoFlow ("Plataforma"), você concorda em cumprir e estar vinculado aos seguintes termos e condições. Caso não concorde com qualquer parte destes termos, não poderá acessar o serviço.</p>
+      <p>Ao acessar e utilizar a plataforma AbbaVideo ("Plataforma"), você concorda em cumprir e estar vinculado aos seguintes termos e condições. Caso não concorde com qualquer parte destes termos, não poderá acessar o serviço.</p>
     </Section>
 
     <Section title="2. Descrição do Serviço">
