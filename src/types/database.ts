@@ -141,3 +141,51 @@ export interface SystemSetting {
   value: unknown;
   updated_at: string;
 }
+
+// Subtask types
+export type SubtaskStatus = 'pending' | 'in_progress' | 'completed' | 'approved';
+export type CaptureSessionStatus = 'scheduled' | 'confirmed' | 'completed' | 'cancelled';
+
+// Project Subtask Template (admin-defined per project)
+export interface ProjectSubtaskTemplate {
+  id: string;
+  custom_project_id: string;
+  name: string;
+  delivery_types: string[];
+  sort_order: number;
+  requires_approval: boolean;
+  is_active: boolean;
+  created_at: string;
+}
+
+// Delivery Subtask (instance per delivery)
+export interface DeliverySubtask {
+  id: string;
+  delivery_id: string;
+  template_id: string | null;
+  name: string;
+  status: SubtaskStatus;
+  sort_order: number;
+  requires_approval: boolean;
+  completed_at: string | null;
+  completed_by: string | null;
+  created_at: string;
+}
+
+// Capture Session (scheduling)
+export interface CaptureSession {
+  id: string;
+  user_project_id: string;
+  delivery_id: string | null;
+  scheduled_date: string;
+  scheduled_time: string | null;
+  duration_minutes: number;
+  location_name: string | null;
+  address: string | null;
+  notes: string | null;
+  status: CaptureSessionStatus;
+  created_by: string;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
