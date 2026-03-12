@@ -123,7 +123,7 @@ const AIChatWidget = () => {
       const errorMsg = err instanceof Error ? err.message : 'Erro desconhecido';
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: `❌ ${errorMsg}` },
+        { role: 'assistant', content: errorMsg },
       ]);
     } finally {
       setIsStreaming(false);

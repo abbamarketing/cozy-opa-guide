@@ -202,7 +202,7 @@ export default function ScriptGenerator() {
               {loading && <span className="inline-block w-1.5 h-4 bg-primary/60 animate-pulse ml-0.5 align-text-bottom" />}
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              💡 Dica: Você pode usar este roteiro ao criar uma nova solicitação de vídeo, colando ele no campo de descrição.
+              Dica: Você pode usar este roteiro ao criar uma nova solicitação de vídeo, colando ele no campo de descrição.
             </p>
           </CardContent>
         </Card>

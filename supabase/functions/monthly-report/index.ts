@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
       const notifications = adminRoles.map((r) => ({
         user_id: r.user_id,
         type: "monthly_report",
-        title: `📊 Relatório Mensal – ${periodLabel}`,
+        title: `Relatório Mensal – ${periodLabel}`,
         message: `${totalDeliveries} entregas (${approved} aprovadas), ${totalRevisions} revisões. Média: ${avgRevisions} revisões/entrega. Tipos: ${byTypeFormatted}`,
         link: "/admin?tab=metricas",
       }));

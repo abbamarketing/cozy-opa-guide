@@ -35,7 +35,7 @@ Regras:
 - Adicione instruções de direção entre parênteses quando relevante, ex: (corte rápido), (B-roll sugerido: imagens de X)
 - Adapte o tom conforme solicitado (educativo, motivacional, humorístico, etc.)
 - Se o usuário mencionar duração, respeite o tempo sugerido
-- Termine com uma seção "📊 Resumo Técnico" contendo: duração estimada, tom, público-alvo sugerido e número de cortes sugeridos`;
+- Termine com uma seção "Resumo Técnico" contendo: duração estimada, tom, público-alvo sugerido e número de cortes sugeridos`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",

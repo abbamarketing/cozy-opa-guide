@@ -41,7 +41,7 @@ const ContextualTour = ({ ready }: ContextualTourProps) => {
   const steps: Step[] = [
     {
       target: '[data-tour="quota-card"]',
-      content: '👋 Aqui você vê suas quotas mensais. Clique em "Nova Solicitação" para começar!',
+      content: 'Aqui você vê suas quotas mensais. Clique em "Nova Solicitação" para começar!',
       disableBeacon: true,
       placement: 'bottom',
     },

@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: "AbbaVideo <onboarding@abbavideo.com.br>",
         to: [email],
-        subject: `Seu projeto ${projectName} está pronto! 🎬`,
+        subject: `Seu projeto ${projectName} está pronto!`,
         html: emailHtml,
       }),
     });
