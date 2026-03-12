@@ -92,7 +92,7 @@ export default function PaymentGate() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h3 className="mb-3 font-semibold">📦 O que está incluído:</h3>
+                <h3 className="mb-3 font-semibold">O que está incluído:</h3>
                 <ul className="space-y-2 text-sm">
                   {project.youtube_videos > 0 && (
                     <li className="flex items-center gap-2">
