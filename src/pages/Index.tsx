@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 
 const Index = () => {
   const { user, isLoading: authLoading } = useAuth();
-  const { profile, isLoading: profileLoading } = useProfile();
+  const { profile, primaryRole, isLoading: profileLoading } = useProfile();
 
   if (authLoading || profileLoading) {
     return (
@@ -19,17 +19,13 @@ const Index = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  if (!profile) {
-    return <Navigate to="/onboarding" replace />;
-  }
-
-  switch (profile.role) {
+  switch (primaryRole) {
     case 'admin':
       return <Navigate to="/admin" replace />;
     case 'editor':
       return <Navigate to="/editor" replace />;
     default:
-      return <Navigate to={profile.onboarding_complete ? '/dashboard' : '/onboarding'} replace />;
+      return <Navigate to={profile?.onboarding_complete ? '/dashboard' : '/onboarding'} replace />;
   }
 };
 
