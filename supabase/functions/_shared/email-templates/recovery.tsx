@@ -10,6 +10,7 @@ import {
   Heading,
   Html,
   Preview,
+  Section,
   Text,
 } from 'npm:@react-email/components@0.0.22'
 
@@ -22,23 +23,31 @@ export const RecoveryEmail = ({
   siteName,
   confirmationUrl,
 }: RecoveryEmailProps) => (
-  <Html lang="en" dir="ltr">
-    <Head />
-    <Preview>Reset your password for {siteName}</Preview>
+  <Html lang="pt-BR" dir="ltr">
+    <Head>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');`}</style>
+    </Head>
+    <Preview>Redefinir senha — AbbaVideo</Preview>
     <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>Reset your password</Heading>
-        <Text style={text}>
-          We received a request to reset your password for {siteName}. Click
-          the button below to choose a new password.
-        </Text>
-        <Button style={button} href={confirmationUrl}>
-          Reset Password
-        </Button>
-        <Text style={footer}>
-          If you didn't request a password reset, you can safely ignore this
-          email. Your password will not be changed.
-        </Text>
+      <Container style={outer}>
+        <Section style={header}>
+          <Text style={logo}><span style={logoAccent}>ABBA</span>VIDEO</Text>
+        </Section>
+        <Section style={content}>
+          <Heading style={h1}>Redefinir senha</Heading>
+          <Text style={text}>
+            Recebemos uma solicitação para redefinir sua senha. Clique abaixo para escolher uma nova.
+          </Text>
+          <Button style={button} href={confirmationUrl}>
+            Redefinir Senha
+          </Button>
+          <Text style={footer}>
+            Se você não solicitou, ignore este e-mail. Sua senha não será alterada.
+          </Text>
+        </Section>
+        <Section style={footerSection}>
+          <Text style={footerBrand}>AbbaVideo · Sistema de Gestão</Text>
+        </Section>
       </Container>
     </Body>
   </Html>
@@ -46,26 +55,15 @@ export const RecoveryEmail = ({
 
 export default RecoveryEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+const main = { backgroundColor: '#ffffff', fontFamily: "'Lato', Arial, sans-serif" }
+const outer = { maxWidth: '560px', margin: '0 auto', padding: '40px 16px' }
+const header = { backgroundColor: '#2A2A2A', padding: '20px 32px', borderBottom: '2px solid #9FE870', borderRadius: '8px 8px 0 0' }
+const logo = { fontFamily: "'Roboto Mono', monospace", fontSize: '16px', fontWeight: '400' as const, color: '#F0F0F0', letterSpacing: '2px', textTransform: 'uppercase' as const, margin: '0' }
+const logoAccent = { fontWeight: '700' as const, color: '#9FE870' }
+const content = { backgroundColor: '#333333', padding: '32px' }
+const h1 = { fontFamily: "'Roboto Mono', monospace", fontSize: '20px', fontWeight: '600' as const, color: '#F0F0F0', margin: '0 0 20px' }
+const text = { fontSize: '15px', color: '#CCCCCC', lineHeight: '1.6', margin: '0 0 20px' }
+const button = { backgroundColor: '#9FE870', color: '#121212', fontFamily: "'Roboto Mono', monospace", fontSize: '13px', fontWeight: '600' as const, borderRadius: '6px', padding: '12px 28px', textDecoration: 'none', letterSpacing: '0.5px', textTransform: 'uppercase' as const }
+const footer = { fontSize: '12px', color: '#999999', margin: '24px 0 0' }
+const footerSection = { backgroundColor: '#2A2A2A', padding: '16px 32px', borderRadius: '0 0 8px 8px' }
+const footerBrand = { fontFamily: "'Roboto Mono', monospace", fontSize: '10px', color: '#666666', letterSpacing: '1px', textTransform: 'uppercase' as const, margin: '0' }
