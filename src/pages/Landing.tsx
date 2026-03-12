@@ -579,6 +579,30 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Benefits strip */}
+      <section className="py-12 sm:py-16 border-t border-border/30">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+            {[
+              { metric: '10–15h', label: 'economizadas por mês', desc: 'Tempo que você gastaria editando — devolvido para criar, vender ou descansar.' },
+              { metric: '24–72h', label: 'prazo de entrega', desc: 'SLA garantido em horas úteis. Você sabe exatamente quando esperar.' },
+              { metric: '100%', label: 'sua identidade visual', desc: 'Editor dedicado que conhece sua marca — cores, fontes, estilo e tom de voz.' },
+            ].map((b) => (
+              <motion.div
+                key={b.label}
+                initial="hidden" whileInView="visible" viewport={{ once: true }}
+                variants={fadeUp} custom={0}
+                className="text-center sm:text-left"
+              >
+                <p className="text-2xl sm:text-3xl font-bold text-primary font-mono">{b.metric}</p>
+                <p className="text-xs font-semibold text-card-foreground mt-1">{b.label}</p>
+                <p className="text-[11px] text-muted-foreground font-body mt-1 leading-relaxed">{b.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Grid */}
       <section className="py-16 sm:py-24 border-t border-border/30">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
