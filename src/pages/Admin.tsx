@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { Play, LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, Settings } from 'lucide-react';
+import { Play, LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, BookOpen } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import AdminOverview from '@/components/admin/AdminOverview';
