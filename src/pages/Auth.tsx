@@ -361,6 +361,10 @@ function SignupForm({ onSwitchTab }: { onSwitchTab: () => void }) {
           Aceito os{' '}
           <Link to="/terms" className="text-primary hover:underline">
             termos de uso
+          </Link>{' '}
+          e a{' '}
+          <Link to="/privacy" className="text-primary hover:underline">
+            política de privacidade
           </Link>
         </Label>
       </div>
