@@ -18,6 +18,7 @@ export default function Onboarding() {
         .update({ onboarding_complete: true })
         .eq('user_id', user.id);
     }
+    logger.info('Onboarding concluído', {}, 'onboarding');
     navigate('/dashboard', { replace: true });
   };
 
