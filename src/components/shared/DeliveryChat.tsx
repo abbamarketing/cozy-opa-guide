@@ -101,18 +101,23 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
     if (!newMessage.trim() || !user) return;
     setSending(true);
 
-    const payload: Record<string, any> = {
+    const insertPayload: {
+      delivery_id: string;
+      sender_id: string;
+      message: string;
+      timestamp_marker?: string;
+    } = {
       delivery_id: deliveryId,
       sender_id: user.id,
       message: newMessage.trim(),
     };
     if (showTimestampInput && timestamp.trim()) {
-      payload.timestamp_marker = timestamp.trim();
+      insertPayload.timestamp_marker = timestamp.trim();
     }
 
     const { error } = await supabase
       .from('delivery_messages')
-      .insert(payload);
+      .insert(insertPayload);
 
     if (!error) {
       setNewMessage('');
