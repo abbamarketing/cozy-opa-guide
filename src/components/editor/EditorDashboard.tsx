@@ -346,7 +346,7 @@ const EditorDashboard = () => {
     if (lateOnly) {
       result = result.filter((d) => {
         if (!d.due_date) return false;
-        return differenceInHours(new Date(d.due_date), new Date()) < 0;
+        return remainingBusinessMinutes(new Date(d.due_date)) < 0;
       });
     }
     return result;
