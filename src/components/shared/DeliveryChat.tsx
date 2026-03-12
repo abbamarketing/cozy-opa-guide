@@ -44,9 +44,8 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
       .limit(200);
 
     if (data) {
-      setMessages(data as any);
-      // Fetch sender names for unique sender_ids
-      const ids = [...new Set((data as any[]).map((m: any) => m.sender_id))];
+      setMessages(data as ChatMessage[]);
+      const ids = [...new Set(data.map((m) => m.sender_id))];
       if (ids.length > 0) {
         const { data: profiles } = await supabase
           .from('profiles')
