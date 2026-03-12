@@ -56,6 +56,12 @@ const Terms = () => {
             </section>
           ))}
         </div>
+
+        <div className="mt-6 text-center text-xs text-muted-foreground font-mono space-x-4">
+          <Link to="/privacy" className="hover:text-primary transition-colors">Política de Privacidade</Link>
+          <span>·</span>
+          <Link to="/auth" className="hover:text-primary transition-colors">Voltar</Link>
+        </div>
       </div>
     </div>
   );
