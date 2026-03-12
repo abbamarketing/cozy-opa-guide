@@ -37,16 +37,15 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
 
   const fetchMessages = useCallback(async () => {
     const { data } = await supabase
-      .from('delivery_messages' as any)
+      .from('delivery_messages')
       .select('*')
       .eq('delivery_id', deliveryId)
       .order('created_at', { ascending: true })
       .limit(200);
 
     if (data) {
-      setMessages(data as any);
-      // Fetch sender names for unique sender_ids
-      const ids = [...new Set((data as any[]).map((m: any) => m.sender_id))];
+      setMessages(data as ChatMessage[]);
+      const ids = [...new Set(data.map((m) => m.sender_id))];
       if (ids.length > 0) {
         const { data: profiles } = await supabase
           .from('profiles')
@@ -102,18 +101,23 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
     if (!newMessage.trim() || !user) return;
     setSending(true);
 
-    const payload: Record<string, any> = {
+    const insertPayload: {
+      delivery_id: string;
+      sender_id: string;
+      message: string;
+      timestamp_marker?: string;
+    } = {
       delivery_id: deliveryId,
       sender_id: user.id,
       message: newMessage.trim(),
     };
     if (showTimestampInput && timestamp.trim()) {
-      payload.timestamp_marker = timestamp.trim();
+      insertPayload.timestamp_marker = timestamp.trim();
     }
 
     const { error } = await supabase
-      .from('delivery_messages' as any)
-      .insert(payload as any);
+      .from('delivery_messages')
+      .insert(insertPayload);
 
     if (!error) {
       setNewMessage('');
