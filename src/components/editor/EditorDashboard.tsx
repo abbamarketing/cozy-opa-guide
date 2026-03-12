@@ -40,7 +40,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import DeliveryDetailModal from '@/components/dashboard/DeliveryDetailModal';
+import EditorBriefingModal from '@/components/editor/EditorBriefingModal';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 
 /* ─── Types ─── */
@@ -463,8 +463,8 @@ const EditorDashboard = () => {
         )}
       </main>
 
-      {/* Detail Modal */}
-      <DeliveryDetailModal
+      {/* Editor Briefing Modal */}
+      <EditorBriefingModal
         open={!!selectedDelivery}
         onOpenChange={() => setSelectedDelivery(null)}
         delivery={selectedDelivery}
