@@ -126,7 +126,7 @@ const Admin = () => {
       {/* Desktop tabs */}
       {!isMobile && (
         <div className="container mx-auto px-6 pt-6">
-          <div className="flex gap-1 mb-6 glass rounded-xl p-1 w-fit overflow-x-auto">
+          <div className="flex gap-1 mb-6 glass rounded-xl p-1 w-full overflow-x-auto scrollbar-none">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
