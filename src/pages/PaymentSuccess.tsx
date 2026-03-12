@@ -149,7 +149,7 @@ const PaymentSuccess = () => {
               </div>
 
               <Button
-                onClick={() => navigate('/onboarding/payment', { replace: true })}
+                onClick={() => navigate('/payment', { replace: true })}
                 className="w-full"
               >
                 Tentar novamente

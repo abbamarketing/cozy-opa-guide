@@ -151,11 +151,12 @@ function handleSingleRoleRedirect(
       if (assignedProjectId === null) {
         return <WaitingForProject />;
       }
+      // Payment FIRST, then onboarding
+      if (projectStatus === 'pending_payment') {
+        return <Navigate to="/payment" replace />;
+      }
       if (!profile?.onboarding_complete) {
         return <Navigate to="/onboarding" replace />;
-      }
-      if (projectStatus === 'pending_payment') {
-        return <Navigate to="/onboarding/payment" replace />;
       }
       return <Navigate to="/dashboard" replace />;
     }

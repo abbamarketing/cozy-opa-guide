@@ -192,7 +192,7 @@ export default function PaymentGate() {
 
                 <Button
                   variant="ghost"
-                  onClick={() => navigate('/onboarding')}
+                  onClick={() => navigate('/')}
                   className="w-full"
                   disabled={creating}
                 >
