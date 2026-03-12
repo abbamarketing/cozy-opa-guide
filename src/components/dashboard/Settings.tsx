@@ -207,28 +207,7 @@ export default function Settings() {
 
       {/* Brand */}
       <TabsContent value="brand">
-        <Card className="glass border-border/40">
-          <CardHeader>
-            <CardTitle>Briefing de Marca</CardTitle>
-            <CardDescription>Suas preferências de edição podem ser atualizadas a qualquer momento</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="glass rounded-xl p-4 space-y-2">
-              <h4 className="text-sm font-semibold text-card-foreground">Editar Briefing Completo</h4>
-              <p className="text-xs text-muted-foreground">
-                Cores, fontes, estilo de legenda e preferências de edição
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              className="w-full gap-2"
-              onClick={() => toast.info('Em breve!', { description: 'Esta funcionalidade estará disponível em breve.' })}
-            >
-              <Palette className="h-4 w-4" />
-              Editar Briefing
-            </Button>
-          </CardContent>
-        </Card>
+        <BrandProfile />
       </TabsContent>
     </Tabs>
   );
