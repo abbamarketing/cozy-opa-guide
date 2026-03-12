@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, Check, CheckCheck, Package, RefreshCw, Zap, Clock, UserPlus, MessageSquare, ThumbsUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,13 +23,19 @@ interface Notification {
 
 const typeIcons: Record<string, React.ReactNode> = {
   delivery_ready: <Package className="h-4 w-4 text-primary" />,
+  delivery_completed: <Package className="h-4 w-4 text-primary" />,
   revision_processed: <RefreshCw className="h-4 w-4 text-[hsl(280,80%,65%)]" />,
+  revision_requested: <MessageSquare className="h-4 w-4 text-[hsl(280,80%,65%)]" />,
   quota_renewed: <Zap className="h-4 w-4 text-[hsl(45,93%,47%)]" />,
   deadline_approaching: <Clock className="h-4 w-4 text-destructive" />,
   new_assignment: <UserPlus className="h-4 w-4 text-primary" />,
-  revision_requested: <MessageSquare className="h-4 w-4 text-[hsl(280,80%,65%)]" />,
+  project_assigned: <UserPlus className="h-4 w-4 text-primary" />,
   client_approved: <ThumbsUp className="h-4 w-4 text-[hsl(142,76%,36%)]" />,
+  delivery_approved: <ThumbsUp className="h-4 w-4 text-[hsl(142,76%,36%)]" />,
 };
+
+const INITIAL_POLL_INTERVAL = 5000; // 5s
+const MAX_POLL_INTERVAL = 30000; // 30s
 
 const NotificationBell = () => {
   const { user } = useAuth();
@@ -37,24 +43,29 @@ const NotificationBell = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pollIntervalRef = useRef(INITIAL_POLL_INTERVAL);
+  const activeRef = useRef(true);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  // Fetch notifications
+  const fetchNotifications = useCallback(async () => {
+    if (!user?.id) return;
+    const { data } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (data) setNotifications(data as unknown as Notification[]);
+  }, [user?.id]);
+
   useEffect(() => {
     if (!user?.id) return;
+    activeRef.current = true;
 
-    const fetchNotifications = async () => {
-      const { data } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(30);
-
-      if (data) setNotifications(data as unknown as Notification[]);
-    };
-
+    // Initial fetch
     fetchNotifications();
 
     // Realtime subscription
@@ -71,16 +82,37 @@ const NotificationBell = () => {
         (payload) => {
           const newNotif = payload.new as Notification;
           setNotifications((prev) => [newNotif, ...prev].slice(0, 50));
+          // Reset poll interval when realtime works
+          pollIntervalRef.current = INITIAL_POLL_INTERVAL;
         },
       )
       .subscribe();
 
     channelRef.current = channel;
 
+    // Polling fallback with exponential backoff
+    const poll = async () => {
+      if (!activeRef.current) return;
+      try {
+        await fetchNotifications();
+        // If no realtime events reset us, gradually back off
+        pollIntervalRef.current = Math.min(pollIntervalRef.current * 1.5, MAX_POLL_INTERVAL);
+      } catch {
+        pollIntervalRef.current = Math.min(pollIntervalRef.current * 2, MAX_POLL_INTERVAL);
+      }
+      if (activeRef.current) {
+        pollTimeoutRef.current = setTimeout(poll, pollIntervalRef.current);
+      }
+    };
+
+    pollTimeoutRef.current = setTimeout(poll, INITIAL_POLL_INTERVAL);
+
     return () => {
+      activeRef.current = false;
+      if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
       if (channelRef.current) supabase.removeChannel(channelRef.current);
     };
-  }, [user?.id]);
+  }, [user?.id, fetchNotifications]);
 
   const markAsRead = async (id: string) => {
     setNotifications((prev) =>
