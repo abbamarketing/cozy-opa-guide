@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
 import DeliveryHistory from '@/components/dashboard/DeliveryHistory';
@@ -226,6 +227,11 @@ const DashboardLayout = () => {
       setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl]);
+
+  // Redirect to root if no project (root handles WaitingForProject)
+  if (!isLoading && !userProject) {
+    return <Navigate to="/" replace />;
+  }
 
   const navItems: NavItem[] = [
     { id: 'deliveries', label: 'Minhas Entregas', shortLabel: 'ENTREGAS', icon: Video },

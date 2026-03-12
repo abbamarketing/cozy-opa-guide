@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useUserProject } from '@/hooks/useUserProject';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
@@ -31,11 +31,7 @@ export default function Onboarding() {
   }
 
   if (!userProject?.custom_project) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground">Nenhum projeto encontrado.</div>
-      </div>
-    );
+    return <Navigate to="/" replace />;
   }
 
   return <BriefingForm onComplete={handleBriefingComplete} />;
