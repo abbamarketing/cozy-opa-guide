@@ -154,16 +154,16 @@ const AdminOverview = () => {
   return (
     <div className="space-y-6">
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {kpiCards.map((kpi) => (
-          <Card key={kpi.label} className="glass border-border/40 p-5 space-y-2">
+          <Card key={kpi.label} className="glass border-border/40 p-4 space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 {kpi.label}
               </span>
               <kpi.icon className={`h-4 w-4 ${kpi.color}`} />
             </div>
-            <p className="text-2xl font-bold text-card-foreground">{kpi.value}</p>
+            <p className="text-lg sm:text-2xl font-bold text-card-foreground break-all">{kpi.value}</p>
           </Card>
         ))}
       </div>
