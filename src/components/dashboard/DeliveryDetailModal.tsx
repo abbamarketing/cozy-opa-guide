@@ -271,7 +271,17 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
 
               <Separator className="bg-border/50" />
 
-              {/* Section 4: Timeline */}
+              {/* Section 4: Chat */}
+              <div className="space-y-3">
+                <DeliveryChat
+                  deliveryId={delivery.id}
+                  showTimestampInput={delivery.delivery_type === 'youtube_video' || delivery.delivery_type === 'instagram_video'}
+                />
+              </div>
+
+              <Separator className="bg-border/50" />
+
+              {/* Section 5: Timeline */}
               <div className="space-y-3">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Timeline
