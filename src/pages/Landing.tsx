@@ -483,11 +483,9 @@ const Landing = () => {
             <Link to="/auth">
               <Button variant="ghost" size="sm">Entrar</Button>
             </Link>
-            <a href="https://wa.me/5500000000000" target="_blank" rel="noopener noreferrer">
-              <Button size="sm" className="gap-1.5">
-                Fale Conosco <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </a>
+            <Button size="sm" className="gap-1.5" onClick={() => setSurveyOpen(true)}>
+              Fale Conosco <ArrowRight className="h-3.5 w-3.5" />
+            </Button>
           </div>
         </div>
       </nav>
