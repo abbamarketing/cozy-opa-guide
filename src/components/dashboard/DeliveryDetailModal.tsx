@@ -100,6 +100,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
 
       // Quota is now automatically managed by the database trigger (approve_quota_on_approve)
 
+      logger.info('Entrega aprovada', { delivery_id: delivery.id, title: delivery.title }, 'delivery');
       toast.success('Entrega aprovada com sucesso! 🎉');
       onOpenChange(false);
       onUpdated();
