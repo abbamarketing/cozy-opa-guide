@@ -224,16 +224,28 @@ const ClientManual = () => (
 const TermsOfUse = () => (
   <article className="prose-doc space-y-8">
     <header>
-      <h1 className="text-2xl font-bold text-foreground">Termos de Uso</h1>
+      <h1 className="text-2xl font-bold text-foreground">Termos de Uso e Condições do Serviço</h1>
       <p className="text-muted-foreground">Última atualização: 12 de março de 2026</p>
+      <div className="text-sm text-muted-foreground mt-2 space-y-1">
+        <p>Razão Social: AML ESTRATEGIAS DIGITAIS E COMERCIAIS LTDA</p>
+        <p>CNPJ: 61.872.918/0001-15</p>
+        <p>E-mail: abbaestrategias@gmail.com</p>
+      </div>
     </header>
 
     <Section title="1. Aceitação dos Termos">
-      <p>Ao acessar ou usar a plataforma VideoFlow ("Plataforma"), você concorda com estes Termos de Uso. Se não concordar, não utilize a Plataforma.</p>
+      <p>Ao acessar e utilizar a plataforma VideoFlow ("Plataforma"), você concorda em cumprir e estar vinculado aos seguintes termos e condições. Caso não concorde com qualquer parte destes termos, não poderá acessar o serviço.</p>
     </Section>
 
     <Section title="2. Descrição do Serviço">
-      <p>O VideoFlow é uma plataforma SaaS de gestão de entregas de conteúdo audiovisual que conecta criadores de conteúdo (Clientes) a editores de vídeo (Editores) por meio de um sistema de assinatura mensal.</p>
+      <p>O VideoFlow é uma plataforma SaaS de gestão de entregas de conteúdo audiovisual que conecta criadores de conteúdo (Clientes) a editores de vídeo (Editores) por meio de um sistema de assinatura mensal. Os serviços incluídos são:</p>
+      <ul className="list-disc pl-6 space-y-1">
+        <li>Upload e gerenciamento de materiais brutos para edição.</li>
+        <li>Configuração de preferências de edição e briefing de marca.</li>
+        <li>Acompanhamento do status de edição em tempo real via Kanban.</li>
+        <li>Sistema de revisões para ajustes finais.</li>
+        <li>Download e aprovação do conteúdo editado finalizado.</li>
+      </ul>
     </Section>
 
     <Section title="3. Cadastro e Conta">
@@ -244,42 +256,67 @@ const TermsOfUse = () => (
       </ul>
     </Section>
 
-    <Section title="4. Planos e Pagamento">
+    <Section title="4. Contagem do Período de Serviço e Pagamento">
       <ul className="list-disc pl-6 space-y-1">
         <li>Os planos são personalizados e definidos pelo administrador.</li>
         <li>O pagamento é processado via Stripe de forma segura.</li>
         <li>A assinatura é renovada automaticamente conforme a frequência contratada (mensal, trimestral ou anual).</li>
         <li>As cotas de entrega são renovadas a cada período de faturamento.</li>
+        <li>Cotas não utilizadas não são acumuláveis para o próximo ciclo.</li>
+        <li>Não há extensão de prazo por inatividade após o início do período.</li>
       </ul>
     </Section>
 
     <Section title="5. Entregas e Prazos">
       <ul className="list-disc pl-6 space-y-1">
+        <li>Todas as solicitações de edição são aceitas automaticamente ao serem enviadas.</li>
         <li>Os prazos de entrega (SLA) são definidos no projeto contratado: 24h, 48h ou 72h úteis.</li>
         <li>O prazo começa a contar a partir da criação da solicitação.</li>
+        <li>Os prazos são contados em dias úteis (segunda a sexta-feira, exceto feriados nacionais).</li>
         <li>Revisões reiniciam o prazo de entrega.</li>
-        <li>O número de revisões é limitado conforme o plano contratado.</li>
       </ul>
     </Section>
 
-    <Section title="6. Propriedade Intelectual">
+    <Section title="6. Sistema de Revisões e Aprovação">
       <ul className="list-disc pl-6 space-y-1">
+        <li>O número de revisões é limitado conforme o plano contratado.</li>
+        <li>Revisões devem ser solicitadas dentro de 72 horas após a entrega.</li>
+        <li>Se não houver manifestação em 72 horas, o projeto será considerado aprovado automaticamente.</li>
+      </ul>
+    </Section>
+
+    <Section title="7. Upload e Armazenamento de Arquivos">
+      <ul className="list-disc pl-6 space-y-1">
+        <li>Formatos aceitos: MP4, MOV, AVI (vídeos) e PNG, JPG, PSD (thumbnails/capas).</li>
+        <li>Os arquivos brutos são excluídos após a aprovação do projeto.</li>
+        <li>O cliente deve fazer o download do conteúdo finalizado em até 14 dias após a aprovação.</li>
+      </ul>
+    </Section>
+
+    <Section title="8. Propriedade Intelectual">
+      <ul className="list-disc pl-6 space-y-1">
+        <li>O cliente mantém todos os direitos sobre o conteúdo original enviado.</li>
         <li>O conteúdo entregue pelo editor é de propriedade do Cliente após aprovação.</li>
+        <li>O VideoFlow não reivindica propriedade sobre os vídeos editados ou brutos.</li>
         <li>O Cliente garante que possui os direitos sobre todo material enviado (brutos, logos, músicas).</li>
         <li>O VideoFlow não se responsabiliza por violações de direitos autorais no material fornecido pelo Cliente.</li>
       </ul>
     </Section>
 
-    <Section title="7. Cancelamento">
+    <Section title="9. Privacidade e Dados Pessoais">
+      <p>Coletamos dados pessoais necessários para a prestação do serviço, que são protegidos conforme a Lei Geral de Proteção de Dados (LGPD). Dados não são compartilhados com terceiros, exceto quando necessário para a operação do serviço. Consulte a Política de Privacidade para detalhes completos.</p>
+    </Section>
+
+    <Section title="10. Cancelamento e Reembolso">
       <ul className="list-disc pl-6 space-y-1">
-        <li>O Cliente pode cancelar a assinatura a qualquer momento via portal de pagamento.</li>
+        <li>O Cliente pode cancelar a assinatura a qualquer momento via portal de pagamento, com efeito na próxima fatura.</li>
         <li>Após o cancelamento, o acesso permanece ativo até o fim do período já pago.</li>
         <li>Entregas em andamento serão concluídas normalmente.</li>
-        <li>Não há reembolso proporcional para períodos parciais.</li>
+        <li>Não há reembolso proporcional para períodos não utilizados.</li>
       </ul>
     </Section>
 
-    <Section title="8. Suspensão e Rescisão">
+    <Section title="11. Suspensão e Rescisão">
       <p>O VideoFlow reserva-se o direito de suspender ou encerrar contas em caso de:</p>
       <ul className="list-disc pl-6 space-y-1">
         <li>Inadimplência por mais de 7 dias.</li>
@@ -288,16 +325,20 @@ const TermsOfUse = () => (
       </ul>
     </Section>
 
-    <Section title="9. Limitação de Responsabilidade">
-      <p>O VideoFlow não garante disponibilidade ininterrupta da Plataforma. Não nos responsabilizamos por danos indiretos, lucros cessantes ou perda de dados decorrentes do uso da Plataforma.</p>
+    <Section title="12. Limitação de Responsabilidade">
+      <p>O VideoFlow não garante disponibilidade ininterrupta da Plataforma. Não nos responsabilizamos por danos indiretos, lucros cessantes ou perda de dados decorrentes do uso da Plataforma ou por falhas fora de nosso controle.</p>
     </Section>
 
-    <Section title="10. Alterações nos Termos">
-      <p>Podemos atualizar estes Termos a qualquer momento. Alterações significativas serão notificadas via email ou notificação na Plataforma. O uso continuado após alterações constitui aceitação.</p>
+    <Section title="13. Alterações nos Termos">
+      <p>Reservamo-nos o direito de modificar estes Termos a qualquer momento, com comunicação prévia de 15 dias para alterações significativas via email ou notificação na Plataforma. O uso continuado após alterações constitui aceitação.</p>
     </Section>
 
-    <Section title="11. Foro e Lei Aplicável">
+    <Section title="14. Foro e Lei Aplicável">
       <p>Estes Termos são regidos pelas leis da República Federativa do Brasil. Fica eleito o foro da comarca de São Paulo/SP para dirimir quaisquer controvérsias.</p>
+    </Section>
+
+    <Section title="15. Contato">
+      <p>Para dúvidas sobre estes termos ou questões gerais, entre em contato pelo e-mail: <strong>abbaestrategias@gmail.com</strong></p>
     </Section>
   </article>
 );
