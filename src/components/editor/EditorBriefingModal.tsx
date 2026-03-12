@@ -294,20 +294,39 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
                 )}
 
                 {briefing?.reference_channels && briefing.reference_channels.length > 0 && (
-                  <div className="space-y-1">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Referências</h4>
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Canais de Referência</h4>
                     <div className="flex flex-wrap gap-2">
                       {briefing.reference_channels.map((ch, i) => (
                         <a
                           key={i}
-                          href={ch.startsWith('http') ? ch : `https://${ch}`}
+                          href={ch.startsWith('http') ? ch : `https://youtube.com/@${ch.replace('@', '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-xs text-primary hover:underline"
+                          className="flex items-center gap-1 text-xs text-primary hover:underline glass rounded-lg px-2 py-1"
                         >
                           <ExternalLink className="h-3 w-3" /> {ch}
                         </a>
                       ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Visual reference / example section */}
+                {briefing?.brand_description && (
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Sobre a Marca</h4>
+                    <div className="rounded-lg border border-border/40 bg-muted/20 p-3">
+                      <p className="text-sm text-card-foreground whitespace-pre-wrap">{briefing.brand_description}</p>
+                    </div>
+                  </div>
+                )}
+
+                {briefing?.target_audience && (
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Público-Alvo</h4>
+                    <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                      <p className="text-sm text-card-foreground">{briefing.target_audience}</p>
                     </div>
                   </div>
                 )}
