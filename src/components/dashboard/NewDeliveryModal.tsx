@@ -172,7 +172,7 @@ const NewDeliveryModal = ({
     setIsSubmitting(true);
 
     try {
-      const dueDate = new Date(Date.now() + getDeadlineHours() * 60 * 60 * 1000).toISOString();
+      const dueDate = addBusinessHours(new Date(), getDeadlineHours()).toISOString();
 
       // Build description with extras
       let fullDescription = values.description;

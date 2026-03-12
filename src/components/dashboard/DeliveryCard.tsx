@@ -74,23 +74,24 @@ function formatCountdown(totalMinutes: number): string {
 function getSlaIndicator(dueDate: string | null, createdAt: string): SlaIndicator {
   if (!dueDate) return { color: 'text-muted-foreground', label: 'Sem prazo', level: 'none', progressPercent: 0 };
 
-  const now = new Date();
   const due = new Date(dueDate);
   const created = new Date(createdAt);
-  const totalMinutes = differenceInMinutes(due, now);
-  const totalDuration = differenceInMinutes(due, created);
-  const elapsed = totalDuration - totalMinutes;
-  const progressPercent = totalDuration > 0 ? Math.min(100, Math.max(0, (elapsed / totalDuration) * 100)) : 0;
 
-  const countdown = formatCountdown(totalMinutes);
+  const remainingBizMin = remainingBusinessMinutes(due);
+  const totalBizMin = remainingBusinessMinutes(due, created);
+  const elapsed = totalBizMin - remainingBizMin;
+  const progressPercent = totalBizMin > 0 ? Math.min(100, Math.max(0, (elapsed / totalBizMin) * 100)) : 0;
 
-  if (totalMinutes < 0) {
+  const countdown = formatBusinessCountdown(remainingBizMin);
+
+  // Thresholds in business minutes: 6h=360min, 12h=720min
+  if (remainingBizMin < 0) {
     return { color: 'text-destructive', label: countdown, level: 'overdue', progressPercent: 100 };
   }
-  if (totalMinutes <= 360) {
+  if (remainingBizMin <= 360) {
     return { color: 'text-destructive', label: countdown, level: 'danger', progressPercent };
   }
-  if (totalMinutes <= 720) {
+  if (remainingBizMin <= 720) {
     return { color: 'text-[hsl(var(--queue-yellow))]', label: countdown, level: 'warning', progressPercent };
   }
   return { color: 'text-[hsl(var(--queue-green))]', label: countdown, level: 'ok', progressPercent };
