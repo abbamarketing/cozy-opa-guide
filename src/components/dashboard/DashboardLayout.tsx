@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
+import NotificationBell from '@/components/shared/NotificationBell';
 import { useNavigate } from 'react-router-dom';
 import {
   Play,
@@ -82,9 +83,7 @@ const DashboardHeader = () => {
       </div>
 
       <div className="flex items-center gap-1">
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-          <Bell className="h-4 w-4" />
-        </Button>
+        <NotificationBell />
         <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
           <HelpCircle className="h-4 w-4" />
         </Button>
