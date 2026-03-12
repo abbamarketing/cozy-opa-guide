@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
-import { Plus, Pencil, Copy, Power, Youtube, Instagram, Image, FileImage } from 'lucide-react';
+import { Plus, Pencil, Copy, Power, Youtube, Instagram, Image, FileImage, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import ProjectCreatorModal from './ProjectCreatorModal';
 import type { CustomProject } from '@/types/database';
