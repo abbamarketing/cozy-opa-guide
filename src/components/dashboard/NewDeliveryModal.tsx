@@ -212,7 +212,7 @@ const NewDeliveryModal = ({
         insertData.drive_link = driveLink.trim();
       }
 
-      const { error: deliveryError } = await supabase.from('deliveries').insert(insertData);
+      const { error: deliveryError } = await supabase.from('deliveries').insert(insertData as any);
 
       if (deliveryError) throw deliveryError;
 
