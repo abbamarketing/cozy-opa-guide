@@ -15,6 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { UserPlus, Loader2, Youtube, Instagram, Image, FileImage, FileText, Camera, Package } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { CustomProject } from '@/types/database';
