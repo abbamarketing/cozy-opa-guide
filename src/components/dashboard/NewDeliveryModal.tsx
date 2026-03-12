@@ -197,7 +197,7 @@ const NewDeliveryModal = ({
       }
 
       // 1. Create delivery
-      const { error: deliveryError } = await supabase.from('deliveries').insert({
+      const insertData: Record<string, any> = {
         user_project_id: userProject.id,
         delivery_type: values.delivery_type,
         title: values.title,
@@ -205,7 +205,14 @@ const NewDeliveryModal = ({
         status: 'pending',
         due_date: dueDate,
         max_revisions: project.max_revisions,
-      });
+      };
+
+      // Store drive link in dedicated column
+      if (isVideo && materialOption === 'drive' && driveLink.trim()) {
+        insertData.drive_link = driveLink.trim();
+      }
+
+      const { error: deliveryError } = await supabase.from('deliveries').insert(insertData);
 
       if (deliveryError) throw deliveryError;
 

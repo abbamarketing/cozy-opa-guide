@@ -26,7 +26,7 @@ interface Column {
 
 const COLUMNS: Column[] = [
   { id: 'todo', title: 'A FAZER', statuses: ['pending'], description: 'Aguardando início' },
-  { id: 'production', title: 'EM PRODUÇÃO', statuses: ['in_progress'], description: 'Editor trabalhando' },
+  { id: 'production', title: 'EM PRODUÇÃO', statuses: ['in_progress', 'revision'], description: 'Editor trabalhando' },
   { id: 'review', title: 'REVISAR', statuses: ['review'], description: 'Pronto para sua aprovação' },
   { id: 'done', title: 'CONCLUÍDO', statuses: ['approved'], description: 'Aprovado e finalizado' },
 ];
