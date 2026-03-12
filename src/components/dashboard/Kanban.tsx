@@ -199,78 +199,12 @@ const Kanban = ({ userProject }: KanbanProps) => {
       )}
 
       {/* Detail Modal */}
-      <Dialog open={!!selectedDelivery} onOpenChange={() => setSelectedDelivery(null)}>
-        <DialogContent className="max-w-md">
-          {selectedDelivery && (
-            <>
-              <DialogHeader>
-                <DialogTitle>{selectedDelivery.title}</DialogTitle>
-                <DialogDescription>
-                  {selectedDelivery.description || 'Sem descrição'}
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Editor</span>
-                  <span className="text-foreground">{selectedDelivery.editor_name || '—'}</span>
-                </div>
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Prazo</span>
-                  <span className="text-foreground">
-                    {selectedDelivery.due_date
-                      ? format(new Date(selectedDelivery.due_date), "dd/MM/yyyy 'às' HH'h'", {
-                          locale: ptBR,
-                        })
-                      : '—'}
-                  </span>
-                </div>
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Revisões</span>
-                  <span className="text-foreground">
-                    {selectedDelivery.revision_count}/{selectedDelivery.max_revisions}
-                  </span>
-                </div>
-              </div>
-
-              {/* Actions based on status */}
-              <div className="flex gap-2 pt-2">
-                {selectedDelivery.file_url && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-1.5"
-                    onClick={() => window.open(selectedDelivery.file_url!, '_blank')}
-                  >
-                    <Download className="h-3.5 w-3.5" /> Baixar
-                  </Button>
-                )}
-
-                {selectedDelivery.status === 'review' && (
-                  <>
-                    <Button
-                      size="sm"
-                      className="gap-1.5"
-                      onClick={() => handleApprove(selectedDelivery)}
-                    >
-                      <Check className="h-3.5 w-3.5" /> Aprovar
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-1.5"
-                      disabled={selectedDelivery.revision_count >= selectedDelivery.max_revisions}
-                      onClick={() => handleRequestRevision(selectedDelivery)}
-                    >
-                      <RotateCcw className="h-3.5 w-3.5" /> Revisão
-                    </Button>
-                  </>
-                )}
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      <DeliveryDetailModal
+        open={!!selectedDelivery}
+        onOpenChange={() => setSelectedDelivery(null)}
+        delivery={selectedDelivery}
+        onUpdated={fetchDeliveries}
+      />
 
       {/* New Delivery Modal */}
       <NewDeliveryModal
