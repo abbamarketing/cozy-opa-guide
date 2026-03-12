@@ -238,7 +238,7 @@ const TermsOfUse = () => (
     </Section>
 
     <Section title="2. Descrição do Serviço">
-      <p>O VideoFlow é uma plataforma SaaS de gestão de entregas de conteúdo audiovisual que conecta criadores de conteúdo (Clientes) a editores de vídeo (Editores) por meio de um sistema de assinatura mensal. Os serviços incluídos são:</p>
+      <p>O AbbaVideo é uma plataforma SaaS de gestão de entregas de conteúdo audiovisual que conecta criadores de conteúdo (Clientes) a editores de vídeo (Editores) por meio de um sistema de assinatura mensal. Os serviços incluídos são:</p>
       <ul className="list-disc pl-6 space-y-1">
         <li>Upload e gerenciamento de materiais brutos para edição.</li>
         <li>Configuração de preferências de edição e briefing de marca.</li>
