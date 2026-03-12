@@ -72,6 +72,28 @@ const generatePassword = () => {
 const getInitials = (name: string) =>
   name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
 
+const parseFunctionErrorMessage = async (error: unknown) => {
+  let message = 'Erro ao criar editor';
+
+  if (error && typeof error === 'object' && 'message' in error) {
+    message = String((error as { message?: unknown }).message || message);
+  }
+
+  const context =
+    error && typeof error === 'object' && 'context' in error
+      ? (error as { context?: unknown }).context
+      : null;
+
+  if (context && typeof (context as { json?: unknown }).json === 'function') {
+    const payload = await (context as { json: () => Promise<any> }).json().catch(() => null);
+    if (payload?.error && typeof payload.error === 'string') {
+      message = payload.error;
+    }
+  }
+
+  return message;
+};
+
 /* ─── Component ─── */
 const EditorManagement = () => {
   const [editors, setEditors] = useState<EditorData[]>([]);
@@ -170,8 +192,13 @@ const EditorManagement = () => {
         body: { name: result.data.name, email: result.data.email, password: addPassword },
       });
 
-      if (error) throw new Error(error.message || 'Erro ao criar editor');
-      if (data?.error) throw new Error(data.error);
+      if (error) {
+        throw new Error(await parseFunctionErrorMessage(error));
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
 
       toast.success('Editor criado com sucesso!', {
         description: `Credenciais: ${result.data.email} / ${addPassword}`,
@@ -182,8 +209,9 @@ const EditorManagement = () => {
       setAddEmail('');
       setAddPassword(generatePassword());
       fetchEditors();
-    } catch (err: any) {
-      toast.error(err.message || 'Erro ao criar editor');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro ao criar editor';
+      toast.error(message);
     } finally {
       setCreating(false);
     }
