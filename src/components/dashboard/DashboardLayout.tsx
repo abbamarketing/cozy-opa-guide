@@ -275,7 +275,7 @@ const DashboardLayout = () => {
       <ContextualTour ready={tourReady} />
       <DashboardHeader />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {!isMobile && (
           <DashboardSidebar activeTab={activeTab} setActiveTab={setActiveTab} navItems={navItems} />
         )}
@@ -308,7 +308,7 @@ const DashboardLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full flex-col bg-background border-0">{mainContent}</div>
+      <div className="flex min-h-screen w-full flex-col bg-background border-0 [--header-height:3rem] md:[--header-height:3.5rem]">{mainContent}</div>
     </SidebarProvider>
   );
 };
