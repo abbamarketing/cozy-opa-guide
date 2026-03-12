@@ -70,6 +70,7 @@ const FREQ_LABELS: Record<string, string> = {
 const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCount }: Props) => {
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
+  const [subtaskTemplates, setSubtaskTemplates] = useState<SubtaskTemplate[]>([]);
   const isEditing = editingProject && editingProject.id !== '';
 
   const {
