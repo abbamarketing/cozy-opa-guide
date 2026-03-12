@@ -25,13 +25,8 @@ const PaymentSuccess = () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (pollRef.current) clearTimeout(pollRef.current);
 
-      // Mark onboarding complete
-      await supabase
-        .from('profiles')
-        .update({ onboarding_complete: true })
-        .eq('user_id', user.id);
-
-      navigate('/dashboard', { replace: true });
+      // Payment confirmed → go to onboarding (briefing)
+      navigate('/onboarding', { replace: true });
     };
 
     // Check if already confirmed (e.g. page reload)
