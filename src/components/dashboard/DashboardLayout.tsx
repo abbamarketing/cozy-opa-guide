@@ -281,11 +281,6 @@ const DashboardLayout = () => {
     </>
   );
 
-  if (isMobile) {
-    // No sidebar provider needed for mobile
-    return <div className="flex min-h-screen flex-col bg-background">{mainContent}</div>;
-  }
-
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full flex-col bg-background">{mainContent}</div>
