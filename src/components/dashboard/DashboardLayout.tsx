@@ -18,6 +18,7 @@ import {
   LogOut,
   ChevronDown,
   Menu,
+  CheckCircle2,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { useProfile } from '@/hooks/useProfile';
