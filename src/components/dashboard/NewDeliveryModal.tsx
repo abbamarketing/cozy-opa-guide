@@ -147,19 +147,10 @@ const NewDeliveryModal = ({
     return result;
   }, [userProject, project]);
 
-  // Deadline calculation
+  // Deadline calculation - always use project default
   const getDeadlineHours = () => {
-    const base = project.deadline === '24h' ? 24 : project.deadline === '48h' ? 48 : 72;
-    return deadlineOption === 'urgent' ? Math.max(24, base - 24) : base;
+    return project.deadline === '24h' ? 24 : project.deadline === '48h' ? 48 : 72;
   };
-
-  const estimatedDelivery = useMemo(() => {
-    const hours = getDeadlineHours();
-    const date = new Date(Date.now() + hours * 60 * 60 * 1000);
-    return date;
-  }, [deadlineOption, project.deadline]);
-
-  const canBeUrgent = project.deadline !== '24h'; // 24h is already the fastest
 
   const onSubmit = async (values: FormValues) => {
     if (!user) return;
