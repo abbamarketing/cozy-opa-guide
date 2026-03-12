@@ -34,6 +34,7 @@ import type { DeliveryData } from './DeliveryCard';
 import { typeConfig, statusConfig } from './DeliveryCard';
 import RevisionModal from './RevisionModal';
 import DeliveryChat from '@/components/shared/DeliveryChat';
+import SubtaskList from '@/components/shared/SubtaskList';
 
 interface DeliveryDetailModalProps {
   open: boolean;
