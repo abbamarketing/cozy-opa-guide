@@ -2,27 +2,32 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VideoFlow — Gestão de Vídeos</title>
-    <meta name="description" content="VideoFlow: plataforma de gestão de entregas de vídeo, thumbnails e capas para criadores de conteúdo." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>VideoFlow — Gestao de Videos</title>
+    <meta name="description" content="VideoFlow: plataforma de gestao de entregas de video, thumbnails e capas para criadores de conteudo." />
     <meta name="author" content="VideoFlow" />
     <link rel="canonical" href="https://videoflow.app" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#A0522D" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="VideoFlow" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
 
     <!-- Preconnect to Supabase -->
     <link rel="preconnect" href="https://iqrypgqdhpanqjqnxtap.supabase.co" crossorigin />
     <link rel="dns-prefetch" href="https://iqrypgqdhpanqjqnxtap.supabase.co" />
 
     <!-- OG -->
-    <meta property="og:title" content="VideoFlow — Gestão de Vídeos" />
-    <meta property="og:description" content="Plataforma completa para gestão de entregas de vídeo, thumbnails e capas." />
+    <meta property="og:title" content="VideoFlow — Gestao de Videos" />
+    <meta property="og:description" content="Plataforma completa para gestao de entregas de video, thumbnails e capas." />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-
-    <!-- Theme color -->
-    <meta name="theme-color" content="#F0F0F0" />
 
     <link rel="icon" href="/favicon.ico" />
   </head>
@@ -30,5 +35,12 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>

@@ -71,7 +71,7 @@ const DashboardHeader = () => {
     : '?';
 
   return (
-    <header className="sticky top-0 z-30 flex h-12 items-center justify-between border-b border-border bg-background px-3 md:px-4 md:h-14">
+    <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-border bg-background px-3 md:px-4 md:h-14">
       <div className="flex items-center gap-2">
         {!isMobile && <SidebarTrigger className="mr-1" />}
         <div className="flex items-center gap-1.5">
@@ -308,7 +308,7 @@ const DashboardLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full flex-col bg-background">{mainContent}</div>
+      <div className="flex min-h-screen w-full flex-col bg-background border-0">{mainContent}</div>
     </SidebarProvider>
   );
 };
