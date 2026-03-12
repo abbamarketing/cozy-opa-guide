@@ -43,6 +43,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const [deliveries, setDeliveries] = useState<DeliveryData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
+  const [showNewModal, setShowNewModal] = useState(false);
 
   const fetchDeliveries = async () => {
     const { data, error } = await supabase
