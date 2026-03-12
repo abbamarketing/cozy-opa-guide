@@ -117,10 +117,50 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
         max_revisions: editingProject.max_revisions,
         deadline: editingProject.deadline,
       });
+      // Load existing subtask templates
+      supabase
+        .from('project_subtask_templates')
+        .select('*')
+        .eq('custom_project_id', editingProject.id)
+        .order('sort_order')
+        .then(({ data }) => {
+          if (data) {
+            setSubtaskTemplates(data.map((t: any) => ({
+              id: t.id,
+              name: t.name,
+              delivery_types: t.delivery_types || [],
+              sort_order: t.sort_order,
+              requires_approval: t.requires_approval,
+              is_active: t.is_active,
+            })));
+          }
+        });
     } else if (open) {
       reset();
+      setSubtaskTemplates([]);
     }
   }, [open, editingProject, reset]);
+
+  const saveSubtaskTemplates = async (projectId: string) => {
+    // Delete existing templates for this project
+    await supabase
+      .from('project_subtask_templates')
+      .delete()
+      .eq('custom_project_id', projectId);
+
+    // Insert new templates
+    if (subtaskTemplates.length > 0) {
+      const inserts = subtaskTemplates.map((t, i) => ({
+        custom_project_id: projectId,
+        name: t.name,
+        delivery_types: t.delivery_types,
+        sort_order: i,
+        requires_approval: t.requires_approval,
+        is_active: t.is_active,
+      }));
+      await supabase.from('project_subtask_templates').insert(inserts as any);
+    }
+  };
 
   const onSubmit = async (data: ProjectFormData) => {
     if (!user) return;
@@ -133,6 +173,8 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
     };
 
     let error;
+    let projectId = editingProject?.id;
+
     if (isEditing) {
       const { created_by, ...updatePayload } = payload;
       ({ error } = await supabase
@@ -140,14 +182,22 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
         .update(updatePayload as any)
         .eq('id', editingProject!.id));
     } else {
-      ({ error } = await supabase
+      const { data: inserted, error: insertError } = await supabase
         .from('custom_projects')
-        .insert(payload as any));
+        .insert(payload as any)
+        .select('id')
+        .single();
+      error = insertError;
+      if (inserted) projectId = inserted.id;
     }
 
     if (error) {
       toast.error('Erro ao salvar projeto', { description: error.message });
     } else {
+      // Save subtask templates
+      if (projectId) {
+        await saveSubtaskTemplates(projectId);
+      }
       toast.success(isEditing ? 'Projeto atualizado!' : 'Projeto criado!');
       onSaved();
     }
