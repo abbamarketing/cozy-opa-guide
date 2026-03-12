@@ -326,7 +326,7 @@ const TermsOfUse = () => (
     </Section>
 
     <Section title="12. Limitação de Responsabilidade">
-      <p>O VideoFlow não garante disponibilidade ininterrupta da Plataforma. Não nos responsabilizamos por danos indiretos, lucros cessantes ou perda de dados decorrentes do uso da Plataforma ou por falhas fora de nosso controle.</p>
+      <p>O AbbaVideo não garante disponibilidade ininterrupta da Plataforma. Não nos responsabilizamos por danos indiretos, lucros cessantes ou perda de dados decorrentes do uso da Plataforma ou por falhas fora de nosso controle.</p>
     </Section>
 
     <Section title="13. Alterações nos Termos">
