@@ -51,6 +51,8 @@ const App = () => (
               {/* Public routes */}
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
 
               {/* Admin only */}
