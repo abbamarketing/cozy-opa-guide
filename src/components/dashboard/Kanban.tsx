@@ -111,43 +111,6 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
   const quotaAvailable = hasQuota();
 
-  const handleApprove = async (delivery: DeliveryData) => {
-    const { error } = await supabase
-      .from('deliveries')
-      .update({ status: 'approved', approved_at: new Date().toISOString() })
-      .eq('id', delivery.id);
-
-    if (error) {
-      toast.error('Erro ao aprovar entrega');
-    } else {
-      toast.success('Entrega aprovada!');
-      setSelectedDelivery(null);
-      fetchDeliveries();
-    }
-  };
-
-  const handleRequestRevision = async (delivery: DeliveryData) => {
-    if (delivery.revision_count >= delivery.max_revisions) {
-      toast.error('Limite de revisões atingido');
-      return;
-    }
-
-    const { error } = await supabase
-      .from('deliveries')
-      .update({
-        status: 'revision',
-        revision_count: delivery.revision_count + 1,
-      })
-      .eq('id', delivery.id);
-
-    if (error) {
-      toast.error('Erro ao solicitar revisão');
-    } else {
-      toast.success('Revisão solicitada');
-      setSelectedDelivery(null);
-      fetchDeliveries();
-    }
-  };
 
   const getDeliveriesForColumn = (col: Column) =>
     deliveries.filter((d) => col.statuses.includes(d.status));
