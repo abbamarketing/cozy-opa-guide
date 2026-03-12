@@ -11,7 +11,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import DeliveryCard, { type DeliveryData } from './DeliveryCard';
 import type { UserProjectData } from '@/hooks/useUserProject';
 import { toast } from 'sonner';
-import { toast } from 'sonner';
 
 interface KanbanProps {
   userProject: UserProjectData;
