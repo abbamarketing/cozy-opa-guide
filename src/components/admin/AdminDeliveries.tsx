@@ -187,7 +187,7 @@ const AdminDeliveries = () => {
       <Card
         draggable={!isMobile}
         onDragStart={!isMobile ? () => setDraggedId(d.id) : undefined}
-        className={`border-border/40 bg-card/80 p-3 space-y-1.5 ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''}`}
+        className={`border-border/20 bg-card/90 p-3 space-y-1.5 hover:border-border/40 transition-colors ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''}`}
       >
         <div className="flex items-start gap-2">
           {!isMobile && <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />}
@@ -303,7 +303,7 @@ const AdminDeliveries = () => {
       {/* Mobile: Tab + single column */}
       {isMobile ? (
         <div className="space-y-3">
-          <div className="flex gap-1 bg-secondary rounded-lg p-1">
+          <div className="flex gap-1 bg-secondary/50 rounded-lg p-1 border border-border/20">
             {COLUMNS.map((col) => {
               const count = filtered.filter((d) => col.statuses.includes(d.status)).length;
               const isActive = activeColumn === col.id;
@@ -343,20 +343,20 @@ const AdminDeliveries = () => {
             return (
               <div
                 key={col.id}
-                className={`flex flex-col rounded-xl border p-2 transition-colors ${
-                  draggedId ? 'border-primary/50 bg-primary/5' : 'border-border/40 bg-muted/30'
+                className={`flex flex-col rounded-xl border p-2.5 min-h-[300px] transition-colors ${
+                  draggedId ? 'border-primary/30 bg-primary/5' : 'border-border/30 bg-muted/15'
                 }`}
                 onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
                 onDrop={() => handleDrop(col.statuses)}
               >
-                <div className="mb-2 px-1 flex items-center justify-between">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{col.title}</h3>
-                  <Badge variant="secondary" className="h-5 min-w-[20px] justify-center px-1.5 text-[10px]">{items.length}</Badge>
+                <div className="mb-2.5 px-1 flex items-center justify-between">
+                  <h3 className="text-[10px] font-mono font-semibold uppercase tracking-widest text-muted-foreground">{col.title}</h3>
+                  <Badge variant="secondary" className="h-5 min-w-[20px] justify-center px-1.5 text-[10px] font-mono">{items.length}</Badge>
                 </div>
                 <ScrollArea className="flex-1">
                   <div className="space-y-2 p-0.5">
                     {items.length === 0 ? (
-                      <p className="py-8 text-center text-xs text-muted-foreground/50">Nenhuma</p>
+                      <p className="py-8 text-center text-[11px] text-muted-foreground/40 font-mono">Nenhuma</p>
                     ) : (
                       items.map((d) => <DeliveryItem key={d.id} d={d} />)
                     )}
