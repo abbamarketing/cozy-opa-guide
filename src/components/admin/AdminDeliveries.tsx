@@ -198,6 +198,35 @@ const AdminDeliveries = () => {
             <SelectItem value="cover">Capa</SelectItem>
           </SelectContent>
         </Select>
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5 h-8 text-xs"
+          disabled={filtered.length === 0}
+          onClick={() => {
+            const typeLabels: Record<string, string> = {
+              youtube_video: 'YouTube', instagram_video: 'Instagram', thumbnail: 'Thumbnail', cover: 'Capa',
+            };
+            const statusLabels: Record<string, string> = {
+              pending: 'Pendente', in_progress: 'Em produção', review: 'Revisão', revision: 'Revisão solicitada', approved: 'Aprovado', cancelled: 'Cancelado',
+            };
+            downloadCSV(
+              filtered.map((d) => ({
+                Título: d.title,
+                Tipo: typeLabels[d.delivery_type] || d.delivery_type,
+                Status: statusLabels[d.status] || d.status,
+                Cliente: d.client_name || '—',
+                Editor: d.editor_name || 'Sem editor',
+                Prazo: d.due_date ? format(new Date(d.due_date), 'dd/MM/yyyy HH:mm', { locale: ptBR }) : '—',
+              })),
+              `entregas-${format(new Date(), 'yyyy-MM-dd')}`
+            );
+          }}
+        >
+          <Download className="h-3.5 w-3.5" />
+          Exportar CSV
+        </Button>
       </div>
 
       {/* Kanban */}
