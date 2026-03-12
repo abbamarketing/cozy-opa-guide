@@ -85,27 +85,28 @@ const TYPE_ICON: Record<string, { icon: typeof Video; color: string }> = {
 };
 
 const FEATURES = [
-  { icon: Video, title: 'Edição para YouTube', desc: 'Cortes dinâmicos, legendas e identidade visual.' },
-  { icon: Camera, title: 'Vídeos para Instagram', desc: 'Reels otimizados para engajamento.' },
-  { icon: Image, title: 'Thumbnails', desc: 'Design estratégico para CTR.' },
-  { icon: Layers, title: 'Capas de Feed', desc: 'Alinhadas à identidade visual.' },
-  { icon: Calendar, title: 'Captação Presencial', desc: 'Agendamento integrado.' },
-  { icon: Clock, title: 'SLA Garantido', desc: 'Prazos com countdown em horas úteis.' },
-  { icon: MessageSquare, title: 'Chat por Entrega', desc: 'Marcadores de tempo inclusos.' },
-  { icon: Shield, title: 'Revisões Incluídas', desc: 'Ajustes até a aprovação.' },
-  { icon: BarChart3, title: 'Dashboard Kanban', desc: 'Visão completa em tempo real.' },
-  { icon: FileText, title: 'Roteiros com IA', desc: 'Geração automática de scripts.' },
-  { icon: Bot, title: 'Assistente IA', desc: 'Suporte 24/7 na plataforma.' },
-  { icon: Users, title: 'Onboarding Guiado', desc: 'Briefing completo da marca.' },
+  { icon: Video, title: 'Edição para YouTube', desc: 'Vídeos que retêm audiência — cortes profissionais, legendas e sua identidade visual.' },
+  { icon: Camera, title: 'Reels que Convertem', desc: 'Conteúdo vertical otimizado para o algoritmo do Instagram.' },
+  { icon: Image, title: 'Thumbnails que Vendem', desc: 'Cada clique conta. Thumbnails estratégicas que aumentam seu CTR.' },
+  { icon: Layers, title: 'Feed Profissional', desc: 'Capas de destaque que transformam seu perfil em vitrine.' },
+  { icon: Calendar, title: 'Captação Sob Demanda', desc: 'Equipe profissional na sua porta — agende direto pela plataforma.' },
+  { icon: Clock, title: 'Prazo Garantido', desc: 'SLA de 24h a 72h em horas úteis. Sem atrasos, sem surpresas.' },
+  { icon: MessageSquare, title: 'Comunicação Zero Ruído', desc: 'Chat por entrega com marcadores de tempo. Adeus, WhatsApp.' },
+  { icon: Shield, title: 'Revisões até Aprovar', desc: 'Peça ajustes quantas vezes precisar dentro do seu plano.' },
+  { icon: BarChart3, title: 'Controle Total', desc: 'Dashboard Kanban para acompanhar cada entrega em tempo real.' },
+  { icon: FileText, title: 'Roteiros com IA', desc: 'Gere scripts otimizados em segundos — sem bloqueio criativo.' },
+  { icon: Bot, title: 'Suporte 24/7', desc: 'Assistente IA que conhece sua conta e resolve na hora.' },
+  { icon: Users, title: 'Onboarding Express', desc: 'Briefing completo de marca — seu editor já começa sabendo tudo.' },
 ];
 
 const FAQ = [
-  { q: 'Como funciona o processo de edição?', a: 'Solicite uma entrega, preencha o briefing e acompanhe pelo Kanban em tempo real.' },
-  { q: 'Quantas revisões estão incluídas?', a: 'Depende do seu plano. Solicite revisões com notas detalhadas e marcadores de tempo.' },
-  { q: 'Os prazos são em horas corridas?', a: 'Não! O SLA conta apenas horas úteis (8h–18h BRT, seg–sex). Fins de semana não contam.' },
-  { q: 'Como converso com meu editor?', a: 'Cada entrega tem chat integrado com marcadores de tempo para referências no vídeo.' },
-  { q: 'Existe app mobile?', a: 'A plataforma é responsiva e funciona perfeitamente no celular, sem instalar nada.' },
-  { q: 'Como começo a usar?', a: 'Entre em contato para um plano personalizado. Após configuração, preencha o briefing e comece.' },
+  { q: 'Por que eu deveria terceirizar minha edição?', a: 'Porque seu tempo vale mais criando conteúdo do que editando. Cada hora que você gasta cortando vídeo é uma hora a menos produzindo, vendendo ou vivendo. Deixe a edição com quem faz isso o dia todo.' },
+  { q: 'Quanto tempo eu economizo por mês?', a: 'Criadores que editam sozinhos gastam em média 8–15 horas por vídeo. Com a AbbaVideo, você só grava, envia o bruto e aprova. São dezenas de horas devolvidas todo mês.' },
+  { q: 'E se eu não gostar do resultado?', a: 'Revisões estão incluídas no seu plano. Peça ajustes com notas detalhadas e marcadores de tempo — o editor corrige exatamente o que você precisa, quantas vezes for necessário.' },
+  { q: 'Os prazos são em horas corridas?', a: 'Não! Contamos apenas horas úteis (8h–18h, seg–sex). Se você pedir na sexta à noite, o prazo só começa segunda de manhã. Justo e transparente.' },
+  { q: 'Funciona para empresas também?', a: 'Sim! Empresas usam a plataforma para gerenciar conteúdo de múltiplos canais. Cada projeto tem seu editor, briefing e cotas independentes.' },
+  { q: 'Preciso instalar alguma coisa?', a: 'Zero instalação. A plataforma roda no navegador — desktop ou celular. Você gerencia tudo do sofá, do Uber ou do escritório.' },
+  { q: 'Quanto custa?', a: 'Cada plano é montado sob medida. Você paga pelo que precisa — sem pacotes inflados, sem surpresas na fatura. Fale conosco para um orçamento em minutos.' },
 ];
 
 type DemoTab = 'dashboard' | 'entrega' | 'editor';
@@ -496,7 +497,7 @@ const Landing = () => {
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 text-center">
           <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
             <Badge variant="outline" className="mb-6 px-4 py-1.5 text-xs border-primary/30 text-primary">
-              <Zap className="h-3 w-3 mr-1.5" /> Plataforma de Edição Profissional
+              <Zap className="h-3 w-3 mr-1.5" /> Pare de editar. Comece a crescer.
             </Badge>
           </motion.div>
 
@@ -504,16 +505,16 @@ const Landing = () => {
             initial="hidden" animate="visible" variants={fadeUp} custom={1}
             className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight"
           >
-            Suas entregas de vídeo,{' '}
-            <span className="text-primary">organizadas e profissionais</span>
+            Vídeos profissionais{' '}
+            <span className="text-primary">sem você precisar editar</span>
           </motion.h1>
 
           <motion.p
             initial="hidden" animate="visible" variants={fadeUp} custom={2}
             className="mx-auto mt-5 max-w-2xl text-base sm:text-lg text-muted-foreground font-body"
           >
-            Gerencie edições, thumbnails, capas e captações em um só lugar.
-            Acompanhe prazos, converse com editores e aprove entregas — tudo em tempo real.
+            Você grava. A gente edita, entrega e surpreende. Thumbnails, Reels, capas — 
+            tudo com prazo garantido, revisões inclusas e um editor dedicado à sua marca.
           </motion.p>
 
           <motion.div
@@ -522,12 +523,12 @@ const Landing = () => {
           >
             <a href="https://wa.me/5500000000000" target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="gap-2 text-sm px-8">
-                <Mail className="h-4 w-4" /> Solicitar Orçamento
+                <Mail className="h-4 w-4" /> Quero um Orçamento Grátis
               </Button>
             </a>
             <Link to="/auth">
               <Button variant="outline" size="lg" className="gap-2 text-sm px-8">
-                Já tenho conta <ArrowRight className="h-4 w-4" />
+                Já sou cliente <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </motion.div>
@@ -539,9 +540,9 @@ const Landing = () => {
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}>
             <div className="text-center mb-6">
-              <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">Explore a plataforma</p>
+              <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">Sua nova central de conteúdo</p>
               <h2 className="text-xl sm:text-2xl font-bold">
-                Veja como funciona <span className="text-primary">na prática</span>
+                Tudo sob controle — <span className="text-primary">do pedido à aprovação</span>
               </h2>
             </div>
 
@@ -554,9 +555,9 @@ const Landing = () => {
             {/* Context labels below demo */}
             <div className="grid grid-cols-3 gap-2 mt-4">
               {[
-                { tab: 'dashboard' as const, title: 'Dashboard do Cliente', desc: 'Cotas, Kanban e entregas em tempo real.' },
-                { tab: 'entrega' as const, title: 'Detalhe da Entrega', desc: 'SLA, revisões, chat e aprovação.' },
-                { tab: 'editor' as const, title: 'Painel do Editor', desc: 'Briefing, checklist e upload.' },
+                { tab: 'dashboard' as const, title: 'Seu Dashboard', desc: 'Veja cotas, acompanhe entregas e solicite novos vídeos em segundos.' },
+                { tab: 'entrega' as const, title: 'Revisão e Aprovação', desc: 'Peça ajustes com marcadores de tempo e aprove quando ficar perfeito.' },
+                { tab: 'editor' as const, title: 'Seu Editor Dedicado', desc: 'Ele já conhece sua marca, seus cortes e seu estilo.' },
               ].map((item) => (
                 <button
                   key={item.tab}
@@ -578,14 +579,41 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Benefits strip */}
+      <section className="py-12 sm:py-16 border-t border-border/30">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+            {[
+              { metric: '10–15h', label: 'economizadas por mês', desc: 'Tempo que você gastaria editando — devolvido para criar, vender ou descansar.' },
+              { metric: '24–72h', label: 'prazo de entrega', desc: 'SLA garantido em horas úteis. Você sabe exatamente quando esperar.' },
+              { metric: '100%', label: 'sua identidade visual', desc: 'Editor dedicado que conhece sua marca — cores, fontes, estilo e tom de voz.' },
+            ].map((b) => (
+              <motion.div
+                key={b.label}
+                initial="hidden" whileInView="visible" viewport={{ once: true }}
+                variants={fadeUp} custom={0}
+                className="text-center sm:text-left"
+              >
+                <p className="text-2xl sm:text-3xl font-bold text-primary font-mono">{b.metric}</p>
+                <p className="text-xs font-semibold text-card-foreground mt-1">{b.label}</p>
+                <p className="text-[11px] text-muted-foreground font-body mt-1 leading-relaxed">{b.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Grid */}
       <section className="py-16 sm:py-24 border-t border-border/30">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-4xl font-bold">
-              Tudo o que você precisa,{' '}
-              <span className="text-primary">em um só lugar</span>
+              Mais tempo criando.{' '}
+              <span className="text-primary">Zero tempo editando.</span>
             </h2>
+            <p className="mt-3 text-muted-foreground font-body max-w-xl mx-auto">
+              Cada funcionalidade foi pensada para você focar no que importa: criar conteúdo que cresce.
+            </p>
           </div>
 
           <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
@@ -618,14 +646,14 @@ const Landing = () => {
             {/* How it works */}
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold mb-8">
-                Como <span className="text-primary">funciona</span>
+                Comece em <span className="text-primary">4 passos</span>
               </h2>
               <div className="space-y-4">
                 {[
-                  { step: '01', title: 'Plano personalizado', desc: 'Montamos sob medida para sua necessidade de conteúdo.' },
-                  { step: '02', title: 'Briefing de marca', desc: 'Preencha uma vez — cores, fontes, estilo e referências.' },
-                  { step: '03', title: 'Solicite entregas', desc: 'Vídeos, thumbnails e capas pelo Dashboard.' },
-                  { step: '04', title: 'Revise e aprove', desc: 'Acompanhe o SLA, peça revisões e aprove em tempo real.' },
+                  { step: '01', title: 'Monte seu plano', desc: 'Diga quantos vídeos, Reels, thumbs e capas precisa. Sem pacote fechado.' },
+                  { step: '02', title: 'Envie seu briefing', desc: 'Cores, fontes, estilo — preencha uma vez e seu editor já sabe tudo.' },
+                  { step: '03', title: 'Grave e envie', desc: 'Mande o bruto. Nós cuidamos de corte, legenda, música e entrega.' },
+                  { step: '04', title: 'Aprove e publique', desc: 'Revise, peça ajustes e aprove. Seu conteúdo pronto para bombar.' },
                 ].map((s, i) => (
                   <motion.div
                     key={s.step}
@@ -654,7 +682,7 @@ const Landing = () => {
                 Conheça a <span className="text-primary">Olívia</span>
               </h2>
               <p className="text-muted-foreground font-body text-sm mb-4">
-                Suporte inteligente 24/7 — esperta, direta e disponível direto na plataforma.
+                Dúvida sobre cotas? Precisa de ajuda com o briefing? A Olívia resolve em segundos — sem esperar atendimento humano.
               </p>
 
               <div className="rounded-2xl border border-border/40 bg-card/60 overflow-hidden shadow-xl">
@@ -737,16 +765,19 @@ const Landing = () => {
         <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
           <div className="rounded-2xl border border-primary/20 bg-primary/5 p-8 sm:p-12">
             <h2 className="text-2xl sm:text-3xl font-bold mb-3">
-              Pronto para profissionalizar seu conteúdo?
+              Seu próximo vídeo pode ser o melhor que você já publicou.
             </h2>
             <p className="text-muted-foreground font-body mb-6 max-w-lg mx-auto">
-              Entre em contato para montar um plano personalizado.
+              Enquanto você cria, a gente edita. Plano sob medida, editor dedicado e zero dor de cabeça. Fale com a gente — o orçamento é grátis.
             </p>
-            <a href="https://wa.me/5500000000000" target="_blank" rel="noopener noreferrer">
-              <Button size="lg" className="gap-2 px-10">
-                <Mail className="h-4 w-4" /> Fale Conosco
-              </Button>
-            </a>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a href="https://wa.me/5500000000000" target="_blank" rel="noopener noreferrer">
+                <Button size="lg" className="gap-2 px-10">
+                  <Mail className="h-4 w-4" /> Quero um Orçamento Grátis
+                </Button>
+              </a>
+              <p className="text-[10px] text-muted-foreground font-body">Resposta em até 2 horas úteis</p>
+            </div>
           </div>
         </div>
       </section>
