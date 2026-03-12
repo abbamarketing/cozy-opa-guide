@@ -202,10 +202,10 @@ const AIChatWidget = () => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-card-foreground">
-                    Olá! 👋
+                    Olá! Eu sou a Olívia 💃
                   </p>
                   <p className="text-xs text-muted-foreground mt-1 max-w-[240px]">
-                    Sou seu assistente virtual. Tire dúvidas sobre a plataforma, suas funcionalidades e como usá-la.
+                    Esperta, direta e sempre pronta pra ajudar. Pergunta aí!
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-2 justify-center">
