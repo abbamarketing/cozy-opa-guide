@@ -91,7 +91,6 @@ const NewDeliveryModal = ({
       delivery_type: undefined,
       title: '',
       description: '',
-      deadline_option: 'normal',
     },
   });
 
