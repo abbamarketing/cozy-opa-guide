@@ -16,7 +16,7 @@ const AdminManual = () => (
   <article className="prose-doc space-y-8">
     <header>
       <h1 className="text-2xl font-bold text-foreground">Manual do Administrador</h1>
-      <p className="text-muted-foreground">Guia completo para gerenciar o VideoFlow.</p>
+      <p className="text-muted-foreground">Guia completo para gerenciar o AbbaVideo.</p>
     </header>
 
     <Section title="1. Visão Geral">
