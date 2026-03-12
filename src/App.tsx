@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Editor from "./pages/Editor";
 import Admin from "./pages/Admin";
 import Terms from "./pages/Terms";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
