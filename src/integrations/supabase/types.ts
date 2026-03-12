@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      capture_sessions: {
+        Row: {
+          address: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          delivery_id: string | null
+          duration_minutes: number | null
+          id: string
+          location_name: string | null
+          notes: string | null
+          scheduled_date: string
+          scheduled_time: string | null
+          status: Database["public"]["Enums"]["capture_session_status"]
+          updated_at: string
+          user_project_id: string
+        }
+        Insert: {
+          address?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          delivery_id?: string | null
+          duration_minutes?: number | null
+          id?: string
+          location_name?: string | null
+          notes?: string | null
+          scheduled_date: string
+          scheduled_time?: string | null
+          status?: Database["public"]["Enums"]["capture_session_status"]
+          updated_at?: string
+          user_project_id: string
+        }
+        Update: {
+          address?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          delivery_id?: string | null
+          duration_minutes?: number | null
+          id?: string
+          location_name?: string | null
+          notes?: string | null
+          scheduled_date?: string
+          scheduled_time?: string | null
+          status?: Database["public"]["Enums"]["capture_session_status"]
+          updated_at?: string
+          user_project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "capture_sessions_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "deliveries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capture_sessions_user_project_id_fkey"
+            columns: ["user_project_id"]
+            isOneToOne: false
+            referencedRelation: "user_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       custom_projects: {
         Row: {
           active: boolean
@@ -27,6 +93,7 @@ export type Database = {
           include_script: boolean
           include_thumbnails: boolean
           instagram_videos: number
+          max_captures: number
           max_revisions: number
           monthly_value: number
           payment_frequency: Database["public"]["Enums"]["payment_frequency_type"]
@@ -48,6 +115,7 @@ export type Database = {
           include_script?: boolean
           include_thumbnails?: boolean
           instagram_videos?: number
+          max_captures?: number
           max_revisions?: number
           monthly_value: number
           payment_frequency?: Database["public"]["Enums"]["payment_frequency_type"]
@@ -69,6 +137,7 @@ export type Database = {
           include_script?: boolean
           include_thumbnails?: boolean
           instagram_videos?: number
+          max_captures?: number
           max_revisions?: number
           monthly_value?: number
           payment_frequency?: Database["public"]["Enums"]["payment_frequency_type"]
@@ -224,6 +293,60 @@ export type Database = {
             columns: ["delivery_id"]
             isOneToOne: false
             referencedRelation: "deliveries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_subtasks: {
+        Row: {
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          delivery_id: string
+          id: string
+          name: string
+          requires_approval: boolean
+          sort_order: number
+          status: Database["public"]["Enums"]["subtask_status"]
+          template_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          delivery_id: string
+          id?: string
+          name: string
+          requires_approval?: boolean
+          sort_order?: number
+          status?: Database["public"]["Enums"]["subtask_status"]
+          template_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          delivery_id?: string
+          id?: string
+          name?: string
+          requires_approval?: boolean
+          sort_order?: number
+          status?: Database["public"]["Enums"]["subtask_status"]
+          template_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_subtasks_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "deliveries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_subtasks_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "project_subtask_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -445,6 +568,47 @@ export type Database = {
           },
         ]
       }
+      project_subtask_templates: {
+        Row: {
+          created_at: string
+          custom_project_id: string
+          delivery_types: string[]
+          id: string
+          is_active: boolean
+          name: string
+          requires_approval: boolean
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          custom_project_id: string
+          delivery_types?: string[]
+          id?: string
+          is_active?: boolean
+          name: string
+          requires_approval?: boolean
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          custom_project_id?: string
+          delivery_types?: string[]
+          id?: string
+          is_active?: boolean
+          name?: string
+          requires_approval?: boolean
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_subtask_templates_custom_project_id_fkey"
+            columns: ["custom_project_id"]
+            isOneToOne: false
+            referencedRelation: "custom_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       system_logs: {
         Row: {
           context: Json | null
@@ -499,6 +663,8 @@ export type Database = {
       user_projects: {
         Row: {
           assigned_at: string
+          captures_approved: number
+          captures_reserved: number
           covers_approved: number
           covers_reserved: number
           created_at: string
@@ -522,6 +688,8 @@ export type Database = {
         }
         Insert: {
           assigned_at?: string
+          captures_approved?: number
+          captures_reserved?: number
           covers_approved?: number
           covers_reserved?: number
           created_at?: string
@@ -545,6 +713,8 @@ export type Database = {
         }
         Update: {
           assigned_at?: string
+          captures_approved?: number
+          captures_reserved?: number
           covers_approved?: number
           covers_reserved?: number
           created_at?: string
@@ -620,6 +790,11 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "editor" | "client"
+      capture_session_status:
+        | "scheduled"
+        | "confirmed"
+        | "completed"
+        | "cancelled"
       deadline_type: "24h" | "48h" | "72h"
       delivery_status:
         | "pending"
@@ -631,6 +806,7 @@ export type Database = {
       delivery_type: "youtube_video" | "instagram_video" | "thumbnail" | "cover"
       editor_status: "available" | "busy" | "inactive"
       payment_frequency_type: "monthly" | "quarterly" | "annual"
+      subtask_status: "pending" | "in_progress" | "completed" | "approved"
       user_project_status:
         | "pending_payment"
         | "active"
@@ -764,6 +940,12 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "editor", "client"],
+      capture_session_status: [
+        "scheduled",
+        "confirmed",
+        "completed",
+        "cancelled",
+      ],
       deadline_type: ["24h", "48h", "72h"],
       delivery_status: [
         "pending",
@@ -776,6 +958,7 @@ export const Constants = {
       delivery_type: ["youtube_video", "instagram_video", "thumbnail", "cover"],
       editor_status: ["available", "busy", "inactive"],
       payment_frequency_type: ["monthly", "quarterly", "annual"],
+      subtask_status: ["pending", "in_progress", "completed", "approved"],
       user_project_status: [
         "pending_payment",
         "active",
