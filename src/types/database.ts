@@ -38,6 +38,7 @@ export interface CustomProject {
   include_script: boolean;
   include_capture: boolean;
   max_captures: number;
+  capture_lead_days: number;
   monthly_value: number;
   payment_frequency: PaymentFrequency;
   max_revisions: number;

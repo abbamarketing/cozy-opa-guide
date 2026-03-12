@@ -83,6 +83,7 @@ export type Database = {
       custom_projects: {
         Row: {
           active: boolean
+          capture_lead_days: number
           created_at: string
           created_by: string
           deadline: Database["public"]["Enums"]["deadline_type"]
@@ -105,6 +106,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          capture_lead_days?: number
           created_at?: string
           created_by: string
           deadline?: Database["public"]["Enums"]["deadline_type"]
@@ -127,6 +129,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          capture_lead_days?: number
           created_at?: string
           created_by?: string
           deadline?: Database["public"]["Enums"]["deadline_type"]

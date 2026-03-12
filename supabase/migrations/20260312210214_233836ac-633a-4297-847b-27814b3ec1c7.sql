@@ -1,0 +1,1 @@
+ALTER TABLE public.custom_projects ADD COLUMN capture_lead_days integer NOT NULL DEFAULT 30;

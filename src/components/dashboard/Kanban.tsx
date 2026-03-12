@@ -1,5 +1,5 @@
-import { useEffect, useState, lazy, Suspense } from 'react';
-import { Plus } from 'lucide-react';
+import { useEffect, useState, lazy, Suspense, useCallback } from 'react';
+import { Plus, Camera, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -12,6 +12,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 const NewDeliveryModal = lazy(() => import('./NewDeliveryModal'));
 const DeliveryDetailModal = lazy(() => import('./DeliveryDetailModal'));
+const CaptureScheduleModal = lazy(() => import('./CaptureScheduleModal'));
 
 interface KanbanProps {
   userProject: UserProjectData;
@@ -38,9 +39,15 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
+  const [showCaptureModal, setShowCaptureModal] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [activeColumn, setActiveColumn] = useState('todo');
+  const [hasScheduledCapture, setHasScheduledCapture] = useState(false);
+  const [captureLeadDays, setCaptureLeadDays] = useState(30);
+  const [captureCheckDone, setCaptureCheckDone] = useState(false);
   const isMobile = useIsMobile();
+
+  const requiresCapture = userProject.custom_project.include_capture;
 
   const fetchDeliveries = async () => {
     const { data, error } = await supabase
@@ -97,6 +104,42 @@ const Kanban = ({ userProject }: KanbanProps) => {
     };
   }, [userProject.id]);
 
+  // Check if capture is scheduled for this period
+  const checkCapture = useCallback(async () => {
+    if (!requiresCapture) {
+      setCaptureCheckDone(true);
+      return;
+    }
+
+    // Get capture_lead_days from custom_projects
+    const { data: proj } = await supabase
+      .from('custom_projects')
+      .select('capture_lead_days')
+      .eq('id', userProject.custom_project.id)
+      .single();
+
+    if (proj && (proj as any).capture_lead_days) {
+      setCaptureLeadDays((proj as any).capture_lead_days);
+    }
+
+    // Check for any scheduled/confirmed capture in current period
+    const { data: captures } = await supabase
+      .from('capture_sessions')
+      .select('id')
+      .eq('user_project_id', userProject.id)
+      .in('status', ['scheduled', 'confirmed', 'completed'])
+      .gte('scheduled_date', userProject.current_period_start)
+      .lte('scheduled_date', userProject.current_period_end)
+      .limit(1);
+
+    setHasScheduledCapture(!!captures && captures.length > 0);
+    setCaptureCheckDone(true);
+  }, [requiresCapture, userProject.id, userProject.custom_project.id, userProject.current_period_start, userProject.current_period_end]);
+
+  useEffect(() => {
+    checkCapture();
+  }, [checkCapture]);
+
   const hasQuota = () => {
     const p = userProject.custom_project;
     const ytUsed = userProject.youtube_reserved + userProject.youtube_approved;
@@ -112,12 +155,51 @@ const Kanban = ({ userProject }: KanbanProps) => {
   };
 
   const quotaAvailable = hasQuota();
+  const canCreateDelivery = quotaAvailable && (!requiresCapture || hasScheduledCapture);
+  const needsCaptureFirst = requiresCapture && !hasScheduledCapture && captureCheckDone;
+
+  const handleNewClick = () => {
+    if (needsCaptureFirst) {
+      setShowCaptureModal(true);
+    } else {
+      setShowNewModal(true);
+    }
+  };
 
   const getDeliveriesForColumn = (col: Column) =>
     deliveries.filter((d) => col.statuses.includes(d.status));
 
   const handleLoadMore = () => {
     setVisibleCount((prev) => prev + PAGE_SIZE);
+  };
+
+  // Capture banner component
+  const CaptureBanner = () => {
+    if (!needsCaptureFirst) return null;
+    return (
+      <div className="flex items-center gap-3 rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-500/15">
+          <Camera className="h-4 w-4 text-yellow-500" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-card-foreground">
+            Agende sua captação primeiro
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Seu plano inclui captação presencial. Agende uma data para liberar as entregas deste mês.
+          </p>
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          className="shrink-0 gap-1.5 border-yellow-500/30 text-yellow-600 hover:bg-yellow-500/10"
+          onClick={() => setShowCaptureModal(true)}
+        >
+          <Camera className="h-3.5 w-3.5" />
+          Agendar
+        </Button>
+      </div>
+    );
   };
 
   // Mobile: segmented control with single column view
@@ -127,6 +209,9 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
     return (
       <div className="space-y-3">
+        {/* Capture Banner */}
+        <CaptureBanner />
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-base font-mono font-semibold text-foreground">Entregas</h2>
@@ -135,19 +220,24 @@ const Kanban = ({ userProject }: KanbanProps) => {
               <span>
                 <Button
                   size="sm"
-                  disabled={!quotaAvailable}
+                  disabled={!canCreateDelivery}
                   className="gap-1.5 h-9"
-                  onClick={() => setShowNewModal(true)}
+                  onClick={handleNewClick}
                   data-tour="new-delivery-btn"
                 >
-                  <Plus className="h-4 w-4" />
-                  Nova
+                  {needsCaptureFirst ? <Camera className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                  {needsCaptureFirst ? 'Agendar' : 'Nova'}
                 </Button>
               </span>
             </TooltipTrigger>
-            {!quotaAvailable && (
+            {!canCreateDelivery && !needsCaptureFirst && (
               <TooltipContent>
                 <p>Quota esgotada</p>
+              </TooltipContent>
+            )}
+            {needsCaptureFirst && (
+              <TooltipContent>
+                <p>Agende uma captação para liberar entregas</p>
               </TooltipContent>
             )}
           </Tooltip>
@@ -224,6 +314,15 @@ const Kanban = ({ userProject }: KanbanProps) => {
               onCreated={fetchDeliveries}
             />
           )}
+          {showCaptureModal && (
+            <CaptureScheduleModal
+              open={showCaptureModal}
+              onOpenChange={setShowCaptureModal}
+              userProject={userProject}
+              onScheduled={checkCapture}
+              captureLeadDays={captureLeadDays}
+            />
+          )}
         </Suspense>
       </div>
     );
@@ -232,6 +331,9 @@ const Kanban = ({ userProject }: KanbanProps) => {
   // Desktop: original 4-column grid
   return (
     <div className="space-y-4">
+      {/* Capture Banner */}
+      <CaptureBanner />
+
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-mono font-semibold text-foreground">Minhas Entregas</h2>
         <Tooltip>
@@ -239,19 +341,24 @@ const Kanban = ({ userProject }: KanbanProps) => {
             <span>
               <Button
                 size="sm"
-                disabled={!quotaAvailable}
+                disabled={!canCreateDelivery}
                 className="gap-1.5"
-                onClick={() => setShowNewModal(true)}
+                onClick={handleNewClick}
                 data-tour="new-delivery-btn"
               >
-                <Plus className="h-4 w-4" />
-                Nova Solicitacao
+                {needsCaptureFirst ? <Camera className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                {needsCaptureFirst ? 'Agendar Captação' : 'Nova Solicitacao'}
               </Button>
             </span>
           </TooltipTrigger>
-          {!quotaAvailable && (
+          {!canCreateDelivery && !needsCaptureFirst && (
             <TooltipContent>
               <p>Quota esgotada</p>
+            </TooltipContent>
+          )}
+          {needsCaptureFirst && (
+            <TooltipContent>
+              <p>Agende uma captação para liberar entregas</p>
             </TooltipContent>
           )}
         </Tooltip>
@@ -335,6 +442,15 @@ const Kanban = ({ userProject }: KanbanProps) => {
             onOpenChange={setShowNewModal}
             userProject={userProject}
             onCreated={fetchDeliveries}
+          />
+        )}
+        {showCaptureModal && (
+          <CaptureScheduleModal
+            open={showCaptureModal}
+            onOpenChange={setShowCaptureModal}
+            userProject={userProject}
+            onScheduled={checkCapture}
+            captureLeadDays={captureLeadDays}
           />
         )}
       </Suspense>
