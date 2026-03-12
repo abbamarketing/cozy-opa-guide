@@ -16,6 +16,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Editor = lazy(() => import("./pages/Editor"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Terms = lazy(() => import("./pages/Terms"));
+const PaymentGate = lazy(() => import("./pages/PaymentGate"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -53,6 +54,7 @@ const App = () => (
               <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Index />} />
                 <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/onboarding/payment" element={<PaymentGate />} />
                 <Route path="/onboarding/payment-success" element={<PaymentSuccess />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/editor" element={<Editor />} />
