@@ -14,6 +14,16 @@ import {
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Search, MoreHorizontal, Eye, Pause, Play, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -42,11 +52,15 @@ const AdminClients = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{
+    type: 'suspend' | 'activate' | null;
+    userId: string | null;
+    clientName: string | null;
+  }>({ type: null, userId: null, clientName: null });
 
   const fetchClients = async () => {
     setLoading(true);
 
-    // Get client user_ids
     const { data: roles } = await supabase
       .from('user_roles')
       .select('user_id')
@@ -108,32 +122,58 @@ const AdminClients = () => {
     return result;
   }, [clients, statusFilter, debouncedSearch]);
 
-  const handleSuspend = async (userId: string) => {
-    setActionLoading(userId);
+  const handleStatusChange = async () => {
+    if (!confirmAction.userId || !confirmAction.type) return;
+
+    const newStatus = confirmAction.type === 'suspend' ? 'suspended' : 'active';
+    setActionLoading(confirmAction.userId);
+
     const { error } = await supabase
       .from('user_projects')
-      .update({ status: 'suspended' } as any)
-      .eq('user_id', userId);
+      .update({ status: newStatus } as any)
+      .eq('user_id', confirmAction.userId);
 
-    if (error) toast.error('Erro ao suspender');
-    else { toast.success('Cliente suspenso'); fetchClients(); }
+    if (error) {
+      toast.error('Erro ao atualizar status');
+    } else {
+      toast.success(
+        confirmAction.type === 'suspend' ? 'Cliente Suspendido' : 'Cliente Reativado',
+        { description: 'Status atualizado com sucesso' }
+      );
+      fetchClients();
+    }
+
     setActionLoading(null);
-  };
-
-  const handleReactivate = async (userId: string) => {
-    setActionLoading(userId);
-    const { error } = await supabase
-      .from('user_projects')
-      .update({ status: 'active' } as any)
-      .eq('user_id', userId);
-
-    if (error) toast.error('Erro ao reativar');
-    else { toast.success('Cliente reativado'); fetchClients(); }
-    setActionLoading(null);
+    setConfirmAction({ type: null, userId: null, clientName: null });
   };
 
   return (
     <div className="space-y-4">
+      {/* Confirmation Dialog */}
+      <AlertDialog
+        open={confirmAction.type !== null}
+        onOpenChange={(open) => !open && setConfirmAction({ type: null, userId: null, clientName: null })}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirmAction.type === 'suspend' ? 'Suspender Cliente?' : 'Reativar Cliente?'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmAction.type === 'suspend'
+                ? `O cliente "${confirmAction.clientName || ''}" não poderá mais acessar o sistema ou criar novas solicitações. As entregas em andamento continuarão normais.`
+                : `O cliente "${confirmAction.clientName || ''}" voltará a ter acesso total ao sistema e poderá criar novas solicitações.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleStatusChange}>
+              {confirmAction.type === 'suspend' ? 'Suspender' : 'Reativar'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Filters */}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
@@ -215,12 +255,17 @@ const AdminClients = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           {c.status === 'active' && (
-                            <DropdownMenuItem onClick={() => handleSuspend(c.user_id)} className="text-destructive">
+                            <DropdownMenuItem
+                              onClick={() => setConfirmAction({ type: 'suspend', userId: c.user_id, clientName: c.full_name })}
+                              className="text-destructive"
+                            >
                               <Pause className="mr-2 h-4 w-4" /> Suspender
                             </DropdownMenuItem>
                           )}
                           {c.status === 'suspended' && (
-                            <DropdownMenuItem onClick={() => handleReactivate(c.user_id)}>
+                            <DropdownMenuItem
+                              onClick={() => setConfirmAction({ type: 'activate', userId: c.user_id, clientName: c.full_name })}
+                            >
                               <Play className="mr-2 h-4 w-4" /> Reativar
                             </DropdownMenuItem>
                           )}
