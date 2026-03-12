@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "VideoFlow <onboarding@videoflow.com.br>",
+        from: "AbbaVideo <onboarding@abbavideo.com.br>",
         to: [email],
         subject: `Seu projeto ${projectName} está pronto! 🎬`,
         html: emailHtml,

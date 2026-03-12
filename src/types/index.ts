@@ -1,4 +1,4 @@
-// VideoFlow v5.0 TypeScript definitions
+// AbbaVideo TypeScript definitions
 
 export interface User {
   id: string;
