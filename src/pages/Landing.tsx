@@ -768,11 +768,9 @@ const Landing = () => {
               Enquanto você cria, a gente edita. Plano sob medida, editor dedicado e zero dor de cabeça. Fale com a gente — o orçamento é grátis.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <a href="https://wa.me/5500000000000" target="_blank" rel="noopener noreferrer">
-                <Button size="lg" className="gap-2 px-10">
-                  <Mail className="h-4 w-4" /> Quero um Orçamento Grátis
-                </Button>
-              </a>
+              <Button size="lg" className="gap-2 px-10" onClick={() => setSurveyOpen(true)}>
+                <Mail className="h-4 w-4" /> Quero um Orçamento Grátis
+              </Button>
               <p className="text-[10px] text-muted-foreground font-body">Resposta em até 2 horas úteis</p>
             </div>
           </div>
