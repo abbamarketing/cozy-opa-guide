@@ -1,0 +1,43 @@
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/lib/auth';
+
+type AppRole = 'admin' | 'editor' | 'client';
+
+export function useRole() {
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const [roles, setRoles] = useState<AppRole[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (isAuthLoading) return;
+
+    if (!user?.id) {
+      setRoles([]);
+      setLoading(false);
+      return;
+    }
+
+    const fetchRoles = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id);
+
+      if (!error && data) {
+        setRoles(data.map(r => r.role as AppRole));
+      }
+      setLoading(false);
+    };
+
+    fetchRoles();
+  }, [user?.id, isAuthLoading]);
+
+  const hasRole = (role: AppRole) => roles.includes(role);
+  const isAdmin = () => hasRole('admin');
+  const isEditor = () => hasRole('editor');
+  const isClient = () => hasRole('client');
+
+  return { roles, loading, hasRole, isAdmin, isEditor, isClient };
+}
