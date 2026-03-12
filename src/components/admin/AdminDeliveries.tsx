@@ -187,7 +187,7 @@ const AdminDeliveries = () => {
       <Card
         draggable={!isMobile}
         onDragStart={!isMobile ? () => setDraggedId(d.id) : undefined}
-        className={`border-border/40 bg-card/80 p-3 space-y-1.5 ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''}`}
+        className={`border-border/20 bg-card/90 p-3 space-y-1.5 hover:border-border/40 transition-colors ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''}`}
       >
         <div className="flex items-start gap-2">
           {!isMobile && <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />}
