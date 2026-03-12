@@ -87,6 +87,7 @@ export type Database = {
           delivered_at: string | null
           delivery_type: Database["public"]["Enums"]["delivery_type"]
           description: string | null
+          drive_link: string | null
           due_date: string | null
           editor_id: string | null
           file_url: string | null
@@ -106,6 +107,7 @@ export type Database = {
           delivered_at?: string | null
           delivery_type: Database["public"]["Enums"]["delivery_type"]
           description?: string | null
+          drive_link?: string | null
           due_date?: string | null
           editor_id?: string | null
           file_url?: string | null
@@ -125,6 +127,7 @@ export type Database = {
           delivered_at?: string | null
           delivery_type?: Database["public"]["Enums"]["delivery_type"]
           description?: string | null
+          drive_link?: string | null
           due_date?: string | null
           editor_id?: string | null
           file_url?: string | null

@@ -44,6 +44,7 @@ import {
 } from 'lucide-react';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 import { typeConfig, statusConfig } from '@/components/dashboard/DeliveryCard';
+import FileUpload from '@/components/editor/FileUpload';
 
 interface EditorBriefingModalProps {
   open: boolean;
@@ -85,18 +86,13 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
   const { user } = useAuth();
   const [briefing, setBriefing] = useState<BriefingData | null>(null);
   const [revisions, setRevisions] = useState<RevisionRecord[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [clientNote, setClientNote] = useState('');
   const [isDelivering, setIsDelivering] = useState(false);
-  const [driveLink, setDriveLink] = useState('');
-  const [isDragOver, setIsDragOver] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState('');
 
   const fetchData = useCallback(async () => {
     if (!delivery) return;
 
-    // Fetch briefing for this delivery's user_project
     const { data: up } = await supabase
       .from('user_projects')
       .select('user_id')
@@ -113,7 +109,6 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
       if (b) setBriefing(b as any);
     }
 
-    // Fetch revisions
     const { data: revs } = await supabase
       .from('delivery_revisions' as any)
       .select('*')
@@ -127,8 +122,6 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
       fetchData();
       setSelectedStatus(delivery.status);
       setClientNote('');
-      setDriveLink('');
-      setUploadProgress(0);
     }
   }, [open, delivery, fetchData]);
 
@@ -138,74 +131,8 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
   const status = statusConfig[delivery.status] || statusConfig.pending;
   const Icon = config.icon;
 
-  const handleFileUpload = async (file: File) => {
-    setIsUploading(true);
-    setUploadProgress(10);
-
-    const ext = file.name.split('.').pop();
-    const filePath = `${delivery.id}/${Date.now()}.${ext}`;
-
-    // Simulate progress
-    const interval = setInterval(() => {
-      setUploadProgress((p) => Math.min(p + 15, 85));
-    }, 300);
-
-    const { data, error } = await supabase.storage
-      .from('delivery-files')
-      .upload(filePath, file, { upsert: true });
-
-    clearInterval(interval);
-
-    if (error) {
-      toast.error('Erro ao fazer upload: ' + error.message);
-      setIsUploading(false);
-      setUploadProgress(0);
-      return;
-    }
-
-    const { data: urlData } = supabase.storage
-      .from('delivery-files')
-      .getPublicUrl(filePath);
-
-    await supabase
-      .from('deliveries')
-      .update({ file_url: urlData.publicUrl })
-      .eq('id', delivery.id);
-
-    setUploadProgress(100);
-    toast.success('Upload concluído!');
-    setTimeout(() => {
-      setIsUploading(false);
-      setUploadProgress(0);
-      onUpdated();
-    }, 500);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) handleFileUpload(file);
-  };
-
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleFileUpload(file);
-  };
-
-  const handleSaveDriveLink = async () => {
-    if (!driveLink.trim()) return;
-    await supabase
-      .from('deliveries')
-      .update({ file_url: driveLink.trim() })
-      .eq('id', delivery.id);
-    toast.success('Link salvo!');
-    setDriveLink('');
-    onUpdated();
-  };
-
   const handleMarkAsDelivered = async () => {
-    if (!delivery.file_url && !driveLink.trim()) {
+    if (!delivery.file_url) {
       toast.error('Anexe um arquivo antes de marcar como entregue.');
       return;
     }
@@ -536,82 +463,14 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
 
               {/* TAB 4: Entregas */}
               <TabsContent value="deliver" className="space-y-4 mt-4">
-                {/* Upload area */}
-                <div className="space-y-2">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Upload do Arquivo Finalizado</h4>
-
-                  <div
-                    className={`relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-colors ${
-                      isDragOver
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border/50 bg-muted/10 hover:border-border'
-                    }`}
-                    onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
-                    onDragLeave={() => setIsDragOver(false)}
-                    onDrop={handleDrop}
-                  >
-                    <Upload className="h-8 w-8 text-muted-foreground/40 mb-2" />
-                    <p className="text-sm text-muted-foreground">Arraste e solte seu arquivo aqui</p>
-                    <p className="text-[10px] text-muted-foreground/60 mt-1">ou</p>
-                    <label className="mt-2 cursor-pointer">
-                      <Button variant="outline" size="sm" asChild>
-                        <span>Selecionar arquivo</span>
-                      </Button>
-                      <input
-                        type="file"
-                        className="hidden"
-                        onChange={handleFileInput}
-                        accept="video/*,image/*,.zip,.rar"
-                      />
-                    </label>
-                  </div>
-
-                  {isUploading && (
-                    <div className="space-y-1">
-                      <Progress value={uploadProgress} className="h-2" />
-                      <p className="text-[10px] text-muted-foreground text-center">{uploadProgress}%</p>
-                    </div>
-                  )}
-                </div>
-
-                <Separator className="bg-border/50" />
-
-                {/* Drive link */}
-                <div className="space-y-2">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Ou link do Google Drive</h4>
-                  <div className="flex gap-2">
-                    <input
-                      type="url"
-                      placeholder="https://drive.google.com/..."
-                      value={driveLink}
-                      onChange={(e) => setDriveLink(e.target.value)}
-                      className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleSaveDriveLink}
-                      disabled={!driveLink.trim()}
-                    >
-                      Salvar
-                    </Button>
-                  </div>
-                </div>
-
-                {delivery.file_url && (
-                  <div className="flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-2">
-                    <FileText className="h-4 w-4 text-primary" />
-                    <span className="text-xs text-card-foreground flex-1 truncate">{delivery.file_url}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 px-2"
-                      onClick={() => window.open(delivery.file_url!, '_blank')}
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                    </Button>
-                  </div>
-                )}
+                <FileUpload
+                  userProjectId={delivery.user_project_id}
+                  deliveryId={delivery.id}
+                  currentFileUrl={delivery.file_url}
+                  currentDriveLink={null}
+                  onUploaded={() => onUpdated()}
+                  onDriveLinkSaved={() => onUpdated()}
+                />
 
                 <Separator className="bg-border/50" />
 
@@ -630,7 +489,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
                 {/* Deliver button */}
                 <Button
                   className="w-full gap-2"
-                  disabled={isDelivering || (!delivery.file_url && !driveLink.trim())}
+                  disabled={isDelivering || !delivery.file_url}
                   onClick={handleMarkAsDelivered}
                 >
                   {isDelivering ? (
