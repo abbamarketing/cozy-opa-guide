@@ -481,7 +481,6 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
               <p className="text-[10px] text-muted-foreground">
                 O cliente só poderá agendar captações com pelo menos {values.capture_lead_days} dias de antecedência.
               </p>
-              </div>
             </section>
           )}
 
