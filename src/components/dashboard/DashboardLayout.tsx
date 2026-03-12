@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Kanban from '@/components/dashboard/Kanban';
+import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
 import { useNavigate } from 'react-router-dom';
 import {
   Play,
@@ -215,9 +216,11 @@ const DashboardLayout = () => {
           </div>
         );
       case 'calendar':
-        return (
+        return userProject ? (
+          <DeliveryCalendar userProject={userProject} />
+        ) : (
           <div className="glass rounded-2xl p-8 text-center">
-            <p className="text-muted-foreground">Calendário — em construção</p>
+            <p className="text-muted-foreground">Nenhum projeto ativo</p>
           </div>
         );
       case 'scripts':
