@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Play, LayoutDashboard, FolderKanban, Users, Settings } from 'lucide-react';
+import { Play, LayoutDashboard, FolderKanban, Users, Settings, ScrollText } from 'lucide-react';
 import ClientAssignment from '@/components/admin/ClientAssignment';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import ProjectManager from '@/components/admin/ProjectManager';
+import LogViewer from '@/components/admin/LogViewer';
 
 const TABS = [
   { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard },
   { id: 'projetos', label: 'Projetos', icon: FolderKanban },
   { id: 'clientes', label: 'Clientes', icon: Users },
+  { id: 'logs', label: 'Logs', icon: ScrollText },
   { id: 'config', label: 'Configurações', icon: Settings },
 ];
 
