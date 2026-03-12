@@ -96,7 +96,7 @@ const EditorManual = () => (
   <article className="prose-doc space-y-8">
     <header>
       <h1 className="text-2xl font-bold text-foreground">Manual do Editor</h1>
-      <p className="text-muted-foreground">Guia para editores de vídeo do VideoFlow.</p>
+      <p className="text-muted-foreground">Guia para editores de vídeo do AbbaVideo.</p>
     </header>
 
     <Section title="1. Acesso">
