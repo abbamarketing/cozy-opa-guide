@@ -167,6 +167,7 @@ const QuotaCard = ({ userProject }: QuotaCardProps) => {
         </Button>
       </CardContent>
     </Card>
+    </div>
   );
 };
 
