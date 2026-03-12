@@ -4,6 +4,7 @@ import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogContent,
