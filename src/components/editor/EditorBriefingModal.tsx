@@ -536,82 +536,14 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
 
               {/* TAB 4: Entregas */}
               <TabsContent value="deliver" className="space-y-4 mt-4">
-                {/* Upload area */}
-                <div className="space-y-2">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Upload do Arquivo Finalizado</h4>
-
-                  <div
-                    className={`relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-colors ${
-                      isDragOver
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border/50 bg-muted/10 hover:border-border'
-                    }`}
-                    onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
-                    onDragLeave={() => setIsDragOver(false)}
-                    onDrop={handleDrop}
-                  >
-                    <Upload className="h-8 w-8 text-muted-foreground/40 mb-2" />
-                    <p className="text-sm text-muted-foreground">Arraste e solte seu arquivo aqui</p>
-                    <p className="text-[10px] text-muted-foreground/60 mt-1">ou</p>
-                    <label className="mt-2 cursor-pointer">
-                      <Button variant="outline" size="sm" asChild>
-                        <span>Selecionar arquivo</span>
-                      </Button>
-                      <input
-                        type="file"
-                        className="hidden"
-                        onChange={handleFileInput}
-                        accept="video/*,image/*,.zip,.rar"
-                      />
-                    </label>
-                  </div>
-
-                  {isUploading && (
-                    <div className="space-y-1">
-                      <Progress value={uploadProgress} className="h-2" />
-                      <p className="text-[10px] text-muted-foreground text-center">{uploadProgress}%</p>
-                    </div>
-                  )}
-                </div>
-
-                <Separator className="bg-border/50" />
-
-                {/* Drive link */}
-                <div className="space-y-2">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Ou link do Google Drive</h4>
-                  <div className="flex gap-2">
-                    <input
-                      type="url"
-                      placeholder="https://drive.google.com/..."
-                      value={driveLink}
-                      onChange={(e) => setDriveLink(e.target.value)}
-                      className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleSaveDriveLink}
-                      disabled={!driveLink.trim()}
-                    >
-                      Salvar
-                    </Button>
-                  </div>
-                </div>
-
-                {delivery.file_url && (
-                  <div className="flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-2">
-                    <FileText className="h-4 w-4 text-primary" />
-                    <span className="text-xs text-card-foreground flex-1 truncate">{delivery.file_url}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 px-2"
-                      onClick={() => window.open(delivery.file_url!, '_blank')}
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                    </Button>
-                  </div>
-                )}
+                <FileUpload
+                  userProjectId={delivery.user_project_id}
+                  deliveryId={delivery.id}
+                  currentFileUrl={delivery.file_url}
+                  currentDriveLink={null}
+                  onUploaded={() => onUpdated()}
+                  onDriveLinkSaved={() => onUpdated()}
+                />
 
                 <Separator className="bg-border/50" />
 
@@ -630,7 +562,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
                 {/* Deliver button */}
                 <Button
                   className="w-full gap-2"
-                  disabled={isDelivering || (!delivery.file_url && !driveLink.trim())}
+                  disabled={isDelivering || !delivery.file_url}
                   onClick={handleMarkAsDelivered}
                 >
                   {isDelivering ? (
