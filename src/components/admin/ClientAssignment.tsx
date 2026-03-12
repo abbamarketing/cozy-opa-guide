@@ -148,6 +148,7 @@ const ClientAssignment = () => {
       return;
     }
 
+    logger.info('Projeto atribuído a cliente', { project: selectedProject.project_name, client: selectedClient.full_name }, 'admin');
     toast.success('Projeto atribuído com sucesso!', {
       description: `${selectedProject.project_name} → ${selectedClient.full_name || 'Cliente'}`,
     });
