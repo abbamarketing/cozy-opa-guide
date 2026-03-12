@@ -24,7 +24,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Search, MoreHorizontal, Eye, Pause, Play, Loader2 } from 'lucide-react';
+import { Search, MoreHorizontal, Eye, Pause, Play, Loader2, Download } from 'lucide-react';
+import { downloadCSV } from '@/lib/csv';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -198,6 +199,27 @@ const AdminClients = () => {
             <SelectItem value="cancelled">Cancelado</SelectItem>
           </SelectContent>
         </Select>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5"
+          disabled={filtered.length === 0}
+          onClick={() => {
+            downloadCSV(
+              filtered.map((c) => ({
+                Nome: c.full_name || 'Sem nome',
+                Plano: c.project_name || '—',
+                'Valor Mensal': c.plan_value ? `R$ ${c.plan_value.toFixed(2)}` : '—',
+                Status: STATUS_MAP[c.status]?.label || c.status,
+                Cadastro: format(new Date(c.created_at), 'dd/MM/yyyy', { locale: ptBR }),
+              })),
+              `clientes-${format(new Date(), 'yyyy-MM-dd')}`
+            );
+          }}
+        >
+          <Download className="h-3.5 w-3.5" />
+          Exportar CSV
+        </Button>
       </div>
 
       {/* Table */}

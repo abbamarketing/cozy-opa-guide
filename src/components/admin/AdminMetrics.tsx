@@ -8,7 +8,9 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, BarChart, Bar,
 } from 'recharts';
-import { DollarSign, Users, Video, Clock, TrendingUp, TrendingDown } from 'lucide-react';
+import { DollarSign, Users, Video, Clock, TrendingUp, TrendingDown, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { downloadCSV } from '@/lib/csv';
 
 const COLORS = ['hsl(142, 72%, 73%)', 'hsl(200, 80%, 60%)', 'hsl(45, 93%, 47%)', 'hsl(280, 70%, 60%)'];
 
@@ -175,6 +177,28 @@ const AdminMetrics = () => {
 
   return (
     <div className="space-y-4">
+      {/* Export */}
+      <div className="flex justify-end">
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5"
+          onClick={() => {
+            const rows = [
+              ...kpis.map((k) => ({ Categoria: 'KPI', Métrica: k.title, Valor: k.value, Variação: k.change })),
+              ...mrrData.map((m) => ({ Categoria: 'MRR', Métrica: m.month, Valor: `R$ ${m.mrr.toFixed(2)}`, Variação: '' })),
+              ...subsData.map((s) => ({ Categoria: 'Assinaturas', Métrica: s.month, Valor: String(s.count), Variação: '' })),
+              ...typeDistribution.map((t) => ({ Categoria: 'Tipo Entrega', Métrica: t.name, Valor: String(t.value), Variação: '' })),
+              ...revisionData.map((r) => ({ Categoria: 'Revisões', Métrica: r.label, Valor: String(r.count), Variação: '' })),
+            ];
+            downloadCSV(rows, `metricas-${format(new Date(), 'yyyy-MM-dd')}`);
+          }}
+        >
+          <Download className="h-3.5 w-3.5" />
+          Exportar Métricas CSV
+        </Button>
+      </div>
+
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {kpis.map((kpi) => {
