@@ -249,8 +249,11 @@ const DashboardLayout = () => {
     }
   };
 
+  const tourReady = !isLoading && !!userProject;
+
   const mainContent = (
     <>
+      <ContextualTour ready={tourReady} />
       <DashboardHeader />
       {isMobile && <MobileNav activeTab={activeTab} setActiveTab={setActiveTab} navItems={navItems} />}
 
