@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Video, Camera, Image, Layers, ChevronDown, ChevronUp } from 'lucide-react';
+import { Video, Camera, Image, Layers, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useIsMobile } from '@/hooks/use-mobile';
