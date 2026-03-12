@@ -108,4 +108,27 @@
   .font-body {
     font-family: 'Lato', sans-serif;
   }
+
+  /* Backward-compatible: glass now maps to card styling */
+  .glass {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+  }
+
+  .glass-hover:hover {
+    background: hsl(var(--accent));
+  }
+
+  /* Legacy neon utilities mapped to primary */
+  .neon-glow {
+    box-shadow: 0 1px 3px hsl(var(--primary) / 0.15);
+  }
+
+  .gradient-neon {
+    background: hsl(var(--primary));
+  }
+
+  .text-neon-glow {
+    color: hsl(var(--primary));
+  }
 }
