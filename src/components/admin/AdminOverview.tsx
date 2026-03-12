@@ -200,12 +200,14 @@ const AdminOverview = () => {
             {urgentDeliveries.map((d) => {
               const h = differenceInHours(new Date(d.due_date), new Date());
               return (
-                <div key={d.id} className="flex items-center justify-between rounded-lg bg-muted/20 px-3 py-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-card-foreground">{d.title}</span>
-                    <Badge variant="outline" className="text-[10px]">{d.delivery_type}</Badge>
+                <div key={d.id} className="flex items-center justify-between gap-2 rounded-lg bg-muted/20 px-3 py-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-sm font-medium text-card-foreground truncate">{d.title}</span>
+                    <Badge variant="outline" className="text-[10px] shrink-0">
+                      {{ youtube_video: 'YouTube', instagram_video: 'Instagram', thumbnail: 'Thumbnail', cover: 'Capa' }[d.delivery_type] || d.delivery_type}
+                    </Badge>
                   </div>
-                  <span className={`text-xs font-medium ${h < 0 ? 'text-destructive' : 'text-[hsl(45,93%,47%)]'}`}>
+                  <span className={`text-xs font-medium shrink-0 ${h < 0 ? 'text-destructive' : 'text-[hsl(45,93%,47%)]'}`}>
                     {h < 0 ? 'Atrasado' : `${h}h restantes`}
                   </span>
                 </div>
