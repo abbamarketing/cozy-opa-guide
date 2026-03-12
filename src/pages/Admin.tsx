@@ -70,6 +70,7 @@ const Admin = () => {
           </div>
         )}
         {activeTab === 'clientes' && <ClientAssignment />}
+        {activeTab === 'logs' && <LogViewer />}
         {activeTab === 'config' && (
           <div className="glass rounded-2xl p-12 text-center">
             <h1 className="text-2xl font-bold mb-4">Configurações</h1>
