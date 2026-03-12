@@ -39,6 +39,7 @@ const projectSchema = z.object({
   include_covers: z.boolean(),
   include_script: z.boolean(),
   include_capture: z.boolean(),
+  capture_lead_days: z.number().min(1).max(90),
   monthly_value: z.number().min(0.01, 'Valor deve ser maior que 0'),
   payment_frequency: z.enum(['monthly', 'quarterly', 'annual']),
   max_revisions: z.number().min(1).max(5),
