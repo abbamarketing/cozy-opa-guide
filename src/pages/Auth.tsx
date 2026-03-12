@@ -194,7 +194,7 @@ function LoginForm({ onSwitchTab }: { onSwitchTab: () => void }) {
             Lembrar-me
           </Label>
         </div>
-        <button type="button" className="text-xs text-primary hover:underline">
+        <button type="button" className="text-xs text-primary hover:underline" onClick={() => navigate('/reset-password')}>
           Esqueci minha senha
         </button>
       </div>

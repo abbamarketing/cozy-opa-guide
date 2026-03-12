@@ -128,7 +128,11 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
       toast.error('Erro ao salvar briefing', { description: error.message });
     } else {
       toast.success('Briefing salvo!');
-      navigate('/onboarding/payment');
+      if (onComplete) {
+        onComplete();
+      } else {
+        navigate('/onboarding/payment');
+      }
     }
     setSaving(false);
   };
