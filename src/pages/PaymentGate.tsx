@@ -102,7 +102,7 @@ export default function PaymentGate() {
                   )}
                   {project.instagram_videos > 0 && (
                     <li className="flex items-center gap-2">
-                      <span className="text-primary">✅</span>
+                       <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                       {project.instagram_videos} vídeos Instagram/mês
                     </li>
                   )}
