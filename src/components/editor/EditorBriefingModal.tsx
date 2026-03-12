@@ -89,12 +89,10 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
   const [clientNote, setClientNote] = useState('');
   const [isDelivering, setIsDelivering] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
 
   const fetchData = useCallback(async () => {
     if (!delivery) return;
 
-    // Fetch briefing for this delivery's user_project
     const { data: up } = await supabase
       .from('user_projects')
       .select('user_id')
@@ -111,7 +109,6 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
       if (b) setBriefing(b as any);
     }
 
-    // Fetch revisions
     const { data: revs } = await supabase
       .from('delivery_revisions' as any)
       .select('*')
@@ -125,8 +122,6 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
       fetchData();
       setSelectedStatus(delivery.status);
       setClientNote('');
-      setDriveLink('');
-      setUploadProgress(0);
     }
   }, [open, delivery, fetchData]);
 
