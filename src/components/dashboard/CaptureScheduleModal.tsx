@@ -83,7 +83,9 @@ const CaptureScheduleModal = ({
         .limit(1);
 
       if (data && data.length > 0) {
-        setLastSessionDate(new Date(data[0].scheduled_date));
+        // Parse YYYY-MM-DD as local date to avoid UTC shift
+        const [y, m, d] = data[0].scheduled_date.split('-').map(Number);
+        setLastSessionDate(new Date(y, m - 1, d));
       } else {
         setLastSessionDate(null);
       }
