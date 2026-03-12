@@ -419,7 +419,7 @@ const EditorPanelView = () => (
           </div>
           <div className="rounded-lg bg-muted/20 p-2">
             <p className="text-[8px] text-muted-foreground">Legendas</p>
-            <p className="text-[10px] font-medium text-card-foreground">Com emojis ✅</p>
+            <p className="text-[10px] font-medium text-card-foreground">Com emojis</p>
           </div>
           <div className="rounded-lg bg-muted/20 p-2">
             <p className="text-[8px] text-muted-foreground">Cortes</p>
