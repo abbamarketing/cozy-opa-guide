@@ -2,11 +2,10 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Sparkles, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 
-const TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes
+const TIMEOUT_MS = 2 * 60 * 1000;
 
 const PaymentSuccess = () => {
   const { user } = useAuth();
@@ -24,19 +23,15 @@ const PaymentSuccess = () => {
       setConfirmed(true);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (pollRef.current) clearTimeout(pollRef.current);
-
-      // Payment confirmed → go to onboarding (briefing)
       navigate('/onboarding', { replace: true });
     };
 
-    // Check if already confirmed (e.g. page reload)
     const checkExisting = async () => {
       const { data } = await supabase
         .from('user_projects')
         .select('payment_confirmed_at')
         .eq('user_id', user.id)
         .maybeSingle();
-
       if (data?.payment_confirmed_at) {
         handleConfirmed();
         return true;
@@ -44,7 +39,6 @@ const PaymentSuccess = () => {
       return false;
     };
 
-    // Polling fallback (every 5s)
     const startPolling = () => {
       const poll = async () => {
         const found = await checkExisting();
@@ -55,7 +49,6 @@ const PaymentSuccess = () => {
       pollRef.current = setTimeout(poll, 5000);
     };
 
-    // Realtime subscription
     const channel = supabase
       .channel(`payment-confirmation-${user.id}`)
       .on(
@@ -72,21 +65,12 @@ const PaymentSuccess = () => {
           }
         },
       )
-      .subscribe((status) => {
-        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-          console.warn('Realtime channel issue, relying on polling fallback');
-        }
-      });
+      .subscribe();
 
     channelRef.current = channel;
-
-    // Initial check
     checkExisting();
-
-    // Start polling fallback
     startPolling();
 
-    // Timeout
     timeoutRef.current = setTimeout(() => {
       setTimedOut(true);
       if (pollRef.current) clearTimeout(pollRef.current);
@@ -100,64 +84,63 @@ const PaymentSuccess = () => {
   }, [user?.id, navigate, confirmed, timedOut]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md border-border/50 bg-card shadow-2xl">
-        <CardContent className="flex flex-col items-center gap-6 p-8 text-center">
-          {!timedOut ? (
-            <>
-              {/* Animated icon */}
-              <div className="relative flex items-center justify-center">
-                {/* Pulse rings */}
-                <div className="absolute h-20 w-20 animate-ping rounded-full bg-primary/20" />
-                <div
-                  className="absolute h-16 w-16 rounded-full bg-primary/10"
-                  style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.5s' }}
-                />
-                {/* Spinner + icon */}
-                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-primary/20">
-                  <Loader2 className="absolute h-16 w-16 animate-spin text-primary/40" />
-                  <Sparkles className="h-7 w-7 text-primary" />
-                </div>
-              </div>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md text-center">
+        {!timedOut ? (
+          <>
+            {/* Animated loader */}
+            <div className="relative mx-auto mb-8 flex h-24 w-24 items-center justify-center">
+              {/* Outer ring */}
+              <div className="absolute inset-0 rounded-full border-2 border-primary/20" />
+              {/* Spinning arc */}
+              <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-primary" style={{ animationDuration: '1.5s' }} />
+              {/* Inner glow */}
+              <div className="absolute inset-3 rounded-full bg-primary/5" />
+              {/* Icon */}
+              <CheckCircle2 className="h-8 w-8 text-primary" />
+            </div>
 
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-foreground">
-                  Processando...
-                </h2>
-                <p className="text-muted-foreground">
-                  Estamos confirmando seu pagamento. Isso leva apenas alguns segundos.
-                </p>
-              </div>
+            <h1 className="mb-2 font-mono text-2xl font-bold text-foreground">
+              Confirmando pagamento
+            </h1>
+            <p className="mb-6 text-muted-foreground">
+              Estamos processando sua assinatura. Isso leva apenas alguns segundos.
+            </p>
 
-              <p className="text-sm text-muted-foreground/70">
-                Você será redirecionado automaticamente.
-              </p>
-            </>
-          ) : (
-            <>
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/20">
-                <AlertCircle className="h-8 w-8 text-destructive" />
-              </div>
+            <div className="mx-auto flex items-center justify-center gap-2 rounded-lg bg-card border border-border/30 px-4 py-2.5">
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+                Aguardando confirmação
+              </span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full border-2 border-destructive/30 bg-destructive/10">
+              <AlertCircle className="h-10 w-10 text-destructive" />
+            </div>
 
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-foreground">
-                  Tempo esgotado
-                </h2>
-                <p className="text-muted-foreground">
-                  Não conseguimos confirmar seu pagamento. Tente novamente ou entre em contato com o suporte.
-                </p>
-              </div>
+            <h1 className="mb-2 font-mono text-2xl font-bold text-foreground">
+              Tempo esgotado
+            </h1>
+            <p className="mb-6 text-muted-foreground">
+              Não conseguimos confirmar seu pagamento. Tente novamente ou entre em contato com o suporte.
+            </p>
 
-              <Button
-                onClick={() => navigate('/payment', { replace: true })}
-                className="w-full"
-              >
-                Tentar novamente
-              </Button>
-            </>
-          )}
-        </CardContent>
-      </Card>
+            <Button
+              onClick={() => navigate('/payment', { replace: true })}
+              className="w-full"
+              size="lg"
+            >
+              Tentar novamente
+            </Button>
+          </>
+        )}
+      </div>
+
+      <p className="mt-12 font-mono text-[10px] uppercase tracking-widest text-muted-foreground/50">
+        AbbaVideo
+      </p>
     </div>
   );
 };
