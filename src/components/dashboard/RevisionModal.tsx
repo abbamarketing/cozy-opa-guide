@@ -85,6 +85,7 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent }: Revisio
         .eq('id', delivery.id);
       if (delError) throw delError;
 
+      logger.info('Revisão solicitada', { delivery_id: deliveryId }, 'delivery');
       toast.success('Revisão solicitada com sucesso!');
       form.reset();
       onOpenChange(false);
