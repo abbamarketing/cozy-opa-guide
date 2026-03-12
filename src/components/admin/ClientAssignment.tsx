@@ -253,6 +253,28 @@ const ClientAssignment = () => {
       {/* Active Clients */}
       <section className="space-y-4">
         <h2 className="text-2xl font-bold">Clientes Ativos</h2>
+        {isMobile ? (
+          <div className="space-y-2">
+            {activeClients.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">Nenhum cliente ativo.</p>
+            ) : (
+              activeClients.map((c) => {
+                const st = STATUS_LABELS[c.status || ''] || STATUS_LABELS.pending_payment;
+                return (
+                  <Card key={c.id} className="p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium truncate">{c.full_name || 'Sem nome'}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{c.project_name}</p>
+                      </div>
+                      <Badge className={`shrink-0 text-[10px] ${st.className}`}>{st.label}</Badge>
+                    </div>
+                  </Card>
+                );
+              })
+            )}
+          </div>
+        ) : (
         <div className="glass rounded-xl overflow-hidden">
           <Table>
             <TableHeader>
@@ -284,6 +306,7 @@ const ClientAssignment = () => {
             </TableBody>
           </Table>
         </div>
+        )}
       </section>
 
       {/* Assignment Modal */}
