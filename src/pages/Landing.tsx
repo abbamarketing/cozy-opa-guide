@@ -584,9 +584,12 @@ const Landing = () => {
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-4xl font-bold">
-              Tudo o que você precisa,{' '}
-              <span className="text-primary">em um só lugar</span>
+              Mais tempo criando.{' '}
+              <span className="text-primary">Zero tempo editando.</span>
             </h2>
+            <p className="mt-3 text-muted-foreground font-body max-w-xl mx-auto">
+              Cada funcionalidade foi pensada para você focar no que importa: criar conteúdo que cresce.
+            </p>
           </div>
 
           <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
