@@ -8,8 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import DeliveryCard, { type DeliveryData } from './DeliveryCard';
 import type { UserProjectData } from '@/hooks/useUserProject';
+import { useIsMobile } from '@/hooks/use-mobile';
 
-// Lazy load heavy modals
 const NewDeliveryModal = lazy(() => import('./NewDeliveryModal'));
 const DeliveryDetailModal = lazy(() => import('./DeliveryDetailModal'));
 
@@ -25,10 +25,10 @@ interface Column {
 }
 
 const COLUMNS: Column[] = [
-  { id: 'todo', title: 'A FAZER', statuses: ['pending'], description: 'Aguardando início' },
-  { id: 'production', title: 'EM PRODUÇÃO', statuses: ['in_progress', 'revision'], description: 'Editor trabalhando' },
-  { id: 'review', title: 'REVISAR', statuses: ['review'], description: 'Pronto para sua aprovação' },
-  { id: 'done', title: 'CONCLUÍDO', statuses: ['approved'], description: 'Aprovado e finalizado' },
+  { id: 'todo', title: 'A FAZER', statuses: ['pending'], description: 'Aguardando inicio' },
+  { id: 'production', title: 'PRODUCAO', statuses: ['in_progress', 'revision'], description: 'Editor trabalhando' },
+  { id: 'review', title: 'REVISAR', statuses: ['review'], description: 'Pronto para aprovacao' },
+  { id: 'done', title: 'CONCLUIDO', statuses: ['approved'], description: 'Aprovado e finalizado' },
 ];
 
 const PAGE_SIZE = 20;
@@ -39,6 +39,8 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [activeColumn, setActiveColumn] = useState('todo');
+  const isMobile = useIsMobile();
 
   const fetchDeliveries = async () => {
     const { data, error } = await supabase
@@ -118,11 +120,120 @@ const Kanban = ({ userProject }: KanbanProps) => {
     setVisibleCount((prev) => prev + PAGE_SIZE);
   };
 
+  // Mobile: segmented control with single column view
+  if (isMobile) {
+    const currentCol = COLUMNS.find(c => c.id === activeColumn) || COLUMNS[0];
+    const items = getDeliveriesForColumn(currentCol);
+
+    return (
+      <div className="space-y-3">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-mono font-semibold text-foreground">Entregas</h2>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span>
+                <Button
+                  size="sm"
+                  disabled={!quotaAvailable}
+                  className="gap-1.5 h-9"
+                  onClick={() => setShowNewModal(true)}
+                  data-tour="new-delivery-btn"
+                >
+                  <Plus className="h-4 w-4" />
+                  Nova
+                </Button>
+              </span>
+            </TooltipTrigger>
+            {!quotaAvailable && (
+              <TooltipContent>
+                <p>Quota esgotada</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </div>
+
+        {/* Column Tabs */}
+        {isLoading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-10 w-full rounded-lg" />
+            <Skeleton className="h-24 w-full rounded-lg" />
+            <Skeleton className="h-24 w-full rounded-lg" />
+          </div>
+        ) : (
+          <>
+            <div className="flex gap-1 bg-secondary rounded-lg p-1" data-tour="kanban-board">
+              {COLUMNS.map((col) => {
+                const count = getDeliveriesForColumn(col).length;
+                const isActive = activeColumn === col.id;
+                return (
+                  <button
+                    key={col.id}
+                    onClick={() => setActiveColumn(col.id)}
+                    className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-md text-[10px] font-mono font-medium tracking-wider transition-colors ${
+                      isActive
+                        ? 'bg-card text-foreground shadow-sm'
+                        : 'text-muted-foreground'
+                    }`}
+                  >
+                    {col.title}
+                    {count > 0 && (
+                      <span className={`text-[9px] ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Cards */}
+            <div className="space-y-2">
+              {items.length === 0 ? (
+                <div className="rounded-lg border border-border bg-card p-8 text-center">
+                  <p className="text-xs font-mono text-muted-foreground">
+                    Nenhuma entrega
+                  </p>
+                </div>
+              ) : (
+                items.map((d) => (
+                  <DeliveryCard
+                    key={d.id}
+                    delivery={d}
+                    onClick={() => setSelectedDelivery(d)}
+                  />
+                ))
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Modals */}
+        <Suspense fallback={null}>
+          <DeliveryDetailModal
+            open={!!selectedDelivery}
+            onOpenChange={() => setSelectedDelivery(null)}
+            delivery={selectedDelivery}
+            onUpdated={fetchDeliveries}
+          />
+          {showNewModal && (
+            <NewDeliveryModal
+              open={showNewModal}
+              onOpenChange={setShowNewModal}
+              userProject={userProject}
+              onCreated={fetchDeliveries}
+            />
+          )}
+        </Suspense>
+      </div>
+    );
+  }
+
+  // Desktop: original 4-column grid
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-foreground">Minhas Entregas</h2>
+        <h2 className="text-lg font-mono font-semibold text-foreground">Minhas Entregas</h2>
         <Tooltip>
           <TooltipTrigger asChild>
             <span>
@@ -134,27 +245,26 @@ const Kanban = ({ userProject }: KanbanProps) => {
                 data-tour="new-delivery-btn"
               >
                 <Plus className="h-4 w-4" />
-                Nova Solicitação
+                Nova Solicitacao
               </Button>
             </span>
           </TooltipTrigger>
           {!quotaAvailable && (
             <TooltipContent>
-              <p>Você não tem quota disponível para este tipo</p>
+              <p>Quota esgotada</p>
             </TooltipContent>
           )}
         </Tooltip>
       </div>
 
-      {/* Kanban Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-4 gap-3">
           {COLUMNS.map((c) => (
-            <Skeleton key={c.id} className="h-64 rounded-xl" />
+            <Skeleton key={c.id} className="h-64 rounded-lg" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-4" data-tour="kanban-board">
+        <div className="grid grid-cols-4 gap-3" data-tour="kanban-board">
           {COLUMNS.map((col) => {
             const allItems = getDeliveriesForColumn(col);
             const items = allItems.slice(0, visibleCount);
@@ -162,16 +272,16 @@ const Kanban = ({ userProject }: KanbanProps) => {
             return (
               <div
                 key={col.id}
-                className="flex flex-col rounded-xl border border-border/40 bg-muted/30 p-2"
+                className="flex flex-col rounded-lg border border-border bg-muted/30 p-2"
               >
                 <div className="mb-2 px-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <h3 className="text-[10px] font-mono font-semibold uppercase tracking-widest text-muted-foreground">
                       {col.title}
                     </h3>
                     <Badge
                       variant="secondary"
-                      className="h-5 min-w-[20px] justify-center px-1.5 text-[10px]"
+                      className="h-5 min-w-[20px] justify-center px-1.5 text-[10px] font-mono"
                     >
                       {allItems.length}
                     </Badge>
@@ -182,7 +292,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
                 <ScrollArea className="flex-1">
                   <div className="space-y-2 p-0.5">
                     {items.length === 0 ? (
-                      <p className="py-8 text-center text-xs text-muted-foreground/50">
+                      <p className="py-8 text-center text-[10px] font-mono text-muted-foreground/50">
                         Nenhuma entrega
                       </p>
                     ) : (
@@ -201,7 +311,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
                         className="w-full text-xs text-muted-foreground"
                         onClick={handleLoadMore}
                       >
-                        Carregar mais ({allItems.length - visibleCount} restantes)
+                        Carregar mais ({allItems.length - visibleCount})
                       </Button>
                     )}
                   </div>
@@ -212,7 +322,6 @@ const Kanban = ({ userProject }: KanbanProps) => {
         </div>
       )}
 
-      {/* Lazy-loaded Modals */}
       <Suspense fallback={null}>
         <DeliveryDetailModal
           open={!!selectedDelivery}
