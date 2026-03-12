@@ -317,7 +317,7 @@ const TermsOfUse = () => (
     </Section>
 
     <Section title="11. Suspensão e Rescisão">
-      <p>O VideoFlow reserva-se o direito de suspender ou encerrar contas em caso de:</p>
+      <p>O AbbaVideo reserva-se o direito de suspender ou encerrar contas em caso de:</p>
       <ul className="list-disc pl-6 space-y-1">
         <li>Inadimplência por mais de 7 dias.</li>
         <li>Uso abusivo ou fora dos fins previstos.</li>
