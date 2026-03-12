@@ -69,8 +69,8 @@ const App = () => (
               <Route element={<ProtectedRoute requireRole="client" />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/onboarding" element={<Onboarding />} />
-                <Route path="/onboarding/payment" element={<PaymentGate />} />
-                <Route path="/onboarding/payment-success" element={<PaymentSuccess />} />
+                <Route path="/payment" element={<PaymentGate />} />
+                <Route path="/payment-success" element={<PaymentSuccess />} />
               </Route>
 
               {/* Any authenticated user */}
