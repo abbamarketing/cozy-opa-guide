@@ -798,6 +798,19 @@ const Landing = () => {
           </p>
         </div>
       </footer>
+
+      {/* Survey Modal */}
+      <Dialog open={surveyOpen} onOpenChange={setSurveyOpen}>
+        <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+          <iframe
+            src="https://api.leadconnectorhq.com/widget/survey/UJXHgLtbCNDB8DixdKLv"
+            style={{ border: 'none', width: '100%', minHeight: '500px' }}
+            scrolling="no"
+            id="UJXHgLtbCNDB8DixdKLv"
+            title="Formulário de contato"
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
