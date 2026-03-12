@@ -348,7 +348,7 @@ const DeliveryDetailView = () => (
           {[
             { role: 'client', text: 'Pode ajustar a legenda no 2:35?', time: '14:22' },
             { role: 'editor', text: 'Feito! Usei a fonte do briefing. Confere?', time: '14:28' },
-            { role: 'client', text: 'Ficou perfeito! Pode aprovar 👍', time: '14:30' },
+            { role: 'client', text: 'Ficou perfeito! Pode aprovar.', time: '14:30' },
           ].map((m, i) => (
             <div key={i} className={`flex ${m.role === 'client' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[80%] rounded-lg px-2 py-1 text-[9px] leading-relaxed ${
@@ -419,7 +419,7 @@ const EditorPanelView = () => (
           </div>
           <div className="rounded-lg bg-muted/20 p-2">
             <p className="text-[8px] text-muted-foreground">Legendas</p>
-            <p className="text-[10px] font-medium text-card-foreground">Com emojis ✅</p>
+            <p className="text-[10px] font-medium text-card-foreground">Com emojis</p>
           </div>
           <div className="rounded-lg bg-muted/20 p-2">
             <p className="text-[8px] text-muted-foreground">Cortes</p>
@@ -689,14 +689,14 @@ const Landing = () => {
                     <Sparkles className="h-3 w-3 text-primary" />
                   </div>
                   <div>
-                    <p className="text-[11px] font-semibold text-card-foreground">Olívia ✨</p>
+                    <p className="text-[11px] font-semibold text-card-foreground">Olívia</p>
                     <p className="text-[8px] text-muted-foreground">Online</p>
                   </div>
                 </div>
                 <div className="p-3 space-y-2">
                   <div className="flex justify-start">
                     <div className="max-w-[85%] rounded-xl rounded-bl-sm bg-muted/60 px-3 py-2 text-[10px] text-card-foreground">
-                      Olá! Eu sou a Olívia 💃 Como posso te ajudar?
+                      Olá! Eu sou a Olívia. Como posso te ajudar?
                     </div>
                   </div>
                   <div className="flex justify-end">
@@ -706,7 +706,7 @@ const Landing = () => {
                   </div>
                   <div className="flex justify-start">
                     <div className="max-w-[85%] rounded-xl rounded-bl-sm bg-muted/60 px-3 py-2 text-[10px] text-card-foreground leading-relaxed">
-                      Você usou <strong>3 de 6</strong> vídeos YouTube e <strong>5 de 8</strong> Reels. Ainda tem crédito! 📊
+                      Você usou <strong>3 de 6</strong> vídeos YouTube e <strong>5 de 8</strong> Reels. Ainda tem crédito!
                     </div>
                   </div>
                 </div>
