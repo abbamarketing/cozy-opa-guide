@@ -163,7 +163,7 @@ const AIChatWidget = () => {
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-card-foreground leading-tight">
-                  Olívia ✨
+                  Olívia
                 </h3>
                 <p className="text-[10px] text-muted-foreground">
                   {roleLabelMap[primaryRole] || 'Suporte'} • Online
@@ -202,7 +202,7 @@ const AIChatWidget = () => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-card-foreground">
-                    Olá! Eu sou a Olívia 💃
+                    Olá! Eu sou a Olívia.
                   </p>
                   <p className="text-xs text-muted-foreground mt-1 max-w-[240px]">
                     Esperta, direta e sempre pronta pra ajudar. Pergunta aí!
