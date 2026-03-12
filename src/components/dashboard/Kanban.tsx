@@ -155,12 +155,51 @@ const Kanban = ({ userProject }: KanbanProps) => {
   };
 
   const quotaAvailable = hasQuota();
+  const canCreateDelivery = quotaAvailable && (!requiresCapture || hasScheduledCapture);
+  const needsCaptureFirst = requiresCapture && !hasScheduledCapture && captureCheckDone;
+
+  const handleNewClick = () => {
+    if (needsCaptureFirst) {
+      setShowCaptureModal(true);
+    } else {
+      setShowNewModal(true);
+    }
+  };
 
   const getDeliveriesForColumn = (col: Column) =>
     deliveries.filter((d) => col.statuses.includes(d.status));
 
   const handleLoadMore = () => {
     setVisibleCount((prev) => prev + PAGE_SIZE);
+  };
+
+  // Capture banner component
+  const CaptureBanner = () => {
+    if (!needsCaptureFirst) return null;
+    return (
+      <div className="flex items-center gap-3 rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-500/15">
+          <Camera className="h-4 w-4 text-yellow-500" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-card-foreground">
+            Agende sua captação primeiro
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Seu plano inclui captação presencial. Agende uma data para liberar as entregas deste mês.
+          </p>
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          className="shrink-0 gap-1.5 border-yellow-500/30 text-yellow-600 hover:bg-yellow-500/10"
+          onClick={() => setShowCaptureModal(true)}
+        >
+          <Camera className="h-3.5 w-3.5" />
+          Agendar
+        </Button>
+      </div>
+    );
   };
 
   // Mobile: segmented control with single column view
