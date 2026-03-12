@@ -64,7 +64,12 @@ const Admin = () => {
         </div>
 
         {activeTab === 'overview' && <AdminOverview />}
-        {activeTab === 'clientes' && <AdminClients />}
+        {activeTab === 'clientes' && (
+          <div className="space-y-10">
+            <ClientAssignment />
+            <AdminClients />
+          </div>
+        )}
         {activeTab === 'entregas' && <AdminDeliveries />}
         {activeTab === 'editores' && <EditorManagement />}
         {activeTab === 'metricas' && <AdminMetrics />}
