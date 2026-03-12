@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { User, Bell, CreditCard, Palette, Loader2, ExternalLink } from 'lucide-react';
+import BrandProfile from '@/components/dashboard/BrandProfile';
 
 export default function Settings() {
   const { user } = useAuth();
