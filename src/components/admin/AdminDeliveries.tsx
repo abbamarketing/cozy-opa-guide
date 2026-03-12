@@ -303,7 +303,7 @@ const AdminDeliveries = () => {
       {/* Mobile: Tab + single column */}
       {isMobile ? (
         <div className="space-y-3">
-          <div className="flex gap-1 bg-secondary rounded-lg p-1">
+          <div className="flex gap-1 bg-secondary/50 rounded-lg p-1 border border-border/20">
             {COLUMNS.map((col) => {
               const count = filtered.filter((d) => col.statuses.includes(d.status)).length;
               const isActive = activeColumn === col.id;
