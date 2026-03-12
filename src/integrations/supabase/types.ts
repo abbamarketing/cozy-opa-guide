@@ -14,35 +14,403 @@ export type Database = {
   }
   public: {
     Tables: {
+      custom_projects: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          deadline: Database["public"]["Enums"]["deadline_type"]
+          description: string | null
+          id: string
+          include_capture: boolean
+          include_covers: boolean
+          include_script: boolean
+          include_thumbnails: boolean
+          instagram_videos: number
+          max_revisions: number
+          monthly_value: number
+          payment_frequency: Database["public"]["Enums"]["payment_frequency_type"]
+          project_name: string
+          stripe_price_id: string | null
+          stripe_product_id: string | null
+          updated_at: string
+          youtube_videos: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          deadline?: Database["public"]["Enums"]["deadline_type"]
+          description?: string | null
+          id?: string
+          include_capture?: boolean
+          include_covers?: boolean
+          include_script?: boolean
+          include_thumbnails?: boolean
+          instagram_videos?: number
+          max_revisions?: number
+          monthly_value: number
+          payment_frequency?: Database["public"]["Enums"]["payment_frequency_type"]
+          project_name: string
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          updated_at?: string
+          youtube_videos?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          deadline?: Database["public"]["Enums"]["deadline_type"]
+          description?: string | null
+          id?: string
+          include_capture?: boolean
+          include_covers?: boolean
+          include_script?: boolean
+          include_thumbnails?: boolean
+          instagram_videos?: number
+          max_revisions?: number
+          monthly_value?: number
+          payment_frequency?: Database["public"]["Enums"]["payment_frequency_type"]
+          project_name?: string
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          updated_at?: string
+          youtube_videos?: number
+        }
+        Relationships: []
+      }
+      deliveries: {
+        Row: {
+          approved_at: string | null
+          created_at: string
+          delivered_at: string | null
+          delivery_type: Database["public"]["Enums"]["delivery_type"]
+          description: string | null
+          due_date: string | null
+          editor_id: string | null
+          file_url: string | null
+          id: string
+          max_revisions: number
+          revision_count: number
+          revision_notes: string | null
+          status: Database["public"]["Enums"]["delivery_status"]
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          user_project_id: string
+        }
+        Insert: {
+          approved_at?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          delivery_type: Database["public"]["Enums"]["delivery_type"]
+          description?: string | null
+          due_date?: string | null
+          editor_id?: string | null
+          file_url?: string | null
+          id?: string
+          max_revisions?: number
+          revision_count?: number
+          revision_notes?: string | null
+          status?: Database["public"]["Enums"]["delivery_status"]
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          user_project_id: string
+        }
+        Update: {
+          approved_at?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          delivery_type?: Database["public"]["Enums"]["delivery_type"]
+          description?: string | null
+          due_date?: string | null
+          editor_id?: string | null
+          file_url?: string | null
+          id?: string
+          max_revisions?: number
+          revision_count?: number
+          revision_notes?: string | null
+          status?: Database["public"]["Enums"]["delivery_status"]
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          user_project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deliveries_editor_id_fkey"
+            columns: ["editor_id"]
+            isOneToOne: false
+            referencedRelation: "editors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_user_project_id_fkey"
+            columns: ["user_project_id"]
+            isOneToOne: false
+            referencedRelation: "user_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      editors: {
+        Row: {
+          active_projects: number
+          created_at: string
+          display_name: string
+          id: string
+          max_concurrent_projects: number
+          portfolio_url: string | null
+          specialty: string | null
+          status: Database["public"]["Enums"]["editor_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active_projects?: number
+          created_at?: string
+          display_name: string
+          id?: string
+          max_concurrent_projects?: number
+          portfolio_url?: string | null
+          specialty?: string | null
+          status?: Database["public"]["Enums"]["editor_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active_projects?: number
+          created_at?: string
+          display_name?: string
+          id?: string
+          max_concurrent_projects?: number
+          portfolio_url?: string | null
+          specialty?: string | null
+          status?: Database["public"]["Enums"]["editor_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      onboarding_briefings: {
+        Row: {
+          additional_notes: string | null
+          brand_colors: Json | null
+          brand_description: string | null
+          brand_fonts: Json | null
+          brand_name: string
+          completed: boolean
+          completed_at: string | null
+          content_style: string | null
+          created_at: string
+          id: string
+          intro_url: string | null
+          logo_url: string | null
+          outro_url: string | null
+          preferred_music_style: string | null
+          reference_channels: string[] | null
+          target_audience: string | null
+          updated_at: string
+          user_id: string
+          user_project_id: string | null
+        }
+        Insert: {
+          additional_notes?: string | null
+          brand_colors?: Json | null
+          brand_description?: string | null
+          brand_fonts?: Json | null
+          brand_name: string
+          completed?: boolean
+          completed_at?: string | null
+          content_style?: string | null
+          created_at?: string
+          id?: string
+          intro_url?: string | null
+          logo_url?: string | null
+          outro_url?: string | null
+          preferred_music_style?: string | null
+          reference_channels?: string[] | null
+          target_audience?: string | null
+          updated_at?: string
+          user_id: string
+          user_project_id?: string | null
+        }
+        Update: {
+          additional_notes?: string | null
+          brand_colors?: Json | null
+          brand_description?: string | null
+          brand_fonts?: Json | null
+          brand_name?: string
+          completed?: boolean
+          completed_at?: string | null
+          content_style?: string | null
+          created_at?: string
+          id?: string
+          intro_url?: string | null
+          logo_url?: string | null
+          outro_url?: string | null
+          preferred_music_style?: string | null
+          reference_channels?: string[] | null
+          target_audience?: string | null
+          updated_at?: string
+          user_id?: string
+          user_project_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_briefings_user_project_id_fkey"
+            columns: ["user_project_id"]
+            isOneToOne: false
+            referencedRelation: "user_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
+          company: string | null
           created_at: string
           full_name: string | null
           id: string
           onboarding_complete: boolean
+          phone: string | null
           role: string
           updated_at: string
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
+          company?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
           onboarding_complete?: boolean
+          phone?: string | null
           role?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           avatar_url?: string | null
+          company?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
           onboarding_complete?: boolean
+          phone?: string | null
           role?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_projects: {
+        Row: {
+          assigned_at: string
+          covers_approved: number
+          covers_reserved: number
+          created_at: string
+          current_period_end: string
+          current_period_start: string
+          custom_project_id: string
+          editor_id: string | null
+          id: string
+          instagram_approved: number
+          instagram_reserved: number
+          payment_confirmed_at: string | null
+          status: Database["public"]["Enums"]["user_project_status"]
+          stripe_subscription_id: string | null
+          thumbnails_approved: number
+          thumbnails_reserved: number
+          tour_completed: boolean
+          updated_at: string
+          user_id: string
+          youtube_approved: number
+          youtube_reserved: number
+        }
+        Insert: {
+          assigned_at?: string
+          covers_approved?: number
+          covers_reserved?: number
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          custom_project_id: string
+          editor_id?: string | null
+          id?: string
+          instagram_approved?: number
+          instagram_reserved?: number
+          payment_confirmed_at?: string | null
+          status?: Database["public"]["Enums"]["user_project_status"]
+          stripe_subscription_id?: string | null
+          thumbnails_approved?: number
+          thumbnails_reserved?: number
+          tour_completed?: boolean
+          updated_at?: string
+          user_id: string
+          youtube_approved?: number
+          youtube_reserved?: number
+        }
+        Update: {
+          assigned_at?: string
+          covers_approved?: number
+          covers_reserved?: number
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          custom_project_id?: string
+          editor_id?: string | null
+          id?: string
+          instagram_approved?: number
+          instagram_reserved?: number
+          payment_confirmed_at?: string | null
+          status?: Database["public"]["Enums"]["user_project_status"]
+          stripe_subscription_id?: string | null
+          thumbnails_approved?: number
+          thumbnails_reserved?: number
+          tour_completed?: boolean
+          updated_at?: string
+          user_id?: string
+          youtube_approved?: number
+          youtube_reserved?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_projects_custom_project_id_fkey"
+            columns: ["custom_project_id"]
+            isOneToOne: false
+            referencedRelation: "custom_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_projects_editor_id_fkey"
+            columns: ["editor_id"]
+            isOneToOne: false
+            referencedRelation: "editors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
         Relationships: []
@@ -52,10 +420,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "editor" | "client"
+      deadline_type: "24h" | "48h" | "72h"
+      delivery_status:
+        | "pending"
+        | "in_progress"
+        | "review"
+        | "revision"
+        | "approved"
+        | "cancelled"
+      delivery_type: "youtube_video" | "instagram_video" | "thumbnail" | "cover"
+      editor_status: "available" | "busy" | "inactive"
+      payment_frequency_type: "monthly" | "quarterly" | "annual"
+      user_project_status:
+        | "pending_payment"
+        | "active"
+        | "suspended"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -182,6 +572,26 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "editor", "client"],
+      deadline_type: ["24h", "48h", "72h"],
+      delivery_status: [
+        "pending",
+        "in_progress",
+        "review",
+        "revision",
+        "approved",
+        "cancelled",
+      ],
+      delivery_type: ["youtube_video", "instagram_video", "thumbnail", "cover"],
+      editor_status: ["available", "busy", "inactive"],
+      payment_frequency_type: ["monthly", "quarterly", "annual"],
+      user_project_status: [
+        "pending_payment",
+        "active",
+        "suspended",
+        "cancelled",
+      ],
+    },
   },
 } as const
