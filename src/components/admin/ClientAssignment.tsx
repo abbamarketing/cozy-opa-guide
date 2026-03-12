@@ -312,29 +312,29 @@ const ClientAssignment = () => {
 
       {/* Assignment Modal */}
       <Dialog open={modalOpen} onOpenChange={(o) => !o && setModalOpen(false)}>
-        <DialogContent className="max-w-lg glass border-border/50">
+        <DialogContent className="w-[95vw] max-w-lg glass border-border/50 max-h-[90vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle>Atribuir Projeto a {selectedClient?.full_name || 'Cliente'}</DialogTitle>
-            <DialogDescription>Escolha um projeto personalizado para atribuir a este cliente.</DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">Atribuir Projeto a {selectedClient?.full_name || 'Cliente'}</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">Escolha um projeto personalizado para atribuir a este cliente.</DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Client info */}
-            <div className="glass rounded-xl p-4 space-y-1">
-              <p className="text-sm"><span className="text-muted-foreground">Nome:</span> {selectedClient?.full_name || 'N/A'}</p>
-              <p className="text-sm"><span className="text-muted-foreground">Cadastro:</span> {selectedClient ? format(new Date(selectedClient.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : ''}</p>
+            <div className="glass rounded-xl p-3 sm:p-4 space-y-1">
+              <p className="text-xs sm:text-sm"><span className="text-muted-foreground">Nome:</span> {selectedClient?.full_name || 'N/A'}</p>
+              <p className="text-xs sm:text-sm"><span className="text-muted-foreground">Cadastro:</span> {selectedClient ? format(new Date(selectedClient.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : ''}</p>
             </div>
 
             {/* Project select */}
             <div className="space-y-2">
-              <Label>Escolher Projeto</Label>
+              <Label className="text-sm">Escolher Projeto</Label>
               <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
-                <SelectTrigger className="bg-secondary border-border">
+                <SelectTrigger className="bg-secondary border-border h-11 sm:h-10 text-sm">
                   <SelectValue placeholder="Selecione um projeto..." />
                 </SelectTrigger>
                 <SelectContent>
                   {projects.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.project_name}</SelectItem>
+                    <SelectItem key={p.id} value={p.id} className="text-sm py-2.5">{p.project_name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -342,53 +342,53 @@ const ClientAssignment = () => {
 
             {/* Project preview */}
             {selectedProject && (
-              <div className="glass rounded-xl p-5 border border-primary/20 space-y-4">
-                <h4 className="font-semibold text-lg">{selectedProject.project_name}</h4>
+              <div className="glass rounded-xl p-4 sm:p-5 border border-primary/20 space-y-3 sm:space-y-4">
+                <h4 className="font-semibold text-base sm:text-lg">{selectedProject.project_name}</h4>
 
                 <div className="space-y-2">
                   <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Package className="h-3 w-3" /> Entregáveis</p>
-                  <div className="space-y-1 text-sm">
+                  <div className="space-y-1.5 text-xs sm:text-sm">
                     {selectedProject.youtube_videos > 0 && (
-                      <p className="flex items-center gap-2"><Youtube className="h-4 w-4 text-muted-foreground" />{selectedProject.youtube_videos} vídeos YouTube/mês</p>
+                      <p className="flex items-center gap-2"><Youtube className="h-4 w-4 shrink-0 text-muted-foreground" />{selectedProject.youtube_videos} vídeos YouTube/mês</p>
                     )}
                     {selectedProject.instagram_videos > 0 && (
-                      <p className="flex items-center gap-2"><Instagram className="h-4 w-4 text-muted-foreground" />{selectedProject.instagram_videos} vídeos Instagram/mês</p>
+                      <p className="flex items-center gap-2"><Instagram className="h-4 w-4 shrink-0 text-muted-foreground" />{selectedProject.instagram_videos} vídeos Instagram/mês</p>
                     )}
                     {selectedProject.include_thumbnails && (
-                      <p className="flex items-center gap-2"><Image className="h-4 w-4 text-muted-foreground" />Thumbnails incluídas</p>
+                      <p className="flex items-center gap-2"><Image className="h-4 w-4 shrink-0 text-muted-foreground" />Thumbnails incluídas</p>
                     )}
                     {selectedProject.include_covers && (
-                      <p className="flex items-center gap-2"><FileImage className="h-4 w-4 text-muted-foreground" />Capas Instagram incluídas</p>
+                      <p className="flex items-center gap-2"><FileImage className="h-4 w-4 shrink-0 text-muted-foreground" />Capas Instagram incluídas</p>
                     )}
                     {selectedProject.include_script && (
-                      <p className="flex items-center gap-2"><FileText className="h-4 w-4 text-muted-foreground" />Roteiros IA incluídos</p>
+                      <p className="flex items-center gap-2"><FileText className="h-4 w-4 shrink-0 text-muted-foreground" />Roteiros IA incluídos</p>
                     )}
                     {selectedProject.include_capture && (
-                      <p className="flex items-center gap-2"><Camera className="h-4 w-4 text-muted-foreground" />Captação de vídeo incluída</p>
+                      <p className="flex items-center gap-2"><Camera className="h-4 w-4 shrink-0 text-muted-foreground" />Captação de vídeo incluída</p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex gap-6 text-sm">
-                  <p><span className="font-mono-code text-primary font-bold">R$ {Number(selectedProject.monthly_value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>/mês</p>
-                  <p>SLA: {selectedProject.deadline}</p>
-                  <p>Até {selectedProject.max_revisions} revisões</p>
+                <div className="grid grid-cols-3 gap-2 text-xs sm:text-sm">
+                  <p><span className="font-mono-code text-primary font-bold">R$ {Number(selectedProject.monthly_value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span><span className="text-muted-foreground">/mês</span></p>
+                  <p className="text-center">SLA: {selectedProject.deadline}</p>
+                  <p className="text-right">Até {selectedProject.max_revisions} revisões</p>
                 </div>
               </div>
             )}
 
             {/* Options */}
-            <div className="flex items-center gap-2">
-              <Checkbox id="sendEmail" checked={sendEmail} onCheckedChange={(c) => setSendEmail(!!c)} />
-              <Label htmlFor="sendEmail" className="text-sm text-muted-foreground cursor-pointer">
+            <div className="flex items-start gap-3 py-1">
+              <Checkbox id="sendEmail" checked={sendEmail} onCheckedChange={(c) => setSendEmail(!!c)} className="mt-0.5 h-5 w-5" />
+              <Label htmlFor="sendEmail" className="text-xs sm:text-sm text-muted-foreground cursor-pointer leading-tight">
                 Enviar email de boas-vindas com detalhes do projeto
               </Label>
             </div>
 
             {/* Actions */}
-            <div className="flex justify-end gap-3">
-              <Button variant="ghost" onClick={() => setModalOpen(false)}>Cancelar</Button>
-              <Button variant="neon" disabled={!selectedProjectId || assigning} onClick={handleAssign}>
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 pt-2">
+              <Button variant="ghost" className="h-11 sm:h-10" onClick={() => setModalOpen(false)}>Cancelar</Button>
+              <Button variant="neon" className="h-11 sm:h-10" disabled={!selectedProjectId || assigning} onClick={handleAssign}>
                 {assigning ? <Loader2 className="h-4 w-4 animate-spin" /> : (
                   <><UserPlus className="h-4 w-4 mr-2" />Atribuir Projeto</>
                 )}
