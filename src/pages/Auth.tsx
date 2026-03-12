@@ -68,7 +68,7 @@ const AuthPage = () => {
             <span className="text-2xl font-bold">
               Abba<span className="text-primary">Video</span>
             </span>
-            <span className="font-mono-code text-xs text-muted-foreground ml-1.5">v5.0</span>
+            <span className="font-mono-code text-xs text-muted-foreground ml-1.5">v1.0</span>
           </div>
         </motion.div>
 
