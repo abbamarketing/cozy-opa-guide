@@ -4,6 +4,7 @@ import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogContent,
@@ -156,6 +157,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
     if (error) {
       toast.error('Erro ao entregar: ' + error.message);
     } else {
+      logger.info('Editor entregou', { delivery_id: delivery.id, title: delivery.title }, 'editor');
       toast.success('Entrega marcada como concluída! 🎉');
       onOpenChange(false);
       onUpdated();

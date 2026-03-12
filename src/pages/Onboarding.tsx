@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import BriefingForm from '@/components/onboarding/BriefingForm';
 import { Loader2 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function Onboarding() {
         .update({ onboarding_complete: true })
         .eq('user_id', user.id);
     }
+    logger.info('Onboarding concluído', {}, 'onboarding');
     navigate('/dashboard', { replace: true });
   };
 

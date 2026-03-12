@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogContent,
@@ -206,6 +207,7 @@ const NewDeliveryModal = ({
 
       // Quota is now automatically reserved by the database trigger (reserve_quota_on_create)
 
+      logger.info('Entrega criada', { delivery_type: values.delivery_type, title: values.title }, 'delivery');
       toast.success('Solicitação criada com sucesso!');
       onOpenChange(false);
       form.reset();

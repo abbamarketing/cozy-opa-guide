@@ -45,6 +45,7 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import EditorBriefingModal from '@/components/editor/EditorBriefingModal';
 import NotificationBell from '@/components/shared/NotificationBell';
+import { logger } from '@/lib/logger';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 
 /* ─── Types ─── */
@@ -380,6 +381,7 @@ const EditorDashboard = () => {
     if (error) {
       toast.error('Erro ao mover entrega');
     } else {
+      logger.info('Editor moveu entrega', { delivery_id: draggedId, to: col.title }, 'editor');
       toast.success(`Movido para ${col.title}`);
       fetchDeliveries();
     }

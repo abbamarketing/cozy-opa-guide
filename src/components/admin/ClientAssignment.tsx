@@ -15,6 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { UserPlus, Loader2, Youtube, Instagram, Image, FileImage, FileText, Camera, Package } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { CustomProject } from '@/types/database';
@@ -147,6 +148,7 @@ const ClientAssignment = () => {
       return;
     }
 
+    logger.info('Projeto atribuído a cliente', { project: selectedProject.project_name, client: selectedClient.full_name }, 'admin');
     toast.success('Projeto atribuído com sucesso!', {
       description: `${selectedProject.project_name} → ${selectedClient.full_name || 'Cliente'}`,
     });

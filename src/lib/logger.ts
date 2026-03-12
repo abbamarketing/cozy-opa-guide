@@ -9,7 +9,8 @@ interface LogEntry {
   source?: string;
 }
 
-const LOG_BATCH_SIZE = 100;
+const LOG_BATCH_SIZE = 10;
+const FLUSH_INTERVAL = 3000;
 let logBuffer: LogEntry[] = [];
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -32,7 +33,6 @@ async function flushLogs() {
     console.error('[Logger] Failed to flush logs:', error.message);
   }
 
-  // If there are remaining logs, schedule another flush
   if (logBuffer.length > 0) {
     scheduleFlush();
   }
@@ -43,7 +43,7 @@ function scheduleFlush() {
   flushTimer = setTimeout(() => {
     flushTimer = null;
     flushLogs();
-  }, 5000); // Flush every 5 seconds
+  }, FLUSH_INTERVAL);
 }
 
 function addLog(entry: LogEntry) {

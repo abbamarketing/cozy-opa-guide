@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 interface AuthContextType {
   user: User | null;
@@ -22,6 +23,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setIsLoading(false);
+
+      if (_event === 'SIGNED_IN') {
+        logger.info('Usuário logado', { email: session?.user?.email }, 'auth');
+      } else if (_event === 'SIGNED_OUT') {
+        logger.info('Usuário deslogado', {}, 'auth');
+        logger.flush();
+      } else if (_event === 'USER_UPDATED') {
+        logger.info('Perfil atualizado', { user_id: session?.user?.id }, 'auth');
+      } else if (_event === 'PASSWORD_RECOVERY') {
+        logger.info('Recuperação de senha iniciada', {}, 'auth');
+      }
     });
 
     // THEN check for existing session

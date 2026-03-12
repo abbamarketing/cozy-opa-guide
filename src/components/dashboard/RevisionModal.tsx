@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogContent,
@@ -84,6 +85,7 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent }: Revisio
         .eq('id', delivery.id);
       if (delError) throw delError;
 
+      logger.info('Revisão solicitada', { delivery_id: delivery.id }, 'delivery');
       toast.success('Revisão solicitada com sucesso!');
       form.reset();
       onOpenChange(false);
