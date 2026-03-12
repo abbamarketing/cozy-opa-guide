@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -30,6 +32,7 @@ interface ClientProfile {
 }
 
 const ClientAssignment = () => {
+  const isMobile = useIsMobile();
   const [clients, setClients] = useState<(ClientProfile & { email?: string })[]>([]);
   const [activeClients, setActiveClients] = useState<(ClientProfile & { email?: string; project_name?: string; status?: string })[]>([]);
   const [projects, setProjects] = useState<CustomProject[]>([]);
@@ -186,6 +189,29 @@ const ClientAssignment = () => {
         </div>
         <p className="text-sm text-muted-foreground">Clientes cadastrados que ainda não têm um projeto atribuído.</p>
 
+        {isMobile ? (
+          <div className="space-y-2">
+            {loading ? (
+              <p className="py-8 text-center text-muted-foreground">Carregando...</p>
+            ) : clients.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">Nenhum cliente aguardando.</p>
+            ) : (
+              clients.map((c) => (
+                <Card key={c.id} className="p-3 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{c.full_name || 'Sem nome'}</p>
+                      <p className="text-[11px] text-muted-foreground">{format(new Date(c.created_at), "dd/MM/yyyy", { locale: ptBR })}</p>
+                    </div>
+                    <Button variant="neon" size="sm" className="shrink-0 text-xs" onClick={() => openModal(c)}>
+                      <UserPlus className="h-3.5 w-3.5 mr-1" />Atribuir
+                    </Button>
+                  </div>
+                </Card>
+              ))
+            )}
+          </div>
+        ) : (
         <div className="glass rounded-xl overflow-hidden">
           <Table>
             <TableHeader>
@@ -222,11 +248,34 @@ const ClientAssignment = () => {
             </TableBody>
           </Table>
         </div>
+        )}
       </section>
 
       {/* Active Clients */}
       <section className="space-y-4">
         <h2 className="text-2xl font-bold">Clientes Ativos</h2>
+        {isMobile ? (
+          <div className="space-y-2">
+            {activeClients.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">Nenhum cliente ativo.</p>
+            ) : (
+              activeClients.map((c) => {
+                const st = STATUS_LABELS[c.status || ''] || STATUS_LABELS.pending_payment;
+                return (
+                  <Card key={c.id} className="p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium truncate">{c.full_name || 'Sem nome'}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{c.project_name}</p>
+                      </div>
+                      <Badge className={`shrink-0 text-[10px] ${st.className}`}>{st.label}</Badge>
+                    </div>
+                  </Card>
+                );
+              })
+            )}
+          </div>
+        ) : (
         <div className="glass rounded-xl overflow-hidden">
           <Table>
             <TableHeader>
@@ -258,6 +307,7 @@ const ClientAssignment = () => {
             </TableBody>
           </Table>
         </div>
+        )}
       </section>
 
       {/* Assignment Modal */}

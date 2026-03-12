@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { format, differenceInHours } from 'date-fns';
+import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { downloadCSV } from '@/lib/csv';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { remainingBusinessMinutes, formatBusinessCountdown } from '@/lib/business-hours';
 
 interface AdminDelivery {
   id: string;
@@ -38,7 +40,7 @@ interface Editor {
 
 const COLUMNS = [
   { id: 'todo', title: 'A FAZER', statuses: ['pending'] },
-  { id: 'production', title: 'EM PRODUÇÃO', statuses: ['in_progress'] },
+  { id: 'production', title: 'PRODUÇÃO', statuses: ['in_progress'] },
   { id: 'review', title: 'REVISAR', statuses: ['review', 'revision'] },
   { id: 'done', title: 'CONCLUÍDO', statuses: ['approved'] },
 ];
@@ -50,7 +52,15 @@ const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   cover: Layers,
 };
 
+const typeLabels: Record<string, string> = {
+  youtube_video: 'YouTube',
+  instagram_video: 'Instagram',
+  thumbnail: 'Thumbnail',
+  cover: 'Capa',
+};
+
 const AdminDeliveries = () => {
+  const isMobile = useIsMobile();
   const [deliveries, setDeliveries] = useState<AdminDelivery[]>([]);
   const [editors, setEditors] = useState<Editor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,6 +69,7 @@ const AdminDeliveries = () => {
   const [typeFilter, setTypeFilter] = useState('all');
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [activeColumn, setActiveColumn] = useState('todo');
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -150,10 +161,86 @@ const AdminDeliveries = () => {
     setActionLoading(null);
   };
 
+  const exportCSV = () => {
+    const statusLabels: Record<string, string> = {
+      pending: 'Pendente', in_progress: 'Em produção', review: 'Revisão', revision: 'Revisão solicitada', approved: 'Aprovado', cancelled: 'Cancelado',
+    };
+    downloadCSV(
+      filtered.map((d) => ({
+        Título: d.title,
+        Tipo: typeLabels[d.delivery_type] || d.delivery_type,
+        Status: statusLabels[d.status] || d.status,
+        Cliente: d.client_name || '—',
+        Editor: d.editor_name || 'Sem editor',
+        Prazo: d.due_date ? format(new Date(d.due_date), 'dd/MM/yyyy HH:mm', { locale: ptBR }) : '—',
+      })),
+      `entregas-${format(new Date(), 'yyyy-MM-dd')}`
+    );
+  };
+
+  /* ─── Delivery Card (shared) ─── */
+  const DeliveryItem = ({ d }: { d: AdminDelivery }) => {
+    const Icon = typeIcons[d.delivery_type] || Video;
+    const bizMin = d.due_date ? remainingBusinessMinutes(new Date(d.due_date)) : null;
+
+    return (
+      <Card
+        draggable={!isMobile}
+        onDragStart={!isMobile ? () => setDraggedId(d.id) : undefined}
+        className={`border-border/40 bg-card/80 p-3 space-y-1.5 ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''}`}
+      >
+        <div className="flex items-start gap-2">
+          {!isMobile && <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />}
+          <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-card-foreground">{d.title}</p>
+            <p className="text-[10px] text-muted-foreground">
+              {d.client_name || '—'} · {d.editor_name || 'Sem editor'}
+            </p>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={actionLoading === d.id}>
+                {actionLoading === d.id ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <MoreHorizontal className="h-3.5 w-3.5" />
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {editors.map((e) => (
+                <DropdownMenuItem key={e.id} onClick={() => handleReassign(d.id, e.id)}>
+                  <UserCheck className="mr-2 h-3.5 w-3.5" /> {e.display_name}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuItem onClick={() => handleCancel(d.id)} className="text-destructive">
+                <XCircle className="mr-2 h-3.5 w-3.5" /> Cancelar
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        {d.due_date && (
+          <div className="flex items-center gap-1 text-[10px]">
+            <Clock className={`h-3 w-3 ${bizMin !== null && bizMin < 0 ? 'text-destructive' : 'text-muted-foreground'}`} />
+            <span className="text-muted-foreground">
+              {format(new Date(d.due_date), "dd/MM HH'h'", { locale: ptBR })}
+            </span>
+            {bizMin !== null && (
+              <span className={`ml-auto text-[10px] font-medium ${bizMin < 0 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                {formatBusinessCountdown(bizMin)}
+              </span>
+            )}
+          </div>
+        )}
+      </Card>
+    );
+  };
+
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        {COLUMNS.map((c) => <Skeleton key={c.id} className="h-64 rounded-xl" />)}
+      <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-4'} gap-3`}>
+        {(isMobile ? [1] : COLUMNS).map((_, i) => <Skeleton key={i} className="h-64 rounded-xl" />)}
       </div>
     );
   }
@@ -161,9 +248,9 @@ const AdminDeliveries = () => {
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 sm:flex-wrap">
         <Select value={clientFilter} onValueChange={setClientFilter}>
-          <SelectTrigger className="h-8 w-[150px] text-xs">
+          <SelectTrigger className="h-8 w-full sm:w-[150px] text-xs">
             <SelectValue placeholder="Cliente" />
           </SelectTrigger>
           <SelectContent>
@@ -175,7 +262,7 @@ const AdminDeliveries = () => {
         </Select>
 
         <Select value={editorFilter} onValueChange={setEditorFilter}>
-          <SelectTrigger className="h-8 w-[150px] text-xs">
+          <SelectTrigger className="h-8 w-full sm:w-[150px] text-xs">
             <SelectValue placeholder="Editor" />
           </SelectTrigger>
           <SelectContent>
@@ -186,135 +273,100 @@ const AdminDeliveries = () => {
           </SelectContent>
         </Select>
 
-        <Select value={typeFilter} onValueChange={setTypeFilter}>
-          <SelectTrigger className="h-8 w-[130px] text-xs">
-            <SelectValue placeholder="Tipo" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos tipos</SelectItem>
-            <SelectItem value="youtube_video">YouTube</SelectItem>
-            <SelectItem value="instagram_video">Instagram</SelectItem>
-            <SelectItem value="thumbnail">Thumbnail</SelectItem>
-            <SelectItem value="cover">Capa</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex gap-2">
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <SelectTrigger className="h-8 flex-1 sm:w-[130px] text-xs">
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos tipos</SelectItem>
+              <SelectItem value="youtube_video">YouTube</SelectItem>
+              <SelectItem value="instagram_video">Instagram</SelectItem>
+              <SelectItem value="thumbnail">Thumbnail</SelectItem>
+              <SelectItem value="cover">Capa</SelectItem>
+            </SelectContent>
+          </Select>
 
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-1.5 h-8 text-xs"
-          disabled={filtered.length === 0}
-          onClick={() => {
-            const typeLabels: Record<string, string> = {
-              youtube_video: 'YouTube', instagram_video: 'Instagram', thumbnail: 'Thumbnail', cover: 'Capa',
-            };
-            const statusLabels: Record<string, string> = {
-              pending: 'Pendente', in_progress: 'Em produção', review: 'Revisão', revision: 'Revisão solicitada', approved: 'Aprovado', cancelled: 'Cancelado',
-            };
-            downloadCSV(
-              filtered.map((d) => ({
-                Título: d.title,
-                Tipo: typeLabels[d.delivery_type] || d.delivery_type,
-                Status: statusLabels[d.status] || d.status,
-                Cliente: d.client_name || '—',
-                Editor: d.editor_name || 'Sem editor',
-                Prazo: d.due_date ? format(new Date(d.due_date), 'dd/MM/yyyy HH:mm', { locale: ptBR }) : '—',
-              })),
-              `entregas-${format(new Date(), 'yyyy-MM-dd')}`
-            );
-          }}
-        >
-          <Download className="h-3.5 w-3.5" />
-          Exportar CSV
-        </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5 h-8 text-xs shrink-0"
+            disabled={filtered.length === 0}
+            onClick={exportCSV}
+          >
+            <Download className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">CSV</span>
+          </Button>
+        </div>
       </div>
 
-      {/* Kanban */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        {COLUMNS.map((col) => {
-          const items = filtered.filter((d) => col.statuses.includes(d.status));
-          return (
-            <div
-              key={col.id}
-              className={`flex flex-col rounded-xl border p-2 transition-colors ${
-                draggedId ? 'border-primary/50 bg-primary/5' : 'border-border/40 bg-muted/30'
-              }`}
-              onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
-              onDrop={() => handleDrop(col.statuses)}
-            >
-              <div className="mb-2 px-1 flex items-center justify-between">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+      {/* Mobile: Tab + single column */}
+      {isMobile ? (
+        <div className="space-y-3">
+          <div className="flex gap-1 bg-secondary rounded-lg p-1">
+            {COLUMNS.map((col) => {
+              const count = filtered.filter((d) => col.statuses.includes(d.status)).length;
+              const isActive = activeColumn === col.id;
+              return (
+                <button
+                  key={col.id}
+                  onClick={() => setActiveColumn(col.id)}
+                  className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-md text-[10px] font-mono font-medium tracking-wider transition-colors ${
+                    isActive ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+                  }`}
+                >
                   {col.title}
-                </h3>
-                <Badge variant="secondary" className="h-5 min-w-[20px] justify-center px-1.5 text-[10px]">
-                  {items.length}
-                </Badge>
-              </div>
-
-              <ScrollArea className="flex-1">
-                <div className="space-y-2 p-0.5">
-                  {items.length === 0 ? (
-                    <p className="py-8 text-center text-xs text-muted-foreground/50">Nenhuma</p>
-                  ) : (
-                    items.map((d) => {
-                      const Icon = typeIcons[d.delivery_type] || Video;
-                      const h = d.due_date ? differenceInHours(new Date(d.due_date), new Date()) : null;
-                      return (
-                        <Card
-                          key={d.id}
-                          draggable
-                          onDragStart={() => setDraggedId(d.id)}
-                          className="cursor-grab active:cursor-grabbing border-border/40 bg-card/80 p-3 space-y-1.5"
-                        >
-                          <div className="flex items-start gap-2">
-                            <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />
-                            <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-sm font-medium text-card-foreground">{d.title}</p>
-                              <p className="text-[10px] text-muted-foreground">
-                                {d.client_name || '—'} · {d.editor_name || 'Sem editor'}
-                              </p>
-                            </div>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={actionLoading === d.id}>
-                                  {actionLoading === d.id ? (
-                                    <Loader2 className="h-3 w-3 animate-spin" />
-                                  ) : (
-                                    <MoreHorizontal className="h-3.5 w-3.5" />
-                                  )}
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-48">
-                                {editors.map((e) => (
-                                  <DropdownMenuItem key={e.id} onClick={() => handleReassign(d.id, e.id)}>
-                                    <UserCheck className="mr-2 h-3.5 w-3.5" /> {e.display_name}
-                                  </DropdownMenuItem>
-                                ))}
-                                <DropdownMenuItem onClick={() => handleCancel(d.id)} className="text-destructive">
-                                  <XCircle className="mr-2 h-3.5 w-3.5" /> Cancelar
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                          {d.due_date && (
-                            <div className="flex items-center gap-1 text-[10px]">
-                              <Clock className={`h-3 w-3 ${h !== null && h < 0 ? 'text-destructive' : 'text-muted-foreground'}`} />
-                              <span className="text-muted-foreground">
-                                {format(new Date(d.due_date), "dd/MM HH'h'", { locale: ptBR })}
-                              </span>
-                            </div>
-                          )}
-                        </Card>
-                      );
-                    })
+                  {count > 0 && (
+                    <span className={`text-[9px] ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>{count}</span>
                   )}
+                </button>
+              );
+            })}
+          </div>
+          <div className="space-y-2">
+            {(() => {
+              const col = COLUMNS.find((c) => c.id === activeColumn) || COLUMNS[0];
+              const items = filtered.filter((d) => col.statuses.includes(d.status));
+              return items.length === 0 ? (
+                <p className="py-8 text-center text-xs text-muted-foreground/50">Nenhuma entrega</p>
+              ) : (
+                items.map((d) => <DeliveryItem key={d.id} d={d} />)
+              );
+            })()}
+          </div>
+        </div>
+      ) : (
+        /* Desktop: 4-column Kanban */
+        <div className="grid grid-cols-4 gap-3">
+          {COLUMNS.map((col) => {
+            const items = filtered.filter((d) => col.statuses.includes(d.status));
+            return (
+              <div
+                key={col.id}
+                className={`flex flex-col rounded-xl border p-2 transition-colors ${
+                  draggedId ? 'border-primary/50 bg-primary/5' : 'border-border/40 bg-muted/30'
+                }`}
+                onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
+                onDrop={() => handleDrop(col.statuses)}
+              >
+                <div className="mb-2 px-1 flex items-center justify-between">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{col.title}</h3>
+                  <Badge variant="secondary" className="h-5 min-w-[20px] justify-center px-1.5 text-[10px]">{items.length}</Badge>
                 </div>
-              </ScrollArea>
-            </div>
-          );
-        })}
-      </div>
+                <ScrollArea className="flex-1">
+                  <div className="space-y-2 p-0.5">
+                    {items.length === 0 ? (
+                      <p className="py-8 text-center text-xs text-muted-foreground/50">Nenhuma</p>
+                    ) : (
+                      items.map((d) => <DeliveryItem key={d.id} d={d} />)
+                    )}
+                  </div>
+                </ScrollArea>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

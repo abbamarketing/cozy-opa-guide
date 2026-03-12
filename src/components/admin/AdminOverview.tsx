@@ -4,8 +4,9 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Users, Package, AlertTriangle, DollarSign, Clock } from 'lucide-react';
-import { format, differenceInHours, subWeeks, startOfWeek, endOfWeek } from 'date-fns';
+import { format, subWeeks, startOfWeek, endOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { remainingBusinessMinutes, formatBusinessCountdown } from '@/lib/business-hours';
 import {
   LineChart,
   Line,
@@ -126,9 +127,9 @@ const AdminOverview = () => {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-28 rounded-xl" />)}
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
+      </div>
         <Skeleton className="h-72 rounded-xl" />
       </div>
     );
@@ -144,16 +145,16 @@ const AdminOverview = () => {
   return (
     <div className="space-y-6">
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {kpiCards.map((kpi) => (
-          <Card key={kpi.label} className="glass border-border/40 p-5 space-y-2">
+          <Card key={kpi.label} className="glass border-border/40 p-4 space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 {kpi.label}
               </span>
               <kpi.icon className={`h-4 w-4 ${kpi.color}`} />
             </div>
-            <p className="text-2xl font-bold text-card-foreground">{kpi.value}</p>
+            <p className="text-lg sm:text-2xl font-bold text-card-foreground break-all">{kpi.value}</p>
           </Card>
         ))}
       </div>
@@ -198,17 +199,17 @@ const AdminOverview = () => {
         ) : (
           <div className="space-y-2">
             {urgentDeliveries.map((d) => {
-              const h = differenceInHours(new Date(d.due_date), new Date());
+              const bizMin = remainingBusinessMinutes(new Date(d.due_date));
               return (
-                <div key={d.id} className="flex items-center justify-between gap-2 rounded-lg bg-muted/20 px-3 py-2">
+                <div key={d.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 rounded-lg bg-muted/20 px-3 py-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="text-sm font-medium text-card-foreground truncate">{d.title}</span>
                     <Badge variant="outline" className="text-[10px] shrink-0">
                       {{ youtube_video: 'YouTube', instagram_video: 'Instagram', thumbnail: 'Thumbnail', cover: 'Capa' }[d.delivery_type] || d.delivery_type}
                     </Badge>
                   </div>
-                  <span className={`text-xs font-medium shrink-0 ${h < 0 ? 'text-destructive' : 'text-[hsl(45,93%,47%)]'}`}>
-                    {h < 0 ? 'Atrasado' : `${h}h restantes`}
+                  <span className={`text-xs font-medium shrink-0 ${bizMin < 0 ? 'text-destructive' : 'text-[hsl(45,93%,47%)]'}`}>
+                    {bizMin < 0 ? 'Atrasado' : formatBusinessCountdown(bizMin)}
                   </span>
                 </div>
               );
