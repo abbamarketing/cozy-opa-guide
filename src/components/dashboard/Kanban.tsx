@@ -209,6 +209,9 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
     return (
       <div className="space-y-3">
+        {/* Capture Banner */}
+        <CaptureBanner />
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-base font-mono font-semibold text-foreground">Entregas</h2>
@@ -217,19 +220,24 @@ const Kanban = ({ userProject }: KanbanProps) => {
               <span>
                 <Button
                   size="sm"
-                  disabled={!quotaAvailable}
+                  disabled={!canCreateDelivery}
                   className="gap-1.5 h-9"
-                  onClick={() => setShowNewModal(true)}
+                  onClick={handleNewClick}
                   data-tour="new-delivery-btn"
                 >
-                  <Plus className="h-4 w-4" />
-                  Nova
+                  {needsCaptureFirst ? <Camera className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                  {needsCaptureFirst ? 'Agendar' : 'Nova'}
                 </Button>
               </span>
             </TooltipTrigger>
-            {!quotaAvailable && (
+            {!canCreateDelivery && !needsCaptureFirst && (
               <TooltipContent>
                 <p>Quota esgotada</p>
+              </TooltipContent>
+            )}
+            {needsCaptureFirst && (
+              <TooltipContent>
+                <p>Agende uma captação para liberar entregas</p>
               </TooltipContent>
             )}
           </Tooltip>
@@ -304,6 +312,15 @@ const Kanban = ({ userProject }: KanbanProps) => {
               onOpenChange={setShowNewModal}
               userProject={userProject}
               onCreated={fetchDeliveries}
+            />
+          )}
+          {showCaptureModal && (
+            <CaptureScheduleModal
+              open={showCaptureModal}
+              onOpenChange={setShowCaptureModal}
+              userProject={userProject}
+              onScheduled={checkCapture}
+              captureLeadDays={captureLeadDays}
             />
           )}
         </Suspense>
