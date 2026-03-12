@@ -1,4 +1,5 @@
 import { Play } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const TERMS_SECTIONS = [
   { title: '1. Aceitação dos Termos', paragraphs: ['Ao acessar e utilizar a plataforma AbbaVideo ("Plataforma"), você concorda em cumprir e estar vinculado aos seguintes termos e condições. Caso não concorde com qualquer parte destes termos, não poderá acessar o serviço.'] },
