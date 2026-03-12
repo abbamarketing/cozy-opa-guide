@@ -85,7 +85,7 @@ export default function PaymentGate() {
           {/* Resumo do Projeto */}
           <Card className="glass border-border/40">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">🎯 Seu Projeto</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-2xl">Seu Projeto</CardTitle>
               <CardDescription className="text-lg font-semibold text-foreground">
                 {project.project_name}
               </CardDescription>
