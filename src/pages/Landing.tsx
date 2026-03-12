@@ -523,12 +523,12 @@ const Landing = () => {
           >
             <a href="https://wa.me/5500000000000" target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="gap-2 text-sm px-8">
-                <Mail className="h-4 w-4" /> Solicitar Orçamento
+                <Mail className="h-4 w-4" /> Quero um Orçamento Grátis
               </Button>
             </a>
             <Link to="/auth">
               <Button variant="outline" size="lg" className="gap-2 text-sm px-8">
-                Já tenho conta <ArrowRight className="h-4 w-4" />
+                Já sou cliente <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </motion.div>
