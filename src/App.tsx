@@ -50,6 +50,7 @@ const App = () => (
               {/* Public routes */}
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
 
               {/* Admin only */}
               <Route element={<ProtectedRoute requireRole="admin" />}>
