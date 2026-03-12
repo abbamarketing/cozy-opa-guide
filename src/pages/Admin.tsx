@@ -20,6 +20,7 @@ const TABS = [
   { id: 'metricas', label: 'Métricas', icon: BarChart3 },
   { id: 'projetos', label: 'Projetos', icon: FolderKanban },
   { id: 'logs', label: 'Logs', icon: ScrollText },
+  { id: 'docs', label: 'Docs', icon: BookOpen },
 ];
 
 const Admin = () => {
