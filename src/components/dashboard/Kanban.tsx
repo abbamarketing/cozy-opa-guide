@@ -104,6 +104,42 @@ const Kanban = ({ userProject }: KanbanProps) => {
     };
   }, [userProject.id]);
 
+  // Check if capture is scheduled for this period
+  const checkCapture = useCallback(async () => {
+    if (!requiresCapture) {
+      setCaptureCheckDone(true);
+      return;
+    }
+
+    // Get capture_lead_days from custom_projects
+    const { data: proj } = await supabase
+      .from('custom_projects')
+      .select('capture_lead_days')
+      .eq('id', userProject.custom_project.id)
+      .single();
+
+    if (proj && (proj as any).capture_lead_days) {
+      setCaptureLeadDays((proj as any).capture_lead_days);
+    }
+
+    // Check for any scheduled/confirmed capture in current period
+    const { data: captures } = await supabase
+      .from('capture_sessions')
+      .select('id')
+      .eq('user_project_id', userProject.id)
+      .in('status', ['scheduled', 'confirmed', 'completed'])
+      .gte('scheduled_date', userProject.current_period_start)
+      .lte('scheduled_date', userProject.current_period_end)
+      .limit(1);
+
+    setHasScheduledCapture(!!captures && captures.length > 0);
+    setCaptureCheckDone(true);
+  }, [requiresCapture, userProject.id, userProject.custom_project.id, userProject.current_period_start, userProject.current_period_end]);
+
+  useEffect(() => {
+    checkCapture();
+  }, [checkCapture]);
+
   const hasQuota = () => {
     const p = userProject.custom_project;
     const ytUsed = userProject.youtube_reserved + userProject.youtube_approved;
