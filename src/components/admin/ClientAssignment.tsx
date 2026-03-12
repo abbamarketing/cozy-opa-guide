@@ -31,6 +31,7 @@ interface ClientProfile {
 }
 
 const ClientAssignment = () => {
+  const isMobile = useIsMobile();
   const [clients, setClients] = useState<(ClientProfile & { email?: string })[]>([]);
   const [activeClients, setActiveClients] = useState<(ClientProfile & { email?: string; project_name?: string; status?: string })[]>([]);
   const [projects, setProjects] = useState<CustomProject[]>([]);
