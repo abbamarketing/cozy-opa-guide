@@ -158,6 +158,41 @@ export type Database = {
           },
         ]
       }
+      delivery_messages: {
+        Row: {
+          created_at: string
+          delivery_id: string
+          id: string
+          message: string
+          sender_id: string
+          timestamp_marker: string | null
+        }
+        Insert: {
+          created_at?: string
+          delivery_id: string
+          id?: string
+          message: string
+          sender_id: string
+          timestamp_marker?: string | null
+        }
+        Update: {
+          created_at?: string
+          delivery_id?: string
+          id?: string
+          message?: string
+          sender_id?: string
+          timestamp_marker?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_messages_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "deliveries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       delivery_revisions: {
         Row: {
           created_at: string

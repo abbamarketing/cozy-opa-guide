@@ -45,6 +45,7 @@ import {
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 import { typeConfig, statusConfig } from '@/components/dashboard/DeliveryCard';
 import FileUpload from '@/components/editor/FileUpload';
+import DeliveryChat from '@/components/shared/DeliveryChat';
 
 interface EditorBriefingModalProps {
   open: boolean;
@@ -258,10 +259,11 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
 
             {/* Tabs */}
             <Tabs defaultValue="briefing" className="w-full">
-              <TabsList className="w-full grid grid-cols-5">
+              <TabsList className="w-full grid grid-cols-6">
                 <TabsTrigger value="briefing" className="text-xs">Briefing</TabsTrigger>
                 <TabsTrigger value="brand" className="text-xs">Marca</TabsTrigger>
                 <TabsTrigger value="files" className="text-xs">Arquivos</TabsTrigger>
+                <TabsTrigger value="chat" className="text-xs">Chat</TabsTrigger>
                 <TabsTrigger value="deliver" className="text-xs">Entregas</TabsTrigger>
                 <TabsTrigger value="history" className="text-xs">Histórico</TabsTrigger>
               </TabsList>
@@ -292,20 +294,39 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
                 )}
 
                 {briefing?.reference_channels && briefing.reference_channels.length > 0 && (
-                  <div className="space-y-1">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Referências</h4>
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Canais de Referência</h4>
                     <div className="flex flex-wrap gap-2">
                       {briefing.reference_channels.map((ch, i) => (
                         <a
                           key={i}
-                          href={ch.startsWith('http') ? ch : `https://${ch}`}
+                          href={ch.startsWith('http') ? ch : `https://youtube.com/@${ch.replace('@', '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-xs text-primary hover:underline"
+                          className="flex items-center gap-1 text-xs text-primary hover:underline glass rounded-lg px-2 py-1"
                         >
                           <ExternalLink className="h-3 w-3" /> {ch}
                         </a>
                       ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Visual reference / example section */}
+                {briefing?.brand_description && (
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Sobre a Marca</h4>
+                    <div className="rounded-lg border border-border/40 bg-muted/20 p-3">
+                      <p className="text-sm text-card-foreground whitespace-pre-wrap">{briefing.brand_description}</p>
+                    </div>
+                  </div>
+                )}
+
+                {briefing?.target_audience && (
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Público-Alvo</h4>
+                    <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                      <p className="text-sm text-card-foreground">{briefing.target_audience}</p>
                     </div>
                   </div>
                 )}
@@ -461,7 +482,15 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
                 )}
               </TabsContent>
 
-              {/* TAB 4: Entregas */}
+              {/* TAB 4: Chat */}
+              <TabsContent value="chat" className="mt-4">
+                <DeliveryChat
+                  deliveryId={delivery.id}
+                  showTimestampInput={delivery.delivery_type === 'youtube_video' || delivery.delivery_type === 'instagram_video'}
+                />
+              </TabsContent>
+
+              {/* TAB 5: Entregas */}
               <TabsContent value="deliver" className="space-y-4 mt-4">
                 <FileUpload
                   userProjectId={delivery.user_project_id}
