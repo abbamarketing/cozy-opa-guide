@@ -520,11 +520,9 @@ const Landing = () => {
             initial="hidden" animate="visible" variants={fadeUp} custom={3}
             className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3"
           >
-            <a href="https://wa.me/5500000000000" target="_blank" rel="noopener noreferrer">
-              <Button size="lg" className="gap-2 text-sm px-8">
-                <Mail className="h-4 w-4" /> Quero um Orçamento Grátis
-              </Button>
-            </a>
+            <Button size="lg" className="gap-2 text-sm px-8" onClick={() => setSurveyOpen(true)}>
+              <Mail className="h-4 w-4" /> Quero um Orçamento Grátis
+            </Button>
             <Link to="/auth">
               <Button variant="outline" size="lg" className="gap-2 text-sm px-8">
                 Já sou cliente <ArrowRight className="h-4 w-4" />
