@@ -54,7 +54,7 @@ const BriefingForm = () => {
       toast.error('Arquivo muito grande', { description: 'Máximo 2MB' });
       return;
     }
-    if (!['image/png', 'image/jpeg', 'image/svg+xml'].test(file.type)) {
+    if (!['image/png', 'image/jpeg', 'image/svg+xml'].includes(file.type)) {
       toast.error('Formato inválido', { description: 'Use PNG, JPG ou SVG' });
       return;
     }
