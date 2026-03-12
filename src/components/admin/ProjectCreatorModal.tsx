@@ -25,9 +25,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Youtube, Instagram, Image, FileImage, FileText, Camera, AlertTriangle } from 'lucide-react';
+import { Loader2, Youtube, Instagram, Image, FileImage, FileText, Camera, AlertTriangle, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import type { CustomProject } from '@/types/database';
+import SubtaskTemplateEditor, { type SubtaskTemplate } from './SubtaskTemplateEditor';
 
 const projectSchema = z.object({
   project_name: z.string().trim().min(1, 'Nome é obrigatório').max(100),
