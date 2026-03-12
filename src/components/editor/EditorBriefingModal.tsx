@@ -86,12 +86,9 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
   const { user } = useAuth();
   const [briefing, setBriefing] = useState<BriefingData | null>(null);
   const [revisions, setRevisions] = useState<RevisionRecord[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [clientNote, setClientNote] = useState('');
   const [isDelivering, setIsDelivering] = useState(false);
-  const [driveLink, setDriveLink] = useState('');
-  const [isDragOver, setIsDragOver] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
   const fetchData = useCallback(async () => {
