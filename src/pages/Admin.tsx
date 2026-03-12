@@ -10,6 +10,7 @@ import EditorManagement from '@/components/admin/EditorManagement';
 import AdminMetrics from '@/components/admin/AdminMetrics';
 import ProjectManager from '@/components/admin/ProjectManager';
 import LogViewer from '@/components/admin/LogViewer';
+import AdminDocs from '@/components/admin/AdminDocs';
 
 const TABS = [
   { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard },
