@@ -108,6 +108,12 @@
     color: hsl(var(--primary));
   }
 
+  /* Fix sidebar starting below header */
+  [data-sidebar="sidebar"] {
+    top: var(--header-height, 3.5rem) !important;
+    height: calc(100svh - var(--header-height, 3.5rem)) !important;
+  }
+
   /* Safe area for mobile bottom nav */
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0);
