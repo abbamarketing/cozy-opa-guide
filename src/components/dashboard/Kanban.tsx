@@ -1,5 +1,5 @@
-import { useEffect, useState, lazy, Suspense } from 'react';
-import { Plus } from 'lucide-react';
+import { useEffect, useState, lazy, Suspense, useCallback } from 'react';
+import { Plus, Camera, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -12,6 +12,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 const NewDeliveryModal = lazy(() => import('./NewDeliveryModal'));
 const DeliveryDetailModal = lazy(() => import('./DeliveryDetailModal'));
+const CaptureScheduleModal = lazy(() => import('./CaptureScheduleModal'));
 
 interface KanbanProps {
   userProject: UserProjectData;
