@@ -540,9 +540,9 @@ const Landing = () => {
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}>
             <div className="text-center mb-6">
-              <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">Explore a plataforma</p>
+              <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">Sua nova central de conteúdo</p>
               <h2 className="text-xl sm:text-2xl font-bold">
-                Veja como funciona <span className="text-primary">na prática</span>
+                Tudo sob controle — <span className="text-primary">do pedido à aprovação</span>
               </h2>
             </div>
 
