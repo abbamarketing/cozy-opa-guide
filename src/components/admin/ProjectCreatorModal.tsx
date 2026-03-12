@@ -426,7 +426,29 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
             </div>
           </section>
 
-          {/* D) Preview */}
+          {/* D) Captação info */}
+          {values.include_capture && (
+            <section className="space-y-3 rounded-lg border border-border/50 bg-secondary/30 p-4">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                Captação Presencial
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                O cliente terá <span className="text-primary font-semibold">1 captação presencial por mês</span> com agendamento completo (data, horário e local).
+              </p>
+            </section>
+          )}
+
+          {/* E) Subtask Templates */}
+          {availableDeliveryTypes.length > 0 && (
+            <SubtaskTemplateEditor
+              templates={subtaskTemplates}
+              onChange={setSubtaskTemplates}
+              availableTypes={availableDeliveryTypes}
+            />
+          )}
+
+          {/* F) Preview */}
           <section className="space-y-3">
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Preview do Projeto</h3>
             <div className="glass rounded-xl p-5 border border-primary/20">
