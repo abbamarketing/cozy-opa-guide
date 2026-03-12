@@ -164,7 +164,7 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
         {/* Card */}
         <div className="glass rounded-2xl p-8 border border-border/50">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold mb-2">Configure sua marca 🎨</h1>
+            <h1 className="text-2xl font-bold mb-2">Configure sua marca</h1>
             <p className="text-sm text-muted-foreground">
               Informações básicas para começar (você pode adicionar mais detalhes depois)
             </p>

@@ -177,13 +177,13 @@ const NewDeliveryModal = ({
       // Build description with extras
       let fullDescription = values.description;
       if (project.include_script && scriptContent.trim()) {
-        fullDescription += `\n\n---\n${aiScript ? '💡 Ideias para roteiro IA' : '📝 Roteiro'}:\n${scriptContent}`;
+        fullDescription += `\n\n---\n${aiScript ? 'Ideias para roteiro IA' : 'Roteiro'}:\n${scriptContent}`;
       }
       if (isVideo && materialOption === 'drive' && driveLink.trim()) {
-        fullDescription += `\n\n📁 Material: ${driveLink.trim()}`;
+        fullDescription += `\n\nMaterial: ${driveLink.trim()}`;
       }
       if (isVideo && materialOption === 'later') {
-        fullDescription += '\n\n📁 Material: será enviado depois';
+        fullDescription += '\n\nMaterial: será enviado depois';
       }
 
       // 1. Create delivery

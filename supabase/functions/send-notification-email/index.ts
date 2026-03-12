@@ -154,19 +154,7 @@ function getTypeLabel(type: string): string {
 }
 
 function getTypeEmoji(type: string): string {
-  const emojis: Record<string, string> = {
-    delivery_completed: "🎉",
-    delivery_ready: "🎬",
-    project_assigned: "🎯",
-    revision_requested: "🔄",
-    revision_processed: "✅",
-    delivery_approved: "✅",
-    new_assignment: "📋",
-    monthly_report: "📊",
-    quota_renewed: "⚡",
-    capture_scheduled: "📸",
-  };
-  return emojis[type] || "🔔";
+  return "";
 }
 
 function getCTAText(type: string): string {

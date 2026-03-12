@@ -65,7 +65,7 @@ const CaptureScheduleModal = ({
       if (error) throw error;
 
       logger.info('Captação agendada', { date: format(date, 'yyyy-MM-dd'), lead_days: captureLeadDays }, 'capture');
-      toast.success('Captação agendada com sucesso! 📹');
+      toast.success('Captação agendada com sucesso!');
       onOpenChange(false);
       resetForm();
       onScheduled();
