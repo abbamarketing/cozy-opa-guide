@@ -21,6 +21,7 @@ const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const PaymentGate = lazy(() => import("./pages/PaymentGate"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const Waiting = lazy(() => import("./pages/Waiting"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
