@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { Plus } from 'lucide-react';
-import NewDeliveryModal from './NewDeliveryModal';
-import DeliveryDetailModal from './DeliveryDetailModal';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -10,7 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import DeliveryCard, { type DeliveryData } from './DeliveryCard';
 import type { UserProjectData } from '@/hooks/useUserProject';
-import { toast } from 'sonner';
+
+// Lazy load heavy modals
+const NewDeliveryModal = lazy(() => import('./NewDeliveryModal'));
+const DeliveryDetailModal = lazy(() => import('./DeliveryDetailModal'));
 
 interface KanbanProps {
   userProject: UserProjectData;
@@ -30,11 +31,14 @@ const COLUMNS: Column[] = [
   { id: 'done', title: 'CONCLUÍDO', statuses: ['approved'], description: 'Aprovado e finalizado' },
 ];
 
+const PAGE_SIZE = 20;
+
 const Kanban = ({ userProject }: KanbanProps) => {
   const [deliveries, setDeliveries] = useState<DeliveryData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const fetchDeliveries = async () => {
     const { data, error } = await supabase
@@ -72,7 +76,6 @@ const Kanban = ({ userProject }: KanbanProps) => {
   useEffect(() => {
     fetchDeliveries();
 
-    // Realtime
     const channel = supabase
       .channel(`deliveries-${userProject.id}`)
       .on(
@@ -83,9 +86,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
           table: 'deliveries',
           filter: `user_project_id=eq.${userProject.id}`,
         },
-        () => {
-          fetchDeliveries();
-        },
+        () => fetchDeliveries(),
       )
       .subscribe();
 
@@ -94,7 +95,6 @@ const Kanban = ({ userProject }: KanbanProps) => {
     };
   }, [userProject.id]);
 
-  // Quota check
   const hasQuota = () => {
     const p = userProject.custom_project;
     const ytUsed = userProject.youtube_reserved + userProject.youtube_approved;
@@ -111,9 +111,12 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
   const quotaAvailable = hasQuota();
 
-
   const getDeliveriesForColumn = (col: Column) =>
     deliveries.filter((d) => col.statuses.includes(d.status));
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + PAGE_SIZE);
+  };
 
   return (
     <div className="space-y-4">
@@ -153,13 +156,14 @@ const Kanban = ({ userProject }: KanbanProps) => {
       ) : (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-4" data-tour="kanban-board">
           {COLUMNS.map((col) => {
-            const items = getDeliveriesForColumn(col);
+            const allItems = getDeliveriesForColumn(col);
+            const items = allItems.slice(0, visibleCount);
+            const hasMore = allItems.length > visibleCount;
             return (
               <div
                 key={col.id}
                 className="flex flex-col rounded-xl border border-border/40 bg-muted/30 p-2"
               >
-                {/* Column header */}
                 <div className="mb-2 px-1">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -169,13 +173,12 @@ const Kanban = ({ userProject }: KanbanProps) => {
                       variant="secondary"
                       className="h-5 min-w-[20px] justify-center px-1.5 text-[10px]"
                     >
-                      {items.length}
+                      {allItems.length}
                     </Badge>
                   </div>
                   <p className="text-[10px] text-muted-foreground/70">{col.description}</p>
                 </div>
 
-                {/* Cards */}
                 <ScrollArea className="flex-1">
                   <div className="space-y-2 p-0.5">
                     {items.length === 0 ? (
@@ -191,6 +194,16 @@ const Kanban = ({ userProject }: KanbanProps) => {
                         />
                       ))
                     )}
+                    {hasMore && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full text-xs text-muted-foreground"
+                        onClick={handleLoadMore}
+                      >
+                        Carregar mais ({allItems.length - visibleCount} restantes)
+                      </Button>
+                    )}
                   </div>
                 </ScrollArea>
               </div>
@@ -199,21 +212,23 @@ const Kanban = ({ userProject }: KanbanProps) => {
         </div>
       )}
 
-      {/* Detail Modal */}
-      <DeliveryDetailModal
-        open={!!selectedDelivery}
-        onOpenChange={() => setSelectedDelivery(null)}
-        delivery={selectedDelivery}
-        onUpdated={fetchDeliveries}
-      />
-
-      {/* New Delivery Modal */}
-      <NewDeliveryModal
-        open={showNewModal}
-        onOpenChange={setShowNewModal}
-        userProject={userProject}
-        onCreated={fetchDeliveries}
-      />
+      {/* Lazy-loaded Modals */}
+      <Suspense fallback={null}>
+        <DeliveryDetailModal
+          open={!!selectedDelivery}
+          onOpenChange={() => setSelectedDelivery(null)}
+          delivery={selectedDelivery}
+          onUpdated={fetchDeliveries}
+        />
+        {showNewModal && (
+          <NewDeliveryModal
+            open={showNewModal}
+            onOpenChange={setShowNewModal}
+            userProject={userProject}
+            onCreated={fetchDeliveries}
+          />
+        )}
+      </Suspense>
     </div>
   );
 };
