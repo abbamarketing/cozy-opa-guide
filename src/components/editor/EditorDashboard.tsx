@@ -474,6 +474,7 @@ const EditorDashboard = () => {
                           <EditorDeliveryCard
                             key={d.id}
                             delivery={d}
+                            isDragging={draggedId === d.id}
                             onClick={() => setSelectedDelivery(d)}
                             onDragStart={handleDragStart(d.id)}
                           />
