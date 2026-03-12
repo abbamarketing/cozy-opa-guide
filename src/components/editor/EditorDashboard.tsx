@@ -87,10 +87,12 @@ const EditorDeliveryCard = ({
   delivery,
   onClick,
   onDragStart,
+  isDragging,
 }: {
   delivery: EditorDelivery;
   onClick: () => void;
   onDragStart: (e: React.DragEvent) => void;
+  isDragging: boolean;
 }) => {
   const Icon = typeIcons[delivery.delivery_type] || Video;
   const deadline = getDeadlineInfo(delivery.due_date);
@@ -98,45 +100,68 @@ const EditorDeliveryCard = ({
   return (
     <Card
       draggable
-      onDragStart={onDragStart}
+      onDragStart={(e) => {
+        // Create a clean drag image
+        const el = e.currentTarget.cloneNode(true) as HTMLElement;
+        el.style.width = `${e.currentTarget.offsetWidth}px`;
+        el.style.opacity = '0.9';
+        el.style.transform = 'rotate(2deg)';
+        el.style.position = 'absolute';
+        el.style.top = '-9999px';
+        document.body.appendChild(el);
+        e.dataTransfer.setDragImage(el, 20, 20);
+        setTimeout(() => document.body.removeChild(el), 0);
+        onDragStart(e);
+      }}
       onClick={onClick}
-      className="cursor-grab active:cursor-grabbing border-border/40 bg-card/80 p-3 transition-all hover:border-border hover:bg-card space-y-2"
+      className={`cursor-grab active:cursor-grabbing border-border/40 bg-card p-3 transition-all hover:border-primary/30 hover:shadow-[0_0_12px_hsl(var(--primary)/0.08)] ${
+        isDragging ? 'opacity-30 scale-95' : ''
+      }`}
     >
-      <div className="flex items-start gap-2">
-        <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />
-        <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+      {/* Header: drag handle + type icon + title */}
+      <div className="flex items-center gap-2">
+        <GripVertical className="h-3.5 w-3.5 shrink-0 text-muted-foreground/30" />
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10">
+          <Icon className="h-3.5 w-3.5 text-primary" />
+        </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-card-foreground">{delivery.title}</p>
-          <p className="text-xs text-muted-foreground">Cliente: {delivery.client_name || '—'}</p>
+          <p className="text-sm font-medium leading-tight text-card-foreground line-clamp-2">
+            {delivery.title}
+          </p>
         </div>
       </div>
 
+      {/* Client name */}
+      <p className="mt-1.5 pl-[42px] text-[11px] text-muted-foreground truncate">
+        {delivery.client_name || '—'}
+      </p>
+
       {/* Brand preview */}
       {(delivery.brand_colors.length > 0 || delivery.logo_url) && (
-        <div className="flex items-center gap-1.5">
+        <div className="mt-2 flex items-center gap-1.5 pl-[42px]">
           {delivery.brand_colors.slice(0, 3).map((c, i) => (
             <div
               key={i}
-              className="h-4 w-4 rounded-full border border-border/50"
+              className="h-3.5 w-3.5 rounded-full border border-border/50"
               style={{ backgroundColor: c }}
             />
           ))}
           {delivery.logo_url && (
-            <img src={delivery.logo_url} alt="logo" className="h-4 w-4 rounded object-contain" />
+            <img src={delivery.logo_url} alt="" className="h-3.5 w-3.5 rounded object-contain" />
           )}
         </div>
       )}
 
       {/* Deadline */}
       {delivery.due_date && (
-        <div className="flex items-center gap-1.5 text-xs">
-          <Clock className={`h-3 w-3 ${deadline.color}`} />
+        <div className="mt-2 flex items-center gap-1.5 pl-[42px] text-[11px]">
+          <Clock className={`h-3 w-3 shrink-0 ${deadline.color}`} />
           <span className="text-muted-foreground">
             {format(new Date(delivery.due_date), "dd/MM 'às' HH'h'", { locale: ptBR })}
           </span>
-          <Badge variant="outline" className={`ml-auto text-[10px] px-1.5 py-0 ${deadline.color} border-0`}>
+          <span className={`ml-auto text-[10px] font-medium ${deadline.color}`}>
             {deadline.label}
-          </Badge>
+          </span>
         </div>
       )}
     </Card>
