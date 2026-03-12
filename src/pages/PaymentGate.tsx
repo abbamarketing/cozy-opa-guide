@@ -135,7 +135,7 @@ export default function PaymentGate() {
                     Até {project.max_revisions} revisões por entrega
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-primary">✅</span>
+                    <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                     Entrega em {project.deadline}
                   </li>
                 </ul>
