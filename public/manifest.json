@@ -1,11 +1,11 @@
 {
-  "name": "VideoFlow",
-  "short_name": "VideoFlow",
+  "name": "AbbaVideo",
+  "short_name": "AbbaVideo",
   "description": "Gestao de entregas de video, thumbnails e capas para criadores de conteudo.",
   "start_url": "/dashboard",
   "display": "standalone",
-  "background_color": "#F0F0F0",
-  "theme_color": "#A0522D",
+  "background_color": "#333333",
+  "theme_color": "#9FE870",
   "orientation": "portrait-primary",
   "icons": [
     {
