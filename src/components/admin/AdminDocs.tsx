@@ -152,7 +152,7 @@ const ClientManual = () => (
   <article className="prose-doc space-y-8">
     <header>
       <h1 className="text-2xl font-bold text-foreground">Manual do Cliente</h1>
-      <p className="text-muted-foreground">Guia completo para usar o VideoFlow como cliente.</p>
+      <p className="text-muted-foreground">Guia completo para usar o AbbaVideo como cliente.</p>
     </header>
 
     <Section title="1. Cadastro e Primeiro Acesso">
