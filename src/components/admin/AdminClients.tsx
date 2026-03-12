@@ -276,19 +276,19 @@ const AdminClients = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          {c.status !== 'active' && c.status !== 'no_project' && (
+                            <DropdownMenuItem
+                              onClick={() => setConfirmAction({ type: 'activate', userId: c.user_id, clientName: c.full_name })}
+                            >
+                              <Play className="mr-2 h-4 w-4" /> Ativar
+                            </DropdownMenuItem>
+                          )}
                           {c.status === 'active' && (
                             <DropdownMenuItem
                               onClick={() => setConfirmAction({ type: 'suspend', userId: c.user_id, clientName: c.full_name })}
                               className="text-destructive"
                             >
                               <Pause className="mr-2 h-4 w-4" /> Suspender
-                            </DropdownMenuItem>
-                          )}
-                          {c.status === 'suspended' && (
-                            <DropdownMenuItem
-                              onClick={() => setConfirmAction({ type: 'activate', userId: c.user_id, clientName: c.full_name })}
-                            >
-                              <Play className="mr-2 h-4 w-4" /> Reativar
                             </DropdownMenuItem>
                           )}
                         </DropdownMenuContent>
