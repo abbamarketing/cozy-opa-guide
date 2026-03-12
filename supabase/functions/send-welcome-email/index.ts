@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const siteUrl = Deno.env.get("SITE_URL") || "https://app.videoflow.com.br";
+    const siteUrl = Deno.env.get("SITE_URL") || "https://app.abbavideo.com.br";
 
     const emailHtml = `
       <!DOCTYPE html>
