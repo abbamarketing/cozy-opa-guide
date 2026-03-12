@@ -128,6 +128,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
                 disabled={!quotaAvailable}
                 className="gap-1.5"
                 onClick={() => setShowNewModal(true)}
+                data-tour="new-delivery-btn"
               >
                 <Plus className="h-4 w-4" />
                 Nova Solicitação
