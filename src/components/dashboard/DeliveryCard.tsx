@@ -125,13 +125,14 @@ const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
       {/* Title row */}
       <div className="flex items-start gap-2">
         <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 overflow-hidden">
           <p className="truncate text-sm font-medium text-foreground">{delivery.title}</p>
-          {delivery.editor_name && (
-            <p className="text-[10px] font-mono text-muted-foreground mt-0.5">
-              {delivery.editor_name}
-            </p>
-          )}
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="text-[10px] font-mono text-muted-foreground">{config.label}</span>
+            {delivery.editor_name && (
+              <span className="text-[10px] font-mono text-muted-foreground">· {delivery.editor_name}</span>
+            )}
+          </div>
         </div>
       </div>
 

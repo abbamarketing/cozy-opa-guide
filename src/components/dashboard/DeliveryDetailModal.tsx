@@ -123,13 +123,18 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
       <Dialog open={open && !showRevisionModal} onOpenChange={onOpenChange}>
         <DialogContent className="max-h-[90vh] max-w-lg overflow-hidden p-0">
           <ScrollArea className="max-h-[90vh]">
-            <div className="p-6 space-y-5">
+            <div className="p-4 sm:p-6 space-y-5">
               {/* Header */}
               <DialogHeader>
-                <div className="flex items-center gap-2">
-                  <Icon className="h-5 w-5 text-primary" />
-                  <DialogTitle className="flex-1">{delivery.title}</DialogTitle>
-                  <Badge variant={status.variant}>{status.label}</Badge>
+                <div className="flex items-start gap-2">
+                  <Icon className="mt-1 h-5 w-5 shrink-0 text-primary" />
+                  <div className="min-w-0 flex-1">
+                    <DialogTitle className="text-base sm:text-lg leading-snug break-words">{delivery.title}</DialogTitle>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <Badge variant="outline" className="text-[10px] shrink-0">{config.label}</Badge>
+                      <Badge variant={status.variant} className="shrink-0">{status.label}</Badge>
+                    </div>
+                  </div>
                 </div>
               </DialogHeader>
 

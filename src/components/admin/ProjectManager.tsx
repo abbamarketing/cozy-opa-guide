@@ -116,12 +116,12 @@ const ProjectManager = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Projetos Personalizados</h2>
+          <h2 className="text-xl sm:text-2xl font-bold">Projetos Personalizados</h2>
           <p className="text-sm text-muted-foreground">Gerencie os projetos que serão atribuídos aos clientes.</p>
         </div>
-        <Button variant="neon" onClick={handleCreate}>
+        <Button variant="neon" onClick={handleCreate} className="w-full sm:w-auto shrink-0">
           <Plus className="h-4 w-4 mr-2" />
           Criar Novo Projeto
         </Button>
