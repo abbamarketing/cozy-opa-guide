@@ -192,8 +192,13 @@ const EditorManagement = () => {
         body: { name: result.data.name, email: result.data.email, password: addPassword },
       });
 
-      if (error) throw new Error(error.message || 'Erro ao criar editor');
-      if (data?.error) throw new Error(data.error);
+      if (error) {
+        throw new Error(await parseFunctionErrorMessage(error));
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
 
       toast.success('Editor criado com sucesso!', {
         description: `Credenciais: ${result.data.email} / ${addPassword}`,
@@ -204,8 +209,9 @@ const EditorManagement = () => {
       setAddEmail('');
       setAddPassword(generatePassword());
       fetchEditors();
-    } catch (err: any) {
-      toast.error(err.message || 'Erro ao criar editor');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro ao criar editor';
+      toast.error(message);
     } finally {
       setCreating(false);
     }
