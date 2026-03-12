@@ -31,7 +31,7 @@ export default function Onboarding() {
   }
 
   if (!userProject?.custom_project) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/waiting" replace />;
   }
 
   return <BriefingForm onComplete={handleBriefingComplete} />;

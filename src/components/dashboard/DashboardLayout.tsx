@@ -230,7 +230,7 @@ const DashboardLayout = () => {
 
   // Redirect to root if no project (root handles WaitingForProject)
   if (!isLoading && !userProject) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/waiting" replace />;
   }
 
   const navItems: NavItem[] = [
