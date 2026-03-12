@@ -25,7 +25,11 @@ const briefingSchema = z.object({
 
 type BriefingFormData = z.infer<typeof briefingSchema>;
 
-const BriefingForm = () => {
+interface BriefingFormProps {
+  onComplete?: () => void;
+}
+
+const BriefingForm = ({ onComplete }: BriefingFormProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
@@ -124,7 +128,11 @@ const BriefingForm = () => {
       toast.error('Erro ao salvar briefing', { description: error.message });
     } else {
       toast.success('Briefing salvo!');
-      navigate('/onboarding/payment');
+      if (onComplete) {
+        onComplete();
+      } else {
+        navigate('/onboarding/payment');
+      }
     }
     setSaving(false);
   };
