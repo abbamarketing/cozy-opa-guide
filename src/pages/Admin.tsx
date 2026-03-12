@@ -77,6 +77,7 @@ const Admin = () => {
         {activeTab === 'metricas' && <AdminMetrics />}
         {activeTab === 'projetos' && <ProjectManager />}
         {activeTab === 'logs' && <LogViewer />}
+        {activeTab === 'docs' && <AdminDocs />}
       </div>
     </div>
   );
