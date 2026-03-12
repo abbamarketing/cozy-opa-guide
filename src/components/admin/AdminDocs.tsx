@@ -20,7 +20,7 @@ const AdminManual = () => (
     </header>
 
     <Section title="1. Visão Geral">
-      <p>O painel administrativo permite gerenciar clientes, editores, projetos, entregas e métricas do VideoFlow. Acesse em <code>/admin</code> com uma conta que possua a role <strong>admin</strong>.</p>
+      <p>O painel administrativo permite gerenciar clientes, editores, projetos, entregas e métricas do AbbaVideo. Acesse em <code>/admin</code> com uma conta que possua a role <strong>admin</strong>.</p>
     </Section>
 
     <Section title="2. Gestão de Projetos">
