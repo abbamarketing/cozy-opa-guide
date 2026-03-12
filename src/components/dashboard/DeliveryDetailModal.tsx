@@ -33,6 +33,7 @@ import {
 import type { DeliveryData } from './DeliveryCard';
 import { typeConfig, statusConfig } from './DeliveryCard';
 import RevisionModal from './RevisionModal';
+import DeliveryChat from '@/components/shared/DeliveryChat';
 
 interface DeliveryDetailModalProps {
   open: boolean;
