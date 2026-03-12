@@ -65,7 +65,7 @@ const Admin = () => {
         {activeTab === 'overview' && <AdminOverview />}
         {activeTab === 'clientes' && <AdminClients />}
         {activeTab === 'entregas' && <AdminDeliveries />}
-        {activeTab === 'editores' && <AdminEditors />}
+        {activeTab === 'editores' && <EditorManagement />}
         {activeTab === 'metricas' && <AdminMetrics />}
         {activeTab === 'projetos' && <ProjectManager />}
         {activeTab === 'logs' && <LogViewer />}
