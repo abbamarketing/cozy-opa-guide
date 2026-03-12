@@ -132,7 +132,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
   const Icon = config.icon;
 
   const handleMarkAsDelivered = async () => {
-    if (!delivery.file_url && !driveLink.trim()) {
+    if (!delivery.file_url) {
       toast.error('Anexe um arquivo antes de marcar como entregue.');
       return;
     }
