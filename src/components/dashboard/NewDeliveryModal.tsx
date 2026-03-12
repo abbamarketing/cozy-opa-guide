@@ -56,7 +56,6 @@ const formSchema = z.object({
     .trim()
     .min(20, 'Por favor, forneça mais detalhes sobre o que você deseja (mínimo 20 caracteres)')
     .max(5000, 'Máximo de 5000 caracteres'),
-  deadline_option: z.enum(['normal', 'urgent']).default('normal'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -92,12 +91,10 @@ const NewDeliveryModal = ({
       delivery_type: undefined,
       title: '',
       description: '',
-      deadline_option: 'normal',
     },
   });
 
   const selectedType = form.watch('delivery_type');
-  const deadlineOption = form.watch('deadline_option');
   const isVideo = selectedType === 'youtube_video' || selectedType === 'instagram_video';
 
   // Build quota info
@@ -150,19 +147,10 @@ const NewDeliveryModal = ({
     return result;
   }, [userProject, project]);
 
-  // Deadline calculation
+  // Deadline calculation - always use project default
   const getDeadlineHours = () => {
-    const base = project.deadline === '24h' ? 24 : project.deadline === '48h' ? 48 : 72;
-    return deadlineOption === 'urgent' ? Math.max(24, base - 24) : base;
+    return project.deadline === '24h' ? 24 : project.deadline === '48h' ? 48 : 72;
   };
-
-  const estimatedDelivery = useMemo(() => {
-    const hours = getDeadlineHours();
-    const date = new Date(Date.now() + hours * 60 * 60 * 1000);
-    return date;
-  }, [deadlineOption, project.deadline]);
-
-  const canBeUrgent = project.deadline !== '24h'; // 24h is already the fastest
 
   const onSubmit = async (values: FormValues) => {
     if (!user) return;
@@ -412,56 +400,6 @@ const NewDeliveryModal = ({
               </div>
             )}
 
-            {/* 6. Prazo */}
-            <FormField
-              control={form.control}
-              name="deadline_option"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Prazo</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      className="space-y-2"
-                    >
-                      <label className="flex cursor-pointer items-center justify-between rounded-lg border border-border p-3">
-                        <div className="flex items-center gap-2">
-                          <RadioGroupItem value="normal" />
-                          <span className="text-sm text-card-foreground">
-                            Normal ({project.deadline} úteis)
-                          </span>
-                        </div>
-                        <Badge variant="secondary" className="text-[10px]">
-                          GRÁTIS
-                        </Badge>
-                      </label>
-                      {canBeUrgent && (
-                        <label className="flex cursor-pointer items-center justify-between rounded-lg border border-border p-3">
-                          <div className="flex items-center gap-2">
-                            <RadioGroupItem value="urgent" />
-                            <span className="text-sm text-card-foreground">
-                              Urgente (24h úteis)
-                            </span>
-                          </div>
-                          <Badge className="bg-[hsl(45,93%,47%)]/20 text-[hsl(45,93%,47%)] text-[10px] border-0">
-                            + R$ 50
-                          </Badge>
-                        </label>
-                      )}
-                    </RadioGroup>
-                  </FormControl>
-                  <p className="text-xs text-muted-foreground">
-                    Estimativa de entrega:{' '}
-                    <span className="text-card-foreground">
-                      {estimatedDelivery.toLocaleDateString('pt-BR')}{' '}
-                      às {estimatedDelivery.getHours()}h
-                    </span>
-                  </p>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             {/* Submit */}
             <Button
