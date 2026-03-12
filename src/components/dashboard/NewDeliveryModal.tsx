@@ -400,56 +400,6 @@ const NewDeliveryModal = ({
               </div>
             )}
 
-            {/* 6. Prazo */}
-            <FormField
-              control={form.control}
-              name="deadline_option"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Prazo</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      className="space-y-2"
-                    >
-                      <label className="flex cursor-pointer items-center justify-between rounded-lg border border-border p-3">
-                        <div className="flex items-center gap-2">
-                          <RadioGroupItem value="normal" />
-                          <span className="text-sm text-card-foreground">
-                            Normal ({project.deadline} úteis)
-                          </span>
-                        </div>
-                        <Badge variant="secondary" className="text-[10px]">
-                          GRÁTIS
-                        </Badge>
-                      </label>
-                      {canBeUrgent && (
-                        <label className="flex cursor-pointer items-center justify-between rounded-lg border border-border p-3">
-                          <div className="flex items-center gap-2">
-                            <RadioGroupItem value="urgent" />
-                            <span className="text-sm text-card-foreground">
-                              Urgente (24h úteis)
-                            </span>
-                          </div>
-                          <Badge className="bg-[hsl(45,93%,47%)]/20 text-[hsl(45,93%,47%)] text-[10px] border-0">
-                            + R$ 50
-                          </Badge>
-                        </label>
-                      )}
-                    </RadioGroup>
-                  </FormControl>
-                  <p className="text-xs text-muted-foreground">
-                    Estimativa de entrega:{' '}
-                    <span className="text-card-foreground">
-                      {estimatedDelivery.toLocaleDateString('pt-BR')}{' '}
-                      às {estimatedDelivery.getHours()}h
-                    </span>
-                  </p>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             {/* Submit */}
             <Button
