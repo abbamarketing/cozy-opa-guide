@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import AdminOverview from '@/components/admin/AdminOverview';
 import AdminClients from '@/components/admin/AdminClients';
 import AdminDeliveries from '@/components/admin/AdminDeliveries';
-import AdminEditors from '@/components/admin/AdminEditors';
+import EditorManagement from '@/components/admin/EditorManagement';
 import AdminMetrics from '@/components/admin/AdminMetrics';
 import ProjectManager from '@/components/admin/ProjectManager';
 import LogViewer from '@/components/admin/LogViewer';
