@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Play, LayoutDashboard, FolderKanban, Users, Settings } from 'lucide-react';
+import ClientAssignment from '@/components/admin/ClientAssignment';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import ProjectManager from '@/components/admin/ProjectManager';
