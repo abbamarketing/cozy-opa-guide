@@ -85,18 +85,18 @@ const TYPE_ICON: Record<string, { icon: typeof Video; color: string }> = {
 };
 
 const FEATURES = [
-  { icon: Video, title: 'Edição para YouTube', desc: 'Cortes dinâmicos, legendas e identidade visual.' },
-  { icon: Camera, title: 'Vídeos para Instagram', desc: 'Reels otimizados para engajamento.' },
-  { icon: Image, title: 'Thumbnails', desc: 'Design estratégico para CTR.' },
-  { icon: Layers, title: 'Capas de Feed', desc: 'Alinhadas à identidade visual.' },
-  { icon: Calendar, title: 'Captação Presencial', desc: 'Agendamento integrado.' },
-  { icon: Clock, title: 'SLA Garantido', desc: 'Prazos com countdown em horas úteis.' },
-  { icon: MessageSquare, title: 'Chat por Entrega', desc: 'Marcadores de tempo inclusos.' },
-  { icon: Shield, title: 'Revisões Incluídas', desc: 'Ajustes até a aprovação.' },
-  { icon: BarChart3, title: 'Dashboard Kanban', desc: 'Visão completa em tempo real.' },
-  { icon: FileText, title: 'Roteiros com IA', desc: 'Geração automática de scripts.' },
-  { icon: Bot, title: 'Assistente IA', desc: 'Suporte 24/7 na plataforma.' },
-  { icon: Users, title: 'Onboarding Guiado', desc: 'Briefing completo da marca.' },
+  { icon: Video, title: 'Edição para YouTube', desc: 'Vídeos que retêm audiência — cortes profissionais, legendas e sua identidade visual.' },
+  { icon: Camera, title: 'Reels que Convertem', desc: 'Conteúdo vertical otimizado para o algoritmo do Instagram.' },
+  { icon: Image, title: 'Thumbnails que Vendem', desc: 'Cada clique conta. Thumbnails estratégicas que aumentam seu CTR.' },
+  { icon: Layers, title: 'Feed Profissional', desc: 'Capas de destaque que transformam seu perfil em vitrine.' },
+  { icon: Calendar, title: 'Captação Sob Demanda', desc: 'Equipe profissional na sua porta — agende direto pela plataforma.' },
+  { icon: Clock, title: 'Prazo Garantido', desc: 'SLA de 24h a 72h em horas úteis. Sem atrasos, sem surpresas.' },
+  { icon: MessageSquare, title: 'Comunicação Zero Ruído', desc: 'Chat por entrega com marcadores de tempo. Adeus, WhatsApp.' },
+  { icon: Shield, title: 'Revisões até Aprovar', desc: 'Peça ajustes quantas vezes precisar dentro do seu plano.' },
+  { icon: BarChart3, title: 'Controle Total', desc: 'Dashboard Kanban para acompanhar cada entrega em tempo real.' },
+  { icon: FileText, title: 'Roteiros com IA', desc: 'Gere scripts otimizados em segundos — sem bloqueio criativo.' },
+  { icon: Bot, title: 'Suporte 24/7', desc: 'Assistente IA que conhece sua conta e resolve na hora.' },
+  { icon: Users, title: 'Onboarding Express', desc: 'Briefing completo de marca — seu editor já começa sabendo tudo.' },
 ];
 
 const FAQ = [
