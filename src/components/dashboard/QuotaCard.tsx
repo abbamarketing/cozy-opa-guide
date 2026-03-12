@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Video, Camera, Image, Layers, ExternalLink } from 'lucide-react';
+import { Video, Camera, Image, Layers, ExternalLink, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import type { UserProjectData } from '@/hooks/useUserProject';
 
 interface QuotaCardProps {
@@ -54,6 +57,7 @@ const QuotaRow = ({ label, icon, used, total }: QuotaLine) => {
 };
 
 const QuotaCard = ({ userProject }: QuotaCardProps) => {
+  const [loadingPortal, setLoadingPortal] = useState(false);
   const project = userProject.custom_project;
   const periodStart = new Date(userProject.current_period_start);
   const periodEnd = new Date(userProject.current_period_end);
@@ -84,7 +88,7 @@ const QuotaCard = ({ userProject }: QuotaCardProps) => {
       label: 'Thumbnails',
       icon: <Image className="h-4 w-4 text-[hsl(200,80%,60%)]" />,
       used: userProject.thumbnails_reserved + userProject.thumbnails_approved,
-      total: project.youtube_videos, // thumbnails tied to YouTube count
+      total: project.youtube_videos,
     });
   }
 
@@ -93,9 +97,27 @@ const QuotaCard = ({ userProject }: QuotaCardProps) => {
       label: 'Capas',
       icon: <Layers className="h-4 w-4 text-[hsl(45,93%,47%)]" />,
       used: userProject.covers_reserved + userProject.covers_approved,
-      total: project.instagram_videos, // covers tied to Instagram count
+      total: project.instagram_videos,
     });
   }
+
+  const handleManageSubscription = async () => {
+    setLoadingPortal(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-portal-session');
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      } else {
+        throw new Error('URL do portal não retornada');
+      }
+    } catch (err: any) {
+      console.error('Portal error:', err);
+      toast.error(err.message || 'Erro ao abrir portal de assinatura');
+    } finally {
+      setLoadingPortal(false);
+    }
+  };
 
   return (
     <Card className="border-border/50 bg-card">
@@ -128,8 +150,18 @@ const QuotaCard = ({ userProject }: QuotaCardProps) => {
           </span>
         </div>
 
-        <Button variant="outline" size="sm" className="w-full gap-2 text-muted-foreground">
-          <ExternalLink className="h-3.5 w-3.5" />
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full gap-2 text-muted-foreground"
+          onClick={handleManageSubscription}
+          disabled={loadingPortal || !userProject.stripe_subscription_id}
+        >
+          {loadingPortal ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <ExternalLink className="h-3.5 w-3.5" />
+          )}
           Gerenciar Assinatura
         </Button>
       </CardContent>
