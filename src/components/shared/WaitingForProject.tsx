@@ -63,6 +63,16 @@ export default function WaitingForProject() {
           <Clock className="h-8 w-8 text-primary" />
         </div>
 
+        {/* User role indicator */}
+        {!roleLoading && (
+          <div className="flex justify-center">
+            <Badge variant={roleDisplay.variant} className="gap-1.5 px-3 py-1 text-xs">
+              <roleDisplay.icon className="h-3 w-3" />
+              {roleDisplay.label}
+            </Badge>
+          </div>
+        )}
+
         {/* Message */}
         <div className="space-y-3">
           <h1 className="font-mono text-2xl font-bold text-foreground">
