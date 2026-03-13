@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { format, differenceInHours, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,19 +24,17 @@ import {
   Clock,
   User,
   Calendar,
-  FileText,
-  Video,
-  Camera,
-  Image,
-  Layers,
   Circle,
   Loader2,
+  Wrench,
 } from 'lucide-react';
 import type { DeliveryData } from './DeliveryCard';
 import { typeConfig, statusConfig } from './DeliveryCard';
 import RevisionModal from './RevisionModal';
 import DeliveryChat from '@/components/shared/DeliveryChat';
 import SubtaskList from '@/components/shared/SubtaskList';
+import DeliveryChecklist from './DeliveryChecklist';
+import ApprovalCelebration from './ApprovalCelebration';
 
 interface DeliveryDetailModalProps {
   open: boolean;
@@ -58,6 +56,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
   const [revisions, setRevisions] = useState<RevisionRecord[]>([]);
   const [showRevisionModal, setShowRevisionModal] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   useEffect(() => {
     if (!delivery || !open) return;
@@ -72,6 +71,10 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
     fetchRevisions();
   }, [delivery, open]);
 
+  const handleCelebrationComplete = useCallback(() => {
+    setShowCelebration(false);
+  }, []);
+
   if (!delivery) return null;
 
   const config = typeConfig[delivery.delivery_type] || typeConfig.youtube_video;
@@ -80,8 +83,8 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
   const canReview = delivery.status === 'review';
   const isApproved = delivery.status === 'approved';
   const canRevise = canReview && delivery.revision_count < delivery.max_revisions;
+  const isVideoType = delivery.delivery_type === 'youtube_video' || delivery.delivery_type === 'instagram_video';
 
-  // Download available for 90 days after approval
   const downloadExpiry = delivery.approved_at
     ? addDays(new Date(delivery.approved_at), 90)
     : null;
@@ -99,9 +102,12 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
         updates: { status: 'approved', approved_at: new Date().toISOString() },
       });
       logger.info('Entrega aprovada', { delivery_id: delivery.id, title: delivery.title }, 'delivery');
+      setShowCelebration(true);
       toast.success('Entrega aprovada com sucesso! 🎉');
-      onOpenChange(false);
-      onUpdated();
+      setTimeout(() => {
+        onOpenChange(false);
+        onUpdated();
+      }, 2000);
     } catch (err: any) {
       toast.error(err.message || 'Erro ao aprovar');
     } finally {
@@ -109,7 +115,6 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
     }
   };
 
-  // Timeline events
   const timeline: { label: string; date: string | null }[] = [
     { label: 'Criado', date: delivery.created_at },
     { label: 'Entregue', date: delivery.delivered_at },
@@ -118,6 +123,8 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
 
   return (
     <>
+      <ApprovalCelebration show={showCelebration} onComplete={handleCelebrationComplete} />
+
       <Dialog open={open && !showRevisionModal} onOpenChange={onOpenChange}>
         <DialogContent className="max-h-[90vh] max-w-lg overflow-hidden p-0">
           <ScrollArea className="max-h-[90vh]">
@@ -136,7 +143,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
                 </div>
               </DialogHeader>
 
-              {/* Section 1: Info */}
+              {/* Info */}
               <div className="space-y-3">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Informações
@@ -149,7 +156,6 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
                 )}
 
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  {/* Deadline */}
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Clock className="h-3.5 w-3.5" />
                     <div>
@@ -170,7 +176,6 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
                     </div>
                   </div>
 
-                  {/* Editor */}
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <User className="h-3.5 w-3.5" />
                     <div>
@@ -188,7 +193,6 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
                     </div>
                   </div>
 
-                  {/* Created */}
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Calendar className="h-3.5 w-3.5" />
                     <div>
@@ -203,12 +207,20 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
 
               <Separator className="bg-border/50" />
 
-              {/* Section: Subtasks */}
+              {/* Subtasks */}
               <SubtaskList deliveryId={delivery.id} role="client" />
 
               <Separator className="bg-border/50" />
 
-              {/* Section 2: Files */}
+              {/* Checklist - only for review status */}
+              {canReview && (
+                <>
+                  <DeliveryChecklist userProjectId={delivery.user_project_id} />
+                  <Separator className="bg-border/50" />
+                </>
+              )}
+
+              {/* Files */}
               {(delivery.file_url || delivery.thumbnail_url) && (
                 <>
                   <div className="space-y-3">
@@ -248,7 +260,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
                 </>
               )}
 
-              {/* Section 3: Revisions */}
+              {/* Revisions */}
               <div className="space-y-3">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Revisões ({delivery.revision_count}/{delivery.max_revisions})
@@ -282,17 +294,17 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
 
               <Separator className="bg-border/50" />
 
-              {/* Section 4: Chat */}
+              {/* Chat */}
               <div className="space-y-3">
                 <DeliveryChat
                   deliveryId={delivery.id}
-                  showTimestampInput={delivery.delivery_type === 'youtube_video' || delivery.delivery_type === 'instagram_video'}
+                  showTimestampInput={isVideoType}
                 />
               </div>
 
               <Separator className="bg-border/50" />
 
-              {/* Section 5: Timeline */}
+              {/* Timeline */}
               <div className="space-y-3">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Timeline
@@ -346,7 +358,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
                         className="gap-1.5"
                         onClick={() => setShowRevisionModal(true)}
                       >
-                        <RotateCcw className="h-3.5 w-3.5" /> Revisão
+                        <Wrench className="h-3.5 w-3.5" /> Solicitar Ajustes
                       </Button>
                     )}
                   </>

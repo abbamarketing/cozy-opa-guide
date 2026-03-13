@@ -24,6 +24,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Loader2, RotateCcw } from 'lucide-react';
 import type { DeliveryData } from './DeliveryCard';
 
@@ -34,11 +35,21 @@ interface RevisionModalProps {
   onRevisionSent: () => void;
 }
 
+const FEEDBACK_CATEGORIES = [
+  { id: 'audio', label: '🔊 Áudio', placeholder: 'Ex: Volume da música muito alto nos primeiros 30s' },
+  { id: 'visual', label: '🎨 Visual', placeholder: 'Ex: Cor do texto no minuto 1:20 está diferente da identidade' },
+  { id: 'cortes', label: '✂️ Cortes', placeholder: 'Ex: Transição brusca em 2:15, suavizar' },
+  { id: 'texto', label: '📝 Texto/Legenda', placeholder: 'Ex: Erro de digitação na legenda em 0:45' },
+  { id: 'ritmo', label: '⏱ Ritmo', placeholder: 'Ex: Parte entre 3:00-4:00 está lenta, acelerar' },
+  { id: 'outro', label: '📌 Outro', placeholder: 'Descreva o ajuste necessário em detalhe...' },
+];
+
 const revisionSchema = z.object({
+  category: z.string().min(1, 'Selecione uma categoria'),
   notes: z
     .string()
     .trim()
-    .min(10, 'Descreva a revisão com pelo menos 10 caracteres')
+    .min(15, 'Descreva a revisão com pelo menos 15 caracteres para garantir clareza')
     .max(2000, 'Máximo de 2000 caracteres'),
   timestamp_marker: z
     .string()
@@ -57,35 +68,39 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent }: Revisio
 
   const form = useForm<RevisionValues>({
     resolver: zodResolver(revisionSchema),
-    defaultValues: { notes: '', timestamp_marker: '' },
+    defaultValues: { notes: '', timestamp_marker: '', category: '' },
   });
+
+  const selectedCategory = form.watch('category');
+  const activeCat = FEEDBACK_CATEGORIES.find((c) => c.id === selectedCategory);
 
   const onSubmit = async (values: RevisionValues) => {
     if (!user) return;
     setIsSubmitting(true);
 
+    const catLabel = FEEDBACK_CATEGORIES.find((c) => c.id === values.category)?.label || '';
+    const formattedNotes = `[${catLabel}] ${values.notes}`;
+
     try {
-      // 1. Create revision record
       const { error: revError } = await supabase.from('delivery_revisions' as any).insert({
         delivery_id: delivery.id,
         requested_by: user.id,
-        notes: values.notes,
+        notes: formattedNotes,
         timestamp_marker: values.timestamp_marker || null,
       });
       if (revError) throw revError;
 
-      // 2. Update delivery
       const { error: delError } = await supabase
         .from('deliveries')
         .update({
           status: 'revision',
           revision_count: delivery.revision_count + 1,
-          revision_notes: values.notes,
+          revision_notes: formattedNotes,
         })
         .eq('id', delivery.id);
       if (delError) throw delError;
 
-      logger.info('Revisão solicitada', { delivery_id: delivery.id }, 'delivery');
+      logger.info('Revisão solicitada', { delivery_id: delivery.id, category: values.category }, 'delivery');
       toast.success('Revisão solicitada com sucesso!');
       form.reset();
       onOpenChange(false);
@@ -102,10 +117,10 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent }: Revisio
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <RotateCcw className="h-4 w-4" /> Solicitar Revisão
+            <RotateCcw className="h-4 w-4" /> Solicitar Ajustes
           </DialogTitle>
           <DialogDescription>
-            Descreva o que precisa ser alterado em "{delivery.title}"
+            Selecione a categoria e descreva exatamente o que precisa ser alterado em "{delivery.title}"
           </DialogDescription>
         </DialogHeader>
 
@@ -116,20 +131,51 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent }: Revisio
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Category selector */}
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Categoria do ajuste *</FormLabel>
+                  <div className="flex flex-wrap gap-1.5">
+                    {FEEDBACK_CATEGORIES.map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => field.onChange(cat.id)}
+                        className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${
+                          field.value === cat.id
+                            ? 'bg-primary text-primary-foreground ring-1 ring-primary/30'
+                            : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Notas da revisão *</FormLabel>
+                  <FormLabel>Descrição detalhada do ajuste *</FormLabel>
                   <FormControl>
                     <Textarea
                       {...field}
-                      placeholder="Descreva detalhadamente o que precisa ser alterado..."
+                      placeholder={activeCat?.placeholder || 'Descreva detalhadamente o que precisa ser alterado...'}
                       rows={4}
                       maxLength={2000}
                     />
                   </FormControl>
+                  <p className="text-[10px] text-muted-foreground">
+                    Seja específico: inclua timestamps, descrição do problema e resultado esperado
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}
@@ -146,6 +192,7 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent }: Revisio
                       {...field}
                       placeholder="Ex: 1:23"
                       maxLength={20}
+                      className="font-mono"
                     />
                   </FormControl>
                   <FormMessage />
@@ -155,7 +202,7 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent }: Revisio
 
             <Button type="submit" disabled={isSubmitting} className="w-full gap-2">
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              Enviar Revisão
+              Enviar Solicitação de Ajuste
             </Button>
           </form>
         </Form>
