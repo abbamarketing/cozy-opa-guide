@@ -322,7 +322,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
             return (
               <div
                 key={col.id}
-                className="flex flex-col rounded-lg border border-border bg-muted/30 p-2"
+                className="flex flex-col rounded-lg glass p-2"
               >
                 <div className="mb-2 px-1">
                   <div className="flex items-center justify-between">
