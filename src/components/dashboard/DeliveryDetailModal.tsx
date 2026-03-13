@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { useDeliveries } from '@/hooks/useDeliveries';
 import {
   Dialog,
   DialogContent,
