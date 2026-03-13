@@ -102,6 +102,13 @@ Deno.serve(async (req) => {
 
     const userId = newUser.user.id;
 
+    // Remove the default 'client' role assigned by handle_new_user trigger
+    await supabaseAdmin
+      .from("user_roles")
+      .delete()
+      .eq("user_id", userId)
+      .eq("role", "client");
+
     const { error: roleInsertError } = await supabaseAdmin
       .from("user_roles")
       .insert({ user_id: userId, role: "editor" });

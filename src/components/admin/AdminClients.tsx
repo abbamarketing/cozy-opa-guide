@@ -64,12 +64,22 @@ const AdminClients = () => {
   const fetchClients = async () => {
     setLoading(true);
 
-    const { data: roles } = await supabase
+    const { data: clientRoles } = await supabase
       .from('user_roles')
       .select('user_id')
       .eq('role', 'client');
 
-    const userIds = (roles || []).map((r) => r.user_id);
+    // Exclude users who also have 'editor' role (editors get 'client' role by default on signup)
+    const { data: editorRoles } = await supabase
+      .from('user_roles')
+      .select('user_id')
+      .eq('role', 'editor');
+
+    const editorUserIds = new Set((editorRoles || []).map((r) => r.user_id));
+    const userIds = (clientRoles || [])
+      .map((r) => r.user_id)
+      .filter((id) => !editorUserIds.has(id));
+
     if (userIds.length === 0) { setClients([]); setLoading(false); return; }
 
     const { data: profiles } = await supabase
