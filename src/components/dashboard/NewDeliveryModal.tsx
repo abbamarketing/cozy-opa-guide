@@ -7,7 +7,6 @@ import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 import { useDeliveries } from '@/hooks/useDeliveries';
-import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogContent,
