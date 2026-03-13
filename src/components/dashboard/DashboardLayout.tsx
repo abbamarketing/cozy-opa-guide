@@ -297,16 +297,18 @@ const DashboardLayout = () => {
         <DashboardHeader />
 
         <main className={`flex-1 overflow-y-auto p-3 md:p-6 space-y-4 ${isMobile ? 'pb-20' : ''}`}>
-          {/* Quota Card */}
-          {isLoading ? (
-            <Skeleton className="h-48 w-full rounded-lg" />
-          ) : userProject ? (
-            activeTab !== 'settings' && <QuotaCard userProject={userProject} />
-          ) : (
-            activeTab === 'deliveries' && (
-              <div className="rounded-lg border border-border bg-card p-4 text-center text-sm text-muted-foreground">
-                Nenhum projeto ativo encontrado.
-              </div>
+          {/* Quota Card - mobile only (desktop shows in sidebar) */}
+          {isMobile && (
+            isLoading ? (
+              <Skeleton className="h-12 w-full rounded-lg" />
+            ) : userProject ? (
+              activeTab !== 'settings' && <QuotaCard userProject={userProject} />
+            ) : (
+              activeTab === 'deliveries' && (
+                <div className="rounded-lg glass p-4 text-center text-sm text-muted-foreground">
+                  Nenhum projeto ativo encontrado.
+                </div>
+              )
             )
           )}
 
