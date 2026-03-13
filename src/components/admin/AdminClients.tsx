@@ -332,6 +332,16 @@ const AdminClients = () => {
                         <Pause className="h-3 w-3" /> Suspender
                       </Button>
                     )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs gap-1 text-destructive"
+                      disabled={actionLoading === c.user_id}
+                      onClick={() => setConfirmAction({ type: 'delete', userId: c.user_id, clientName: c.full_name })}
+                    >
+                      <Trash2 className="h-3 w-3" /> Excluir
+                    </Button>
+                  </div>
                   </div>
                 </Card>
               );
