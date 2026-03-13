@@ -1,8 +1,9 @@
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useUserProject } from '@/hooks/useUserProject';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import BriefingForm from '@/components/onboarding/BriefingForm';
+import ClientGuard from '@/components/layout/ClientGuard';
 import { Loader2 } from 'lucide-react';
 import { logger } from '@/lib/logger';
 
@@ -30,9 +31,9 @@ export default function Onboarding() {
     );
   }
 
-  if (!userProject?.custom_project) {
-    return <Navigate to="/waiting" replace />;
-  }
-
-  return <BriefingForm onComplete={handleBriefingComplete} />;
+  return (
+    <ClientGuard requireStep="onboarding">
+      <BriefingForm onComplete={handleBriefingComplete} />
+    </ClientGuard>
+  );
 }

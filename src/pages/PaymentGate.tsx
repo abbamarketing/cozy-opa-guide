@@ -5,17 +5,12 @@ import { ArrowLeft, CreditCard, Lock, Loader2, CheckCircle2, Shield, Zap, Clock 
 import { useUserProject } from '@/hooks/useUserProject';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import ClientGuard from '@/components/layout/ClientGuard';
 
 export default function PaymentGate() {
   const navigate = useNavigate();
   const { userProject, isLoading } = useUserProject();
   const [creating, setCreating] = useState(false);
-
-  useEffect(() => {
-    if (userProject?.status === 'active') {
-      navigate('/dashboard');
-    }
-  }, [userProject, navigate]);
 
   const handlePayment = async () => {
     setCreating(true);
@@ -89,140 +84,142 @@ export default function PaymentGate() {
   ].filter(Boolean) as string[];
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      {/* Header */}
-      <header className="border-b border-border/30 px-4 py-4">
-        <div className="mx-auto flex max-w-5xl items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/')}
-            disabled={creating}
-            className="gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Voltar
-          </Button>
-          <span className="ml-auto font-mono text-xs uppercase tracking-widest text-muted-foreground">
-            AbbaVideo
-          </span>
-        </div>
-      </header>
-
-      {/* Main */}
-      <main className="flex flex-1 items-center justify-center px-4 py-8">
-        <div className="mx-auto w-full max-w-4xl">
-          {/* Title */}
-          <div className="mb-8 text-center">
-            <h1 className="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-              Finalizar assinatura
-            </h1>
-            <p className="mt-2 text-muted-foreground">
-              Revise os detalhes do seu projeto e prossiga com o pagamento seguro.
-            </p>
+    <ClientGuard requireStep="payment">
+      <div className="flex min-h-screen flex-col bg-background">
+        {/* Header */}
+        <header className="border-b border-border/30 px-4 py-4">
+          <div className="mx-auto flex max-w-5xl items-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/')}
+              disabled={creating}
+              className="gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Voltar
+            </Button>
+            <span className="ml-auto font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              AbbaVideo
+            </span>
           </div>
+        </header>
 
-          <div className="grid gap-6 md:grid-cols-5">
-            {/* Plan details – 3 cols */}
-            <div className="space-y-5 md:col-span-3">
-              {/* Project card */}
-              <div className="rounded-xl border border-border/40 bg-card p-6">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15">
-                    <Zap className="h-5 w-5 text-primary" />
+        {/* Main */}
+        <main className="flex flex-1 items-center justify-center px-4 py-8">
+          <div className="mx-auto w-full max-w-4xl">
+            {/* Title */}
+            <div className="mb-8 text-center">
+              <h1 className="font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                Finalizar assinatura
+              </h1>
+              <p className="mt-2 text-muted-foreground">
+                Revise os detalhes do seu projeto e prossiga com o pagamento seguro.
+              </p>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-5">
+              {/* Plan details – 3 cols */}
+              <div className="space-y-5 md:col-span-3">
+                {/* Project card */}
+                <div className="rounded-xl border border-border/40 bg-card p-6">
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15">
+                      <Zap className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                        Projeto
+                      </p>
+                      <h2 className="text-lg font-bold text-foreground">{project.project_name}</h2>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                      Projeto
-                    </p>
-                    <h2 className="text-lg font-bold text-foreground">{project.project_name}</h2>
+
+                  <div className="grid gap-2">
+                    {features.map((feat, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 rounded-lg bg-muted/20 px-3 py-2 text-sm"
+                      >
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
+                        <span className="text-foreground/90">{feat}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <div className="grid gap-2">
-                  {features.map((feat, i) => (
+                {/* Trust badges */}
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { icon: Shield, label: 'Pagamento seguro' },
+                    { icon: Lock, label: 'Dados criptografados' },
+                    { icon: Clock, label: 'Cancele quando quiser' },
+                  ].map(({ icon: Icon, label }) => (
                     <div
-                      key={i}
-                      className="flex items-center gap-3 rounded-lg bg-muted/20 px-3 py-2 text-sm"
+                      key={label}
+                      className="flex flex-col items-center gap-2 rounded-lg border border-border/30 bg-card/50 p-3 text-center"
                     >
-                      <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
-                      <span className="text-foreground/90">{feat}</span>
+                      <Icon className="h-4 w-4 text-primary" />
+                      <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+                        {label}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Trust badges */}
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { icon: Shield, label: 'Pagamento seguro' },
-                  { icon: Lock, label: 'Dados criptografados' },
-                  { icon: Clock, label: 'Cancele quando quiser' },
-                ].map(({ icon: Icon, label }) => (
-                  <div
-                    key={label}
-                    className="flex flex-col items-center gap-2 rounded-lg border border-border/30 bg-card/50 p-3 text-center"
-                  >
-                    <Icon className="h-4 w-4 text-primary" />
-                    <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
-                      {label}
+              {/* Payment CTA – 2 cols */}
+              <div className="md:col-span-2">
+                <div className="sticky top-8 rounded-xl border border-primary/20 bg-card p-6">
+                  <p className="mb-1 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                    Investimento
+                  </p>
+                  <div className="mb-1 flex items-baseline gap-1">
+                    <span className="text-4xl font-bold text-primary">
+                      R${' '}
+                      {Number(project.monthly_value).toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                      })}
                     </span>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Payment CTA – 2 cols */}
-            <div className="md:col-span-2">
-              <div className="sticky top-8 rounded-xl border border-primary/20 bg-card p-6">
-                <p className="mb-1 font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                  Investimento
-                </p>
-                <div className="mb-1 flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-primary">
-                    R${' '}
-                    {Number(project.monthly_value).toLocaleString('pt-BR', {
-                      minimumFractionDigits: 2,
-                    })}
-                  </span>
-                </div>
-                <p className="mb-6 text-xs text-muted-foreground">
-                  Cobrado {frequencyLabel} via Stripe
-                </p>
-
-                <div className="space-y-3">
-                  <Button
-                    onClick={handlePayment}
-                    disabled={creating}
-                    className="w-full"
-                    size="lg"
-                  >
-                    {creating ? (
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    ) : (
-                      <CreditCard className="mr-2 h-5 w-5" />
-                    )}
-                    {creating ? 'Processando...' : 'Ir para pagamento'}
-                  </Button>
-
-                  <p className="text-center text-[10px] text-muted-foreground">
-                    Você será redirecionado para a página segura do Stripe.
+                  <p className="mb-6 text-xs text-muted-foreground">
+                    Cobrado {frequencyLabel} via Stripe
                   </p>
-                </div>
 
-                <div className="mt-6 rounded-lg bg-muted/15 p-3">
-                  <div className="flex items-start gap-2">
-                    <Lock className="mt-0.5 h-4 w-4 shrink-0 text-primary/70" />
-                    <p className="text-xs text-muted-foreground">
-                      Seus dados de cartão são criptografados e nunca passam pelos nossos servidores.
+                  <div className="space-y-3">
+                    <Button
+                      onClick={handlePayment}
+                      disabled={creating}
+                      className="w-full"
+                      size="lg"
+                    >
+                      {creating ? (
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      ) : (
+                        <CreditCard className="mr-2 h-5 w-5" />
+                      )}
+                      {creating ? 'Processando...' : 'Ir para pagamento'}
+                    </Button>
+
+                    <p className="text-center text-[10px] text-muted-foreground">
+                      Você será redirecionado para a página segura do Stripe.
                     </p>
+                  </div>
+
+                  <div className="mt-6 rounded-lg bg-muted/15 p-3">
+                    <div className="flex items-start gap-2">
+                      <Lock className="mt-0.5 h-4 w-4 shrink-0 text-primary/70" />
+                      <p className="text-xs text-muted-foreground">
+                        Seus dados de cartão são criptografados e nunca passam pelos nossos servidores.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </ClientGuard>
   );
 }
