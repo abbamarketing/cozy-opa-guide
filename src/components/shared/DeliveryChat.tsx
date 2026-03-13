@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Send, Clock, MessageSquare } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { toast } from 'sonner';
 
 interface ChatMessage {
   id: string;
@@ -21,9 +22,38 @@ interface ChatMessage {
 
 interface DeliveryChatProps {
   deliveryId: string;
-  /** Show a timestamp input for video comments */
   showTimestampInput?: boolean;
 }
+
+// Regex to match MM:SS or H:MM:SS patterns
+const TIMESTAMP_REGEX = /\b(\d{1,2}:\d{2}(?::\d{2})?)\b/g;
+
+/** Render message text with clickable timestamp highlights */
+const renderMessageWithTimestamps = (text: string) => {
+  const parts = text.split(TIMESTAMP_REGEX);
+  if (parts.length === 1) return <span>{text}</span>;
+
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (TIMESTAMP_REGEX.test(part)) {
+          // Reset regex lastIndex
+          TIMESTAMP_REGEX.lastIndex = 0;
+          return (
+            <button
+              key={i}
+              onClick={() => toast.info(`Ponto crítico no vídeo: ⏱ ${part}`, { duration: 3000 })}
+              className="inline-flex items-center gap-0.5 px-1 py-0 rounded bg-primary/15 text-primary font-mono text-[11px] font-semibold hover:bg-primary/25 transition-colors cursor-pointer border border-primary/20"
+            >
+              ⏱ {part}
+            </button>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </>
+  );
+};
 
 const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatProps) => {
   const { user } = useAuth();
@@ -65,7 +95,6 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
   useEffect(() => {
     fetchMessages();
 
-    // Realtime subscription
     const channel = supabase
       .channel(`chat-${deliveryId}`)
       .on(
@@ -90,7 +119,6 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
     };
   }, [deliveryId, fetchMessages]);
 
-  // Auto-scroll on new messages
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -150,7 +178,6 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
         <span className="text-[10px] text-muted-foreground">({messages.length})</span>
       </div>
 
-      {/* Messages area */}
       <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto space-y-2 rounded-lg border border-border/40 bg-muted/10 p-3 min-h-[120px] max-h-[240px]"
@@ -194,12 +221,15 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
                       <Badge
                         variant="outline"
                         className="text-[9px] px-1 py-0 border-0 bg-primary/10 text-primary cursor-pointer"
+                        onClick={() => toast.info(`Ponto crítico: ⏱ ${msg.timestamp_marker}`, { duration: 3000 })}
                       >
                         ⏱ {msg.timestamp_marker}
                       </Badge>
                     )}
                   </div>
-                  <p className="text-xs leading-relaxed whitespace-pre-wrap">{msg.message}</p>
+                  <p className="text-xs leading-relaxed whitespace-pre-wrap">
+                    {renderMessageWithTimestamps(msg.message)}
+                  </p>
                   <p className="text-[9px] text-muted-foreground/60">
                     {formatDistanceToNow(new Date(msg.created_at), {
                       addSuffix: true,
@@ -213,7 +243,6 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
         )}
       </div>
 
-      {/* Input */}
       <div className="flex items-end gap-2 pt-2">
         {showTimestampInput && (
           <div className="w-20">
