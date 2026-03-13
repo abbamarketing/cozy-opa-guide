@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
+import { useRole } from '@/hooks/useRole';
 import { Button } from '@/components/ui/button';
-import { Clock, MessageCircle, Loader2, CheckCircle, LogOut } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Clock, MessageCircle, Loader2, CheckCircle, LogOut, Shield, Film, User } from 'lucide-react';
 
 const WHATSAPP_NUMBER = '5511999117106';
 const WHATSAPP_MESSAGE = encodeURIComponent(
@@ -12,8 +14,15 @@ const WHATSAPP_MESSAGE = encodeURIComponent(
 
 export default function WaitingForProject() {
   const { user, signOut } = useAuth();
+  const { roles, loading: roleLoading } = useRole();
   const navigate = useNavigate();
   const [dots, setDots] = useState('');
+
+  const roleDisplay = roles.includes('admin')
+    ? { label: 'Administrador', icon: Shield, variant: 'default' as const }
+    : roles.includes('editor')
+    ? { label: 'Editor', icon: Film, variant: 'secondary' as const }
+    : { label: 'Cliente', icon: User, variant: 'outline' as const };
 
   useEffect(() => {
     if (!user) return;
@@ -53,6 +62,16 @@ export default function WaitingForProject() {
           />
           <Clock className="h-8 w-8 text-primary" />
         </div>
+
+        {/* User role indicator */}
+        {!roleLoading && (
+          <div className="flex justify-center">
+            <Badge variant={roleDisplay.variant} className="gap-1.5 px-3 py-1 text-xs">
+              <roleDisplay.icon className="h-3 w-3" />
+              {roleDisplay.label}
+            </Badge>
+          </div>
+        )}
 
         {/* Message */}
         <div className="space-y-3">
