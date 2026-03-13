@@ -17,3 +17,7 @@ project_id = "iqrypgqdhpanqjqnxtap"
     verify_jwt = false
   [functions.support-chat]
     verify_jwt = false
+  [functions.generate-script]
+    verify_jwt = false
+  [functions.brainstorm-ideas]
+    verify_jwt = false
