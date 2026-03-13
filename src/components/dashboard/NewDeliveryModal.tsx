@@ -188,7 +188,7 @@ const NewDeliveryModal = ({
         fullDescription += '\n\nMaterial: será enviado depois';
       }
 
-      // 1. Create delivery
+      // 1. Create delivery via mutation
       const insertData: Record<string, any> = {
         user_project_id: userProject.id,
         delivery_type: values.delivery_type,
@@ -204,11 +204,7 @@ const NewDeliveryModal = ({
         insertData.drive_link = driveLink.trim();
       }
 
-      const { error: deliveryError } = await supabase.from('deliveries').insert(insertData as any);
-
-      if (deliveryError) throw deliveryError;
-
-      // Quota is now automatically reserved by the database trigger (reserve_quota_on_create)
+      await createDelivery.mutateAsync(insertData);
 
       logger.info('Entrega criada', { delivery_type: values.delivery_type, title: values.title }, 'delivery');
       toast.success('Solicitação criada com sucesso!');
