@@ -247,7 +247,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
             open={!!selectedDelivery}
             onOpenChange={() => setSelectedDelivery(null)}
             delivery={selectedDelivery}
-            onUpdated={fetchDeliveries}
+            onUpdated={refetch}
           />
           {showNewModal && (
             <NewDeliveryModal
