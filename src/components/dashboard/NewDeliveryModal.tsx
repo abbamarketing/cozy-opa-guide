@@ -3,9 +3,10 @@ import { addBusinessHours } from '@/lib/business-hours';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
+import { useDeliveries } from '@/hooks/useDeliveries';
 import { logger } from '@/lib/logger';
 import {
   Dialog,
