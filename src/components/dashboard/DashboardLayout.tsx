@@ -72,7 +72,7 @@ const DashboardHeader = () => {
     : '?';
 
   return (
-    <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-border bg-background px-3 md:px-4 md:h-14">
+    <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-border/50 bg-background/80 backdrop-blur-lg px-3 md:px-4 md:h-14">
       <div className="flex items-center gap-2">
         {!isMobile && <SidebarTrigger className="mr-1" />}
         <div className="flex items-center gap-1.5">
@@ -136,10 +136,12 @@ const DashboardSidebar = ({
   activeTab,
   setActiveTab,
   navItems,
+  userProject,
 }: {
   activeTab: DashboardTab;
   setActiveTab: (t: DashboardTab) => void;
   navItems: NavItem[];
+  userProject: import('@/hooks/useUserProject').UserProjectData | null;
 }) => {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
@@ -169,6 +171,12 @@ const DashboardSidebar = ({
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      {/* QuotaCard at sidebar bottom (desktop only) */}
+      {!collapsed && userProject && (
+        <div className="mt-auto p-2 border-t border-border/50">
+          <QuotaCard userProject={userProject} />
+        </div>
+      )}
     </Sidebar>
   );
 };
@@ -183,7 +191,7 @@ const MobileBottomNav = ({
   setActiveTab: (t: DashboardTab) => void;
   navItems: NavItem[];
 }) => (
-  <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background safe-area-bottom">
+  <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/50 bg-background/80 backdrop-blur-lg safe-area-bottom">
     <div className="flex items-stretch">
       {navItems.map((item) => {
         const isActive = activeTab === item.id;
@@ -282,23 +290,25 @@ const DashboardLayout = () => {
 
       {/* Desktop: sidebar + content side-by-side */}
       {!isMobile && (
-        <DashboardSidebar activeTab={activeTab} setActiveTab={setActiveTab} navItems={navItems} />
+        <DashboardSidebar activeTab={activeTab} setActiveTab={setActiveTab} navItems={navItems} userProject={userProject} />
       )}
 
       <div className="flex-1 flex flex-col min-h-screen">
         <DashboardHeader />
 
         <main className={`flex-1 overflow-y-auto p-3 md:p-6 space-y-4 ${isMobile ? 'pb-20' : ''}`}>
-          {/* Quota Card */}
-          {isLoading ? (
-            <Skeleton className="h-48 w-full rounded-lg" />
-          ) : userProject ? (
-            activeTab !== 'settings' && <QuotaCard userProject={userProject} />
-          ) : (
-            activeTab === 'deliveries' && (
-              <div className="rounded-lg border border-border bg-card p-4 text-center text-sm text-muted-foreground">
-                Nenhum projeto ativo encontrado.
-              </div>
+          {/* Quota Card - mobile only (desktop shows in sidebar) */}
+          {isMobile && (
+            isLoading ? (
+              <Skeleton className="h-12 w-full rounded-lg" />
+            ) : userProject ? (
+              activeTab !== 'settings' && <QuotaCard userProject={userProject} />
+            ) : (
+              activeTab === 'deliveries' && (
+                <div className="rounded-lg glass p-4 text-center text-sm text-muted-foreground">
+                  Nenhum projeto ativo encontrado.
+                </div>
+              )
             )
           )}
 

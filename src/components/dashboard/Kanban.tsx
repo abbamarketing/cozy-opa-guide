@@ -223,7 +223,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
             {/* Cards */}
             <div className="space-y-2">
               {items.length === 0 ? (
-                <div className="rounded-lg border border-border bg-card p-8 text-center">
+                <div className="rounded-lg glass p-8 text-center">
                   <p className="text-xs font-mono text-muted-foreground">
                     Nenhuma entrega
                   </p>
@@ -322,7 +322,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
             return (
               <div
                 key={col.id}
-                className="flex flex-col rounded-lg border border-border bg-muted/30 p-2"
+                className="flex flex-col rounded-lg glass p-2"
               >
                 <div className="mb-2 px-1">
                   <div className="flex items-center justify-between">

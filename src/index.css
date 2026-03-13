@@ -17,7 +17,7 @@
     --secondary: 0 0% 24%;
     --secondary-foreground: 0 0% 94%;
     --muted: 0 0% 24%;
-    --muted-foreground: 0 0% 60%;
+    --muted-foreground: 0 0% 68%;
     --accent: 101 72% 67%;
     --accent-foreground: 0 0% 7%;
     --destructive: 0 65% 51%;
@@ -85,14 +85,31 @@
     font-family: 'Lato', sans-serif;
   }
 
-  /* Backward-compatible: glass now maps to card styling */
+  /* Glassmorphism card */
   .glass {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
+    background: hsl(var(--card) / 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(0 0% 100% / 0.1);
   }
 
   .glass-hover:hover {
-    background: hsl(var(--accent));
+    background: hsl(var(--card) / 0.55);
+    border-color: hsl(var(--primary) / 0.25);
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.08), 0 4px 16px hsl(0 0% 0% / 0.2);
+  }
+
+  /* Hover elevation for delivery cards */
+  .card-elevate {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .card-elevate:hover {
+    transform: translateY(-1px);
+    border-color: hsl(var(--primary) / 0.2);
+    box-shadow: 0 0 16px hsl(var(--primary) / 0.06), 0 8px 24px hsl(0 0% 0% / 0.25);
+  }
+  .card-elevate:active {
+    transform: translateY(0);
   }
 
   /* Legacy neon utilities mapped to primary */

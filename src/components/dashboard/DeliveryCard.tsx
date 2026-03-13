@@ -122,7 +122,7 @@ const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
   return (
     <Card
       onClick={onClick}
-      className="cursor-pointer border-border bg-card p-3 transition-colors active:bg-muted hover:bg-muted/50 space-y-2 shadow-sm"
+      className="cursor-pointer glass card-elevate p-3 space-y-2"
     >
       {/* Title row */}
       <div className="flex items-start gap-2">
