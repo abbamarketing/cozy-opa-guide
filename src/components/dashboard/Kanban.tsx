@@ -254,7 +254,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
               open={showNewModal}
               onOpenChange={setShowNewModal}
               userProject={userProject}
-              onCreated={fetchDeliveries}
+              onCreated={refetch}
             />
           )}
           {showCaptureModal && (
