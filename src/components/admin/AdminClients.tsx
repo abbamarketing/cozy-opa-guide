@@ -418,6 +418,12 @@ const AdminClients = () => {
                                 <Pause className="mr-2 h-4 w-4" /> Suspender
                               </DropdownMenuItem>
                             )}
+                            <DropdownMenuItem
+                              onClick={() => setConfirmAction({ type: 'delete', userId: c.user_id, clientName: c.full_name })}
+                              className="text-destructive"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
