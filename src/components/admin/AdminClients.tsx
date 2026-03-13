@@ -216,18 +216,31 @@ const AdminClients = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {confirmAction.type === 'suspend' ? 'Suspender Cliente?' : 'Reativar Cliente?'}
+              {confirmAction.type === 'suspend'
+                ? 'Suspender Cliente?'
+                : confirmAction.type === 'delete'
+                ? 'Excluir Cliente Permanentemente?'
+                : 'Reativar Cliente?'}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {confirmAction.type === 'suspend'
                 ? `O cliente "${confirmAction.clientName || ''}" não poderá mais acessar o sistema.`
+                : confirmAction.type === 'delete'
+                ? `ATENÇÃO: Esta ação é irreversível. Todos os dados do cliente "${confirmAction.clientName || ''}" (entregas, briefings, mensagens) serão permanentemente excluídos.`
                 : `O cliente "${confirmAction.clientName || ''}" voltará a ter acesso total.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleStatusChange}>
-              {confirmAction.type === 'suspend' ? 'Suspender' : 'Reativar'}
+            <AlertDialogAction
+              onClick={handleStatusChange}
+              className={confirmAction.type === 'delete' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : ''}
+            >
+              {confirmAction.type === 'suspend'
+                ? 'Suspender'
+                : confirmAction.type === 'delete'
+                ? 'Excluir Permanentemente'
+                : 'Reativar'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
