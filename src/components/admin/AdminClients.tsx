@@ -56,7 +56,7 @@ const AdminClients = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<{
-    type: 'suspend' | 'activate' | null;
+    type: 'suspend' | 'activate' | 'delete' | null;
     userId: string | null;
     clientName: string | null;
   }>({ type: null, userId: null, clientName: null });
