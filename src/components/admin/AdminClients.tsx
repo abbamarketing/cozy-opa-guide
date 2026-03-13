@@ -24,7 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Search, MoreHorizontal, Pause, Play, Loader2, Download } from 'lucide-react';
+import { Search, MoreHorizontal, Pause, Play, Loader2, Download, Trash2 } from 'lucide-react';
 import { downloadCSV } from '@/lib/csv';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
