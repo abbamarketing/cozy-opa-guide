@@ -94,14 +94,10 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
     if (!user) return;
     setIsApproving(true);
     try {
-      const { error } = await supabase
-        .from('deliveries')
-        .update({ status: 'approved', approved_at: new Date().toISOString() })
-        .eq('id', delivery.id);
-      if (error) throw error;
-
-      // Quota is now automatically managed by the database trigger (approve_quota_on_approve)
-
+      await updateDelivery.mutateAsync({
+        id: delivery.id,
+        updates: { status: 'approved', approved_at: new Date().toISOString() },
+      });
       logger.info('Entrega aprovada', { delivery_id: delivery.id, title: delivery.title }, 'delivery');
       toast.success('Entrega aprovada com sucesso! 🎉');
       onOpenChange(false);
