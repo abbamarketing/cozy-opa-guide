@@ -24,7 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Search, MoreHorizontal, Pause, Play, Loader2, Download } from 'lucide-react';
+import { Search, MoreHorizontal, Pause, Play, Loader2, Download, Trash2 } from 'lucide-react';
 import { downloadCSV } from '@/lib/csv';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -56,7 +56,7 @@ const AdminClients = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<{
-    type: 'suspend' | 'activate' | null;
+    type: 'suspend' | 'activate' | 'delete' | null;
     userId: string | null;
     clientName: string | null;
   }>({ type: null, userId: null, clientName: null });
@@ -138,22 +138,55 @@ const AdminClients = () => {
   const handleStatusChange = async () => {
     if (!confirmAction.userId || !confirmAction.type) return;
 
-    const newStatus = confirmAction.type === 'suspend' ? 'suspended' : 'active';
     setActionLoading(confirmAction.userId);
 
-    const { error } = await supabase
-      .from('user_projects')
-      .update({ status: newStatus } as any)
-      .eq('user_id', confirmAction.userId);
+    if (confirmAction.type === 'delete') {
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData?.session?.access_token;
+        if (!accessToken) throw new Error('Sessão expirada');
 
-    if (error) {
-      toast.error('Erro ao atualizar status');
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-client`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: JSON.stringify({ user_id: confirmAction.userId }),
+          },
+        );
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err?.error || `Erro ${response.status}`);
+        }
+
+        toast.success('Cliente Excluído', { description: 'Conta e dados removidos com sucesso.' });
+        fetchClients();
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Erro desconhecido';
+        toast.error('Erro ao excluir cliente', { description: message });
+      }
     } else {
-      toast.success(
-        confirmAction.type === 'suspend' ? 'Cliente Suspendido' : 'Cliente Reativado',
-        { description: 'Status atualizado com sucesso' }
-      );
-      fetchClients();
+      const newStatus = confirmAction.type === 'suspend' ? 'suspended' : 'active';
+
+      const { error } = await supabase
+        .from('user_projects')
+        .update({ status: newStatus } as any)
+        .eq('user_id', confirmAction.userId);
+
+      if (error) {
+        toast.error('Erro ao atualizar status');
+      } else {
+        toast.success(
+          confirmAction.type === 'suspend' ? 'Cliente Suspendido' : 'Cliente Reativado',
+          { description: 'Status atualizado com sucesso' }
+        );
+        fetchClients();
+      }
     }
 
     setActionLoading(null);
@@ -183,18 +216,31 @@ const AdminClients = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {confirmAction.type === 'suspend' ? 'Suspender Cliente?' : 'Reativar Cliente?'}
+              {confirmAction.type === 'suspend'
+                ? 'Suspender Cliente?'
+                : confirmAction.type === 'delete'
+                ? 'Excluir Cliente Permanentemente?'
+                : 'Reativar Cliente?'}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {confirmAction.type === 'suspend'
                 ? `O cliente "${confirmAction.clientName || ''}" não poderá mais acessar o sistema.`
+                : confirmAction.type === 'delete'
+                ? `ATENÇÃO: Esta ação é irreversível. Todos os dados do cliente "${confirmAction.clientName || ''}" (entregas, briefings, mensagens) serão permanentemente excluídos.`
                 : `O cliente "${confirmAction.clientName || ''}" voltará a ter acesso total.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleStatusChange}>
-              {confirmAction.type === 'suspend' ? 'Suspender' : 'Reativar'}
+            <AlertDialogAction
+              onClick={handleStatusChange}
+              className={confirmAction.type === 'delete' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : ''}
+            >
+              {confirmAction.type === 'suspend'
+                ? 'Suspender'
+                : confirmAction.type === 'delete'
+                ? 'Excluir Permanentemente'
+                : 'Reativar'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -286,6 +332,15 @@ const AdminClients = () => {
                         <Pause className="h-3 w-3" /> Suspender
                       </Button>
                     )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs gap-1 text-destructive"
+                      disabled={actionLoading === c.user_id}
+                      onClick={() => setConfirmAction({ type: 'delete', userId: c.user_id, clientName: c.full_name })}
+                    >
+                      <Trash2 className="h-3 w-3" /> Excluir
+                    </Button>
                   </div>
                 </Card>
               );
@@ -362,6 +417,12 @@ const AdminClients = () => {
                                 <Pause className="mr-2 h-4 w-4" /> Suspender
                               </DropdownMenuItem>
                             )}
+                            <DropdownMenuItem
+                              onClick={() => setConfirmAction({ type: 'delete', userId: c.user_id, clientName: c.full_name })}
+                              className="text-destructive"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
