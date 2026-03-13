@@ -79,6 +79,7 @@ const NewDeliveryModal = ({
   onCreated,
 }: NewDeliveryModalProps) => {
   const { user } = useAuth();
+  const { createDelivery } = useDeliveries(userProject.id);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [aiScript, setAiScript] = useState(false);
   const [scriptContent, setScriptContent] = useState('');
