@@ -290,7 +290,7 @@ const DashboardLayout = () => {
 
       {/* Desktop: sidebar + content side-by-side */}
       {!isMobile && (
-        <DashboardSidebar activeTab={activeTab} setActiveTab={setActiveTab} navItems={navItems} />
+        <DashboardSidebar activeTab={activeTab} setActiveTab={setActiveTab} navItems={navItems} userProject={userProject} />
       )}
 
       <div className="flex-1 flex flex-col min-h-screen">
