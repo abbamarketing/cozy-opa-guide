@@ -136,10 +136,12 @@ const DashboardSidebar = ({
   activeTab,
   setActiveTab,
   navItems,
+  userProject,
 }: {
   activeTab: DashboardTab;
   setActiveTab: (t: DashboardTab) => void;
   navItems: NavItem[];
+  userProject: import('@/hooks/useUserProject').UserProjectData | null;
 }) => {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
@@ -169,6 +171,12 @@ const DashboardSidebar = ({
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      {/* QuotaCard at sidebar bottom (desktop only) */}
+      {!collapsed && userProject && (
+        <div className="mt-auto p-2 border-t border-border/50">
+          <QuotaCard userProject={userProject} />
+        </div>
+      )}
     </Sidebar>
   );
 };
