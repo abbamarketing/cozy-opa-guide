@@ -14,8 +14,15 @@ const WHATSAPP_MESSAGE = encodeURIComponent(
 
 export default function WaitingForProject() {
   const { user, signOut } = useAuth();
+  const { roles, loading: roleLoading } = useRole();
   const navigate = useNavigate();
   const [dots, setDots] = useState('');
+
+  const roleDisplay = roles.includes('admin')
+    ? { label: 'Administrador', icon: Shield, variant: 'default' as const }
+    : roles.includes('editor')
+    ? { label: 'Editor', icon: Film, variant: 'secondary' as const }
+    : { label: 'Cliente', icon: User, variant: 'outline' as const };
 
   useEffect(() => {
     if (!user) return;
