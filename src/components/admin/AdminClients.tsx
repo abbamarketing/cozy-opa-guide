@@ -342,7 +342,6 @@ const AdminClients = () => {
                       <Trash2 className="h-3 w-3" /> Excluir
                     </Button>
                   </div>
-                  </div>
                 </Card>
               );
             })
