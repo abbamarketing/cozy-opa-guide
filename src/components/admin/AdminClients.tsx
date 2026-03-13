@@ -138,22 +138,55 @@ const AdminClients = () => {
   const handleStatusChange = async () => {
     if (!confirmAction.userId || !confirmAction.type) return;
 
-    const newStatus = confirmAction.type === 'suspend' ? 'suspended' : 'active';
     setActionLoading(confirmAction.userId);
 
-    const { error } = await supabase
-      .from('user_projects')
-      .update({ status: newStatus } as any)
-      .eq('user_id', confirmAction.userId);
+    if (confirmAction.type === 'delete') {
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData?.session?.access_token;
+        if (!accessToken) throw new Error('Sessão expirada');
 
-    if (error) {
-      toast.error('Erro ao atualizar status');
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-client`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: JSON.stringify({ user_id: confirmAction.userId }),
+          },
+        );
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err?.error || `Erro ${response.status}`);
+        }
+
+        toast.success('Cliente Excluído', { description: 'Conta e dados removidos com sucesso.' });
+        fetchClients();
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Erro desconhecido';
+        toast.error('Erro ao excluir cliente', { description: message });
+      }
     } else {
-      toast.success(
-        confirmAction.type === 'suspend' ? 'Cliente Suspendido' : 'Cliente Reativado',
-        { description: 'Status atualizado com sucesso' }
-      );
-      fetchClients();
+      const newStatus = confirmAction.type === 'suspend' ? 'suspended' : 'active';
+
+      const { error } = await supabase
+        .from('user_projects')
+        .update({ status: newStatus } as any)
+        .eq('user_id', confirmAction.userId);
+
+      if (error) {
+        toast.error('Erro ao atualizar status');
+      } else {
+        toast.success(
+          confirmAction.type === 'suspend' ? 'Cliente Suspendido' : 'Cliente Reativado',
+          { description: 'Status atualizado com sucesso' }
+        );
+        fetchClients();
+      }
     }
 
     setActionLoading(null);
