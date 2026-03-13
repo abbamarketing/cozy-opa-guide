@@ -191,7 +191,7 @@ const MobileBottomNav = ({
   setActiveTab: (t: DashboardTab) => void;
   navItems: NavItem[];
 }) => (
-  <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background safe-area-bottom">
+  <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/50 bg-background/80 backdrop-blur-lg safe-area-bottom">
     <div className="flex items-stretch">
       {navItems.map((item) => {
         const isActive = activeTab === item.id;
