@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { useDeliveries } from '@/hooks/useDeliveries';
 import {
   Dialog,
   DialogContent,
@@ -53,6 +54,7 @@ interface RevisionRecord {
 
 const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: DeliveryDetailModalProps) => {
   const { user } = useAuth();
+  const { updateDelivery } = useDeliveries(delivery?.user_project_id ?? '');
   const [revisions, setRevisions] = useState<RevisionRecord[]>([]);
   const [showRevisionModal, setShowRevisionModal] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
@@ -92,14 +94,10 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
     if (!user) return;
     setIsApproving(true);
     try {
-      const { error } = await supabase
-        .from('deliveries')
-        .update({ status: 'approved', approved_at: new Date().toISOString() })
-        .eq('id', delivery.id);
-      if (error) throw error;
-
-      // Quota is now automatically managed by the database trigger (approve_quota_on_approve)
-
+      await updateDelivery.mutateAsync({
+        id: delivery.id,
+        updates: { status: 'approved', approved_at: new Date().toISOString() },
+      });
       logger.info('Entrega aprovada', { delivery_id: delivery.id, title: delivery.title }, 'delivery');
       toast.success('Entrega aprovada com sucesso! 🎉');
       onOpenChange(false);

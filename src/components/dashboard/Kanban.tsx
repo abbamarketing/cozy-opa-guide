@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import DeliveryCard, { type DeliveryData } from './DeliveryCard';
+import { useDeliveries } from '@/hooks/useDeliveries';
 import type { UserProjectData } from '@/hooks/useUserProject';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -35,8 +36,7 @@ const COLUMNS: Column[] = [
 const PAGE_SIZE = 20;
 
 const Kanban = ({ userProject }: KanbanProps) => {
-  const [deliveries, setDeliveries] = useState<DeliveryData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { deliveries, isLoading, refetch } = useDeliveries(userProject.id);
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [showCaptureModal, setShowCaptureModal] = useState(false);
@@ -48,63 +48,6 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const isMobile = useIsMobile();
 
   const requiresCapture = userProject.custom_project.include_capture;
-
-  const fetchDeliveries = async () => {
-    const { data, error } = await supabase
-      .from('deliveries')
-      .select('*, editor:editors(display_name)')
-      .eq('user_project_id', userProject.id)
-      .order('due_date', { ascending: true, nullsFirst: false });
-
-    if (!error && data) {
-      setDeliveries(
-        data.map((d: any) => ({
-          id: d.id,
-          title: d.title,
-          description: d.description,
-          delivery_type: d.delivery_type,
-          status: d.status,
-          due_date: d.due_date,
-          revision_count: d.revision_count,
-          max_revisions: d.max_revisions,
-          file_url: d.file_url,
-          thumbnail_url: d.thumbnail_url,
-          editor_name: d.editor?.display_name || null,
-          editor_id: d.editor_id,
-          created_at: d.created_at,
-          delivered_at: d.delivered_at,
-          approved_at: d.approved_at,
-          revision_notes: d.revision_notes,
-          user_project_id: d.user_project_id,
-        })),
-      );
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    fetchDeliveries();
-
-    const channel = supabase
-      .channel(`deliveries-${userProject.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'deliveries',
-          filter: `user_project_id=eq.${userProject.id}`,
-        },
-        () => fetchDeliveries(),
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [userProject.id]);
-
-  // Check if capture is scheduled for this period
   const checkCapture = useCallback(async () => {
     if (!requiresCapture) {
       setCaptureCheckDone(true);
@@ -304,14 +247,14 @@ const Kanban = ({ userProject }: KanbanProps) => {
             open={!!selectedDelivery}
             onOpenChange={() => setSelectedDelivery(null)}
             delivery={selectedDelivery}
-            onUpdated={fetchDeliveries}
+            onUpdated={refetch}
           />
           {showNewModal && (
             <NewDeliveryModal
               open={showNewModal}
               onOpenChange={setShowNewModal}
               userProject={userProject}
-              onCreated={fetchDeliveries}
+              onCreated={refetch}
             />
           )}
           {showCaptureModal && (
@@ -434,14 +377,14 @@ const Kanban = ({ userProject }: KanbanProps) => {
           open={!!selectedDelivery}
           onOpenChange={() => setSelectedDelivery(null)}
           delivery={selectedDelivery}
-          onUpdated={fetchDeliveries}
+          onUpdated={refetch}
         />
         {showNewModal && (
           <NewDeliveryModal
             open={showNewModal}
             onOpenChange={setShowNewModal}
             userProject={userProject}
-            onCreated={fetchDeliveries}
+            onCreated={refetch}
           />
         )}
         {showCaptureModal && (
