@@ -1,19 +1,112 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Sparkles, Copy, Check, StopCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Loader2, Sparkles, Copy, Check, StopCircle, Lightbulb, ArrowRight, Zap } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/lib/auth';
 
 const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-script`;
+const BRAINSTORM_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/brainstorm-ideas`;
+
+interface VideoIdea {
+  title: string;
+  hook: string;
+  topics: string[];
+}
+
+interface BriefingContext {
+  content_style: string | null;
+  target_audience: string | null;
+  reference_channels: string[] | null;
+  brand_name: string | null;
+}
 
 export default function ScriptGenerator() {
+  const { user } = useAuth();
   const [prompt, setPrompt] = useState('');
+  const [brainstormTopic, setBrainstormTopic] = useState('');
   const [generatedScript, setGeneratedScript] = useState('');
   const [loading, setLoading] = useState(false);
+  const [brainstormLoading, setBrainstormLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [abortController, setAbortController] = useState<AbortController | null>(null);
+  const [ideas, setIdeas] = useState<VideoIdea[]>([]);
+  const [briefing, setBriefing] = useState<BriefingContext | null>(null);
+  const [selectedIdeaIndex, setSelectedIdeaIndex] = useState<number | null>(null);
+
+  // Fetch user briefing context
+  useEffect(() => {
+    if (!user) return;
+    const fetchBriefing = async () => {
+      const { data } = await supabase
+        .from('onboarding_briefings')
+        .select('content_style, target_audience, reference_channels, brand_name')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (data) setBriefing(data as BriefingContext);
+    };
+    fetchBriefing();
+  }, [user]);
+
+  const handleBrainstorm = async () => {
+    if (!brainstormTopic.trim()) {
+      toast.error('Informe um tema', { description: 'Digite o tema ou nicho para o brainstorm' });
+      return;
+    }
+    if (!user) return;
+
+    setBrainstormLoading(true);
+    setIdeas([]);
+    setSelectedIdeaIndex(null);
+
+    try {
+      const resp = await fetch(BRAINSTORM_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ topic: brainstormTopic.trim(), userId: user.id }),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({ error: 'Erro desconhecido' }));
+        if (resp.status === 429) {
+          toast.error('Limite excedido', { description: 'Aguarde um momento e tente novamente.' });
+        } else if (resp.status === 402) {
+          toast.error('Créditos insuficientes', { description: 'Adicione créditos ao workspace.' });
+        } else {
+          toast.error(err.error || 'Erro ao gerar ideias');
+        }
+        return;
+      }
+
+      const data = await resp.json();
+      if (data.ideas && Array.isArray(data.ideas)) {
+        setIdeas(data.ideas);
+        toast.success('3 ideias geradas!', { description: 'Selecione uma para usar no roteiro' });
+      } else {
+        toast.error('Resposta inesperada da IA');
+      }
+    } catch (err: any) {
+      toast.error('Erro ao gerar ideias');
+    } finally {
+      setBrainstormLoading(false);
+    }
+  };
+
+  const handleSelectIdea = (idea: VideoIdea, index: number) => {
+    setSelectedIdeaIndex(index);
+    const topicsList = idea.topics.map((t, i) => `${i + 1}. ${t}`).join('\n');
+    const scriptPrompt = `Título: ${idea.title}\n\nGancho inicial: ${idea.hook}\n\nTópicos principais:\n${topicsList}\n\nCrie um roteiro completo e detalhado para este vídeo.`;
+    setPrompt(scriptPrompt);
+    toast.success('Ideia selecionada!', { description: 'Clique em "Gerar Roteiro" para criar o roteiro completo' });
+  };
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -39,7 +132,13 @@ export default function ScriptGenerator() {
 
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({ error: 'Erro desconhecido' }));
-        toast.error(err.error || 'Erro ao gerar roteiro');
+        if (resp.status === 429) {
+          toast.error('Limite excedido', { description: 'Aguarde um momento e tente novamente.' });
+        } else if (resp.status === 402) {
+          toast.error('Créditos insuficientes', { description: 'Adicione créditos ao workspace.' });
+        } else {
+          toast.error(err.error || 'Erro ao gerar roteiro');
+        }
         setLoading(false);
         return;
       }
@@ -127,14 +226,123 @@ export default function ScriptGenerator() {
 
   return (
     <div className="space-y-4">
-      <Card className="glass border-border/40">
+      {/* Brainstorm Section */}
+      <Card className="glass">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lightbulb className="h-5 w-5 text-primary" />
+            Brainstorm com IA
+          </CardTitle>
+          <CardDescription>
+            Digite um tema e a IA sugerirá 3 ideias de vídeo
+            {briefing?.brand_name && (
+              <span className="ml-1">
+                personalizadas para <span className="text-primary font-medium">{briefing.brand_name}</span>
+              </span>
+            )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Ex: produtividade, marketing digital, receitas fitness..."
+              value={brainstormTopic}
+              onChange={(e) => setBrainstormTopic(e.target.value)}
+              disabled={brainstormLoading}
+              className="flex-1"
+              maxLength={200}
+              onKeyDown={(e) => e.key === 'Enter' && !brainstormLoading && handleBrainstorm()}
+            />
+            <Button
+              onClick={handleBrainstorm}
+              disabled={brainstormLoading}
+              className="gap-1.5 shrink-0"
+            >
+              {brainstormLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Zap className="h-4 w-4" />
+              )}
+              {brainstormLoading ? 'Gerando...' : 'Brainstorm'}
+            </Button>
+          </div>
+
+          {/* Context badges */}
+          {briefing && (
+            <div className="flex flex-wrap gap-1.5">
+              {briefing.content_style && (
+                <Badge variant="outline" className="text-[10px]">
+                  Estilo: {briefing.content_style}
+                </Badge>
+              )}
+              {briefing.target_audience && (
+                <Badge variant="outline" className="text-[10px]">
+                  Público: {briefing.target_audience}
+                </Badge>
+              )}
+              {briefing.reference_channels && briefing.reference_channels.length > 0 && (
+                <Badge variant="outline" className="text-[10px]">
+                  Refs: {briefing.reference_channels.slice(0, 2).join(', ')}
+                </Badge>
+              )}
+            </div>
+          )}
+
+          {/* Ideas grid */}
+          {ideas.length > 0 && (
+            <div className="grid gap-3 sm:grid-cols-3">
+              {ideas.map((idea, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSelectIdea(idea, idx)}
+                  className={`text-left rounded-lg p-3 space-y-2 transition-all card-elevate ${
+                    selectedIdeaIndex === idx
+                      ? 'glass border border-primary/40 ring-1 ring-primary/20'
+                      : 'glass'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-1">
+                    <p className="text-sm font-medium text-foreground leading-snug line-clamp-2">
+                      {idea.title}
+                    </p>
+                    {selectedIdeaIndex === idx && (
+                      <Check className="h-4 w-4 shrink-0 text-primary" />
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground line-clamp-2 italic">
+                    "{idea.hook}"
+                  </p>
+                  <div className="space-y-0.5">
+                    {idea.topics.slice(0, 3).map((topic, i) => (
+                      <div key={i} className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                        <ArrowRight className="h-2.5 w-2.5 shrink-0 text-primary/60" />
+                        <span className="line-clamp-1">{topic}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {selectedIdeaIndex !== idx && (
+                    <p className="text-[10px] font-mono text-primary/70 pt-1">
+                      Clique para usar →
+                    </p>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Script Generator */}
+      <Card className="glass">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
             Gerador de Roteiros com IA
           </CardTitle>
           <CardDescription>
-            Descreva o tema do seu vídeo e a IA criará um roteiro completo com sugestões de títulos
+            {selectedIdeaIndex !== null
+              ? 'Ideia selecionada! Clique em "Gerar Roteiro" para criar o roteiro completo'
+              : 'Descreva o tema do seu vídeo e a IA criará um roteiro completo com sugestões de títulos'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -179,7 +387,7 @@ export default function ScriptGenerator() {
       </Card>
 
       {generatedScript && (
-        <Card className="glass border-border/40">
+        <Card className="glass">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Roteiro Gerado</CardTitle>
             <Button variant="outline" size="sm" onClick={handleCopy} className="gap-1.5">
