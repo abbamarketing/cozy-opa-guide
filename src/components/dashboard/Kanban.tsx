@@ -47,7 +47,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const [captureCheckDone, setCaptureCheckDone] = useState(false);
   const isMobile = useIsMobile();
 
-  // Check if capture is scheduled for this period
+  const requiresCapture = userProject.custom_project.include_capture;
   const checkCapture = useCallback(async () => {
     if (!requiresCapture) {
       setCaptureCheckDone(true);
