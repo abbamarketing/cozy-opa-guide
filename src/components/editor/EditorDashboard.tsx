@@ -534,9 +534,16 @@ const EditorDashboard = () => {
       const nextItem = subscriptionQueue.find((d) => d.status === 'queue');
       if (!nextItem) return;
 
+      const slaHours = nextItem.sla_hours ?? 72;
+      const newDeadline = countWeekdayHours(new Date(), slaHours);
+
       const { error } = await supabase
         .from('deliveries')
-        .update({ status: 'in_progress' } as any)
+        .update({
+          status: 'in_progress',
+          sla_deadline: newDeadline.toISOString(),
+          due_date: newDeadline.toISOString(),
+        } as any)
         .eq('id', nextItem.id);
 
       if (error) {
