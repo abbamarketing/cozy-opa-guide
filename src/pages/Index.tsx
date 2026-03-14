@@ -95,7 +95,7 @@ const Index = () => {
   // If user selected a role, redirect
   if (selectedRole) {
     if (selectedRole === 'client') {
-      return handleSingleRoleRedirect('client', assignedProjectId, profile, projectStatus);
+      return handleSingleRoleRedirect('client', assignedProjectId, profile, projectStatus, clientType);
     }
     const config = ROLE_CONFIG[selectedRole];
     if (config) return <Navigate to={config.path} replace />;
