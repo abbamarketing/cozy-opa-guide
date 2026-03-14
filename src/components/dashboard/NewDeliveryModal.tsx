@@ -295,7 +295,7 @@ const NewDeliveryModal = ({
         status: (userProject as any).client_type === 'subscription' ? 'queue' : 'pending',
         due_date: dueDate,
         priority_level: priorityLevel,
-        max_revisions: project.max_revisions,
+        max_revisions: isSubscription ? 2 : (project?.max_revisions ?? 2),
       };
 
       // Raw material fields

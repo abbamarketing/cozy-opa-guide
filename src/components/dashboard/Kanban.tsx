@@ -74,19 +74,21 @@ const Kanban = ({ userProject }: KanbanProps) => {
     checkCapture();
   }, [checkCapture]);
 
-  const hasQuota = () => {
+  const hasQuota = useCallback(() => {
+    const isSubscription = userProject.client_type === 'subscription';
+    if (isSubscription) {
+      const used = (userProject.instagram_reserved ?? 0) + (userProject.instagram_approved ?? 0);
+      const total = (userProject as any).monthly_quota ?? 0;
+      return used < total;
+    }
     const p = userProject.custom_project;
-    const ytUsed = userProject.youtube_reserved + userProject.youtube_approved;
-    const igUsed = userProject.instagram_reserved + userProject.instagram_approved;
-    const thUsed = userProject.thumbnails_reserved + userProject.thumbnails_approved;
-    const cvUsed = userProject.covers_reserved + userProject.covers_approved;
-
+    if (!p) return false;
+    const ytUsed = (userProject.youtube_reserved ?? 0) + (userProject.youtube_approved ?? 0);
     if (p.youtube_videos > 0 && ytUsed < p.youtube_videos) return true;
+    const igUsed = (userProject.instagram_reserved ?? 0) + (userProject.instagram_approved ?? 0);
     if (p.instagram_videos > 0 && igUsed < p.instagram_videos) return true;
-    if (p.include_thumbnails && thUsed < p.youtube_videos) return true;
-    if (p.include_covers && cvUsed < p.instagram_videos) return true;
     return false;
-  };
+  }, [userProject]);
 
   const quotaAvailable = hasQuota();
   const canCreateDelivery = quotaAvailable && (!requiresCapture || hasScheduledCapture);

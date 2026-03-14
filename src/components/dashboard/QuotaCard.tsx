@@ -97,11 +97,12 @@ const StudioQuotaCard = () => {
 const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const isMobile = useIsMobile();
-  const project = userProject.custom_project;
   const periodEnd = new Date(userProject.current_period_end);
   const daysUntilRenewal = differenceInDays(periodEnd, new Date());
 
-  const totalVideos = project.instagram_videos;
+  const totalVideos = userProject.custom_project?.instagram_videos
+    ?? (userProject as any).monthly_quota
+    ?? 0;
   const usedVideos = userProject.instagram_reserved + userProject.instagram_approved;
   const remaining = Math.max(0, totalVideos - usedVideos);
 
