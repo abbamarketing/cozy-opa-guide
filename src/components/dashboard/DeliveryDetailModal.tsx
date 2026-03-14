@@ -102,6 +102,18 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
         id: delivery.id,
         updates: { status: 'approved', approved_at: new Date().toISOString() },
       });
+
+      // Notificação para o editor
+      if (delivery.editor_id) {
+        await supabase.from('notifications').insert({
+          user_id: delivery.editor_id,
+          type: 'delivery_approved',
+          title: 'Entrega aprovada',
+          message: `"${delivery.title}" foi aprovada pelo cliente.`,
+          link: '/editor',
+        });
+      }
+
       logger.info('Entrega aprovada', { delivery_id: delivery.id, title: delivery.title }, 'delivery');
       setShowCelebration(true);
       toast.success('Entrega aprovada com sucesso! 🎉');
