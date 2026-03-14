@@ -400,11 +400,20 @@ const Kanban = ({ userProject }: KanbanProps) => {
                       </div>
                     ) : (
                       items.map((d) => (
-                        <DeliveryCard
-                          key={d.id}
-                          delivery={d}
-                          onClick={() => setSelectedDelivery(d)}
-                        />
+                        <div key={d.id} className="relative">
+                          {col.id === 'queue' && (
+                            <div className="absolute top-2 right-2 z-10">
+                              <Badge variant="secondary" className="text-[9px] font-mono gap-1">
+                                <Clock className="h-2.5 w-2.5" />
+                                Aguardando editor
+                              </Badge>
+                            </div>
+                          )}
+                          <DeliveryCard
+                            delivery={d}
+                            onClick={() => setSelectedDelivery(d)}
+                          />
+                        </div>
                       ))
                     )}
                     {hasMore && (
