@@ -15,11 +15,14 @@ import { FileText, Camera, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useRole } from "@/hooks/useRole";
+import { useUserProject } from "@/hooks/useUserProject";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 const Studio = () => {
   const { user } = useAuth();
   const { hasRole } = useRole();
+  const { userProject } = useUserProject();
   const isAdmin = hasRole('admin');
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -163,6 +166,49 @@ const Studio = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Upsell 1 — Card permanente para studio-only users */}
+      {userProject?.client_type === 'studio' && (
+        <div className="max-w-3xl mt-6">
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="p-6 space-y-3">
+              <h3 className="text-base font-semibold text-foreground">
+                Quer ver seu roteiro ganhar vida?
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Com o plano Standard, você envia o vídeo gravado e nossa equipe
+                edita em até 72h — com sua identidade visual. A partir de R$490/mês,
+                fila ilimitada, cancele quando quiser.
+              </p>
+              <Button asChild variant="default" size="sm">
+                <Link to="/plans">Ver planos de edição</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Upsell 2 — Quando créditos zerados */}
+      {!isAdmin && credits === 0 && (
+        <div className="max-w-3xl mt-4 space-y-2">
+          <p className="text-sm text-muted-foreground">
+            Seus créditos renovam em {daysUntilRenewal()} dias.
+          </p>
+          {userProject?.client_type === 'studio' && (
+            <>
+              <p className="text-sm text-muted-foreground">
+                Enquanto isso, transforme seus roteiros em vídeos editados.
+              </p>
+              <Link
+                to="/plans"
+                className="text-sm font-medium text-primary hover:underline"
+              >
+                Conhecer planos de edição →
+              </Link>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Photo interest dialog */}
       <Dialog open={photoDialogOpen} onOpenChange={setPhotoDialogOpen}>

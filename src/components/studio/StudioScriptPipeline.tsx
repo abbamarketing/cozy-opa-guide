@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useRole } from "@/hooks/useRole";
+import { useUserProject } from "@/hooks/useUserProject";
 import { toast } from "sonner";
 
 export interface ScriptFormData {
@@ -105,6 +107,7 @@ interface StudioScriptPipelineProps {
 const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) => {
   const { user } = useAuth();
   const { hasRole } = useRole();
+  const { userProject } = useUserProject();
   const isAdmin = hasRole('admin');
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<ScriptFormData>(INITIAL_DATA);
@@ -309,6 +312,16 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
                 Gerar novo roteiro
               </Button>
             </div>
+
+            {/* Upsell 3 — após roteiro gerado */}
+            {userProject?.client_type === 'studio' && generatedScript && (
+              <p className="text-sm text-muted-foreground pt-2">
+                Roteiro pronto. Agora é só gravar e enviar para edição.{' '}
+                <Link to="/plans" className="text-primary font-medium hover:underline">
+                  Contratar edição a partir de R$490/mês →
+                </Link>
+              </p>
+            )}
           </CardContent>
         </Card>
 
