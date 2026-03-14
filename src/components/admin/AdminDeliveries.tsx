@@ -59,6 +59,8 @@ const typeLabels: Record<string, string> = {
   cover: 'Capa',
 };
 
+const PAGE_SIZE = 20;
+
 const AdminDeliveries = () => {
   const isMobile = useIsMobile();
   const [deliveries, setDeliveries] = useState<AdminDelivery[]>([]);
@@ -70,6 +72,8 @@ const AdminDeliveries = () => {
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [activeColumn, setActiveColumn] = useState('todo');
+  const [page, setPage] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -77,21 +81,22 @@ const AdminDeliveries = () => {
     const [deliveriesRes, editorsRes] = await Promise.all([
       supabase
         .from('deliveries')
-        .select(`*, user_project:user_projects!inner(user_id)`)
-        .order('due_date', { ascending: true }),
+        .select(`*, user_project:user_projects!inner(user_id)`, { count: 'exact' })
+        .order('due_date', { ascending: true })
+        .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1),
       supabase.from('editors').select('id, display_name'),
     ]);
 
     const editorsList = (editorsRes.data || []) as Editor[];
     setEditors(editorsList);
     const editorMap = new Map(editorsList.map((e) => [e.id, e.display_name]));
+    setTotalCount(deliveriesRes.count || 0);
 
     if (deliveriesRes.data) {
       const userIds = [...new Set(deliveriesRes.data.map((d: any) => d.user_project?.user_id).filter(Boolean))];
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, full_name')
-        .in('user_id', userIds);
+      const { data: profiles } = userIds.length > 0
+        ? await supabase.from('profiles').select('user_id, full_name').in('user_id', userIds)
+        : { data: [] };
 
       const profileMap = new Map((profiles || []).map((p: any) => [p.user_id, p.full_name]));
 
@@ -110,7 +115,7 @@ const AdminDeliveries = () => {
       );
     }
     setLoading(false);
-  }, []);
+  }, [page]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -365,6 +370,33 @@ const AdminDeliveries = () => {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalCount > PAGE_SIZE && (
+        <div className="flex items-center justify-center gap-3 pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+          >
+            Anterior
+          </Button>
+          <span className="text-xs text-muted-foreground">
+            Página {page + 1} de {Math.ceil(totalCount / PAGE_SIZE)}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => setPage((p) => p + 1)}
+            disabled={(page + 1) * PAGE_SIZE >= totalCount}
+          >
+            Próxima
+          </Button>
         </div>
       )}
     </div>
