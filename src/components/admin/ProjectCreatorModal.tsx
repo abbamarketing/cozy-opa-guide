@@ -181,6 +181,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
     const payload = {
       ...data,
       description: data.description || null,
+      custom_slug: data.custom_slug?.trim() || null,
       created_by: user.id,
     };
 
