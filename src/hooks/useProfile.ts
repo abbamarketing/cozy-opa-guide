@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 
@@ -17,44 +17,33 @@ interface Profile {
 
 export const useProfile = () => {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [roles, setRoles] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user) {
-      setProfile(null);
-      setRoles([]);
-      setIsLoading(false);
-      return;
-    }
-
-    const fetchData = async () => {
-      setIsLoading(true);
-
+  const { data, isLoading } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
       const [profileRes, rolesRes] = await Promise.all([
         supabase
           .from('profiles')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', user!.id)
           .maybeSingle(),
         supabase
           .from('user_roles')
           .select('role')
-          .eq('user_id', user.id),
+          .eq('user_id', user!.id),
       ]);
 
-      if (profileRes.data) {
-        setProfile(profileRes.data as unknown as Profile);
-      }
-      if (rolesRes.data) {
-        setRoles(rolesRes.data.map((r) => r.role));
-      }
-      setIsLoading(false);
-    };
+      const profile = profileRes.data ? (profileRes.data as unknown as Profile) : null;
+      const roles = rolesRes.data ? rolesRes.data.map((r) => r.role) : [];
 
-    fetchData();
-  }, [user]);
+      return { profile, roles };
+    },
+    enabled: !!user?.id,
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const profile = data?.profile ?? null;
+  const roles = data?.roles ?? [];
 
   const primaryRole = roles.includes('admin')
     ? 'admin'
