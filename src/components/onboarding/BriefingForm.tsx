@@ -14,7 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Play, ArrowRight, ArrowLeft, Loader2, Upload, X, Palette } from 'lucide-react';
+import { Play, ArrowRight, ArrowLeft, Loader2, Upload, X, Palette, Plus } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 
 export interface BriefingFormData {
