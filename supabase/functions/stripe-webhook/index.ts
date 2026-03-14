@@ -4,6 +4,15 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const STRIPE_API = "https://api.stripe.com/v1";
 
+function generateSlug(name: string, suffix?: number): string {
+  const base = name
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  return suffix ? `${base}-${suffix}` : base;
+}
+
 // Minimal HMAC-SHA256 webhook signature verification using Web Crypto API
 async function verifyStripeSignature(
   payload: string,
