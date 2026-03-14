@@ -6,6 +6,10 @@ export interface UserProjectData {
   id: string;
   user_id: string;
   status: string;
+  client_type: string | null;
+  subscription_tier: string | null;
+  sla_hours: number | null;
+  studio_access: boolean | null;
   youtube_reserved: number;
   youtube_approved: number;
   instagram_reserved: number;
