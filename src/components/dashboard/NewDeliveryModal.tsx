@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from 'react';
-import { addBusinessHours } from '@/lib/business-hours';
+import { addBusinessHours, countWeekdayHours } from '@/lib/business-hours';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
