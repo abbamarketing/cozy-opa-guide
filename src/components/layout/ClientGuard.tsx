@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useUserProject } from '@/hooks/useUserProject';
 import { useProfile } from '@/hooks/useProfile';
-import { useRole } from '@/hooks/useRole';
+// REMOVIDO em PRD v5 — useRole não é mais necessário para bypass admin
 import { Loader2 } from 'lucide-react';
 
 interface ClientGuardProps {
