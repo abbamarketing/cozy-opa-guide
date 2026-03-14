@@ -72,25 +72,29 @@ const AdminOverview = () => {
         supabase.from('deliveries').select('id, title, due_date, status, delivery_type').in('status', ['pending', 'in_progress', 'revision']).not('due_date', 'is', null).lte('due_date', in24h).order('due_date', { ascending: true }).limit(10),
       ]);
 
-      // MRR (depends on activeProjects result)
-      let mrr = 0;
+      let customMRR = 0;
+      let subscriptionMRR = 0;
       const activeProjects = activeProjectsRes.data;
       if (activeProjects && activeProjects.length > 0) {
-        const projectIds = [...new Set(activeProjects.map((p: any) => p.custom_project_id))];
-        const { data: projects } = await supabase
-          .from('custom_projects')
-          .select('id, monthly_value')
-          .in('id', projectIds);
+        const projectIds = [...new Set(activeProjects.map((p: any) => p.custom_project_id).filter(Boolean))];
+        const { data: projects } = projectIds.length > 0
+          ? await supabase.from('custom_projects').select('id, monthly_value').in('id', projectIds)
+          : { data: [] };
 
         const valueMap = new Map((projects || []).map((p: any) => [p.id, Number(p.monthly_value)]));
-        mrr = activeProjects.reduce((sum: number, p: any) => sum + (valueMap.get(p.custom_project_id) || 0), 0);
+        customMRR = activeProjects.reduce((sum: number, p: any) => sum + (valueMap.get(p.custom_project_id) || 0), 0);
+        subscriptionMRR = activeProjects
+          .filter((up: any) => up.client_type === 'subscription' && up.subscription_tier)
+          .reduce((sum: number, up: any) => sum + (SUBSCRIPTION_TIER_VALUES[up.subscription_tier] ?? 0), 0);
       }
 
       setKpis({
         activeClients: activeClientsRes.count || 0,
         pendingDeliveries: pendingRes.count || 0,
         lateDeliveries: lateRes.count || 0,
-        mrr,
+        mrr: customMRR + subscriptionMRR,
+        customMRR,
+        subscriptionMRR,
       });
 
       const weekCounts = weeks.map((w) => ({
