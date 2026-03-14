@@ -92,6 +92,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
     defaultValues: {
       project_name: '',
       description: '',
+      custom_slug: '',
       youtube_videos: 0,
       instagram_videos: 0,
       include_thumbnails: false,
