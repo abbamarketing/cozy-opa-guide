@@ -766,6 +766,25 @@ const EditorDashboard = () => {
         </div>
       </header>
 
+      {/* Subscription Queue - Desktop */}
+      {subscriptionQueue.length > 0 && (
+        <div className="px-4 pt-4">
+          <div className="mb-3 flex items-center gap-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              Fila de Produção
+            </h2>
+            <Badge variant="secondary" className="text-xs">
+              {subscriptionQueue.length} {subscriptionQueue.length === 1 ? 'item' : 'itens'}
+            </Badge>
+          </div>
+          <div className="grid grid-cols-2 xl:grid-cols-3 gap-2 mb-4">
+            {subscriptionQueue.map((item) => (
+              <SubscriptionQueueCard key={item.id} item={item} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Kanban desktop */}
       <main className="flex-1 overflow-x-auto p-4">
         {isLoading ? (
