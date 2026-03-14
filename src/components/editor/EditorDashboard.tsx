@@ -354,6 +354,7 @@ const EditorDashboard = () => {
           priority_level: d.priority_level ?? d.user_project?.priority_level ?? 1,
           client_name: profileMap.get(d.user_project?.user_id)?.full_name || null,
           subscription_tier: d.user_project?.subscription_tier || null,
+          sla_hours: d.user_project?.sla_hours || null,
         }))
       );
     }
