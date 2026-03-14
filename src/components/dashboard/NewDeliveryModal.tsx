@@ -101,6 +101,7 @@ const NewDeliveryModal = ({
   const [exceptionNotes, setExceptionNotes] = useState('');
 
   const project = userProject.custom_project;
+  const isSubscription = userProject.client_type === 'subscription';
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -125,7 +126,7 @@ const NewDeliveryModal = ({
 
     if (isSubscription) {
       const used = userProject.instagram_reserved + userProject.instagram_approved;
-      const total = project.instagram_videos;
+      const total = (userProject as any).monthly_quota ?? (project?.instagram_videos ?? 0);
       return [{
         type: 'instagram_video' as DeliveryType,
         label: 'Reels / Shorts / TikToks',
@@ -138,7 +139,7 @@ const NewDeliveryModal = ({
 
     // Custom / other — show all available types
     const result: QuotaInfo[] = [];
-    if (project.youtube_videos > 0) {
+    if (project && project.youtube_videos > 0) {
       const used = userProject.youtube_reserved + userProject.youtube_approved;
       result.push({
         type: 'youtube_video',
@@ -149,7 +150,7 @@ const NewDeliveryModal = ({
         available: project.youtube_videos - used,
       });
     }
-    if (project.instagram_videos > 0) {
+    if (project && project.instagram_videos > 0) {
       const used = userProject.instagram_reserved + userProject.instagram_approved;
       result.push({
         type: 'instagram_video',
@@ -160,7 +161,7 @@ const NewDeliveryModal = ({
         available: project.instagram_videos - used,
       });
     }
-    if (project.include_thumbnails) {
+    if (project?.include_thumbnails) {
       const used = userProject.thumbnails_reserved + userProject.thumbnails_approved;
       result.push({
         type: 'thumbnail',
@@ -171,7 +172,7 @@ const NewDeliveryModal = ({
         available: project.youtube_videos - used,
       });
     }
-    if (project.include_covers) {
+    if (project?.include_covers) {
       const used = userProject.covers_reserved + userProject.covers_approved;
       result.push({
         type: 'cover',
@@ -187,6 +188,8 @@ const NewDeliveryModal = ({
 
   // Deadline calculation
   const getDeadlineHours = () => {
+    if (isSubscription) return (userProject as any).sla_hours ?? 72;
+    if (!project) return 72;
     return project.deadline === '24h' ? 24 : project.deadline === '48h' ? 48 : 72;
   };
 
@@ -280,7 +283,7 @@ const NewDeliveryModal = ({
       }
 
       let fullDescription = values.description;
-      if (project.include_script && scriptContent.trim()) {
+      if (project?.include_script && scriptContent.trim()) {
         fullDescription += `\n\n---\n${aiScript ? 'Ideias para roteiro IA' : 'Roteiro'}:\n${scriptContent}`;
       }
 
@@ -292,7 +295,7 @@ const NewDeliveryModal = ({
         status: (userProject as any).client_type === 'subscription' ? 'queue' : 'pending',
         due_date: dueDate,
         priority_level: priorityLevel,
-        max_revisions: project.max_revisions,
+        max_revisions: isSubscription ? 2 : (project?.max_revisions ?? 2),
       };
 
       // Raw material fields

@@ -47,14 +47,14 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const [captureCheckDone, setCaptureCheckDone] = useState(false);
   const isMobile = useIsMobile();
 
-  const requiresCapture = userProject.custom_project.include_capture;
+  const requiresCapture = userProject.custom_project?.include_capture ?? false;
   const checkCapture = useCallback(async () => {
     if (!requiresCapture) {
       setCaptureCheckDone(true);
       return;
     }
 
-    setCaptureLeadDays(userProject.custom_project.capture_lead_days ?? 30);
+    setCaptureLeadDays(userProject.custom_project?.capture_lead_days ?? 30);
 
     // Check for any scheduled/confirmed capture in current period
     const { data: captures } = await supabase
@@ -68,25 +68,27 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
     setHasScheduledCapture(!!captures && captures.length > 0);
     setCaptureCheckDone(true);
-  }, [requiresCapture, userProject.id, userProject.custom_project.id, userProject.current_period_start, userProject.current_period_end]);
+  }, [requiresCapture, userProject.id, userProject.current_period_start, userProject.current_period_end]);
 
   useEffect(() => {
     checkCapture();
   }, [checkCapture]);
 
-  const hasQuota = () => {
+  const hasQuota = useCallback(() => {
+    const isSubscription = userProject.client_type === 'subscription';
+    if (isSubscription) {
+      const used = (userProject.instagram_reserved ?? 0) + (userProject.instagram_approved ?? 0);
+      const total = (userProject as any).monthly_quota ?? 0;
+      return used < total;
+    }
     const p = userProject.custom_project;
-    const ytUsed = userProject.youtube_reserved + userProject.youtube_approved;
-    const igUsed = userProject.instagram_reserved + userProject.instagram_approved;
-    const thUsed = userProject.thumbnails_reserved + userProject.thumbnails_approved;
-    const cvUsed = userProject.covers_reserved + userProject.covers_approved;
-
+    if (!p) return false;
+    const ytUsed = (userProject.youtube_reserved ?? 0) + (userProject.youtube_approved ?? 0);
     if (p.youtube_videos > 0 && ytUsed < p.youtube_videos) return true;
+    const igUsed = (userProject.instagram_reserved ?? 0) + (userProject.instagram_approved ?? 0);
     if (p.instagram_videos > 0 && igUsed < p.instagram_videos) return true;
-    if (p.include_thumbnails && thUsed < p.youtube_videos) return true;
-    if (p.include_covers && cvUsed < p.instagram_videos) return true;
     return false;
-  };
+  }, [userProject]);
 
   const quotaAvailable = hasQuota();
   const canCreateDelivery = quotaAvailable && (!requiresCapture || hasScheduledCapture);

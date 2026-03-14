@@ -97,11 +97,12 @@ const StudioQuotaCard = () => {
 const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const isMobile = useIsMobile();
-  const project = userProject.custom_project;
   const periodEnd = new Date(userProject.current_period_end);
   const daysUntilRenewal = differenceInDays(periodEnd, new Date());
 
-  const totalVideos = project.instagram_videos;
+  const totalVideos = userProject.custom_project?.instagram_videos
+    ?? (userProject as any).monthly_quota
+    ?? 0;
   const usedVideos = userProject.instagram_reserved + userProject.instagram_approved;
   const remaining = Math.max(0, totalVideos - usedVideos);
 
@@ -120,7 +121,7 @@ const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
           className="w-full glass rounded-lg p-2.5 flex items-center gap-3"
         >
           <p className="text-xs font-mono font-semibold text-primary truncate shrink-0">
-            {project.project_name}
+            {userProject.custom_project?.project_name ?? userProject.subscription_tier ?? 'Assinatura'}
           </p>
           <div className="flex-1 flex items-center gap-2 overflow-hidden">
             <div className="flex items-center gap-1 shrink-0">
@@ -171,7 +172,7 @@ const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
                 SEU PLANO
               </p>
               <p className="text-sm font-mono font-semibold text-primary mt-0.5">
-                {project.project_name}
+                {userProject.custom_project?.project_name ?? userProject.subscription_tier ?? 'Assinatura'}
               </p>
             </div>
             <div className="flex items-center gap-2">
