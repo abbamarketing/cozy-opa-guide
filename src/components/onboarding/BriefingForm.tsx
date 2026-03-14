@@ -14,7 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Play, ArrowRight, ArrowLeft, Loader2, Upload, X, Palette } from 'lucide-react';
+import { Play, ArrowRight, ArrowLeft, Loader2, Upload, X, Palette, Plus } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 
 export interface BriefingFormData {
@@ -22,7 +23,6 @@ export interface BriefingFormData {
   primary_color: string;
   secondary_color: string;
   logo_url: string | null;
-  // Steps 2 & 3 fields (to be added)
   brand_description: string;
   target_audience: string;
   content_style: string;
@@ -34,6 +34,9 @@ export interface BriefingFormData {
   use_emojis: boolean;
   use_icons: boolean;
   additional_notes: string;
+  brand_fonts: string;
+  intro_url: string | null;
+  outro_url: string | null;
 }
 
 const INITIAL_DATA: BriefingFormData = {
@@ -52,6 +55,9 @@ const INITIAL_DATA: BriefingFormData = {
   use_emojis: true,
   use_icons: true,
   additional_notes: '',
+  brand_fonts: '',
+  intro_url: null,
+  outro_url: null,
 };
 
 interface BriefingFormProps {
@@ -67,6 +73,9 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [channelInput, setChannelInput] = useState('');
+  const [introFile, setIntroFile] = useState<File | null>(null);
+  const [outroFile, setOutroFile] = useState<File | null>(null);
 
   const update = <K extends keyof BriefingFormData>(field: K, value: BriefingFormData[K]) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -139,12 +148,51 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
     }
   };
 
-  // Final submit (Step 3 — placeholder for now, will be implemented in future prompt)
+  const uploadMediaFile = async (file: File, folder: string): Promise<string | null> => {
+    if (!user) return null;
+    const ext = file.name.split('.').pop();
+    const path = `${user.id}/${folder}-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from('brand-logos').upload(path, file);
+    if (error) {
+      toast.error(`Erro ao enviar ${folder}`, { description: error.message });
+      return null;
+    }
+    const { data } = supabase.storage.from('brand-logos').getPublicUrl(path);
+    return data.publicUrl;
+  };
+
+  const addChannel = () => {
+    const val = channelInput.trim();
+    if (!val) return;
+    if (formData.reference_channels.includes(val)) {
+      toast.error('Canal já adicionado');
+      return;
+    }
+    update('reference_channels', [...formData.reference_channels, val]);
+    setChannelInput('');
+  };
+
+  const removeChannel = (ch: string) => {
+    update('reference_channels', formData.reference_channels.filter((c) => c !== ch));
+  };
+
   const handleSubmit = async () => {
     if (!user) return;
     setSaving(true);
 
-    const { error } = await supabase.from('onboarding_briefings').insert({
+    // Upload intro/outro if present
+    let introUrl = formData.intro_url;
+    let outroUrl = formData.outro_url;
+    if (introFile) {
+      introUrl = await uploadMediaFile(introFile, 'intro');
+      if (!introUrl) { setSaving(false); return; }
+    }
+    if (outroFile) {
+      outroUrl = await uploadMediaFile(outroFile, 'outro');
+      if (!outroUrl) { setSaving(false); return; }
+    }
+
+    const { error } = await supabase.from('onboarding_briefings').upsert({
       user_id: user.id,
       brand_name: formData.brand_name,
       primary_color: formData.primary_color,
@@ -162,9 +210,12 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
       use_icons: formData.use_icons,
       additional_notes: formData.additional_notes || null,
       brand_colors: [formData.primary_color, formData.secondary_color],
+      brand_fonts: formData.brand_fonts ? [formData.brand_fonts] : null,
+      intro_url: introUrl,
+      outro_url: outroUrl,
       completed: true,
       completed_at: new Date().toISOString(),
-    } as any);
+    } as any, { onConflict: 'user_id' });
 
     if (error) {
       toast.error('Erro ao salvar briefing', { description: error.message });
@@ -439,15 +490,169 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
             </>
           )}
 
-          {/* Step 3 placeholder */}
+          {/* Step 3 — Audiência e Referências */}
           {currentStep === 3 && (
-            <div className="text-center py-12">
-              <h1 className="text-2xl font-bold mb-2">Preferências de Edição</h1>
-              <p className="text-muted-foreground">Passo 3 em breve</p>
-              <Button className="mt-6" onClick={handleSubmit} disabled={saving}>
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Finalizar'}
-              </Button>
-            </div>
+            <>
+              <div className="text-center mb-8">
+                <h1 className="text-2xl font-bold mb-2">Audiência e Referências</h1>
+                <p className="text-sm text-muted-foreground">
+                  Detalhes finais sobre sua marca e público
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                {/* Target Audience */}
+                <div className="space-y-2">
+                  <Label htmlFor="target_audience">Público-alvo</Label>
+                  <Input
+                    id="target_audience"
+                    placeholder="Ex: Empreendedores 30-45 anos"
+                    className="bg-secondary border-border"
+                    value={formData.target_audience}
+                    onChange={(e) => update('target_audience', e.target.value)}
+                  />
+                </div>
+
+                {/* Brand Description */}
+                <div className="space-y-2">
+                  <Label htmlFor="brand_description">Descreva sua marca em uma frase</Label>
+                  <Input
+                    id="brand_description"
+                    placeholder="Ex: Educação financeira para iniciantes"
+                    className="bg-secondary border-border"
+                    value={formData.brand_description}
+                    onChange={(e) => update('brand_description', e.target.value)}
+                  />
+                </div>
+
+                {/* Reference Channels */}
+                <div className="space-y-2">
+                  <Label>Canais de referência</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="URL ou nome do canal"
+                      className="bg-secondary border-border flex-1"
+                      value={channelInput}
+                      onChange={(e) => setChannelInput(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addChannel())}
+                    />
+                    <Button type="button" variant="secondary" size="icon" onClick={addChannel}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {formData.reference_channels.length > 0 && (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {formData.reference_channels.map((ch) => (
+                        <span
+                          key={ch}
+                          className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs text-foreground"
+                        >
+                          {ch}
+                          <button type="button" onClick={() => removeChannel(ch)} className="hover:text-destructive">
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Brand Fonts */}
+                <div className="space-y-2">
+                  <Label htmlFor="brand_fonts">Fontes da marca</Label>
+                  <Input
+                    id="brand_fonts"
+                    placeholder="Ex: Montserrat, Open Sans"
+                    className="bg-secondary border-border"
+                    value={formData.brand_fonts}
+                    onChange={(e) => update('brand_fonts', e.target.value)}
+                  />
+                </div>
+
+                {/* Intro Upload */}
+                <div className="space-y-2">
+                  <Label>Intro personalizada (opcional)</Label>
+                  {introFile ? (
+                    <div className="flex items-center gap-3 rounded-lg border border-border p-3">
+                      <span className="text-sm truncate flex-1">{introFile.name}</span>
+                      <Button type="button" variant="ghost" size="icon" onClick={() => setIntroFile(null)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => document.getElementById('intro-input')?.click()}
+                    >
+                      <Upload className="h-4 w-4 mr-2" /> Selecionar arquivo
+                    </Button>
+                  )}
+                  <input
+                    id="intro-input"
+                    type="file"
+                    accept="video/*,audio/*,.mov,.mp4"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) setIntroFile(f); }}
+                    className="hidden"
+                  />
+                </div>
+
+                {/* Outro Upload */}
+                <div className="space-y-2">
+                  <Label>Outro personalizado (opcional)</Label>
+                  {outroFile ? (
+                    <div className="flex items-center gap-3 rounded-lg border border-border p-3">
+                      <span className="text-sm truncate flex-1">{outroFile.name}</span>
+                      <Button type="button" variant="ghost" size="icon" onClick={() => setOutroFile(null)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => document.getElementById('outro-input')?.click()}
+                    >
+                      <Upload className="h-4 w-4 mr-2" /> Selecionar arquivo
+                    </Button>
+                  )}
+                  <input
+                    id="outro-input"
+                    type="file"
+                    accept="video/*,audio/*,.mov,.mp4"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) setOutroFile(f); }}
+                    className="hidden"
+                  />
+                </div>
+
+                {/* Additional Notes */}
+                <div className="space-y-2">
+                  <Label htmlFor="additional_notes">Notas adicionais</Label>
+                  <Textarea
+                    id="additional_notes"
+                    placeholder="Alguma observação para o editor?"
+                    className="bg-secondary border-border min-h-[80px]"
+                    value={formData.additional_notes}
+                    onChange={(e) => update('additional_notes', e.target.value)}
+                  />
+                </div>
+
+                {/* Submit */}
+                <Button
+                  onClick={handleSubmit}
+                  disabled={saving}
+                  className="w-full"
+                  size="lg"
+                >
+                  {saving ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : null}
+                  {saving ? 'Salvando...' : 'Concluir'}
+                </Button>
+              </div>
+            </>
           )}
 
           {/* Navigation */}
