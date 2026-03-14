@@ -64,25 +64,21 @@ serve(async (req) => {
     briefing,
   } = body;
 
-  // Verificar créditos antes de gerar (skip for admins)
-  let credits: any = null;
-  if (!isAdmin) {
-    const { data } = await supabaseAdmin
-      .from("studio_credits")
-      .select("credits_remaining, credits_used_month")
-      .eq("user_id", userId)
-      .single();
-    credits = data;
+  // REMOVIDO em PRD v5 — todos os usuários precisam de créditos, incluindo admin
+  const { data: credits } = await supabaseAdmin
+    .from("studio_credits")
+    .select("credits_remaining, credits_used_month")
+    .eq("user_id", userId)
+    .single();
 
-    if (!credits || (credits.credits_remaining ?? 0) <= 0) {
-      return new Response(
-        JSON.stringify({ error: "Sem créditos disponíveis" }),
-        {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
+  if (!credits || (credits.credits_remaining ?? 0) <= 0) {
+    return new Response(
+      JSON.stringify({ error: "Sem créditos disponíveis" }),
+      {
+        status: 402,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
   }
 
   // Contexto do briefing de marca
