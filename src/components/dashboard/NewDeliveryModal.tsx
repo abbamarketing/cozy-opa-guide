@@ -161,7 +161,7 @@ const NewDeliveryModal = ({
         available: project.instagram_videos - used,
       });
     }
-    if (project.include_thumbnails) {
+    if (project?.include_thumbnails) {
       const used = userProject.thumbnails_reserved + userProject.thumbnails_approved;
       result.push({
         type: 'thumbnail',
