@@ -27,3 +27,5 @@ project_id = "iqrypgqdhpanqjqnxtap"
     verify_jwt = false
   [functions.reset-studio-credits]
     verify_jwt = false
+  [functions.send-monthly-client-report]
+    verify_jwt = false
