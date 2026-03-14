@@ -12,14 +12,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import {
   Plus, Loader2, Video, CheckCircle, Clock, Eye, Pencil, Power,
-  Copy, AlertTriangle, User, BarChart3, Package,
+  Copy, AlertTriangle, User, BarChart3, Package, Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
