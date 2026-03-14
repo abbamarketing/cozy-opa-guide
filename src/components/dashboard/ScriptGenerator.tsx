@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 
-const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-script`;
+const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-script-v2`;
 const BRAINSTORM_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/brainstorm-ideas`;
 
 interface VideoIdea {
