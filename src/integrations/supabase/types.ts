@@ -890,6 +890,7 @@ export type Database = {
           assigned_at: string
           captures_approved: number
           captures_reserved: number
+          client_type: string | null
           covers_approved: number
           covers_reserved: number
           created_at: string
@@ -901,8 +902,12 @@ export type Database = {
           instagram_approved: number
           instagram_reserved: number
           payment_confirmed_at: string | null
+          priority_level: number | null
+          sla_hours: number | null
           status: Database["public"]["Enums"]["user_project_status"]
           stripe_subscription_id: string | null
+          studio_access: boolean | null
+          subscription_tier: string | null
           thumbnails_approved: number
           thumbnails_reserved: number
           tour_completed: boolean
@@ -915,6 +920,7 @@ export type Database = {
           assigned_at?: string
           captures_approved?: number
           captures_reserved?: number
+          client_type?: string | null
           covers_approved?: number
           covers_reserved?: number
           created_at?: string
@@ -926,8 +932,12 @@ export type Database = {
           instagram_approved?: number
           instagram_reserved?: number
           payment_confirmed_at?: string | null
+          priority_level?: number | null
+          sla_hours?: number | null
           status?: Database["public"]["Enums"]["user_project_status"]
           stripe_subscription_id?: string | null
+          studio_access?: boolean | null
+          subscription_tier?: string | null
           thumbnails_approved?: number
           thumbnails_reserved?: number
           tour_completed?: boolean
@@ -940,6 +950,7 @@ export type Database = {
           assigned_at?: string
           captures_approved?: number
           captures_reserved?: number
+          client_type?: string | null
           covers_approved?: number
           covers_reserved?: number
           created_at?: string
@@ -951,8 +962,12 @@ export type Database = {
           instagram_approved?: number
           instagram_reserved?: number
           payment_confirmed_at?: string | null
+          priority_level?: number | null
+          sla_hours?: number | null
           status?: Database["public"]["Enums"]["user_project_status"]
           stripe_subscription_id?: string | null
+          studio_access?: boolean | null
+          subscription_tier?: string | null
           thumbnails_approved?: number
           thumbnails_reserved?: number
           tour_completed?: boolean
