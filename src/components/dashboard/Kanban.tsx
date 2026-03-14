@@ -1,5 +1,5 @@
 import { useEffect, useState, lazy, Suspense, useCallback } from 'react';
-import { Plus, Camera, AlertCircle } from 'lucide-react';
+import { Plus, Camera, AlertCircle, Video } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -214,10 +214,17 @@ const Kanban = ({ userProject }: KanbanProps) => {
             {/* Cards */}
             <div className="space-y-2">
               {items.length === 0 ? (
-                <div className="rounded-lg glass p-8 text-center">
+                <div className="rounded-lg glass p-8 text-center space-y-3">
+                  <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
                   <p className="text-xs font-mono text-muted-foreground">
-                    Nenhuma entrega
+                    Nenhuma entrega aqui
                   </p>
+                  {activeColumn === 'todo' && canCreateDelivery && (
+                    <Button size="sm" variant="outline" onClick={handleNewClick} className="text-xs">
+                      <Plus className="h-3 w-3 mr-1" />
+                      Criar primeira entrega
+                    </Button>
+                  )}
                 </div>
               ) : (
                 items.map((d) => (
@@ -338,9 +345,16 @@ const Kanban = ({ userProject }: KanbanProps) => {
                 <ScrollArea className="flex-1">
                   <div className="space-y-2 p-0.5">
                     {items.length === 0 ? (
-                      <p className="py-8 text-center text-[10px] font-mono text-muted-foreground/50">
-                        Nenhuma entrega
-                      </p>
+                      <div className="py-8 text-center space-y-3">
+                        <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
+                        <p className="text-[10px] font-mono text-muted-foreground/50">Nenhuma entrega aqui</p>
+                        {col.id === 'todo' && canCreateDelivery && (
+                          <Button size="sm" variant="outline" onClick={handleNewClick} className="text-xs">
+                            <Plus className="h-3 w-3 mr-1" />
+                            Criar primeira entrega
+                          </Button>
+                        )}
+                      </div>
                     ) : (
                       items.map((d) => (
                         <DeliveryCard
