@@ -475,7 +475,6 @@ const EditorDashboard = () => {
   // Subscription queue: count in-progress and start production
   const inProgressSubCount = subscriptionQueue.filter((d) => d.status === 'in_progress').length;
   const canStartProduction = inProgressSubCount < 2 && subscriptionQueue.some((d) => d.status === 'queue');
-  const [startingProduction, setStartingProduction] = useState(false);
 
   const handleStartProduction = async () => {
     if (!canStartProduction) return;
