@@ -752,7 +752,7 @@ const EditorDashboard = () => {
             </div>
             <div className="space-y-2">
               {subscriptionQueue.map((item) => (
-                <SubscriptionQueueCard key={item.id} item={item} />
+                <SubscriptionQueueCard key={item.id} item={item} onClick={() => setSelectedDelivery(item as unknown as DeliveryData)} />
               ))}
             </div>
           </div>
