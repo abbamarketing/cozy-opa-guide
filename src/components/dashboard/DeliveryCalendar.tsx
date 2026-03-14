@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import {
   format,
   startOfMonth,
@@ -21,7 +21,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import DeliveryDetailModal from './DeliveryDetailModal';
+const DeliveryDetailModal = lazy(() => import('./DeliveryDetailModal'));
 import type { DeliveryData } from './DeliveryCard';
 import type { UserProjectData } from '@/hooks/useUserProject';
 
@@ -290,12 +290,14 @@ const DeliveryCalendar = ({ userProject }: DeliveryCalendarProps) => {
       </div>
 
       {/* Detail Modal */}
-      <DeliveryDetailModal
-        open={!!selectedDelivery}
-        onOpenChange={() => setSelectedDelivery(null)}
-        delivery={selectedDelivery}
-        onUpdated={fetchDeliveries}
-      />
+      <Suspense fallback={null}>
+        <DeliveryDetailModal
+          open={!!selectedDelivery}
+          onOpenChange={() => setSelectedDelivery(null)}
+          delivery={selectedDelivery}
+          onUpdated={fetchDeliveries}
+        />
+      </Suspense>
     </div>
   );
 };
