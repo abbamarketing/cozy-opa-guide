@@ -135,7 +135,7 @@ const AIChatWidget = () => {
     } finally {
       setIsStreaming(false);
     }
-  }, [input, isStreaming, messages, primaryRole, user, buildUserContext]);
+  }, [input, isStreaming, messages, primaryRole, user]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
