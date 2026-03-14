@@ -191,25 +191,57 @@ export default function Settings() {
             <CardDescription className="text-xs">Como deseja receber atualizacoes</CardDescription>
           </CardHeader>
           <CardContent className="p-4 pt-0 space-y-4">
-            <div className="flex items-center justify-between min-h-[44px]">
-              <div className="space-y-0.5">
-                <Label className="text-xs font-mono">Email</Label>
-                <p className="text-[10px] text-muted-foreground">Atualizacoes por email</p>
+            {prefsLoading ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between min-h-[44px]">
+                  <Skeleton className="h-8 w-40" />
+                  <Skeleton className="h-5 w-10 rounded-full" />
+                </div>
+                <Separator className="bg-border" />
+                <div className="flex items-center justify-between min-h-[44px]">
+                  <Skeleton className="h-8 w-40" />
+                  <Skeleton className="h-5 w-10 rounded-full" />
+                </div>
+                <Separator className="bg-border" />
+                <div className="flex items-center justify-between min-h-[44px]">
+                  <Skeleton className="h-8 w-40" />
+                  <Skeleton className="h-5 w-10 rounded-full" />
+                </div>
               </div>
-              <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
-            </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between min-h-[44px]">
+                  <div className="space-y-0.5">
+                    <Label className="text-xs font-mono">Entrega aprovada</Label>
+                    <p className="text-[10px] text-muted-foreground">Aviso quando uma entrega for aprovada</p>
+                  </div>
+                  <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
+                </div>
 
-            <Separator className="bg-border" />
+                <Separator className="bg-border" />
 
-            <div className="flex items-center justify-between min-h-[44px]">
-              <div className="space-y-0.5">
-                <Label className="text-xs font-mono">Push</Label>
-                <p className="text-[10px] text-muted-foreground">Notificacoes no navegador</p>
-              </div>
-              <Switch checked={pushNotifications} onCheckedChange={setPushNotifications} />
-            </div>
+                <div className="flex items-center justify-between min-h-[44px]">
+                  <div className="space-y-0.5">
+                    <Label className="text-xs font-mono">Revisão solicitada</Label>
+                    <p className="text-[10px] text-muted-foreground">Aviso quando pedirem revisão</p>
+                  </div>
+                  <Switch checked={pushNotifications} onCheckedChange={setPushNotifications} />
+                </div>
 
-            <Button onClick={handleUpdateNotifications} className="w-full h-10">
+                <Separator className="bg-border" />
+
+                <div className="flex items-center justify-between min-h-[44px]">
+                  <div className="space-y-0.5">
+                    <Label className="text-xs font-mono">Nova mensagem</Label>
+                    <p className="text-[10px] text-muted-foreground">Aviso de novas mensagens no chat</p>
+                  </div>
+                  <Switch checked={notifyNewMessage} onCheckedChange={setNotifyNewMessage} />
+                </div>
+              </>
+            )}
+
+            <Button onClick={handleUpdateNotifications} disabled={loading || prefsLoading} className="w-full h-10">
+              {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Salvar Preferências
             </Button>
           </CardContent>
