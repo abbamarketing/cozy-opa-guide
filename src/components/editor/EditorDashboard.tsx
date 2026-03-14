@@ -70,6 +70,13 @@ interface SubscriptionQueueItem {
   client_name: string | null;
   subscription_tier: string | null;
   sla_hours: number | null;
+  description: string | null;
+  raw_file_url: string | null;
+  raw_drive_link: string | null;
+  client_notes: string | null;
+  is_exception: boolean | null;
+  revision_count: number | null;
+  max_revisions: number | null;
 }
 
 interface Column {
