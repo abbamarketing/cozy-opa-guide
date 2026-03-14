@@ -75,7 +75,7 @@ const DeliveryChecklist = ({ userProjectId }: DeliveryChecklistProps) => {
     };
 
     fetchBriefing();
-  }, [userProjectId]);
+  }, [user, userProjectId]);
 
   const toggleItem = (id: string) => {
     setItems((prev) =>
