@@ -24,6 +24,7 @@ const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const Waiting = lazy(() => import("./pages/Waiting"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Studio = lazy(() => import("./pages/Studio"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -103,6 +104,7 @@ const App = () => (
                 <Route path="/payment" element={<PaymentGate />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/waiting" element={<Waiting />} />
+                <Route path="/studio" element={<Studio />} />
               </Route>
 
               {/* Any authenticated user */}
