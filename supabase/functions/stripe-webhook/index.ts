@@ -100,12 +100,12 @@ Deno.serve(async (req) => {
   }
 
   // ─── Subscription tier mapping ───
-  const SUBSCRIPTION_TIERS: Record<string, { tier: string; sla: number; priority: number }> = {
-    "abbavideo_standard": { tier: "standard_72h", sla: 72, priority: 1 },
-    "abbavideo_pro":      { tier: "pro_48h",      sla: 48, priority: 2 },
-    "abbavideo_business": { tier: "business", sla: 48, priority: 3 },
-    "abbavideo_premium":  { tier: "premium_8h",   sla: 8,  priority: 4 },
-    "abbavideo_agency":   { tier: "agency_4h",    sla: 4,  priority: 5 },
+  const SUBSCRIPTION_TIERS: Record<string, { tier: string; sla: number; priority: number; monthly_quota: number }> = {
+    "abbavideo_standard": { tier: "standard", sla: 72, priority: 1, monthly_quota: 4  },
+    "abbavideo_pro":      { tier: "pro",      sla: 48, priority: 2, monthly_quota: 8  },
+    "abbavideo_business": { tier: "business", sla: 48, priority: 3, monthly_quota: 16 },
+    "abbavideo_premium":  { tier: "premium",  sla: 8,  priority: 4, monthly_quota: 30 },
+    "abbavideo_agency":   { tier: "agency",   sla: 4,  priority: 5, monthly_quota: 60 },
   };
 
   try {

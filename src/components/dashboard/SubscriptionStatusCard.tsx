@@ -12,11 +12,11 @@ interface Props {
 }
 
 const TIER_LABELS: Record<string, string> = {
-  standard_72h: 'Standard',
-  pro_48h: 'Pro',
-  business_24h: 'Business',
-  premium_8h: 'Premium',
-  agency_4h: 'Agency',
+  standard: 'Standard',
+  pro:      'Pro',
+  business: 'Business',
+  premium:  'Premium',
+  agency:   'Agency',
 };
 
 interface InProgressDelivery {
