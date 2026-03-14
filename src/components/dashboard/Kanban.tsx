@@ -343,7 +343,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
       {isLoading ? (
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-          {COLUMNS.map((c) => (
+          {ALL_COLUMNS.filter(c => c.id !== 'queue' || isSubscription).map((c) => (
             <div key={c.id} className="rounded-lg border border-border/30 bg-muted/15 p-2.5 min-w-[240px] space-y-2">
               <div className="flex items-center justify-between px-1 mb-1">
                 <Skeleton className="h-3 w-20" />
