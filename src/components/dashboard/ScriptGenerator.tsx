@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 
-const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-script`;
+const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-script-v2`;
 const BRAINSTORM_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/brainstorm-ideas`;
 
 interface VideoIdea {
@@ -132,7 +132,16 @@ export default function ScriptGenerator() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ prompt: prompt.trim() }),
+        body: JSON.stringify({
+          content_type: 'short_video',
+          topic: prompt.trim(),
+          objective: 'engajamento',
+          tone: briefing?.content_style || '',
+          audience: briefing?.target_audience || '',
+          audience_level: 'intermediate',
+          reference: (briefing?.reference_channels || []).join(', '),
+          keywords: '',
+        }),
         signal: controller.signal,
       });
 
