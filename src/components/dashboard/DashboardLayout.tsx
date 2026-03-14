@@ -243,12 +243,12 @@ const DashboardLayout = () => {
 
   const navItems: NavItem[] = [
     { id: 'deliveries', label: 'Minhas Entregas', shortLabel: 'ENTREGAS', icon: Video },
-    { id: 'calendar', label: 'Calendario', shortLabel: 'AGENDA', icon: Calendar },
-    { id: 'history', label: 'Historico', shortLabel: 'HIST.', icon: CheckCircle2 },
+    { id: 'calendar', label: 'Calendário', shortLabel: 'AGENDA', icon: Calendar },
+    { id: 'history', label: 'Histórico', shortLabel: 'HIST.', icon: CheckCircle2 },
     ...(userProject?.custom_project?.include_script
       ? [{ id: 'scripts' as DashboardTab, label: 'Roteiros', shortLabel: 'ROTEIRO', icon: FileText }]
       : []),
-    { id: 'settings', label: 'Configuracoes', shortLabel: 'CONFIG', icon: Settings },
+    { id: 'settings', label: 'Configurações', shortLabel: 'CONFIG', icon: Settings },
   ];
 
   const renderContent = () => {
