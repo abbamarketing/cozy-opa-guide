@@ -44,6 +44,14 @@ export default function Settings() {
       setName(data.full_name || '');
     }
     setEmail(user?.email || '');
+
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (authUser?.user_metadata?.email_notifications !== undefined) {
+      setEmailNotifications(authUser.user_metadata.email_notifications);
+    }
+    if (authUser?.user_metadata?.push_notifications !== undefined) {
+      setPushNotifications(authUser.user_metadata.push_notifications);
+    }
   };
 
   const handleUpdateProfile = async () => {
@@ -64,7 +72,19 @@ export default function Settings() {
   };
 
   const handleUpdateNotifications = async () => {
-    toast.success('Preferencias salvas');
+    setLoading(true);
+    const { error } = await supabase.auth.updateUser({
+      data: {
+        email_notifications: emailNotifications,
+        push_notifications: pushNotifications,
+      }
+    });
+    setLoading(false);
+    if (error) {
+      toast.error('Erro ao salvar', { description: error.message });
+    } else {
+      toast.success('Preferências salvas');
+    }
   };
 
   const handleOpenStripePortal = async () => {
