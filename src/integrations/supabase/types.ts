@@ -726,6 +726,51 @@ export type Database = {
         }
         Relationships: []
       }
+      studio_scripts: {
+        Row: {
+          audience: string | null
+          audience_level: string | null
+          content_type: string | null
+          created_at: string | null
+          generated_script: string | null
+          id: string
+          keywords: string | null
+          objective: string | null
+          reference: string | null
+          tone: string | null
+          topic: string | null
+          user_id: string
+        }
+        Insert: {
+          audience?: string | null
+          audience_level?: string | null
+          content_type?: string | null
+          created_at?: string | null
+          generated_script?: string | null
+          id?: string
+          keywords?: string | null
+          objective?: string | null
+          reference?: string | null
+          tone?: string | null
+          topic?: string | null
+          user_id: string
+        }
+        Update: {
+          audience?: string | null
+          audience_level?: string | null
+          content_type?: string | null
+          created_at?: string | null
+          generated_script?: string | null
+          id?: string
+          keywords?: string | null
+          objective?: string | null
+          reference?: string | null
+          tone?: string | null
+          topic?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
