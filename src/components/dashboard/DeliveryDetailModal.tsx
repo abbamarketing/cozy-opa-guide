@@ -62,11 +62,11 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
     if (!delivery || !open) return;
     const fetchRevisions = async () => {
       const { data } = await supabase
-        .from('delivery_revisions' as any)
+        .from('delivery_revisions')
         .select('*')
         .eq('delivery_id', delivery.id)
         .order('created_at', { ascending: false });
-      if (data) setRevisions(data as any);
+      if (data) setRevisions(data);
     };
     fetchRevisions();
   }, [delivery, open]);
