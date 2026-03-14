@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '@/lib/auth'
 import { useRole } from '@/hooks/useRole'
+import { Loader2 } from 'lucide-react'
 
 type ProtectedRouteProps = {
   requireRole?: 'admin' | 'editor' | 'client'
