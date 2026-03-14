@@ -204,6 +204,7 @@ Deno.serve(async (req) => {
                 subscription_tier: tier,
                 sla_hours: sla,
                 priority_level: priority,
+                monthly_quota: monthly_quota,
                 studio_access: true,
                 subscription_slug: slug,
                 payment_confirmed_at: now,
