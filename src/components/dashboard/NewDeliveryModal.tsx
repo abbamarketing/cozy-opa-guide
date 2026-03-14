@@ -126,7 +126,7 @@ const NewDeliveryModal = ({
 
     if (isSubscription) {
       const used = userProject.instagram_reserved + userProject.instagram_approved;
-      const total = project.instagram_videos;
+      const total = (userProject as any).monthly_quota ?? (project?.instagram_videos ?? 0);
       return [{
         type: 'instagram_video' as DeliveryType,
         label: 'Reels / Shorts / TikToks',
