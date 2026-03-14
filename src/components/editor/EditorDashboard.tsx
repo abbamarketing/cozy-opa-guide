@@ -637,6 +637,25 @@ const EditorDashboard = () => {
           </div>
         </div>
 
+        {/* Subscription Queue - Mobile */}
+        {subscriptionQueue.length > 0 && (
+          <div className="px-4 pt-3">
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Fila de Produção
+              </h2>
+              <Badge variant="secondary" className="text-[10px]">
+                {subscriptionQueue.length}
+              </Badge>
+            </div>
+            <div className="space-y-2">
+              {subscriptionQueue.map((item) => (
+                <SubscriptionQueueCard key={item.id} item={item} />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Cards */}
         <main className="flex-1 px-4 py-3">
           {isLoading ? (
