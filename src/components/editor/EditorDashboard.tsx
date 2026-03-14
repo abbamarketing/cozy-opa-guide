@@ -323,7 +323,7 @@ const EditorDashboard = () => {
       .select(`
         id, title, delivery_type, status, created_at, due_date, priority_level,
         user_project:user_projects!inner(
-          user_id, client_type, subscription_tier, priority_level
+          user_id, client_type, subscription_tier, priority_level, sla_hours
         )
       `)
       .eq('editor_id', editor.id)
