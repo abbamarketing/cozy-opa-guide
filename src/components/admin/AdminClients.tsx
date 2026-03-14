@@ -48,6 +48,8 @@ const STATUS_MAP: Record<string, { label: string; variant: 'default' | 'secondar
   cancelled: { label: 'Cancelado', variant: 'secondary' },
 };
 
+const PAGE_SIZE = 20;
+
 const AdminClients = () => {
   const isMobile = useIsMobile();
   const [clients, setClients] = useState<ClientRow[]>([]);
@@ -55,6 +57,8 @@ const AdminClients = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
   const [confirmAction, setConfirmAction] = useState<{
     type: 'suspend' | 'activate' | 'delete' | null;
     userId: string | null;
@@ -82,10 +86,14 @@ const AdminClients = () => {
 
     if (userIds.length === 0) { setClients([]); setLoading(false); return; }
 
-    const { data: profiles } = await supabase
+    const { data: profiles, count: profilesCount } = await supabase
       .from('profiles')
-      .select('user_id, full_name, avatar_url, created_at')
-      .in('user_id', userIds);
+      .select('user_id, full_name, avatar_url, created_at', { count: 'exact' })
+      .in('user_id', userIds)
+      .order('created_at', { ascending: false })
+      .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+
+    setTotalCount(profilesCount || 0);
 
     const { data: userProjects } = await supabase
       .from('user_projects')
@@ -119,7 +127,7 @@ const AdminClients = () => {
     setLoading(false);
   };
 
-  useEffect(() => { fetchClients(); }, []);
+  useEffect(() => { fetchClients(); }, [page]);
 
   const debouncedSearch = useDebouncedValue(search, 300);
 
@@ -433,6 +441,33 @@ const AdminClients = () => {
             </TableBody>
           </Table>
         </Card>
+      )}
+
+      {/* Pagination */}
+      {totalCount > PAGE_SIZE && (
+        <div className="flex items-center justify-center gap-3 pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+          >
+            Anterior
+          </Button>
+          <span className="text-xs text-muted-foreground">
+            Página {page + 1} de {Math.ceil(totalCount / PAGE_SIZE)}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => setPage((p) => p + 1)}
+            disabled={(page + 1) * PAGE_SIZE >= totalCount}
+          >
+            Próxima
+          </Button>
+        </div>
       )}
     </div>
   );
