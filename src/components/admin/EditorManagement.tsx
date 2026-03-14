@@ -286,6 +286,7 @@ const EditorManagement = () => {
     setConfirmRemoveEditor(null);
     setRemoving(false);
     fetchEditors();
+  };
 
   /* ─── View Details ─── */
   const openDetails = async (editor: EditorData) => {
