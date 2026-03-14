@@ -27,6 +27,7 @@ export function getCorsHeaders(req: Request, extraHeaders?: string): Record<stri
 
   return {
     "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": extraHeaders
       ? `${BASE_HEADERS}, ${extraHeaders}`
       : BASE_HEADERS,
