@@ -127,7 +127,13 @@ const AdminOverview = () => {
     { label: 'Clientes Ativos', value: kpis?.activeClients || 0, icon: Users, color: 'text-primary' },
     { label: 'Entregas Pendentes', value: kpis?.pendingDeliveries || 0, icon: Package, color: 'text-[hsl(45,93%,47%)]' },
     { label: 'Entregas Atrasadas', value: kpis?.lateDeliveries || 0, icon: AlertTriangle, color: 'text-destructive' },
-    { label: 'MRR', value: `R$ ${(kpis?.mrr || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, icon: DollarSign, color: 'text-primary' },
+    {
+      label: 'MRR',
+      value: `R$ ${(kpis?.mrr || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`,
+      subtitle: `Custom: R$ ${(kpis?.customMRR || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })} · Assin: R$ ${(kpis?.subscriptionMRR || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`,
+      icon: DollarSign,
+      color: 'text-primary',
+    },
   ];
 
   return (
