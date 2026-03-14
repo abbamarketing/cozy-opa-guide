@@ -180,9 +180,18 @@ const Kanban = ({ userProject }: KanbanProps) => {
         {/* Column Tabs */}
         {isLoading ? (
           <div className="space-y-3">
-            <Skeleton className="h-10 w-full rounded-lg" />
-            <Skeleton className="h-24 w-full rounded-lg" />
-            <Skeleton className="h-24 w-full rounded-lg" />
+            <div className="flex gap-1 bg-secondary/50 rounded-lg p-1">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="flex-1 h-8 rounded-md" />
+              ))}
+            </div>
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="rounded-lg border border-border/20 bg-card/50 p-3 space-y-2">
+                <Skeleton className="h-3.5 w-3/4" />
+                <Skeleton className="h-2.5 w-1/2" />
+                <Skeleton className="h-2.5 w-1/3" />
+              </div>
+            ))}
           </div>
         ) : (
           <>
