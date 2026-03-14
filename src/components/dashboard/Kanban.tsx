@@ -301,7 +301,12 @@ const Kanban = ({ userProject }: KanbanProps) => {
       {isLoading ? (
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
           {COLUMNS.map((c) => (
-            <Skeleton key={c.id} className="h-64 rounded-lg" />
+            <div key={c.id} className="rounded-lg border border-border bg-muted/30 p-2 min-w-[240px]">
+              <Skeleton className="h-4 w-24 mb-3 ml-1" />
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-20 w-full rounded-lg mb-2" />
+              ))}
+            </div>
           ))}
         </div>
       ) : (
