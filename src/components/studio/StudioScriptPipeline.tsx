@@ -312,6 +312,16 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
                 Gerar novo roteiro
               </Button>
             </div>
+
+            {/* Upsell 3 — após roteiro gerado */}
+            {userProject?.client_type === 'studio' && generatedScript && (
+              <p className="text-sm text-muted-foreground pt-2">
+                Roteiro pronto. Agora é só gravar e enviar para edição.{' '}
+                <Link to="/plans" className="text-primary font-medium hover:underline">
+                  Contratar edição a partir de R$490/mês →
+                </Link>
+              </p>
+            )}
           </CardContent>
         </Card>
 
