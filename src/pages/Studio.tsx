@@ -77,7 +77,7 @@ const Studio = () => {
         >
           ← Voltar ao Studio
         </Button>
-        <StudioScriptPipeline />
+        <StudioScriptPipeline onCreditsChanged={fetchCredits} />
       </div>
     );
   }
