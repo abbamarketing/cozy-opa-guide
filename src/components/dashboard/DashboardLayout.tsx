@@ -4,6 +4,7 @@ import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
 import DeliveryHistory from '@/components/dashboard/DeliveryHistory';
 import ScriptGenerator from '@/components/dashboard/ScriptGenerator';
+import BrandProfile from '@/components/dashboard/BrandProfile';
 import SettingsComponent from '@/components/dashboard/Settings';
 import NotificationBell from '@/components/shared/NotificationBell';
 import ContextualTour, { restartTour } from '@/components/dashboard/ContextualTour';
@@ -16,6 +17,7 @@ import {
   CheckCircle2,
   FileText,
   Settings,
+  Palette,
   LogOut,
   ChevronDown,
 } from 'lucide-react';
@@ -46,7 +48,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import QuotaCard from '@/components/dashboard/QuotaCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-type DashboardTab = 'deliveries' | 'calendar' | 'history' | 'scripts' | 'settings';
+type DashboardTab = 'deliveries' | 'calendar' | 'history' | 'scripts' | 'brand' | 'settings';
 
 interface NavItem {
   id: DashboardTab;
@@ -248,6 +250,7 @@ const DashboardLayout = () => {
     ...(userProject?.custom_project?.include_script
       ? [{ id: 'scripts' as DashboardTab, label: 'Roteiros', shortLabel: 'ROTEIRO', icon: FileText }]
       : []),
+    { id: 'brand', label: 'Minha Marca', shortLabel: 'MARCA', icon: Palette },
     { id: 'settings', label: 'Configurações', shortLabel: 'CONFIG', icon: Settings },
   ];
 
@@ -275,6 +278,8 @@ const DashboardLayout = () => {
         return <DeliveryHistory />;
       case 'scripts':
         return <ScriptGenerator />;
+      case 'brand':
+        return <BrandProfile />;
       case 'settings':
         return <SettingsComponent />;
       default:
