@@ -219,7 +219,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
                   <p className="text-xs font-mono text-muted-foreground">
                     Nenhuma entrega aqui
                   </p>
-                  {col.id === 'todo' && canCreateDelivery && (
+                  {activeColumn === 'todo' && canCreateDelivery && (
                     <Button size="sm" variant="outline" onClick={handleNewClick} className="text-xs">
                       <Plus className="h-3 w-3 mr-1" />
                       Criar primeira entrega
