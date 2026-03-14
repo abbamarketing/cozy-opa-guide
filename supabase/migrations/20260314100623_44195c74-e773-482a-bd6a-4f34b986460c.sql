@@ -1,0 +1,1 @@
+ALTER TABLE deliveries ADD COLUMN IF NOT EXISTS sla_deadline timestamptz DEFAULT null;

@@ -173,6 +173,7 @@ export type Database = {
           raw_file_url: string | null
           revision_count: number
           revision_notes: string | null
+          sla_deadline: string | null
           status: Database["public"]["Enums"]["delivery_status"]
           thumbnail_url: string | null
           title: string
@@ -199,6 +200,7 @@ export type Database = {
           raw_file_url?: string | null
           revision_count?: number
           revision_notes?: string | null
+          sla_deadline?: string | null
           status?: Database["public"]["Enums"]["delivery_status"]
           thumbnail_url?: string | null
           title: string
@@ -225,6 +227,7 @@ export type Database = {
           raw_file_url?: string | null
           revision_count?: number
           revision_notes?: string | null
+          sla_deadline?: string | null
           status?: Database["public"]["Enums"]["delivery_status"]
           thumbnail_url?: string | null
           title?: string

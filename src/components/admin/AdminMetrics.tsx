@@ -8,7 +8,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, BarChart, Bar,
 } from 'recharts';
-import { DollarSign, Users, Video, Clock, TrendingUp, TrendingDown, Download } from 'lucide-react';
+import { DollarSign, Users, Video, Clock, TrendingUp, TrendingDown, Download, AlertTriangle, ShieldAlert, CheckCircle, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { downloadCSV } from '@/lib/csv';
 
@@ -30,6 +30,36 @@ const AdminMetrics = () => {
   const [typeDistribution, setTypeDistribution] = useState<{ name: string; value: number }[]>([]);
   const [revisionData, setRevisionData] = useState<{ label: string; count: number }[]>([]);
   const [kpis, setKpis] = useState<KPI[]>([]);
+  const [slaRisk, setSlaRisk] = useState<number>(0);
+  const [slaBreached, setSlaBreached] = useState<number>(0);
+  const [slaRate, setSlaRate] = useState<number | null>(null);
+  const [editorRanking, setEditorRanking] = useState<[string, number][]>([]);
+
+  // Real-time SLA polling every 60s
+  useEffect(() => {
+    const fetchSla = async () => {
+      const { count: risk } = await supabase
+        .from('deliveries')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'in_progress')
+        .not('sla_deadline', 'is', null)
+        .lt('sla_deadline', new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString());
+
+      const { count: breached } = await supabase
+        .from('deliveries')
+        .select('*', { count: 'exact', head: true })
+        .in('status', ['in_progress', 'revision', 'queue'])
+        .not('sla_deadline', 'is', null)
+        .lt('sla_deadline', new Date().toISOString());
+
+      setSlaRisk(risk ?? 0);
+      setSlaBreached(breached ?? 0);
+    };
+
+    fetchSla();
+    const interval = setInterval(fetchSla, 60_000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -74,7 +104,7 @@ const AdminMetrics = () => {
 
       const { data: deliveries } = await supabase
         .from('deliveries')
-        .select('delivery_type, revision_count, status, due_date, delivered_at');
+        .select('delivery_type, revision_count, status, due_date, delivered_at, created_at, sla_deadline, approved_at, editor_id');
 
       const typeCounts: Record<string, number> = {};
       const typeLabels: Record<string, string> = {
@@ -97,6 +127,46 @@ const AdminMetrics = () => {
       });
       setRevisionData(Object.entries(revCounts).map(([label, count]) => ({ label, count })));
 
+      // ── Correção: tempo médio baseado em created_at → delivered_at ──
+      const completedDeliveries = (deliveries || []).filter((d: any) => d.delivered_at && d.created_at);
+      let avgHours = 0;
+      if (completedDeliveries.length > 0) {
+        const avgTime = completedDeliveries.reduce((acc: number, d: any) => {
+          return acc + (new Date(d.delivered_at).getTime() - new Date(d.created_at).getTime());
+        }, 0) / completedDeliveries.length;
+        avgHours = Math.round(avgTime / (1000 * 60 * 60));
+      }
+
+      // ── Taxa de SLA cumprido (mês atual) ──
+      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      const approvedMonth = (deliveries || []).filter((d: any) =>
+        d.status === 'approved' && d.approved_at && new Date(d.approved_at) >= monthStart
+      );
+      const onTime = approvedMonth.filter((d: any) =>
+        d.approved_at && d.sla_deadline &&
+        new Date(d.approved_at) <= new Date(d.sla_deadline)
+      ).length;
+      const rate = approvedMonth.length > 0
+        ? Math.round((onTime / approvedMonth.length) * 100)
+        : null;
+      setSlaRate(rate);
+
+      // ── Ranking de entregas por editor (mês atual) ──
+      const { data: byEditor } = await supabase
+        .from('deliveries')
+        .select('editor_id, editors!inner(display_name)')
+        .eq('status', 'approved')
+        .gte('approved_at', monthStart.toISOString());
+
+      const ranking = Object.entries(
+        (byEditor ?? []).reduce((acc: Record<string, number>, d: any) => {
+          const name = d.editors?.display_name ?? d.editor_id ?? 'desconhecido';
+          acc[name] = (acc[name] ?? 0) + 1;
+          return acc;
+        }, {})
+      ).sort(([, a], [, b]) => (b as number) - (a as number)) as [string, number][];
+      setEditorRanking(ranking);
+
       // Build KPIs
       const currentMrr = mrrMonthly[mrrMonthly.length - 1]?.mrr || 0;
       const prevMrr = mrrMonthly[mrrMonthly.length - 2]?.mrr || 0;
@@ -109,17 +179,6 @@ const AdminMetrics = () => {
         const created = new Date(d.due_date || '');
         return created >= months[months.length - 1].start;
       }).length;
-
-      // Avg delivery time (completed ones)
-      const completed = (deliveries || []).filter((d: any) => d.delivered_at && d.due_date);
-      let avgHours = 0;
-      if (completed.length > 0) {
-        const totalHours = completed.reduce((sum: number, d: any) => {
-          const diff = (new Date(d.delivered_at).getTime() - new Date(d.due_date).getTime()) / (1000 * 60 * 60);
-          return sum + Math.abs(diff);
-        }, 0);
-        avgHours = Math.round(totalHours / completed.length);
-      }
 
       setKpis([
         {
@@ -149,7 +208,7 @@ const AdminMetrics = () => {
         {
           title: 'Tempo Médio',
           value: `${avgHours}h`,
-          change: completed.length > 0 ? `${completed.length} entregas` : 'N/A',
+          change: completedDeliveries.length > 0 ? `${completedDeliveries.length} entregas` : 'N/A',
           trend: 'down',
           icon: Clock,
           color: 'text-primary',
@@ -197,6 +256,38 @@ const AdminMetrics = () => {
           <Download className="h-3.5 w-3.5" />
           Exportar Métricas CSV
         </Button>
+      </div>
+
+      {/* SLA Alert Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <Card className="border-yellow-500/40 bg-yellow-500/5 p-4 space-y-1">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-yellow-500" />
+            <span className="text-xs font-medium text-yellow-500">SLA em Risco</span>
+          </div>
+          <p className="text-2xl font-bold text-card-foreground">{slaRisk}</p>
+          <p className="text-xs text-muted-foreground">Deadline em menos de 4h</p>
+        </Card>
+
+        <Card className="border-destructive/40 bg-destructive/5 p-4 space-y-1">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="h-4 w-4 text-destructive" />
+            <span className="text-xs font-medium text-destructive">SLA Estourado</span>
+          </div>
+          <p className="text-2xl font-bold text-card-foreground">{slaBreached}</p>
+          <p className="text-xs text-muted-foreground">Deadline ultrapassado</p>
+        </Card>
+
+        <Card className="border-primary/40 bg-primary/5 p-4 space-y-1">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-primary" />
+            <span className="text-xs font-medium text-primary">Taxa de SLA — Mês Atual</span>
+          </div>
+          <p className="text-2xl font-bold text-card-foreground">
+            {slaRate !== null ? `${slaRate}%` : 'N/A'}
+          </p>
+          <p className="text-xs text-muted-foreground">Entregas dentro do prazo</p>
+        </Card>
       </div>
 
       {/* KPI Cards */}
@@ -299,6 +390,27 @@ const AdminMetrics = () => {
           </ResponsiveContainer>
         </Card>
       </div>
+
+      {/* Editor Ranking */}
+      {editorRanking.length > 0 && (
+        <Card className="glass border-border/40 p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Trophy className="h-4 w-4 text-yellow-500" />
+            <h3 className="text-sm font-semibold text-card-foreground">Entregas por Editor — Mês Atual</h3>
+          </div>
+          <div className="space-y-2">
+            {editorRanking.map(([name, count], i) => (
+              <div key={name} className="flex items-center justify-between py-2 px-3 rounded-lg bg-muted/30">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-bold text-muted-foreground w-6">{i + 1}º</span>
+                  <span className="text-sm text-card-foreground">{name}</span>
+                </div>
+                <span className="text-sm font-semibold text-primary">{count} {count === 1 ? 'entrega' : 'entregas'}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
     </div>
   );
 };
