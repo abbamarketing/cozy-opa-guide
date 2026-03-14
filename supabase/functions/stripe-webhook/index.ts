@@ -51,6 +51,7 @@ async function verifyStripeSignature(
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req, "stripe-signature");
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
