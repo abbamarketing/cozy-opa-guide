@@ -101,6 +101,7 @@ const NewDeliveryModal = ({
   const [exceptionNotes, setExceptionNotes] = useState('');
 
   const project = userProject.custom_project;
+  const isSubscription = userProject.client_type === 'subscription';
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
