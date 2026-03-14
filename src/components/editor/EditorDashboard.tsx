@@ -312,22 +312,72 @@ const EditorDashboard = () => {
 
   const activeFilterCount = [clientFilter !== 'all', typeFilter !== 'all', lateOnly].filter(Boolean).length;
 
-  const fetchDeliveries = useCallback(async () => {
+  const fetchSubscriptionQueue = useCallback(async () => {
     if (!editor) return;
-    setIsLoading(true);
 
     const { data, error } = await supabase
       .from('deliveries')
       .select(`
-        *,
+        id, title, delivery_type, status, created_at, due_date, priority_level,
         user_project:user_projects!inner(
-          user_id,
-          custom_project_id,
-          custom_project:custom_projects(project_name)
+          user_id, client_type, subscription_tier, priority_level
         )
       `)
       .eq('editor_id', editor.id)
-      .order('due_date', { ascending: true });
+      .in('status', ['queue', 'in_progress'])
+      .order('priority_level', { ascending: false })
+      .order('created_at', { ascending: true });
+
+    if (!error && data) {
+      // Filter to subscription client_type only
+      const subItems = (data as any[]).filter((d) => d.user_project?.client_type === 'subscription');
+      const userIds = [...new Set(subItems.map((d) => d.user_project?.user_id).filter(Boolean))];
+
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name')
+        .in('user_id', userIds);
+
+      const profileMap = new Map((profiles || []).map((p: any) => [p.user_id, p]));
+
+      setSubscriptionQueue(
+        subItems.map((d) => ({
+          id: d.id,
+          title: d.title,
+          delivery_type: d.delivery_type,
+          status: d.status,
+          created_at: d.created_at,
+          due_date: d.due_date,
+          priority_level: d.priority_level ?? d.user_project?.priority_level ?? 1,
+          client_name: profileMap.get(d.user_project?.user_id)?.full_name || null,
+          subscription_tier: d.user_project?.subscription_tier || null,
+        }))
+      );
+    }
+  }, [editor]);
+
+  const fetchDeliveries = useCallback(async () => {
+    if (!editor) return;
+    setIsLoading(true);
+
+    // Fetch both in parallel
+    const [, deliveriesResult] = await Promise.all([
+      fetchSubscriptionQueue(),
+      supabase
+        .from('deliveries')
+        .select(`
+          *,
+          user_project:user_projects!inner(
+            user_id,
+            custom_project_id,
+            custom_project:custom_projects(project_name)
+          )
+        `)
+        .eq('editor_id', editor.id)
+        .order('due_date', { ascending: true }),
+    ]);
+
+    const { data, error } = deliveriesResult;
 
     if (!error && data) {
       const userIds = [...new Set(data.map((d: any) => d.user_project?.user_id).filter(Boolean))];
@@ -381,7 +431,7 @@ const EditorDashboard = () => {
       );
     }
     setIsLoading(false);
-  }, [editor]);
+  }, [editor, fetchSubscriptionQueue]);
 
   useEffect(() => {
     if (editor) fetchDeliveries();
