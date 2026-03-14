@@ -12,7 +12,7 @@ interface ClientGuardProps {
 
 /**
  * Enforces the client journey order: Waiting → Payment → Onboarding → Dashboard.
- * Admins bypass all guards to access any client page freely.
+ * REMOVIDO em PRD v5 — admin não bypassa mais a jornada do cliente.
  */
 export default function ClientGuard({ children, requireStep }: ClientGuardProps) {
   const { userProject, isLoading: projectLoading } = useUserProject();
