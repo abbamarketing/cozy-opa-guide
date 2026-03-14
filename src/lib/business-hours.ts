@@ -157,3 +157,52 @@ export function formatBusinessCountdown(businessMinutes: number): string {
   }
   return `${sign}${absMin}m`;
 }
+
+/**
+ * Calcula a data de deadline contando horas úteis (seg-sex, 24h/dia).
+ * O relógio para totalmente no sábado meia-noite e retoma na segunda meia-noite.
+ * Uso exclusivo para clientes de assinatura (subscription).
+ *
+ * @param startDate - Data/hora de início (quando a entrega foi criada)
+ * @param slaHours - Número de horas úteis do SLA (72, 48, 24, 8 ou 4)
+ * @returns Data/hora do deadline
+ */
+export function countWeekdayHours(startDate: Date, slaHours: number): Date {
+  let remaining = slaHours;
+  const current = new Date(startDate);
+
+  while (remaining > 0) {
+    const dayOfWeek = current.getDay(); // 0=dom, 1=seg, ..., 6=sab
+
+    // Pular fim de semana: avançar para segunda-feira meia-noite
+    if (dayOfWeek === 0) {
+      // Domingo: avançar 24h (para segunda)
+      current.setHours(current.getHours() + 24);
+      continue;
+    }
+    if (dayOfWeek === 6) {
+      // Sábado: calcular horas até meia-noite e avançar para segunda
+      const hoursUntilMidnight = 24 - current.getHours();
+      current.setHours(current.getHours() + hoursUntilMidnight + 24); // sab->dom->seg meia-noite
+      continue;
+    }
+
+    // É dia útil (seg-sex): verificar se chegamos no sábado antes de esgotar o SLA
+    const currentHour = current.getHours();
+    const hoursUntilWeekend = dayOfWeek === 5
+      ? (24 - currentHour) // sexta: horas até meia-noite
+      : (24 * (5 - dayOfWeek)) + (24 - currentHour); // horas até sexta meia-noite
+
+    if (remaining <= hoursUntilWeekend) {
+      current.setHours(current.getHours() + remaining);
+      remaining = 0;
+    } else {
+      // Consumir até o fim da sexta e pular o fim de semana
+      remaining -= hoursUntilWeekend;
+      const hoursToMonday = hoursUntilWeekend + 48; // sexta->sab->dom->seg
+      current.setHours(current.getHours() + hoursToMonday);
+    }
+  }
+
+  return current;
+}
