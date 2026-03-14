@@ -147,12 +147,51 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
     }
   };
 
-  // Final submit (Step 3 — placeholder for now, will be implemented in future prompt)
+  const uploadMediaFile = async (file: File, folder: string): Promise<string | null> => {
+    if (!user) return null;
+    const ext = file.name.split('.').pop();
+    const path = `${user.id}/${folder}-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from('brand-logos').upload(path, file);
+    if (error) {
+      toast.error(`Erro ao enviar ${folder}`, { description: error.message });
+      return null;
+    }
+    const { data } = supabase.storage.from('brand-logos').getPublicUrl(path);
+    return data.publicUrl;
+  };
+
+  const addChannel = () => {
+    const val = channelInput.trim();
+    if (!val) return;
+    if (formData.reference_channels.includes(val)) {
+      toast.error('Canal já adicionado');
+      return;
+    }
+    update('reference_channels', [...formData.reference_channels, val]);
+    setChannelInput('');
+  };
+
+  const removeChannel = (ch: string) => {
+    update('reference_channels', formData.reference_channels.filter((c) => c !== ch));
+  };
+
   const handleSubmit = async () => {
     if (!user) return;
     setSaving(true);
 
-    const { error } = await supabase.from('onboarding_briefings').insert({
+    // Upload intro/outro if present
+    let introUrl = formData.intro_url;
+    let outroUrl = formData.outro_url;
+    if (introFile) {
+      introUrl = await uploadMediaFile(introFile, 'intro');
+      if (!introUrl) { setSaving(false); return; }
+    }
+    if (outroFile) {
+      outroUrl = await uploadMediaFile(outroFile, 'outro');
+      if (!outroUrl) { setSaving(false); return; }
+    }
+
+    const { error } = await supabase.from('onboarding_briefings').upsert({
       user_id: user.id,
       brand_name: formData.brand_name,
       primary_color: formData.primary_color,
@@ -170,9 +209,12 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
       use_icons: formData.use_icons,
       additional_notes: formData.additional_notes || null,
       brand_colors: [formData.primary_color, formData.secondary_color],
+      brand_fonts: formData.brand_fonts ? [formData.brand_fonts] : null,
+      intro_url: introUrl,
+      outro_url: outroUrl,
       completed: true,
       completed_at: new Date().toISOString(),
-    } as any);
+    } as any, { onConflict: 'user_id' });
 
     if (error) {
       toast.error('Erro ao salvar briefing', { description: error.message });
