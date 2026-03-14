@@ -33,6 +33,10 @@ import SubtaskTemplateEditor, { type SubtaskTemplate } from './SubtaskTemplateEd
 const projectSchema = z.object({
   project_name: z.string().trim().min(1, 'Nome é obrigatório').max(100),
   description: z.string().max(500).optional().or(z.literal('')),
+  custom_slug: z.string().max(60).optional().or(z.literal('')).refine(
+    (v) => !v || /^[a-z0-9-]+$/.test(v),
+    { message: 'Apenas letras minúsculas, números e hifens (a-z, 0-9, -)' }
+  ),
   youtube_videos: z.number().min(0).max(30),
   instagram_videos: z.number().min(0).max(30),
   include_thumbnails: z.boolean(),
