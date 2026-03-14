@@ -119,7 +119,7 @@ const DashboardHeader = () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-44">
             <DropdownMenuItem onClick={() => navigate('/dashboard?tab=settings')}>
-              <Settings className="mr-2 h-4 w-4" /> Configuracoes
+              <Settings className="mr-2 h-4 w-4" /> Configurações
             </DropdownMenuItem>
             <DropdownMenuItem onClick={signOut} className="text-destructive">
               <LogOut className="mr-2 h-4 w-4" /> Sair
