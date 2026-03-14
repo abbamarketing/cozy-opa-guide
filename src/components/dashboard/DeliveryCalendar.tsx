@@ -21,7 +21,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import DeliveryDetailModal from './DeliveryDetailModal';
+const DeliveryDetailModal = lazy(() => import('./DeliveryDetailModal'));
 import type { DeliveryData } from './DeliveryCard';
 import type { UserProjectData } from '@/hooks/useUserProject';
 
