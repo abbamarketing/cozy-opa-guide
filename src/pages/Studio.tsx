@@ -14,10 +14,13 @@ import { Input } from "@/components/ui/input";
 import { FileText, Camera, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { useRole } from "@/hooks/useRole";
 import { toast } from "sonner";
 
 const Studio = () => {
   const { user } = useAuth();
+  const { hasRole } = useRole();
+  const isAdmin = hasRole('admin');
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [showPipeline, setShowPipeline] = useState(false);
@@ -27,6 +30,11 @@ const Studio = () => {
 
   const fetchCredits = async () => {
     if (!user) return;
+    if (isAdmin) {
+      setCredits(Infinity);
+      setLoading(false);
+      return;
+    }
     const { data } = await supabase
       .from("studio_credits")
       .select("credits_remaining")
