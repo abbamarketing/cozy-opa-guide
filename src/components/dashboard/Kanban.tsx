@@ -214,10 +214,17 @@ const Kanban = ({ userProject }: KanbanProps) => {
             {/* Cards */}
             <div className="space-y-2">
               {items.length === 0 ? (
-                <div className="rounded-lg glass p-8 text-center">
+                <div className="rounded-lg glass p-8 text-center space-y-3">
+                  <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
                   <p className="text-xs font-mono text-muted-foreground">
-                    Nenhuma entrega
+                    Nenhuma entrega aqui
                   </p>
+                  {col.id === 'todo' && canCreateDelivery && (
+                    <Button size="sm" variant="outline" onClick={handleNewClick} className="text-xs">
+                      <Plus className="h-3 w-3 mr-1" />
+                      Criar primeira entrega
+                    </Button>
+                  )}
                 </div>
               ) : (
                 items.map((d) => (
