@@ -1,7 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
-const personality = `Você é a Olívia, assistente virtual da plataforma de edição de vídeo. Você é esperta, inteligente e bem-humorada — inspirada no espírito da banda ABBA: otimista, elegante e com um toque de diversão.
+const personality = `Você é a Olívia, assistente virtual da plataforma de edição de vídeo AbbaVideo. Você é esperta, inteligente e bem-humorada — inspirada no espírito da banda ABBA: otimista, elegante e com um toque de diversão.
 
 Regras de personalidade:
 - Sempre se apresente como "Olívia" quando perguntarem seu nome
@@ -29,7 +30,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, role, userContext } = await req.json();
+    const { messages, role } = await req.json();
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(
@@ -43,19 +44,79 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const userRole = (role && roleContexts[role]) ? role : "client";
+    // --- Authenticate user ---
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    let contextBlock = "";
-    if (userContext && typeof userContext === "object") {
-      contextBlock = `\n\nDados atuais do usuário (use para responder perguntas sobre conta, créditos, entregas):
-- Plano: ${userContext.plan || "desconhecido"}
-- Créditos Studio restantes: ${userContext.studioCredits ?? "N/A"}
-- Renovação de créditos em: ${userContext.creditRenewal || "N/A"}
-- Entregas na fila: ${userContext.queueCount ?? 0}
-- Em produção: ${userContext.inProduction || "nenhum"}`;
+    const supabaseUser = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: req.headers.get("Authorization")! } },
+    });
+    const { data: { user } } = await supabaseUser.auth.getUser();
+    if (!user) {
+      return new Response(
+        JSON.stringify({ error: "Não autenticado" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    const userId = user.id;
+
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+    // --- Fetch real context ---
+    const [profileRes, userProjectRes, briefingRes] = await Promise.all([
+      supabaseAdmin.from("profiles").select("full_name").eq("user_id", userId).maybeSingle(),
+      supabaseAdmin.from("user_projects").select("id, client_type, subscription_tier, status").eq("user_id", userId).eq("status", "active").limit(1).maybeSingle(),
+      supabaseAdmin.from("onboarding_briefings").select("brand_name, target_audience, content_style").eq("user_id", userId).maybeSingle(),
+    ]);
+
+    const profile = profileRes.data;
+    const userProject = userProjectRes.data;
+    const briefing = briefingRes.data;
+
+    let recentDeliveries: { title: string; status: string; due_date: string | null }[] = [];
+    if (userProject?.id) {
+      const { data } = await supabaseAdmin
+        .from("deliveries")
+        .select("title, status, due_date")
+        .eq("user_project_id", userProject.id)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      recentDeliveries = data || [];
     }
 
-    const systemPrompt = `${personality}\n\nContexto do usuário:\n${roleContexts[userRole]}${contextBlock}`;
+    const planLabel = userProject?.client_type === "subscription"
+      ? `Assinatura ${userProject.subscription_tier || ""}`
+      : userProject?.client_type === "custom"
+      ? "Projeto Customizado"
+      : userProject?.client_type === "studio"
+      ? "Studio"
+      : "sem plano ativo";
+
+    const deliveriesText = recentDeliveries.length
+      ? recentDeliveries.map(d => `- ${d.title}: ${d.status} (prazo: ${d.due_date || "não definido"})`).join("\n")
+      : "Nenhuma entrega recente.";
+
+    const userRole = (role && roleContexts[role]) ? role : "client";
+
+    const systemPrompt = `${personality}
+
+Contexto da role: ${roleContexts[userRole]}
+
+Você está conversando com ${profile?.full_name || "o cliente"}.
+
+CONTEXTO DO CLIENTE:
+- Marca: ${briefing?.brand_name || "não informado"}
+- Estilo de conteúdo: ${briefing?.content_style || "não informado"}
+- Público-alvo: ${briefing?.target_audience || "não informado"}
+- Plano: ${planLabel}
+
+ENTREGAS RECENTES:
+${deliveriesText}
+
+REGRAS ADICIONAIS:
+- Responda sempre em português brasileiro
+- Se o cliente perguntar sobre prazos, use as informações reais das entregas acima
+- Não invente informações que não estão no contexto`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
