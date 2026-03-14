@@ -894,6 +894,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_preferences: {
+        Row: {
+          notify_delivery_approved: boolean
+          notify_delivery_revision: boolean
+          notify_new_message: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          notify_delivery_approved?: boolean
+          notify_delivery_revision?: boolean
+          notify_new_message?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          notify_delivery_approved?: boolean
+          notify_delivery_revision?: boolean
+          notify_new_message?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_projects: {
         Row: {
           assigned_at: string
