@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { User, Bell, CreditCard, Palette, Loader2, ExternalLink } from 'lucide-react';
 import BrandProfile from '@/components/dashboard/BrandProfile';
 
@@ -26,10 +27,13 @@ export default function Settings() {
   // Notifications
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
+  const [notifyNewMessage, setNotifyNewMessage] = useState(true);
+  const [prefsLoading, setPrefsLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
       loadProfile();
+      loadPreferences();
     }
   }, [user]);
 
@@ -44,14 +48,22 @@ export default function Settings() {
       setName(data.full_name || '');
     }
     setEmail(user?.email || '');
+  };
 
-    const { data: { user: authUser } } = await supabase.auth.getUser();
-    if (authUser?.user_metadata?.email_notifications !== undefined) {
-      setEmailNotifications(authUser.user_metadata.email_notifications);
+  const loadPreferences = async () => {
+    setPrefsLoading(true);
+    const { data: prefs } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', user!.id)
+      .maybeSingle();
+
+    if (prefs) {
+      setEmailNotifications((prefs as any).notify_delivery_approved);
+      setPushNotifications((prefs as any).notify_delivery_revision);
+      setNotifyNewMessage((prefs as any).notify_new_message);
     }
-    if (authUser?.user_metadata?.push_notifications !== undefined) {
-      setPushNotifications(authUser.user_metadata.push_notifications);
-    }
+    setPrefsLoading(false);
   };
 
   const handleUpdateProfile = async () => {
@@ -73,17 +85,20 @@ export default function Settings() {
 
   const handleUpdateNotifications = async () => {
     setLoading(true);
-    const { error } = await supabase.auth.updateUser({
-      data: {
-        email_notifications: emailNotifications,
-        push_notifications: pushNotifications,
-      }
-    });
+    const { error } = await supabase
+      .from('user_preferences')
+      .upsert({
+        user_id: user!.id,
+        notify_delivery_approved: emailNotifications,
+        notify_delivery_revision: pushNotifications,
+        notify_new_message: notifyNewMessage,
+        updated_at: new Date().toISOString(),
+      } as any);
     setLoading(false);
     if (error) {
-      toast.error('Erro ao salvar', { description: error.message });
+      toast.error('Erro ao salvar preferências.', { description: error.message });
     } else {
-      toast.success('Preferências salvas');
+      toast.success('Preferências salvas com sucesso.');
     }
   };
 
@@ -177,25 +192,57 @@ export default function Settings() {
             <CardDescription className="text-xs">Como deseja receber atualizacoes</CardDescription>
           </CardHeader>
           <CardContent className="p-4 pt-0 space-y-4">
-            <div className="flex items-center justify-between min-h-[44px]">
-              <div className="space-y-0.5">
-                <Label className="text-xs font-mono">Email</Label>
-                <p className="text-[10px] text-muted-foreground">Atualizacoes por email</p>
+            {prefsLoading ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between min-h-[44px]">
+                  <Skeleton className="h-8 w-40" />
+                  <Skeleton className="h-5 w-10 rounded-full" />
+                </div>
+                <Separator className="bg-border" />
+                <div className="flex items-center justify-between min-h-[44px]">
+                  <Skeleton className="h-8 w-40" />
+                  <Skeleton className="h-5 w-10 rounded-full" />
+                </div>
+                <Separator className="bg-border" />
+                <div className="flex items-center justify-between min-h-[44px]">
+                  <Skeleton className="h-8 w-40" />
+                  <Skeleton className="h-5 w-10 rounded-full" />
+                </div>
               </div>
-              <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
-            </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between min-h-[44px]">
+                  <div className="space-y-0.5">
+                    <Label className="text-xs font-mono">Entrega aprovada</Label>
+                    <p className="text-[10px] text-muted-foreground">Aviso quando uma entrega for aprovada</p>
+                  </div>
+                  <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
+                </div>
 
-            <Separator className="bg-border" />
+                <Separator className="bg-border" />
 
-            <div className="flex items-center justify-between min-h-[44px]">
-              <div className="space-y-0.5">
-                <Label className="text-xs font-mono">Push</Label>
-                <p className="text-[10px] text-muted-foreground">Notificacoes no navegador</p>
-              </div>
-              <Switch checked={pushNotifications} onCheckedChange={setPushNotifications} />
-            </div>
+                <div className="flex items-center justify-between min-h-[44px]">
+                  <div className="space-y-0.5">
+                    <Label className="text-xs font-mono">Revisão solicitada</Label>
+                    <p className="text-[10px] text-muted-foreground">Aviso quando pedirem revisão</p>
+                  </div>
+                  <Switch checked={pushNotifications} onCheckedChange={setPushNotifications} />
+                </div>
 
-            <Button onClick={handleUpdateNotifications} className="w-full h-10">
+                <Separator className="bg-border" />
+
+                <div className="flex items-center justify-between min-h-[44px]">
+                  <div className="space-y-0.5">
+                    <Label className="text-xs font-mono">Nova mensagem</Label>
+                    <p className="text-[10px] text-muted-foreground">Aviso de novas mensagens no chat</p>
+                  </div>
+                  <Switch checked={notifyNewMessage} onCheckedChange={setNotifyNewMessage} />
+                </div>
+              </>
+            )}
+
+            <Button onClick={handleUpdateNotifications} disabled={loading || prefsLoading} className="w-full h-10">
+              {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Salvar Preferências
             </Button>
           </CardContent>
