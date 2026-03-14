@@ -36,6 +36,7 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [currentStep] = useState(1);
 
   const {
     register,
@@ -131,7 +132,7 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
       if (onComplete) {
         onComplete();
       } else {
-        navigate('/onboarding/payment');
+        navigate('/dashboard');
       }
     }
     setSaving(false);
@@ -155,10 +156,10 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
         {/* Progress */}
         <div className="mb-6">
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-            <span>Passo 1 de 3</span>
-            <span>33%</span>
+            <span>Passo {currentStep} de 3</span>
+            <span>{Math.round((currentStep / 3) * 100)}%</span>
           </div>
-          <Progress value={33} className="h-1.5" />
+          <Progress value={(currentStep / 3) * 100} className="h-1.5" />
         </div>
 
         {/* Card */}
