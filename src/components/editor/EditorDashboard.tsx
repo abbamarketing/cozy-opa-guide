@@ -70,6 +70,13 @@ interface SubscriptionQueueItem {
   client_name: string | null;
   subscription_tier: string | null;
   sla_hours: number | null;
+  description: string | null;
+  raw_file_url: string | null;
+  raw_drive_link: string | null;
+  client_notes: string | null;
+  is_exception: boolean | null;
+  revision_count: number | null;
+  max_revisions: number | null;
 }
 
 interface Column {
@@ -122,13 +129,13 @@ const getDeadlineInfo = (dueDate: string | null) => {
 };
 
 /* ─── Subscription Queue Card ─── */
-const SubscriptionQueueCard = ({ item }: { item: SubscriptionQueueItem }) => {
+const SubscriptionQueueCard = ({ item, onClick }: { item: SubscriptionQueueItem; onClick?: () => void }) => {
   const Icon = typeIcons[item.delivery_type] || Video;
   const priority = PRIORITY_CONFIG[item.priority_level ?? 1] || PRIORITY_CONFIG[1];
   const isInProgress = item.status === 'in_progress';
 
   return (
-    <Card className="border-border/40 bg-card p-3">
+    <Card className="cursor-pointer border-border/40 bg-card p-3 transition-all hover:border-primary/30" onClick={onClick}>
       <div className="flex items-center gap-3">
         {/* Priority badge */}
         <Badge className={`shrink-0 text-[10px] font-bold px-2 py-0.5 ${priority.color}`}>
@@ -346,6 +353,7 @@ const EditorDashboard = () => {
       .from('deliveries')
       .select(`
         id, title, delivery_type, status, created_at, due_date, priority_level,
+        description, raw_file_url, raw_drive_link, client_notes, is_exception, revision_count, max_revisions,
         user_project:user_projects!inner(
           user_id, client_type, subscription_tier, priority_level, sla_hours
         )
@@ -379,6 +387,13 @@ const EditorDashboard = () => {
           client_name: profileMap.get(d.user_project?.user_id)?.full_name || null,
           subscription_tier: d.user_project?.subscription_tier || null,
           sla_hours: d.user_project?.sla_hours || null,
+          description: d.description || null,
+          raw_file_url: d.raw_file_url || null,
+          raw_drive_link: d.raw_drive_link || null,
+          client_notes: d.client_notes || null,
+          is_exception: d.is_exception ?? null,
+          revision_count: d.revision_count ?? null,
+          max_revisions: d.max_revisions ?? null,
         }))
       );
     }
@@ -737,7 +752,7 @@ const EditorDashboard = () => {
             </div>
             <div className="space-y-2">
               {subscriptionQueue.map((item) => (
-                <SubscriptionQueueCard key={item.id} item={item} />
+                <SubscriptionQueueCard key={item.id} item={item} onClick={() => setSelectedDelivery(item as unknown as DeliveryData)} />
               ))}
             </div>
           </div>
@@ -890,7 +905,7 @@ const EditorDashboard = () => {
           </div>
           <div className="grid grid-cols-2 xl:grid-cols-3 gap-2 mb-4">
             {subscriptionQueue.map((item) => (
-              <SubscriptionQueueCard key={item.id} item={item} />
+              <SubscriptionQueueCard key={item.id} item={item} onClick={() => setSelectedDelivery(item as unknown as DeliveryData)} />
             ))}
           </div>
         </div>
