@@ -119,8 +119,24 @@ const NewDeliveryModal = ({
     ? (rawTab === 'upload' && rawFileUrl) || (rawTab === 'link' && rawDriveLink.trim().length > 0)
     : true; // non-video types don't require raw material
 
-  // Build quota info
+  // Build quota info — subscription clients only see short videos
   const quotas = useMemo<QuotaInfo[]>(() => {
+    const isSubscription = userProject.client_type === 'subscription';
+
+    if (isSubscription) {
+      const used = userProject.instagram_reserved + userProject.instagram_approved;
+      const total = project.instagram_videos;
+      return [{
+        type: 'instagram_video' as DeliveryType,
+        label: 'Reels / Shorts / TikToks',
+        icon: Video,
+        total,
+        used,
+        available: total - used,
+      }];
+    }
+
+    // Custom / other — show all available types
     const result: QuotaInfo[] = [];
     if (project.youtube_videos > 0) {
       const used = userProject.youtube_reserved + userProject.youtube_approved;
