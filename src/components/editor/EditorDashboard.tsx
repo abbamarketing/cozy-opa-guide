@@ -303,6 +303,7 @@ const EditorDashboard = () => {
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [activeColumn, setActiveColumn] = useState('todo');
+  const [startingProduction, setStartingProduction] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
 
   // Filters
