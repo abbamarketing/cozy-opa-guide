@@ -89,7 +89,7 @@ const Index = () => {
 
   // If user has only one role, redirect directly
   if (roles.length <= 1) {
-    return handleSingleRoleRedirect(primaryRole, assignedProjectId, profile, projectStatus);
+    return handleSingleRoleRedirect(primaryRole, assignedProjectId, profile, projectStatus, clientType);
   }
 
   // If user selected a role, redirect
