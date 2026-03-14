@@ -69,7 +69,7 @@ const AdminOverview = () => {
         supabase.from('deliveries').select('*', { count: 'exact', head: true }).in('status', ['queue', 'pending', 'in_progress', 'revision']).not('due_date', 'is', null).lt('due_date', new Date().toISOString()),
         supabase.from('user_projects').select('custom_project_id, client_type, subscription_tier').eq('status', 'active'),
         supabase.from('deliveries').select('created_at').gte('created_at', weeks[0].start.toISOString()),
-        supabase.from('deliveries').select('id, title, due_date, status, delivery_type').in('status', ['pending', 'in_progress', 'revision']).not('due_date', 'is', null).lte('due_date', in24h).order('due_date', { ascending: true }).limit(10),
+        supabase.from('deliveries').select('id, title, due_date, status, delivery_type').in('status', ['queue', 'pending', 'in_progress', 'revision']).not('due_date', 'is', null).lte('due_date', in24h).order('due_date', { ascending: true }).limit(10),
       ]);
 
       let customMRR = 0;
