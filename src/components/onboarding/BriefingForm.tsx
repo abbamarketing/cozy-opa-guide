@@ -22,7 +22,6 @@ export interface BriefingFormData {
   primary_color: string;
   secondary_color: string;
   logo_url: string | null;
-  // Steps 2 & 3 fields (to be added)
   brand_description: string;
   target_audience: string;
   content_style: string;
@@ -34,6 +33,9 @@ export interface BriefingFormData {
   use_emojis: boolean;
   use_icons: boolean;
   additional_notes: string;
+  brand_fonts: string;
+  intro_url: string | null;
+  outro_url: string | null;
 }
 
 const INITIAL_DATA: BriefingFormData = {
