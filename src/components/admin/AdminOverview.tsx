@@ -47,15 +47,12 @@ const AdminOverview = () => {
         .in('status', ['pending', 'in_progress', 'revision']);
 
       // Late deliveries
-      const { data: allPending } = await supabase
+      const { count: lateDeliveries } = await supabase
         .from('deliveries')
-        .select('due_date')
+        .select('*', { count: 'exact', head: true })
         .in('status', ['pending', 'in_progress', 'revision'])
-        .not('due_date', 'is', null);
-
-      const lateDeliveries = (allPending || []).filter(
-        (d: any) => new Date(d.due_date) < new Date()
-      ).length;
+        .not('due_date', 'is', null)
+        .lt('due_date', new Date().toISOString());
 
       // MRR
       const { data: activeProjects } = await supabase
@@ -78,7 +75,7 @@ const AdminOverview = () => {
       setKpis({
         activeClients: activeClients || 0,
         pendingDeliveries: pendingDeliveries || 0,
-        lateDeliveries,
+        lateDeliveries: lateDeliveries || 0,
         mrr,
       });
 
