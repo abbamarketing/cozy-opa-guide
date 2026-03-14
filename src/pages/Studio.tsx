@@ -14,16 +14,15 @@ import { Input } from "@/components/ui/input";
 import { FileText, Camera, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { useRole } from "@/hooks/useRole";
+// REMOVIDO em PRD v5 — useRole não é mais necessário para bypasses de produto
 import { useUserProject } from "@/hooks/useUserProject";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
 const Studio = () => {
   const { user } = useAuth();
-  const { hasRole } = useRole();
   const { userProject } = useUserProject();
-  const isAdmin = hasRole('admin');
+  // REMOVIDO em PRD v5 — admin não tem privilégios de produto, apenas de gestão
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [showPipeline, setShowPipeline] = useState(false);
@@ -33,11 +32,7 @@ const Studio = () => {
 
   const fetchCredits = async () => {
     if (!user) return;
-    if (isAdmin) {
-      setCredits(Infinity);
-      setLoading(false);
-      return;
-    }
+    // REMOVIDO em PRD v5 — admin não tem créditos de Studio gratuitos
     const { data } = await supabase
       .from("studio_credits")
       .select("credits_remaining")
@@ -104,12 +99,9 @@ const Studio = () => {
           </h1>
         </div>
 
+        {/* REMOVIDO em PRD v5 — admin não exibe créditos ilimitados */}
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-        ) : isAdmin ? (
-          <Badge variant="secondary" className="text-sm px-3 py-1">
-            ∞ créditos (admin)
-          </Badge>
         ) : (
           <Badge
             variant={credits === 0 ? "destructive" : "secondary"}
@@ -189,7 +181,8 @@ const Studio = () => {
       )}
 
       {/* Upsell 2 — Quando créditos zerados */}
-      {!isAdmin && credits === 0 && (
+      {/* REMOVIDO em PRD v5 — admin não tem bypass de créditos */}
+      {credits === 0 && (
         <div className="max-w-3xl mt-4 space-y-2">
           <p className="text-sm text-muted-foreground">
             Seus créditos renovam em {daysUntilRenewal()} dias.

@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useUserProject } from '@/hooks/useUserProject';
 import { useProfile } from '@/hooks/useProfile';
-import { useRole } from '@/hooks/useRole';
+// REMOVIDO em PRD v5 — useRole não é mais necessário para bypass admin
 import { Loader2 } from 'lucide-react';
 
 interface ClientGuardProps {
@@ -12,14 +12,14 @@ interface ClientGuardProps {
 
 /**
  * Enforces the client journey order: Waiting → Payment → Onboarding → Dashboard.
- * Admins bypass all guards to access any client page freely.
+ * REMOVIDO em PRD v5 — admin não bypassa mais a jornada do cliente.
  */
 export default function ClientGuard({ children, requireStep }: ClientGuardProps) {
   const { userProject, isLoading: projectLoading } = useUserProject();
   const { profile, isLoading: profileLoading } = useProfile();
-  const { hasRole, loading: roleLoading } = useRole();
+  
 
-  if (projectLoading || profileLoading || roleLoading) {
+  if (projectLoading || profileLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -27,10 +27,7 @@ export default function ClientGuard({ children, requireStep }: ClientGuardProps)
     );
   }
 
-  // Admins bypass the client journey flow entirely
-  if (hasRole('admin')) {
-    return <>{children}</>;
-  }
+  // REMOVIDO em PRD v5 — admin não bypassa payment gate nem jornada do cliente
 
   // No project at all → waiting
   if (!userProject) {

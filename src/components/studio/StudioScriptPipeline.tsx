@@ -39,7 +39,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { useRole } from "@/hooks/useRole";
+// REMOVIDO em PRD v5 — useRole não é mais necessário para bypasses de produto
 import { useUserProject } from "@/hooks/useUserProject";
 import { toast } from "sonner";
 
@@ -106,9 +106,8 @@ interface StudioScriptPipelineProps {
 
 const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) => {
   const { user } = useAuth();
-  const { hasRole } = useRole();
   const { userProject } = useUserProject();
-  const isAdmin = hasRole('admin');
+  // REMOVIDO em PRD v5 — admin não tem privilégios de produto, apenas de gestão
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<ScriptFormData>(INITIAL_DATA);
   const [generating, setGenerating] = useState(false);
@@ -123,13 +122,10 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
     setFormData((prev) => ({ ...prev, [field]: value }));
 
   // Fetch credits
+  // REMOVIDO em PRD v5 — admin não tem créditos de Studio gratuitos
   useEffect(() => {
     if (!user) return;
-    if (isAdmin) {
-      setCredits(Infinity);
-      return;
-    }
-    const fetch = async () => {
+    const fetchCredits = async () => {
       const { data } = await supabase
         .from("studio_credits")
         .select("credits_remaining")
@@ -137,8 +133,8 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
         .maybeSingle();
       setCredits(data?.credits_remaining ?? 0);
     };
-    fetch();
-  }, [user, isAdmin]);
+    fetchCredits();
+  }, [user]);
 
   // Fetch history
   useEffect(() => {
@@ -246,10 +242,8 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
       const data = await res.json();
       setGeneratedScript(data.script || "");
 
-      // Update credits locally (skip for admins)
-      if (!isAdmin) {
-        setCredits((c) => (c !== null ? Math.max(0, c - 1) : 0));
-      }
+      // REMOVIDO em PRD v5 — admin não tem bypass de créditos
+      setCredits((c) => (c !== null ? Math.max(0, c - 1) : 0));
       onCreditsChanged?.();
     } catch {
       toast.error("Erro de conexão. Tente novamente.");
