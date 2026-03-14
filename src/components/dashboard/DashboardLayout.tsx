@@ -46,6 +46,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Skeleton } from '@/components/ui/skeleton';
 import QuotaCard from '@/components/dashboard/QuotaCard';
+import SubscriptionStatusCard from '@/components/dashboard/SubscriptionStatusCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 type DashboardTab = 'deliveries' | 'calendar' | 'history' | 'scripts' | 'brand' | 'settings';
