@@ -831,6 +831,30 @@ const EditorDashboard = () => {
             <Badge variant="secondary" className="text-xs">
               {subscriptionQueue.length} {subscriptionQueue.length === 1 ? 'item' : 'itens'}
             </Badge>
+            <div className="ml-auto">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button
+                      size="sm"
+                      className="h-8"
+                      disabled={!canStartProduction || startingProduction}
+                      onClick={handleStartProduction}
+                    >
+                      {startingProduction ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Play className="mr-1.5 h-3.5 w-3.5" />}
+                      Iniciar produção
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                {!canStartProduction && (
+                  <TooltipContent>
+                    {inProgressSubCount >= 2
+                      ? 'Limite de 2 produções simultâneas atingido'
+                      : 'Nenhum item na fila'}
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </div>
           </div>
           <div className="grid grid-cols-2 xl:grid-cols-3 gap-2 mb-4">
             {subscriptionQueue.map((item) => (
