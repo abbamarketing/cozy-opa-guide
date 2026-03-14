@@ -63,25 +63,9 @@ const AIChatWidget = () => {
     let assistantContent = '';
 
     try {
-      const [sessionResult, userContext] = await Promise.all([
-        supabase.auth.getSession(),
-        buildUserContext(),
-      ]);
+      const sessionResult = await supabase.auth.getSession();
       const session = sessionResult.data.session;
       if (!session) return;
-
-      const resp = await fetch(CHAT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
-          role: primaryRole,
-          ...(userContext && { userContext }),
-        }),
-      });
 
       if (!resp.ok || !resp.body) {
         const errData = await resp.json().catch(() => ({}));
