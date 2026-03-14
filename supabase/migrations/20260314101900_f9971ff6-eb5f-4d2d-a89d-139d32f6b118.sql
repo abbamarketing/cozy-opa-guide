@@ -1,0 +1,1 @@
+ALTER TABLE public.custom_projects ADD COLUMN IF NOT EXISTS custom_slug text;

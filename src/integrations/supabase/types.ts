@@ -86,6 +86,7 @@ export type Database = {
           capture_lead_days: number
           created_at: string
           created_by: string
+          custom_slug: string | null
           deadline: Database["public"]["Enums"]["deadline_type"]
           deleted_at: string | null
           description: string | null
@@ -110,6 +111,7 @@ export type Database = {
           capture_lead_days?: number
           created_at?: string
           created_by: string
+          custom_slug?: string | null
           deadline?: Database["public"]["Enums"]["deadline_type"]
           deleted_at?: string | null
           description?: string | null
@@ -134,6 +136,7 @@ export type Database = {
           capture_lead_days?: number
           created_at?: string
           created_by?: string
+          custom_slug?: string | null
           deadline?: Database["public"]["Enums"]["deadline_type"]
           deleted_at?: string | null
           description?: string | null
