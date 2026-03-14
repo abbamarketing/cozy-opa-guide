@@ -40,6 +40,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useRole } from "@/hooks/useRole";
+import { useUserProject } from "@/hooks/useUserProject";
 import { toast } from "sonner";
 
 export interface ScriptFormData {
