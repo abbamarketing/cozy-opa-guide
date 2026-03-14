@@ -11,7 +11,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { FileText, Camera, Sparkles, Loader2 } from "lucide-react";
+import { FileText, Camera, Sparkles, Loader2, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 // REMOVIDO em PRD v5 — useRole não é mais necessário para bypasses de produto
