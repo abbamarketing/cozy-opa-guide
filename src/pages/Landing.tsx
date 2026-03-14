@@ -32,9 +32,12 @@ import {
   Bell,
   Plus,
   LogOut,
+  Mic,
+  Scissors,
+  Check,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -107,12 +110,12 @@ const FAQ = [
   { q: 'Os prazos são em horas corridas?', a: 'Não! Contamos apenas horas úteis (8h–18h, seg–sex). Se você pedir na sexta à noite, o prazo só começa segunda de manhã. Justo e transparente.' },
   { q: 'Funciona para empresas também?', a: 'Sim! Empresas usam a plataforma para gerenciar conteúdo de múltiplos canais. Cada projeto tem seu editor, briefing e cotas independentes.' },
   { q: 'Preciso instalar alguma coisa?', a: 'Zero instalação. A plataforma roda no navegador — desktop ou celular. Você gerencia tudo do sofá, do Uber ou do escritório.' },
-  { q: 'Quanto custa?', a: 'Cada plano é montado sob medida. Você paga pelo que precisa — sem pacotes inflados, sem surpresas na fatura. Fale conosco para um orçamento em minutos.' },
+  { q: 'Quanto custa?', a: 'Studio: R$97 (pagamento único). Edição de shorts a partir de R$490/mês. Cada plano é transparente — sem surpresas.' },
 ];
 
 type DemoTab = 'dashboard' | 'entrega' | 'editor';
 
-/* ─── App Shell: Wraps all demos in a realistic interface ─── */
+/* ─── App Shell ─── */
 const AppShell = ({ activeTab, onTabChange, children }: {
   activeTab: DemoTab;
   onTabChange: (tab: DemoTab) => void;
@@ -126,7 +129,6 @@ const AppShell = ({ activeTab, onTabChange, children }: {
 
   return (
     <div className="rounded-xl border border-border/50 overflow-hidden shadow-2xl shadow-primary/5">
-      {/* Browser chrome */}
       <div className="flex items-center gap-1.5 bg-card px-4 py-2 border-b border-border/50">
         <div className="h-2.5 w-2.5 rounded-full bg-destructive/60" />
         <div className="h-2.5 w-2.5 rounded-full bg-queue-yellow/60" />
@@ -135,9 +137,7 @@ const AppShell = ({ activeTab, onTabChange, children }: {
       </div>
 
       <div className="flex bg-background min-h-[380px] sm:min-h-[420px]">
-        {/* Sidebar */}
         <div className="hidden sm:flex w-[180px] shrink-0 flex-col border-r border-border/30 bg-sidebar p-3 gap-1">
-          {/* Logo */}
           <div className="flex items-center gap-2 px-2 py-2 mb-2">
             <div className="h-6 w-6 rounded-md gradient-neon flex items-center justify-center">
               <Play className="h-3 w-3 text-primary-foreground" />
@@ -172,12 +172,9 @@ const AppShell = ({ activeTab, onTabChange, children }: {
           </div>
         </div>
 
-        {/* Main content area */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Top bar */}
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-border/30">
             <div className="flex items-center gap-2">
-              {/* Mobile tabs */}
               <div className="flex sm:hidden gap-1 bg-secondary rounded-md p-0.5">
                 {sidebarItems.map((item) => (
                   <button
@@ -206,7 +203,6 @@ const AppShell = ({ activeTab, onTabChange, children }: {
             </div>
           </div>
 
-          {/* Content */}
           <div className="flex-1 overflow-auto p-3 sm:p-4">
             <AnimatePresence mode="wait">
               <motion.div
@@ -229,7 +225,6 @@ const AppShell = ({ activeTab, onTabChange, children }: {
 /* ─── Dashboard View ─── */
 const DashboardView = () => (
   <div className="space-y-4">
-    {/* Quotas */}
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
       {[
         { label: 'YouTube', used: 3, total: 6, icon: Video, color: 'text-destructive' },
@@ -250,7 +245,6 @@ const DashboardView = () => (
       ))}
     </div>
 
-    {/* New delivery button */}
     <div className="flex items-center justify-between">
       <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Minhas Entregas</span>
       <div className="h-6 px-2 rounded-md bg-primary flex items-center gap-1 text-primary-foreground">
@@ -259,7 +253,6 @@ const DashboardView = () => (
       </div>
     </div>
 
-    {/* Kanban */}
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
       {KANBAN_COLUMNS.map((col) => (
         <div key={col.title} className="rounded-lg border border-border/30 bg-muted/15 p-1.5">
@@ -302,7 +295,6 @@ const DashboardView = () => (
 /* ─── Delivery Detail View ─── */
 const DeliveryDetailView = () => (
   <div className="space-y-4">
-    {/* Delivery header */}
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
       <div className="flex items-center gap-2">
         <Video className="h-4 w-4 text-destructive" />
@@ -316,7 +308,6 @@ const DeliveryDetailView = () => (
       </Badge>
     </div>
 
-    {/* SLA bar */}
     <Card className="border-border/30 bg-card/80 p-3 space-y-1.5">
       <div className="flex items-center justify-between text-[10px]">
         <span className="text-muted-foreground flex items-center gap-1">
@@ -328,7 +319,6 @@ const DeliveryDetailView = () => (
     </Card>
 
     <div className="grid sm:grid-cols-2 gap-3">
-      {/* Revision notes */}
       <Card className="border-border/30 bg-card/80 p-3 space-y-2">
         <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Notas de Revisão</p>
         <div className="rounded-lg bg-muted/20 p-2.5 text-[11px] text-card-foreground font-body leading-relaxed space-y-1.5">
@@ -338,7 +328,6 @@ const DeliveryDetailView = () => (
         </div>
       </Card>
 
-      {/* Chat */}
       <Card className="border-border/30 bg-card/80 overflow-hidden">
         <div className="px-3 py-2 border-b border-border/20 flex items-center gap-2">
           <MessageSquare className="h-3 w-3 text-primary" />
@@ -373,7 +362,6 @@ const DeliveryDetailView = () => (
       </Card>
     </div>
 
-    {/* Actions */}
     <div className="flex gap-2">
       <Button variant="outline" size="sm" className="flex-1 text-xs gap-1">
         <Eye className="h-3 w-3" /> Ver arquivo
@@ -388,7 +376,6 @@ const DeliveryDetailView = () => (
 /* ─── Editor Panel View ─── */
 const EditorPanelView = () => (
   <div className="space-y-4">
-    {/* Delivery being worked */}
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         <Camera className="h-4 w-4 text-primary" />
@@ -401,7 +388,6 @@ const EditorPanelView = () => (
     </div>
 
     <div className="grid sm:grid-cols-2 gap-3">
-      {/* Briefing */}
       <Card className="border-border/30 bg-card/80 p-3 space-y-2">
         <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Briefing da Marca</p>
         <div className="grid grid-cols-2 gap-2">
@@ -428,7 +414,6 @@ const EditorPanelView = () => (
         </div>
       </Card>
 
-      {/* Checklist */}
       <Card className="border-border/30 bg-card/80 p-3 space-y-2">
         <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Checklist</p>
         <div className="space-y-1">
@@ -450,7 +435,6 @@ const EditorPanelView = () => (
       </Card>
     </div>
 
-    {/* Upload */}
     <Card className="border-border/30 bg-card/80 p-3">
       <div className="rounded-lg border-2 border-dashed border-border/30 p-4 text-center">
         <Upload className="h-5 w-5 mx-auto text-muted-foreground/40 mb-1" />
@@ -461,11 +445,64 @@ const EditorPanelView = () => (
   </div>
 );
 
+/* ─── Pricing plans data ─── */
+const PLANS = {
+  studio: {
+    name: 'Studio',
+    price: 'R$97',
+    frequency: 'pagamento único',
+    badge: 'Comece aqui',
+    features: [
+      '10 roteiros/mês com IA — para sempre',
+      'Pipeline guiado: tipo → contexto → audiência → referências → gerar',
+    ],
+    cta: 'Começar por R$97',
+    href: '#checkout-studio',
+    highlight: false,
+  },
+  standard: {
+    name: 'Standard',
+    price: 'R$490',
+    frequency: '/mês',
+    badge: null,
+    features: [
+      'Short videos (Reels, Shorts, TikTok) — fila ilimitada',
+      'SLA: 72h por vídeo · Studio incluso',
+    ],
+    cta: 'Assinar Standard',
+    href: '#checkout-standard',
+    highlight: true,
+  },
+  agencia: {
+    name: 'Agência',
+    price: 'R$5.590',
+    frequency: '/mês',
+    badge: 'Máxima prioridade',
+    features: [
+      'SLA 4h · P5 na fila',
+    ],
+    cta: 'Assinar Agência',
+    href: '#checkout-agencia',
+    highlight: false,
+  },
+};
+
+const PRO_TIERS = [
+  { name: 'Pro', sla: '48h', price: 'R$660/mês', href: '#checkout-pro' },
+  { name: 'Business', sla: '24h', price: 'R$1.100/mês', href: '#checkout-business' },
+  { name: 'Premium', sla: '8h', price: 'R$2.970/mês', href: '#checkout-premium' },
+];
+
 /* ─── Main Landing ─── */
 const Landing = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [activeDemo, setActiveDemo] = useState<DemoTab>('dashboard');
   const [surveyOpen, setSurveyOpen] = useState(false);
+  const [proExpanded, setProExpanded] = useState(false);
+
+  const scrollToPlanos = () => {
+    document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -484,14 +521,14 @@ const Landing = () => {
             <Link to="/auth">
               <Button variant="ghost" size="sm">Entrar</Button>
             </Link>
-            <Button size="sm" className="gap-1.5" onClick={() => setSurveyOpen(true)}>
-              Fale Conosco <ArrowRight className="h-3.5 w-3.5" />
+            <Button size="sm" className="gap-1.5" onClick={scrollToPlanos}>
+              Ver planos <ArrowRight className="h-3.5 w-3.5" />
             </Button>
           </div>
         </div>
       </nav>
 
-      {/* Hero */}
+      {/* ═══════ SEÇÃO 1 — HERO ═══════ */}
       <section className="relative overflow-hidden py-16 sm:py-24 lg:py-28">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.08),transparent_60%)]" />
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 text-center">
@@ -505,35 +542,68 @@ const Landing = () => {
             initial="hidden" animate="visible" variants={fadeUp} custom={1}
             className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight"
           >
-            Vídeos profissionais{' '}
-            <span className="text-primary">sem você precisar editar</span>
+            Você grava. A gente edita, entrega no prazo e mantém sua{' '}
+            <span className="text-primary">identidade visual</span> — sempre.
           </motion.h1>
 
           <motion.p
             initial="hidden" animate="visible" variants={fadeUp} custom={2}
             className="mx-auto mt-5 max-w-2xl text-base sm:text-lg text-muted-foreground font-body"
           >
-            Você grava. A gente edita, entrega e surpreende. Thumbnails, Reels, capas — 
-            tudo com prazo garantido, revisões inclusas e um editor dedicado à sua marca.
+            Roteiros com IA por R$97 uma vez. Edição profissional de short videos a partir de R$490/mês.
           </motion.p>
 
           <motion.div
             initial="hidden" animate="visible" variants={fadeUp} custom={3}
             className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3"
           >
-            <Button size="lg" className="gap-2 text-sm px-8" onClick={() => setSurveyOpen(true)}>
-              <Mail className="h-4 w-4" /> Quero um Orçamento Grátis
+            <Button asChild size="lg" className="gap-2 text-sm px-8">
+              <a href="#checkout-studio">
+                <Sparkles className="h-4 w-4" /> Começar com Studio por R$97
+              </a>
             </Button>
-            <Link to="/auth">
-              <Button variant="outline" size="lg" className="gap-2 text-sm px-8">
-                Já sou cliente <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
+            <Button variant="outline" size="lg" className="gap-2 text-sm px-8" onClick={scrollToPlanos}>
+              Ver planos de edição <ArrowRight className="h-4 w-4" />
+            </Button>
           </motion.div>
         </div>
       </section>
 
-      {/* Interactive App Demo — single unified section */}
+      {/* ═══════ SEÇÃO 2 — COMO FUNCIONA ═══════ */}
+      <section className="py-16 sm:py-24 border-t border-border/30">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-4xl font-bold">
+              Como <span className="text-primary">funciona</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {[
+              { icon: Mic, step: '01', title: 'Você grava', desc: 'Grava seu vídeo bruto ou cria um roteiro com IA' },
+              { icon: Scissors, step: '02', title: 'A gente edita', desc: 'Sua equipe recebe, edita e entrega dentro do SLA garantido' },
+              { icon: Check, step: '03', title: 'Você aprova', desc: 'Revisa no app, pede ajuste ou aprova com um clique' },
+            ].map((item, i) => (
+              <motion.div
+                key={item.step}
+                initial="hidden" whileInView="visible" viewport={{ once: true }}
+                variants={fadeUp} custom={i}
+              >
+                <Card className="h-full border-border/40 bg-card/60 p-6 text-center hover:border-primary/30 transition-colors">
+                  <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-xl bg-primary/10 mb-4">
+                    <item.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">Passo {item.step}</span>
+                  <h3 className="text-base font-semibold text-card-foreground mt-1 mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground font-body leading-relaxed">{item.desc}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive App Demo */}
       <section className="pb-16 sm:pb-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}>
@@ -550,7 +620,6 @@ const Landing = () => {
               {activeDemo === 'editor' && <EditorPanelView />}
             </AppShell>
 
-            {/* Context labels below demo */}
             <div className="grid grid-cols-3 gap-2 mt-4">
               {[
                 { tab: 'dashboard' as const, title: 'Seu Dashboard', desc: 'Veja cotas, acompanhe entregas e solicite novos vídeos em segundos.' },
@@ -637,18 +706,174 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* ═══════ SEÇÃO 3 — PLANOS ═══════ */}
+      <section id="planos" className="py-16 sm:py-24 border-t border-border/30">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl sm:text-4xl font-bold">
+              Escolha seu <span className="text-primary">plano</span>
+            </h2>
+            <p className="mt-3 text-muted-foreground font-body max-w-xl mx-auto">
+              Do roteiro à edição profissional. Comece pequeno, escale quando quiser.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Card 1 — Studio */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}>
+              <Card className="h-full border-border/40 bg-card/60 flex flex-col">
+                <CardContent className="p-6 flex flex-col flex-1">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-card-foreground">{PLANS.studio.name}</h3>
+                    <Badge variant="secondary" className="text-[10px]">{PLANS.studio.badge}</Badge>
+                  </div>
+                  <div className="mb-4">
+                    <span className="text-3xl font-bold text-card-foreground font-mono">{PLANS.studio.price}</span>
+                    <span className="text-sm text-muted-foreground ml-1">{PLANS.studio.frequency}</span>
+                  </div>
+                  <ul className="space-y-2 mb-6 flex-1">
+                    {PLANS.studio.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground font-body">
+                        <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Button asChild variant="default" className="w-full">
+                    <a href={PLANS.studio.href}>{PLANS.studio.cta}</a>
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Card 2 — Standard (destaque) */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={1}>
+              <Card className="h-full border-primary/50 bg-card/60 ring-1 ring-primary/20 flex flex-col relative">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className="bg-primary text-primary-foreground text-[10px] px-3">Mais popular</Badge>
+                </div>
+                <CardContent className="p-6 flex flex-col flex-1 pt-8">
+                  <h3 className="text-lg font-bold text-card-foreground mb-4">{PLANS.standard.name}</h3>
+                  <div className="mb-4">
+                    <span className="text-3xl font-bold text-card-foreground font-mono">{PLANS.standard.price}</span>
+                    <span className="text-sm text-muted-foreground">{PLANS.standard.frequency}</span>
+                  </div>
+                  <ul className="space-y-2 mb-6 flex-1">
+                    {PLANS.standard.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground font-body">
+                        <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Button asChild variant="default" className="w-full">
+                    <a href={PLANS.standard.href}>{PLANS.standard.cta}</a>
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Card 3 — Pro / Business / Premium (expandable) */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={2}>
+              <Card className="h-full border-border/40 bg-card/60 flex flex-col">
+                <CardContent className="p-6 flex flex-col flex-1">
+                  <h3 className="text-lg font-bold text-card-foreground mb-4">Pro / Business / Premium</h3>
+                  <p className="text-sm text-muted-foreground font-body mb-4">
+                    SLA mais rápido para quem precisa de velocidade.
+                  </p>
+
+                  <button
+                    onClick={() => setProExpanded(!proExpanded)}
+                    className="flex items-center justify-between w-full rounded-lg border border-border/40 p-3 mb-4 hover:border-primary/30 transition-colors"
+                  >
+                    <span className="text-sm font-medium text-card-foreground">Ver opções</span>
+                    {proExpanded ? (
+                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </button>
+
+                  <AnimatePresence>
+                    {proExpanded && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-3 overflow-hidden"
+                      >
+                        {PRO_TIERS.map((tier) => (
+                          <div key={tier.name} className="rounded-lg border border-border/30 bg-muted/10 p-3 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-semibold text-card-foreground">{tier.name}</span>
+                              <span className="text-xs font-mono text-muted-foreground">SLA {tier.sla}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-bold font-mono text-card-foreground">{tier.price}</span>
+                              <Button asChild size="sm" variant="outline" className="h-7 text-xs">
+                                <a href={tier.href}>Assinar {tier.name}</a>
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Card 4 — Agência */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={3}>
+              <Card className="h-full border-border/40 bg-card/60 flex flex-col">
+                <CardContent className="p-6 flex flex-col flex-1">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-card-foreground">{PLANS.agencia.name}</h3>
+                    <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">{PLANS.agencia.badge}</Badge>
+                  </div>
+                  <div className="mb-4">
+                    <span className="text-3xl font-bold text-card-foreground font-mono">{PLANS.agencia.price}</span>
+                    <span className="text-sm text-muted-foreground">{PLANS.agencia.frequency}</span>
+                  </div>
+                  <ul className="space-y-2 mb-6 flex-1">
+                    {PLANS.agencia.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground font-body">
+                        <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Button asChild variant="default" className="w-full">
+                    <a href={PLANS.agencia.href}>{PLANS.agencia.cta}</a>
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+
+          {/* Rodapé da seção — Projetos customizados */}
+          <div className="mt-10 text-center">
+            <p className="text-sm text-muted-foreground font-body max-w-xl mx-auto mb-3">
+              Precisa de algo diferente? Projetos customizados com cotas específicas, SLA negociado e captação presencial.
+            </p>
+            <Button variant="ghost" className="gap-2" onClick={() => setSurveyOpen(true)}>
+              <Mail className="h-4 w-4" /> Falar com a equipe
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* How it works + Olívia */}
       <section className="py-16 sm:py-24 border-t border-border/30">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-12">
-            {/* How it works */}
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold mb-8">
                 Comece em <span className="text-primary">4 passos</span>
               </h2>
               <div className="space-y-4">
                 {[
-                  { step: '01', title: 'Monte seu plano', desc: 'Diga quantos vídeos, Reels, thumbs e capas precisa. Sem pacote fechado.' },
+                  { step: '01', title: 'Escolha seu plano', desc: 'Studio para roteiros ou edição completa a partir do Standard.' },
                   { step: '02', title: 'Envie seu briefing', desc: 'Cores, fontes, estilo — preencha uma vez e seu editor já sabe tudo.' },
                   { step: '03', title: 'Grave e envie', desc: 'Mande o bruto. Nós cuidamos de corte, legenda, música e entrega.' },
                   { step: '04', title: 'Aprove e publique', desc: 'Revise, peça ajustes e aprove. Seu conteúdo pronto para bombar.' },
@@ -671,7 +896,6 @@ const Landing = () => {
               </div>
             </div>
 
-            {/* Olívia */}
             <div>
               <Badge variant="outline" className="mb-4 border-primary/30 text-primary text-xs">
                 <Sparkles className="h-3 w-3 mr-1" /> Assistente IA
@@ -758,7 +982,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA Final */}
       <section className="py-16 sm:py-24 border-t border-border/30">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
           <div className="rounded-2xl border border-primary/20 bg-primary/5 p-8 sm:p-12">
@@ -766,13 +990,17 @@ const Landing = () => {
               Seu próximo vídeo pode ser o melhor que você já publicou.
             </h2>
             <p className="text-muted-foreground font-body mb-6 max-w-lg mx-auto">
-              Enquanto você cria, a gente edita. Plano sob medida, editor dedicado e zero dor de cabeça. Fale com a gente — o orçamento é grátis.
+              Comece com roteiros por R$97 ou assine edição profissional a partir de R$490/mês. Cancele quando quiser.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Button size="lg" className="gap-2 px-10" onClick={() => setSurveyOpen(true)}>
-                <Mail className="h-4 w-4" /> Quero um Orçamento Grátis
+              <Button asChild size="lg" className="gap-2 px-10">
+                <a href="#checkout-studio">
+                  <Sparkles className="h-4 w-4" /> Começar com Studio por R$97
+                </a>
               </Button>
-              <p className="text-[10px] text-muted-foreground font-body">Resposta em até 2 horas úteis</p>
+              <Button variant="outline" size="lg" className="gap-2 px-8" onClick={scrollToPlanos}>
+                Ver todos os planos
+              </Button>
             </div>
           </div>
         </div>
