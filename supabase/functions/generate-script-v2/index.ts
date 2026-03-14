@@ -40,14 +40,7 @@ serve(async (req) => {
 
   const userId = user.id;
 
-  // Check if user is admin (unlimited credits)
-  const { data: roleData } = await supabaseAdmin
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .eq("role", "admin")
-    .maybeSingle();
-  const isAdmin = !!roleData;
+  // REMOVIDO em PRD v5 — admin não tem créditos de Studio gratuitos, apenas gestão
 
   let body: any;
   try {
