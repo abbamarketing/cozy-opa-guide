@@ -175,7 +175,7 @@ Deno.serve(async (req) => {
           const brandName = session.metadata?.brand_name
             || session.customer_details?.name
             || 'cliente';
-          const slug = generateSlug(brandName);
+          let slug = generateSlug(brandName);
 
           // If user already has a user_project, update it; otherwise INSERT new record
           const { data: existingUp } = await supabase
