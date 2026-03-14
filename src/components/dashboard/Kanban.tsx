@@ -1,5 +1,5 @@
-import { useEffect, useState, lazy, Suspense, useCallback } from 'react';
-import { Plus, Camera, AlertCircle, Video } from 'lucide-react';
+import { useEffect, useState, lazy, Suspense, useCallback, useMemo } from 'react';
+import { Plus, Camera, AlertCircle, Video, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -26,11 +26,13 @@ interface Column {
   description: string;
 }
 
-const COLUMNS: Column[] = [
-  { id: 'todo', title: 'A FAZER', statuses: ['pending'], description: 'Aguardando início' },
-  { id: 'production', title: 'PRODUÇÃO', statuses: ['in_progress', 'revision'], description: 'Editor trabalhando' },
-  { id: 'review', title: 'REVISAR', statuses: ['review'], description: 'Pronto para aprovação' },
-  { id: 'done', title: 'CONCLUÍDO', statuses: ['approved'], description: 'Aprovado e finalizado' },
+const ALL_COLUMNS: Column[] = [
+  { id: 'queue',      title: 'NA FILA',    statuses: ['queue'],        description: 'Aguardando editor disponível' },
+  { id: 'todo',       title: 'A FAZER',    statuses: ['pending'],      description: 'Aguardando início' },
+  { id: 'production', title: 'PRODUÇÃO',   statuses: ['in_progress'],  description: 'Editor produzindo' },
+  { id: 'revision',   title: 'EM REVISÃO', statuses: ['revision'],     description: 'Editor revisando' },
+  { id: 'review',     title: 'REVISAR',    statuses: ['review'],       description: 'Pronto para aprovação' },
+  { id: 'done',       title: 'CONCLUÍDO',  statuses: ['approved'],     description: 'Aprovado e finalizado' },
 ];
 
 const PAGE_SIZE = 20;
