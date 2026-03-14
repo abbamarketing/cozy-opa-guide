@@ -345,9 +345,16 @@ const Kanban = ({ userProject }: KanbanProps) => {
                 <ScrollArea className="flex-1">
                   <div className="space-y-2 p-0.5">
                     {items.length === 0 ? (
-                      <p className="py-8 text-center text-[10px] font-mono text-muted-foreground/50">
-                        Nenhuma entrega
-                      </p>
+                      <div className="py-8 text-center space-y-3">
+                        <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
+                        <p className="text-[10px] font-mono text-muted-foreground/50">Nenhuma entrega aqui</p>
+                        {col.id === 'todo' && canCreateDelivery && (
+                          <Button size="sm" variant="outline" onClick={handleNewClick} className="text-xs">
+                            <Plus className="h-3 w-3 mr-1" />
+                            Criar primeira entrega
+                          </Button>
+                        )}
+                      </div>
                     ) : (
                       items.map((d) => (
                         <DeliveryCard
