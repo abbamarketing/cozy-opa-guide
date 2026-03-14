@@ -155,6 +155,7 @@ export type Database = {
       deliveries: {
         Row: {
           approved_at: string | null
+          client_notes: string | null
           created_at: string
           delivered_at: string | null
           delivery_type: Database["public"]["Enums"]["delivery_type"]
@@ -162,9 +163,14 @@ export type Database = {
           drive_link: string | null
           due_date: string | null
           editor_id: string | null
+          exception_notes: string | null
           file_url: string | null
           id: string
+          is_exception: boolean | null
           max_revisions: number
+          priority_level: number | null
+          raw_drive_link: string | null
+          raw_file_url: string | null
           revision_count: number
           revision_notes: string | null
           status: Database["public"]["Enums"]["delivery_status"]
@@ -175,6 +181,7 @@ export type Database = {
         }
         Insert: {
           approved_at?: string | null
+          client_notes?: string | null
           created_at?: string
           delivered_at?: string | null
           delivery_type: Database["public"]["Enums"]["delivery_type"]
@@ -182,9 +189,14 @@ export type Database = {
           drive_link?: string | null
           due_date?: string | null
           editor_id?: string | null
+          exception_notes?: string | null
           file_url?: string | null
           id?: string
+          is_exception?: boolean | null
           max_revisions?: number
+          priority_level?: number | null
+          raw_drive_link?: string | null
+          raw_file_url?: string | null
           revision_count?: number
           revision_notes?: string | null
           status?: Database["public"]["Enums"]["delivery_status"]
@@ -195,6 +207,7 @@ export type Database = {
         }
         Update: {
           approved_at?: string | null
+          client_notes?: string | null
           created_at?: string
           delivered_at?: string | null
           delivery_type?: Database["public"]["Enums"]["delivery_type"]
@@ -202,9 +215,14 @@ export type Database = {
           drive_link?: string | null
           due_date?: string | null
           editor_id?: string | null
+          exception_notes?: string | null
           file_url?: string | null
           id?: string
+          is_exception?: boolean | null
           max_revisions?: number
+          priority_level?: number | null
+          raw_drive_link?: string | null
+          raw_file_url?: string | null
           revision_count?: number
           revision_notes?: string | null
           status?: Database["public"]["Enums"]["delivery_status"]
