@@ -699,6 +699,33 @@ export type Database = {
           },
         ]
       }
+      studio_credits: {
+        Row: {
+          created_at: string | null
+          credits_remaining: number | null
+          credits_used_month: number | null
+          id: string
+          last_reset_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          credits_remaining?: number | null
+          credits_used_month?: number | null
+          id?: string
+          last_reset_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          credits_remaining?: number | null
+          credits_used_month?: number | null
+          id?: string
+          last_reset_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
