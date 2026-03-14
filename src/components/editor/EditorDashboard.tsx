@@ -385,7 +385,8 @@ const EditorDashboard = () => {
           )
         `)
         .eq('editor_id', editor.id)
-        .order('due_date', { ascending: true }),
+        .order('priority_level', { ascending: false })
+        .order('created_at', { ascending: true }),
     ]);
 
     const { data, error } = deliveriesResult;
