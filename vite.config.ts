@@ -34,6 +34,11 @@ export default defineConfig(({ mode }) => ({
           'vendor-charts': ['recharts'],
           'vendor-motion': ['framer-motion'],
           'vendor-supabase': ['@supabase/supabase-js'],
+          'admin': [
+            './src/components/admin/AdminClients.tsx',
+            './src/components/admin/AdminEditors.tsx',
+            './src/components/admin/AdminMetrics.tsx',
+          ],
         },
       },
     },
