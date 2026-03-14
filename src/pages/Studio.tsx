@@ -21,7 +21,6 @@ import { Link } from "react-router-dom";
 
 const Studio = () => {
   const { user } = useAuth();
-  const { hasRole } = useRole();
   const { userProject } = useUserProject();
   // REMOVIDO em PRD v5 — admin não tem privilégios de produto, apenas de gestão
   const [credits, setCredits] = useState<number | null>(null);
