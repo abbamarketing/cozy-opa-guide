@@ -115,6 +115,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
       reset({
         project_name: editingProject.project_name,
         description: editingProject.description || '',
+        custom_slug: (editingProject as any).custom_slug || '',
         youtube_videos: editingProject.youtube_videos,
         instagram_videos: editingProject.instagram_videos,
         include_thumbnails: editingProject.include_thumbnails,
