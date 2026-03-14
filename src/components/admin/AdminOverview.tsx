@@ -149,6 +149,9 @@ const AdminOverview = () => {
               <kpi.icon className={`h-4 w-4 ${kpi.color}`} />
             </div>
             <p className="text-lg sm:text-2xl font-bold text-card-foreground break-all">{kpi.value}</p>
+            {'subtitle' in kpi && kpi.subtitle && (
+              <p className="text-[9px] font-mono text-muted-foreground">{kpi.subtitle}</p>
+            )}
           </Card>
         ))}
       </div>

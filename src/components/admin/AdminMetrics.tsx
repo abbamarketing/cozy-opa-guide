@@ -77,11 +77,15 @@ const AdminMetrics = () => {
 
       const { data: allUserProjects } = await supabase
         .from('user_projects')
-        .select('status, created_at, custom_project_id');
+        .select('status, created_at, custom_project_id, client_type, subscription_tier');
 
       const { data: allProjects } = await supabase
         .from('custom_projects')
         .select('id, monthly_value');
+
+      const TIER_VALUES: Record<string, number> = {
+        standard: 490, pro: 660, business: 1100, premium: 2970, agency: 5590,
+      };
 
       const valueMap = new Map((allProjects || []).map((p: any) => [p.id, Number(p.monthly_value)]));
 
@@ -89,8 +93,11 @@ const AdminMetrics = () => {
         const activeInMonth = (allUserProjects || []).filter((up: any) =>
           new Date(up.created_at) <= m.end && up.status === 'active'
         );
-        const mrr = activeInMonth.reduce((sum: number, up: any) => sum + (valueMap.get(up.custom_project_id) || 0), 0);
-        return { month: m.label, mrr };
+        const customMrr = activeInMonth.reduce((sum: number, up: any) => sum + (valueMap.get(up.custom_project_id) || 0), 0);
+        const subMrr = activeInMonth
+          .filter((up: any) => up.client_type === 'subscription' && up.subscription_tier)
+          .reduce((sum: number, up: any) => sum + (TIER_VALUES[up.subscription_tier] ?? 0), 0);
+        return { month: m.label, mrr: customMrr + subMrr };
       });
       setMrrData(mrrMonthly);
 
