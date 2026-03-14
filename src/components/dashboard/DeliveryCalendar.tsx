@@ -290,12 +290,14 @@ const DeliveryCalendar = ({ userProject }: DeliveryCalendarProps) => {
       </div>
 
       {/* Detail Modal */}
-      <DeliveryDetailModal
-        open={!!selectedDelivery}
-        onOpenChange={() => setSelectedDelivery(null)}
-        delivery={selectedDelivery}
-        onUpdated={fetchDeliveries}
-      />
+      <Suspense fallback={null}>
+        <DeliveryDetailModal
+          open={!!selectedDelivery}
+          onOpenChange={() => setSelectedDelivery(null)}
+          delivery={selectedDelivery}
+          onUpdated={fetchDeliveries}
+        />
+      </Suspense>
     </div>
   );
 };
