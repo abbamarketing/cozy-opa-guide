@@ -41,6 +41,7 @@ interface DeliveryDetailModalProps {
   onOpenChange: (open: boolean) => void;
   delivery: DeliveryData | null;
   onUpdated: () => void;
+  userProject?: any;
 }
 
 interface RevisionRecord {
