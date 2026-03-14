@@ -143,9 +143,15 @@ const SubscriptionQueueCard = ({ item }: { item: SubscriptionQueueItem }) => {
           <p className="text-sm font-medium leading-tight text-card-foreground line-clamp-1">
             {item.title}
           </p>
-          <p className="text-[10px] text-muted-foreground truncate">
-            {item.client_name || '—'} · {item.subscription_tier || priority.label}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-[10px] text-muted-foreground truncate">
+              {item.client_name || '—'} · {item.subscription_tier || priority.label}
+            </p>
+            {/* SLA Countdown for in-progress items */}
+            {isInProgress && item.due_date && item.sla_hours && (
+              <SlaCountdown slaDeadline={item.due_date} slaHours={item.sla_hours} />
+            )}
+          </div>
         </div>
 
         {/* Status */}
