@@ -238,6 +238,55 @@ const EditorManagement = () => {
     }
   };
 
+  /* ─── Remove Editor ─── */
+  const handleRemoveEditor = async (editor: EditorData) => {
+    const { count: inProd, data: inProdData } = await supabase
+      .from('deliveries')
+      .select('title', { count: 'exact' })
+      .eq('editor_id', editor.id)
+      .eq('status', 'in_progress');
+
+    if ((inProd ?? 0) > 0) {
+      setBlockedEditor({
+        editor,
+        count: inProd ?? 0,
+        titles: (inProdData || []).map((d: any) => d.title),
+      });
+      setBlockedModalOpen(true);
+      return;
+    }
+
+    setConfirmRemoveEditor(editor);
+  };
+
+  const confirmRemove = async (editor: EditorData) => {
+    setRemoving(true);
+
+    // Release queued/revision deliveries
+    await supabase
+      .from('deliveries')
+      .update({ editor_id: null })
+      .eq('editor_id', editor.id)
+      .in('status', ['queue', 'revision']);
+
+    // Remove editor role
+    await supabase
+      .from('user_roles')
+      .delete()
+      .eq('user_id', editor.user_id)
+      .eq('role', 'editor');
+
+    // Set editor status to inactive
+    await supabase
+      .from('editors')
+      .update({ status: 'inactive' })
+      .eq('id', editor.id);
+
+    toast.success('Editor removido');
+    setConfirmRemoveEditor(null);
+    setRemoving(false);
+    fetchEditors();
+
   /* ─── View Details ─── */
   const openDetails = async (editor: EditorData) => {
     setDetailEditor(editor);
