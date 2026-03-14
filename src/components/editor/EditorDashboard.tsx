@@ -225,6 +225,22 @@ const EditorDeliveryCard = ({
         {delivery.client_name || '—'}
       </p>
 
+      {/* Revision badge + notes */}
+      {delivery.status === 'revision' && (
+        <div className={`mt-1.5 space-y-1 ${onDragStart ? 'pl-[42px]' : 'pl-8'}`}>
+          <Badge className="bg-orange-500/15 text-orange-600 border-orange-500/30 text-[10px] font-mono">
+            Revisão solicitada
+          </Badge>
+          {delivery.revision_notes && (
+            <p className="text-[10px] text-muted-foreground line-clamp-2 italic">
+              {delivery.revision_notes.length > 80
+                ? delivery.revision_notes.slice(0, 80) + '…'
+                : delivery.revision_notes}
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Brand colors */}
       {(delivery.brand_colors.length > 0 || delivery.logo_url) && (
         <div className={`mt-2 flex items-center gap-1.5 ${onDragStart ? 'pl-[42px]' : 'pl-8'}`}>
