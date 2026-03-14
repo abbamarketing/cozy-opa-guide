@@ -113,7 +113,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
     }
 
     const { data: revs } = await supabase
-      .from('delivery_revisions' as any)
+      .from('delivery_revisions')
       .select('*')
       .eq('delivery_id', delivery.id)
       .order('created_at', { ascending: false });
