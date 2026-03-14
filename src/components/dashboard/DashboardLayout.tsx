@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   FileText,
   Settings,
+  Palette,
   LogOut,
   ChevronDown,
 } from 'lucide-react';
