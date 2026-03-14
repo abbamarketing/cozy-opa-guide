@@ -63,7 +63,7 @@ const revisionSchema = z.object({
 
 type RevisionValues = z.infer<typeof revisionSchema>;
 
-const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent }: RevisionModalProps) => {
+const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProject }: RevisionModalProps) => {
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const remaining = delivery.max_revisions - delivery.revision_count;
