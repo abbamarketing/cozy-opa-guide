@@ -672,12 +672,36 @@ const EditorDashboard = () => {
         {subscriptionQueue.length > 0 && (
           <div className="px-4 pt-3">
             <div className="mb-2 flex items-center justify-between">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Fila de Produção
-              </h2>
-              <Badge variant="secondary" className="text-[10px]">
-                {subscriptionQueue.length}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Fila de Produção
+                </h2>
+                <Badge variant="secondary" className="text-[10px]">
+                  {subscriptionQueue.length}
+                </Badge>
+              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button
+                      size="sm"
+                      className="h-7 text-[10px]"
+                      disabled={!canStartProduction || startingProduction}
+                      onClick={handleStartProduction}
+                    >
+                      {startingProduction ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
+                      Iniciar produção
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                {!canStartProduction && (
+                  <TooltipContent>
+                    {inProgressSubCount >= 2
+                      ? 'Limite de 2 produções simultâneas atingido'
+                      : 'Nenhum item na fila'}
+                  </TooltipContent>
+                )}
+              </Tooltip>
             </div>
             <div className="space-y-2">
               {subscriptionQueue.map((item) => (
