@@ -41,6 +41,15 @@ serve(async (req) => {
 
   const userId = claimsData.claims.sub as string;
 
+  // Check if user is admin (unlimited credits)
+  const { data: roleData } = await supabaseAdmin
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .maybeSingle();
+  const isAdmin = !!roleData;
+
   let body: any;
   try {
     body = await req.json();
@@ -63,21 +72,25 @@ serve(async (req) => {
     briefing,
   } = body;
 
-  // Verificar créditos antes de gerar
-  const { data: credits } = await supabaseAdmin
-    .from("studio_credits")
-    .select("credits_remaining, credits_used_month")
-    .eq("user_id", userId)
-    .single();
+  // Verificar créditos antes de gerar (skip for admins)
+  let credits: any = null;
+  if (!isAdmin) {
+    const { data } = await supabaseAdmin
+      .from("studio_credits")
+      .select("credits_remaining, credits_used_month")
+      .eq("user_id", userId)
+      .single();
+    credits = data;
 
-  if (!credits || (credits.credits_remaining ?? 0) <= 0) {
-    return new Response(
-      JSON.stringify({ error: "Sem créditos disponíveis" }),
-      {
-        status: 402,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+    if (!credits || (credits.credits_remaining ?? 0) <= 0) {
+      return new Response(
+        JSON.stringify({ error: "Sem créditos disponíveis" }),
+        {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
   }
 
   // Contexto do briefing de marca
