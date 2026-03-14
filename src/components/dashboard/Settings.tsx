@@ -84,17 +84,20 @@ export default function Settings() {
 
   const handleUpdateNotifications = async () => {
     setLoading(true);
-    const { error } = await supabase.auth.updateUser({
-      data: {
-        email_notifications: emailNotifications,
-        push_notifications: pushNotifications,
-      }
-    });
+    const { error } = await supabase
+      .from('user_preferences')
+      .upsert({
+        user_id: user!.id,
+        notify_delivery_approved: emailNotifications,
+        notify_delivery_revision: pushNotifications,
+        notify_new_message: notifyNewMessage,
+        updated_at: new Date().toISOString(),
+      } as any);
     setLoading(false);
     if (error) {
-      toast.error('Erro ao salvar', { description: error.message });
+      toast.error('Erro ao salvar preferências.', { description: error.message });
     } else {
-      toast.success('Preferências salvas');
+      toast.success('Preferências salvas com sucesso.');
     }
   };
 
