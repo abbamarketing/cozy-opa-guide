@@ -75,7 +75,7 @@ const AdminOverview = () => {
       setKpis({
         activeClients: activeClients || 0,
         pendingDeliveries: pendingDeliveries || 0,
-        lateDeliveries,
+        lateDeliveries: lateDeliveries || 0,
         mrr,
       });
 
