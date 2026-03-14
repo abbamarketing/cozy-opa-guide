@@ -242,10 +242,8 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
       const data = await res.json();
       setGeneratedScript(data.script || "");
 
-      // Update credits locally (skip for admins)
-      if (!isAdmin) {
-        setCredits((c) => (c !== null ? Math.max(0, c - 1) : 0));
-      }
+      // REMOVIDO em PRD v5 — admin não tem bypass de créditos
+      setCredits((c) => (c !== null ? Math.max(0, c - 1) : 0));
       onCreditsChanged?.();
     } catch {
       toast.error("Erro de conexão. Tente novamente.");

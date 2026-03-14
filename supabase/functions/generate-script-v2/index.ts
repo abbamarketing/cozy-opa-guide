@@ -181,16 +181,14 @@ DURAÇÃO ESTIMADA: [Xmin Ys]`;
   const generatedScript =
     aiData.choices?.[0]?.message?.content || "";
 
-  // Debitar 1 crédito (skip for admins)
-  if (!isAdmin && credits) {
-    await supabaseAdmin
-      .from("studio_credits")
-      .update({
-        credits_remaining: (credits.credits_remaining ?? 1) - 1,
-        credits_used_month: (credits.credits_used_month ?? 0) + 1,
-      })
-      .eq("user_id", userId);
-  }
+  // REMOVIDO em PRD v5 — admin não bypassa débito de créditos
+  await supabaseAdmin
+    .from("studio_credits")
+    .update({
+      credits_remaining: (credits.credits_remaining ?? 1) - 1,
+      credits_used_month: (credits.credits_used_month ?? 0) + 1,
+    })
+    .eq("user_id", userId);
 
   // Salvar roteiro no histórico
   await supabaseAdmin.from("studio_scripts").insert({

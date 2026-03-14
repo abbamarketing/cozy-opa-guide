@@ -182,7 +182,8 @@ const Studio = () => {
       )}
 
       {/* Upsell 2 — Quando créditos zerados */}
-      {!isAdmin && credits === 0 && (
+      {/* REMOVIDO em PRD v5 — admin não tem bypass de créditos */}
+      {credits === 0 && (
         <div className="max-w-3xl mt-4 space-y-2">
           <p className="text-sm text-muted-foreground">
             Seus créditos renovam em {daysUntilRenewal()} dias.

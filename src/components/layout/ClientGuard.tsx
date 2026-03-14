@@ -27,10 +27,7 @@ export default function ClientGuard({ children, requireStep }: ClientGuardProps)
     );
   }
 
-  // Admins bypass the client journey flow entirely
-  if (hasRole('admin')) {
-    return <>{children}</>;
-  }
+  // REMOVIDO em PRD v5 — admin não bypassa payment gate nem jornada do cliente
 
   // No project at all → waiting
   if (!userProject) {
