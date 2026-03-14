@@ -29,7 +29,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, role } = await req.json();
+    const { messages, role, userContext } = await req.json();
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(
@@ -44,7 +44,18 @@ serve(async (req) => {
     }
 
     const userRole = (role && roleContexts[role]) ? role : "client";
-    const systemPrompt = `${personality}\n\nContexto do usuário:\n${roleContexts[userRole]}`;
+
+    let contextBlock = "";
+    if (userContext && typeof userContext === "object") {
+      contextBlock = `\n\nDados atuais do usuário (use para responder perguntas sobre conta, créditos, entregas):
+- Plano: ${userContext.plan || "desconhecido"}
+- Créditos Studio restantes: ${userContext.studioCredits ?? "N/A"}
+- Renovação de créditos em: ${userContext.creditRenewal || "N/A"}
+- Entregas na fila: ${userContext.queueCount ?? 0}
+- Em produção: ${userContext.inProduction || "nenhum"}`;
+    }
+
+    const systemPrompt = `${personality}\n\nContexto do usuário:\n${roleContexts[userRole]}${contextBlock}`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",

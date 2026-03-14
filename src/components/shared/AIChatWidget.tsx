@@ -48,6 +48,63 @@ const AIChatWidget = () => {
     }
   }, [open]);
 
+  const buildUserContext = useCallback(async () => {
+    if (!user) return null;
+    try {
+      // Get user's active project
+      const { data: up } = await supabase
+        .from('user_projects')
+        .select('id, subscription_tier, client_type')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .limit(1)
+        .maybeSingle();
+
+      const { data: credits } = await supabase
+        .from('studio_credits')
+        .select('credits_remaining, last_reset_at')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      let queueCount = 0;
+      let inProd: { title: string; due_date: string | null } | null = null;
+
+      if (up) {
+        const { count } = await supabase
+          .from('deliveries')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_project_id', up.id)
+          .eq('status', 'queue');
+        queueCount = count ?? 0;
+
+        const { data: inProgData } = await supabase
+          .from('deliveries')
+          .select('title, due_date')
+          .eq('user_project_id', up.id)
+          .eq('status', 'in_progress')
+          .limit(1)
+          .maybeSingle();
+        inProd = inProgData;
+      }
+
+      const now = new Date();
+      const nextReset = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      const daysUntilReset = Math.ceil((nextReset.getTime() - now.getTime()) / 86_400_000);
+
+      return {
+        plan: up?.subscription_tier || up?.client_type || 'custom',
+        studioCredits: credits?.credits_remaining ?? 0,
+        creditRenewal: `${daysUntilReset} dias`,
+        queueCount,
+        inProduction: inProd
+          ? `${inProd.title}${inProd.due_date ? ` — deadline: ${new Date(inProd.due_date).toLocaleString('pt-BR')}` : ''}`
+          : 'nenhum',
+      };
+    } catch {
+      return null;
+    }
+  }, [user]);
+
   const handleSend = useCallback(async () => {
     const text = input.trim();
     if (!text || isStreaming || !user) return;
@@ -61,7 +118,11 @@ const AIChatWidget = () => {
     let assistantContent = '';
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const [sessionResult, userContext] = await Promise.all([
+        supabase.auth.getSession(),
+        buildUserContext(),
+      ]);
+      const session = sessionResult.data.session;
       if (!session) return;
 
       const resp = await fetch(CHAT_URL, {
@@ -73,6 +134,7 @@ const AIChatWidget = () => {
         body: JSON.stringify({
           messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
           role: primaryRole,
+          ...(userContext && { userContext }),
         }),
       });
 
@@ -132,7 +194,7 @@ const AIChatWidget = () => {
     } finally {
       setIsStreaming(false);
     }
-  }, [input, isStreaming, messages, primaryRole, user]);
+  }, [input, isStreaming, messages, primaryRole, user, buildUserContext]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
