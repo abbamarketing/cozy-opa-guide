@@ -33,11 +33,7 @@ const Studio = () => {
 
   const fetchCredits = async () => {
     if (!user) return;
-    if (isAdmin) {
-      setCredits(Infinity);
-      setLoading(false);
-      return;
-    }
+    // REMOVIDO em PRD v5 — admin não tem créditos de Studio gratuitos
     const { data } = await supabase
       .from("studio_credits")
       .select("credits_remaining")
