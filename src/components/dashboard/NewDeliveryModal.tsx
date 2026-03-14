@@ -249,7 +249,17 @@ const NewDeliveryModal = ({
     setIsSubmitting(true);
 
     try {
-      const dueDate = addBusinessHours(new Date(), getDeadlineHours()).toISOString();
+      // Calculate deadline based on client type
+      let dueDate: string;
+      let priorityLevel = 1;
+
+      if ((userProject as any).client_type === 'subscription' && (userProject as any).sla_hours) {
+        const deadline = countWeekdayHours(new Date(), (userProject as any).sla_hours);
+        dueDate = deadline.toISOString();
+        priorityLevel = (userProject as any).priority_level ?? 1;
+      } else {
+        dueDate = addBusinessHours(new Date(), getDeadlineHours()).toISOString();
+      }
 
       let fullDescription = values.description;
       if (project.include_script && scriptContent.trim()) {
@@ -261,8 +271,9 @@ const NewDeliveryModal = ({
         delivery_type: values.delivery_type,
         title: values.title,
         description: fullDescription,
-        status: 'pending',
+        status: (userProject as any).client_type === 'subscription' ? 'queue' : 'pending',
         due_date: dueDate,
+        priority_level: priorityLevel,
         max_revisions: project.max_revisions,
       };
 
