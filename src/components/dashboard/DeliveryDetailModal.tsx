@@ -66,7 +66,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
         .select('*')
         .eq('delivery_id', delivery.id)
         .order('created_at', { ascending: false });
-      if (data) setRevisions(data as any);
+      if (data) setRevisions(data);
     };
     fetchRevisions();
   }, [delivery, open]);

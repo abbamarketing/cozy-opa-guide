@@ -82,7 +82,7 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent }: Revisio
     const formattedNotes = `[${catLabel}] ${values.notes}`;
 
     try {
-      const { error: revError } = await supabase.from('delivery_revisions' as any).insert({
+      const { error: revError } = await supabase.from('delivery_revisions').insert({
         delivery_id: delivery.id,
         requested_by: user.id,
         notes: formattedNotes,
