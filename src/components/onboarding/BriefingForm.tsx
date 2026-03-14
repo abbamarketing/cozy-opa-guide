@@ -330,12 +330,113 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
             </>
           )}
 
-          {/* Step 2 placeholder */}
+          {/* Step 2 — Estilo de Produção */}
           {currentStep === 2 && (
-            <div className="text-center py-12">
-              <h1 className="text-2xl font-bold mb-2">Estilo de Conteúdo</h1>
-              <p className="text-muted-foreground">Passo 2 em breve</p>
-            </div>
+            <>
+              <div className="text-center mb-8">
+                <h1 className="text-2xl font-bold mb-2">Estilo de Produção</h1>
+                <p className="text-sm text-muted-foreground">
+                  Como seus vídeos devem ser editados
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                {/* Content Style */}
+                <div className="space-y-2">
+                  <Label>Estilo de conteúdo</Label>
+                  <Select
+                    value={formData.content_style}
+                    onValueChange={(v) => update('content_style', v)}
+                  >
+                    <SelectTrigger className="bg-secondary border-border">
+                      <SelectValue placeholder="Selecione o estilo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="educacional">Educacional</SelectItem>
+                      <SelectItem value="entretenimento">Entretenimento</SelectItem>
+                      <SelectItem value="institucional">Institucional</SelectItem>
+                      <SelectItem value="vendas">Vendas</SelectItem>
+                      <SelectItem value="misto">Misto</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Legend Style */}
+                <div className="space-y-2">
+                  <Label>Estilo de legenda</Label>
+                  <Select
+                    value={formData.legend_style}
+                    onValueChange={(v) => update('legend_style', v)}
+                  >
+                    <SelectTrigger className="bg-secondary border-border">
+                      <SelectValue placeholder="Selecione o estilo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Sem legenda</SelectItem>
+                      <SelectItem value="minimalist">Discreta</SelectItem>
+                      <SelectItem value="highlighted">Destacada</SelectItem>
+                      <SelectItem value="dynamic">Dinâmica (TikTok style)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Toggles */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="jump_cuts">Jump cuts</Label>
+                    <Switch
+                      id="jump_cuts"
+                      checked={formData.jump_cuts}
+                      onCheckedChange={(v) => update('jump_cuts', v)}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="remove_silences">Remover silêncios</Label>
+                    <Switch
+                      id="remove_silences"
+                      checked={formData.remove_silences}
+                      onCheckedChange={(v) => update('remove_silences', v)}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="use_emojis">Usar emojis no vídeo</Label>
+                    <Switch
+                      id="use_emojis"
+                      checked={formData.use_emojis}
+                      onCheckedChange={(v) => update('use_emojis', v)}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="use_icons">Usar ícones/gráficos</Label>
+                    <Switch
+                      id="use_icons"
+                      checked={formData.use_icons}
+                      onCheckedChange={(v) => update('use_icons', v)}
+                    />
+                  </div>
+                </div>
+
+                {/* Music Style */}
+                <div className="space-y-2">
+                  <Label>Estilo musical preferido</Label>
+                  <Select
+                    value={formData.preferred_music_style}
+                    onValueChange={(v) => update('preferred_music_style', v)}
+                  >
+                    <SelectTrigger className="bg-secondary border-border">
+                      <SelectValue placeholder="Selecione o estilo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="lofi">Lo-fi</SelectItem>
+                      <SelectItem value="eletronico">Eletrônico</SelectItem>
+                      <SelectItem value="acustico">Acústico</SelectItem>
+                      <SelectItem value="sem_musica">Sem música</SelectItem>
+                      <SelectItem value="depende">Depende do conteúdo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </>
           )}
 
           {/* Step 3 placeholder */}
