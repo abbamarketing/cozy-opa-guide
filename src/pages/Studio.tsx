@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { FileText, Camera, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { useRole } from "@/hooks/useRole";
+// REMOVIDO em PRD v5 — useRole não é mais necessário para bypasses de produto
 import { useUserProject } from "@/hooks/useUserProject";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
