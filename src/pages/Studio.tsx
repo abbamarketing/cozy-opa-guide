@@ -25,17 +25,19 @@ const Studio = () => {
   const [photoEmail, setPhotoEmail] = useState("");
   const [submittingEmail, setSubmittingEmail] = useState(false);
 
+  const fetchCredits = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("studio_credits")
+      .select("credits_remaining")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    setCredits(data?.credits_remaining ?? 0);
+    setLoading(false);
+  };
+
   useEffect(() => {
     if (!user) return;
-    const fetchCredits = async () => {
-      const { data } = await supabase
-        .from("studio_credits")
-        .select("credits_remaining")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      setCredits(data?.credits_remaining ?? 0);
-      setLoading(false);
-    };
     fetchCredits();
   }, [user]);
 
