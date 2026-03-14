@@ -22,7 +22,17 @@ interface KPIs {
   pendingDeliveries: number;
   lateDeliveries: number;
   mrr: number;
+  customMRR: number;
+  subscriptionMRR: number;
 }
+
+const SUBSCRIPTION_TIER_VALUES: Record<string, number> = {
+  standard: 490,
+  pro:      660,
+  business: 1100,
+  premium:  2970,
+  agency:   5590,
+};
 
 const AdminOverview = () => {
   const [kpis, setKpis] = useState<KPIs | null>(null);
