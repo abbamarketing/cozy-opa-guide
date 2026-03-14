@@ -67,7 +67,14 @@ const Studio = () => {
 
   if (showPipeline) {
     return (
-      <div className="min-h-screen bg-background p-6">
+      <div className="min-h-screen bg-background p-6 md:p-10">
+        <Button
+          variant="ghost"
+          onClick={() => setShowPipeline(false)}
+          className="mb-6 text-muted-foreground"
+        >
+          ← Voltar ao Studio
+        </Button>
         <StudioScriptPipeline />
       </div>
     );
