@@ -139,7 +139,7 @@ const NewDeliveryModal = ({
 
     // Custom / other — show all available types
     const result: QuotaInfo[] = [];
-    if (project.youtube_videos > 0) {
+    if (project && project.youtube_videos > 0) {
       const used = userProject.youtube_reserved + userProject.youtube_approved;
       result.push({
         type: 'youtube_video',
