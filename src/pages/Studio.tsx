@@ -15,7 +15,9 @@ import { FileText, Camera, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useRole } from "@/hooks/useRole";
+import { useUserProject } from "@/hooks/useUserProject";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 const Studio = () => {
   const { user } = useAuth();
