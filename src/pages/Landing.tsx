@@ -946,49 +946,57 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* ═══════ SEÇÃO 4 — PROVA SOCIAL ═══════ */}
+      <section className="py-16 sm:py-24 border-t border-border/30">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-10 sm:gap-16 text-center">
+            {[
+              { value: '500+', label: 'vídeos entregues' },
+              { value: '94%', label: 'de SLA cumprido' },
+              { value: '80+', label: 'clientes ativos' },
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial="hidden" whileInView="visible" viewport={{ once: true }}
+                variants={fadeUp} custom={i}
+              >
+                <p className="text-4xl sm:text-5xl font-bold text-primary font-mono">{stat.value}</p>
+                <p className="text-sm text-muted-foreground font-body mt-1">{stat.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ SEÇÃO 5 — FAQ ═══════ */}
       <section className="py-16 sm:py-24 border-t border-border/30">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <h2 className="text-2xl sm:text-4xl font-bold text-center mb-10">
             Perguntas <span className="text-primary">Frequentes</span>
           </h2>
-          <div className="space-y-2">
-            {FAQ.map((item, i) => {
-              const isOpen = openFaq === i;
-              return (
-                <Card
-                  key={i}
-                  className="border-border/40 bg-card/60 overflow-hidden cursor-pointer"
-                  onClick={() => setOpenFaq(isOpen ? null : i)}
-                >
-                  <div className="flex items-center justify-between p-4">
-                    <span className="text-sm font-medium text-card-foreground pr-4">{item.q}</span>
-                    {isOpen ? (
-                      <ChevronUp className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    )}
-                  </div>
-                  <AnimatePresence>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="px-4 pb-4"
-                      >
-                        <p className="text-sm text-muted-foreground font-body leading-relaxed">{item.a}</p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </Card>
-              );
-            })}
-          </div>
+          <Accordion type="single" collapsible className="space-y-2">
+            {[
+              { q: 'O que é o Studio?', a: 'Ferramenta de roteiro com IA. Paga R$97 uma vez, usa 10 créditos/mês para sempre. Não inclui edição de vídeo.' },
+              { q: 'Como funciona a fila?', a: 'Você envia quantos pedidos quiser. Processamos um por vez, na ordem + prioridade do seu plano.' },
+              { q: 'O que são short videos?', a: 'Reels, Shorts e TikTok de até 90 segundos. Não inclui vídeos longos, capas ou thumbnails.' },
+              { q: 'Qual a diferença entre os planos?', a: 'SLA e prioridade na fila. Agência tem 4h garantidos, Standard tem 72h.' },
+              { q: 'Posso cancelar?', a: 'Sim, a qualquer momento pelo portal do cliente. Sem multa.' },
+              { q: 'O que são Clientes Especiais?', a: 'Projetos customizados fora da fila padrão — cotas fixas, SLA negociado, captação presencial. Fale com a equipe.' },
+            ].map((item, i) => (
+              <AccordionItem key={i} value={`faq-${i}`} className="rounded-lg border border-border/40 bg-card/60 px-4">
+                <AccordionTrigger className="text-sm font-medium text-card-foreground hover:no-underline py-4">
+                  {item.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground font-body leading-relaxed pb-4">
+                  {item.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </section>
 
-      {/* CTA Final */}
+      {/* ═══════ SEÇÃO 6 — CTA FINAL ═══════ */}
       <section className="py-16 sm:py-24 border-t border-border/30">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
           <div className="rounded-2xl border border-primary/20 bg-primary/5 p-8 sm:p-12">
@@ -1001,11 +1009,13 @@ const Landing = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Button asChild size="lg" className="gap-2 px-10">
                 <a href="#checkout-studio">
-                  <Sparkles className="h-4 w-4" /> Começar com Studio por R$97
+                  <Sparkles className="h-4 w-4" /> Criar roteiro por R$97
                 </a>
               </Button>
-              <Button variant="outline" size="lg" className="gap-2 px-8" onClick={scrollToPlanos}>
-                Ver todos os planos
+              <Button asChild variant="default" size="lg" className="gap-2 px-8">
+                <a href="#checkout-standard">
+                  Assinar Standard — R$490/mês
+                </a>
               </Button>
             </div>
           </div>
