@@ -149,6 +149,7 @@ function handleSingleRoleRedirect(
   assignedProjectId: string | null | undefined,
   profile: { onboarding_complete: boolean } | null,
   projectStatus: string | null,
+  clientType: string | null,
 ) {
   switch (role) {
     case 'admin':
