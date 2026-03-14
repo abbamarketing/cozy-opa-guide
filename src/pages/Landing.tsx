@@ -109,15 +109,6 @@ const FEATURES = [
   { icon: Users, title: 'Onboarding Express', desc: 'Briefing completo de marca — seu editor já começa sabendo tudo.' },
 ];
 
-const FAQ = [
-  { q: 'Por que eu deveria terceirizar minha edição?', a: 'Porque seu tempo vale mais criando conteúdo do que editando. Cada hora que você gasta cortando vídeo é uma hora a menos produzindo, vendendo ou vivendo. Deixe a edição com quem faz isso o dia todo.' },
-  { q: 'Quanto tempo eu economizo por mês?', a: 'Criadores que editam sozinhos gastam em média 8–15 horas por vídeo. Com a AbbaVideo, você só grava, envia o bruto e aprova. São dezenas de horas devolvidas todo mês.' },
-  { q: 'E se eu não gostar do resultado?', a: 'Revisões estão incluídas no seu plano. Peça ajustes com notas detalhadas e marcadores de tempo — o editor corrige exatamente o que você precisa, quantas vezes for necessário.' },
-  { q: 'Os prazos são em horas corridas?', a: 'Não! Contamos apenas horas úteis (8h–18h, seg–sex). Se você pedir na sexta à noite, o prazo só começa segunda de manhã. Justo e transparente.' },
-  { q: 'Funciona para empresas também?', a: 'Sim! Empresas usam a plataforma para gerenciar conteúdo de múltiplos canais. Cada projeto tem seu editor, briefing e cotas independentes.' },
-  { q: 'Preciso instalar alguma coisa?', a: 'Zero instalação. A plataforma roda no navegador — desktop ou celular. Você gerencia tudo do sofá, do Uber ou do escritório.' },
-  { q: 'Quanto custa?', a: 'Studio: R$97 (pagamento único). Edição de shorts a partir de R$490/mês. Cada plano é transparente — sem surpresas.' },
-];
 
 type DemoTab = 'dashboard' | 'entrega' | 'editor';
 
