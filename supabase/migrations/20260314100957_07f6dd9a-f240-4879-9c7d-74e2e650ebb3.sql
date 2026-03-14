@@ -1,0 +1,1 @@
+ALTER TABLE custom_projects ADD COLUMN IF NOT EXISTS deleted_at timestamptz DEFAULT null;

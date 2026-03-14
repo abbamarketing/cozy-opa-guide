@@ -3,10 +3,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
-import { Plus, Pencil, Copy, Power, Youtube, Instagram, Image, FileImage, MapPin } from 'lucide-react';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from '@/components/ui/dialog';
+import { Plus, Pencil, Copy, Power, Youtube, Instagram, Image, FileImage, MapPin, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import ProjectCreatorModal from './ProjectCreatorModal';
 import type { CustomProject } from '@/types/database';
@@ -20,11 +24,22 @@ const ProjectManager = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<CustomProject | null>(null);
 
+  // Delete states
+  const [blockedProject, setBlockedProject] = useState<{ project: CustomProject; count: number } | null>(null);
+  const [blockedModalOpen, setBlockedModalOpen] = useState(false);
+  const [doubleConfirmProject, setDoubleConfirmProject] = useState<{ project: CustomProject; count: number } | null>(null);
+  const [doubleConfirmModalOpen, setDoubleConfirmModalOpen] = useState(false);
+  const [doubleConfirmInput, setDoubleConfirmInput] = useState('');
+  const [simpleConfirmProject, setSimpleConfirmProject] = useState<CustomProject | null>(null);
+  const [simpleConfirmModalOpen, setSimpleConfirmModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const fetchProjects = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('custom_projects')
       .select('*')
+      .is('deleted_at' as any, null)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -68,6 +83,75 @@ const ProjectManager = () => {
   const handleCreate = () => { setEditingProject(null); setModalOpen(true); };
   const handleModalClose = () => { setModalOpen(false); setEditingProject(null); };
   const handleSaved = () => { handleModalClose(); fetchProjects(); };
+
+  // ── Delete logic ──
+  const handleDeleteProject = async (project: CustomProject) => {
+    // Get user_project IDs for this custom project
+    const { data: userProjects } = await supabase
+      .from('user_projects')
+      .select('id')
+      .eq('custom_project_id', project.id);
+
+    const upIds = (userProjects || []).map((up: any) => up.id);
+
+    if (upIds.length === 0) {
+      setSimpleConfirmProject(project);
+      setSimpleConfirmModalOpen(true);
+      return;
+    }
+
+    // Check in_progress deliveries
+    const { count: inProd } = await supabase
+      .from('deliveries')
+      .select('*', { count: 'exact', head: true })
+      .in('user_project_id', upIds)
+      .eq('status', 'in_progress');
+
+    if ((inProd ?? 0) > 0) {
+      setBlockedProject({ project, count: inProd ?? 0 });
+      setBlockedModalOpen(true);
+      return;
+    }
+
+    // Check queue/revision deliveries
+    const { count: inQueue } = await supabase
+      .from('deliveries')
+      .select('*', { count: 'exact', head: true })
+      .in('user_project_id', upIds)
+      .in('status', ['queue', 'revision']);
+
+    if ((inQueue ?? 0) > 0) {
+      setDoubleConfirmProject({ project, count: inQueue ?? 0 });
+      setDoubleConfirmInput('');
+      setDoubleConfirmModalOpen(true);
+      return;
+    }
+
+    setSimpleConfirmProject(project);
+    setSimpleConfirmModalOpen(true);
+  };
+
+  const confirmDelete = async (projectId: string) => {
+    setDeleting(true);
+    const { error } = await supabase
+      .from('custom_projects')
+      .update({ deleted_at: new Date().toISOString() } as any)
+      .eq('id', projectId);
+
+    if (error) {
+      toast.error('Erro ao excluir projeto');
+    } else {
+      toast.success('Projeto excluído');
+      fetchProjects();
+    }
+    setDeleting(false);
+    setBlockedModalOpen(false);
+    setDoubleConfirmModalOpen(false);
+    setSimpleConfirmModalOpen(false);
+    setBlockedProject(null);
+    setDoubleConfirmProject(null);
+    setSimpleConfirmProject(null);
+  };
 
   const renderDeliverables = (p: CustomProject) => {
     const items: React.ReactNode[] = [];
@@ -143,6 +227,9 @@ const ProjectManager = () => {
                   <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => handleToggleActive(p)}>
                     <Power className={`h-3 w-3 ${p.active ? 'text-primary' : 'text-muted-foreground'}`} />
                   </Button>
+                  <Button variant="ghost" size="sm" className="text-xs gap-1 text-destructive hover:text-destructive" onClick={() => handleDeleteProject(p)}>
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
                 </div>
               </Card>
             ))
@@ -197,6 +284,9 @@ const ProjectManager = () => {
                         <Button variant="ghost" size="icon" onClick={() => handleToggleActive(p)} title={p.active ? 'Desativar' : 'Ativar'}>
                           <Power className={`h-4 w-4 ${p.active ? 'text-primary' : 'text-muted-foreground'}`} />
                         </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteProject(p)} title="Excluir" className="text-destructive hover:text-destructive">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -214,6 +304,73 @@ const ProjectManager = () => {
         editingProject={editingProject}
         clientCount={editingProject ? (clientCounts[editingProject.id] || 0) : 0}
       />
+
+      {/* Modal: Bloqueado */}
+      <Dialog open={blockedModalOpen} onOpenChange={setBlockedModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Exclusão Bloqueada</DialogTitle>
+            <DialogDescription>
+              Este projeto tem <strong>{blockedProject?.count}</strong> vídeo(s) em produção. Conclua ou reatribua antes de excluir.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBlockedModalOpen(false)}>Fechar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal: Confirmação dupla */}
+      <Dialog open={doubleConfirmModalOpen} onOpenChange={(open) => { setDoubleConfirmModalOpen(open); if (!open) setDoubleConfirmInput(''); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Exclusão</DialogTitle>
+            <DialogDescription>
+              <strong>{doubleConfirmProject?.count}</strong> entrega(s) em fila/revisão serão canceladas. Digite o nome do projeto para confirmar:
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-foreground">"{doubleConfirmProject?.project.project_name}"</p>
+            <Input
+              placeholder="Digite o nome do projeto"
+              value={doubleConfirmInput}
+              onChange={(e) => setDoubleConfirmInput(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDoubleConfirmModalOpen(false)}>Cancelar</Button>
+            <Button
+              variant="destructive"
+              disabled={deleting || doubleConfirmInput !== doubleConfirmProject?.project.project_name}
+              onClick={() => doubleConfirmProject && confirmDelete(doubleConfirmProject.project.id)}
+            >
+              {deleting ? 'Excluindo…' : 'Excluir'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal: Confirmação simples */}
+      <Dialog open={simpleConfirmModalOpen} onOpenChange={setSimpleConfirmModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Exclusão</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir <strong>"{simpleConfirmProject?.project_name}"</strong>?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSimpleConfirmModalOpen(false)}>Cancelar</Button>
+            <Button
+              variant="destructive"
+              disabled={deleting}
+              onClick={() => simpleConfirmProject && confirmDelete(simpleConfirmProject.id)}
+            >
+              {deleting ? 'Excluindo…' : 'Excluir'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
