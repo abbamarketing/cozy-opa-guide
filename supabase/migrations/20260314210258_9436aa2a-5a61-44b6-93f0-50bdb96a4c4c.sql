@@ -1,0 +1,1 @@
+ALTER TABLE public.user_projects ADD COLUMN IF NOT EXISTS monthly_quota integer DEFAULT NULL;

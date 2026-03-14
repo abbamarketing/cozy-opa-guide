@@ -166,7 +166,7 @@ Deno.serve(async (req) => {
 
         // ─── Handler Subscription Tiers ───
         if (productId && SUBSCRIPTION_TIERS[productId]) {
-          const { tier, sla, priority } = SUBSCRIPTION_TIERS[productId];
+          const { tier, sla, priority, monthly_quota } = SUBSCRIPTION_TIERS[productId];
           console.log(`Processing subscription ${tier} for user: ${userId}`);
 
           const now = new Date().toISOString();
@@ -204,6 +204,7 @@ Deno.serve(async (req) => {
                 subscription_tier: tier,
                 sla_hours: sla,
                 priority_level: priority,
+                monthly_quota: monthly_quota,
                 studio_access: true,
                 subscription_slug: slug,
                 payment_confirmed_at: now,
@@ -222,6 +223,7 @@ Deno.serve(async (req) => {
               subscription_tier: tier,
               sla_hours: sla,
               priority_level: priority,
+              monthly_quota: monthly_quota,
               studio_access: true,
               subscription_slug: slug,
               stripe_subscription_id: session.subscription,

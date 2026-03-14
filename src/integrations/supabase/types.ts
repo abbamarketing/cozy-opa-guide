@@ -936,6 +936,7 @@ export type Database = {
           id: string
           instagram_approved: number
           instagram_reserved: number
+          monthly_quota: number | null
           payment_confirmed_at: string | null
           priority_level: number | null
           sla_hours: number | null
@@ -969,6 +970,7 @@ export type Database = {
           id?: string
           instagram_approved?: number
           instagram_reserved?: number
+          monthly_quota?: number | null
           payment_confirmed_at?: string | null
           priority_level?: number | null
           sla_hours?: number | null
@@ -1002,6 +1004,7 @@ export type Database = {
           id?: string
           instagram_approved?: number
           instagram_reserved?: number
+          monthly_quota?: number | null
           payment_confirmed_at?: string | null
           priority_level?: number | null
           sla_hours?: number | null
