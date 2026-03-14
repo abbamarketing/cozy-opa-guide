@@ -290,7 +290,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
                 data-tour="new-delivery-btn"
               >
                 {needsCaptureFirst ? <Camera className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                {needsCaptureFirst ? 'Agendar Captação' : 'Nova Solicitacao'}
+                {needsCaptureFirst ? 'Agendar Captação' : 'Nova Solicitação'}
               </Button>
             </span>
           </TooltipTrigger>
