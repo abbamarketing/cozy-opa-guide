@@ -22,7 +22,17 @@ interface KPIs {
   pendingDeliveries: number;
   lateDeliveries: number;
   mrr: number;
+  customMRR: number;
+  subscriptionMRR: number;
 }
+
+const SUBSCRIPTION_TIER_VALUES: Record<string, number> = {
+  standard: 490,
+  pro:      660,
+  business: 1100,
+  premium:  2970,
+  agency:   5590,
+};
 
 const AdminOverview = () => {
   const [kpis, setKpis] = useState<KPIs | null>(null);
@@ -57,30 +67,34 @@ const AdminOverview = () => {
         supabase.from('user_projects').select('*', { count: 'exact', head: true }).eq('status', 'active'),
         supabase.from('deliveries').select('*', { count: 'exact', head: true }).in('status', ['pending', 'in_progress', 'revision']),
         supabase.from('deliveries').select('*', { count: 'exact', head: true }).in('status', ['pending', 'in_progress', 'revision']).not('due_date', 'is', null).lt('due_date', new Date().toISOString()),
-        supabase.from('user_projects').select('custom_project_id').eq('status', 'active'),
+        supabase.from('user_projects').select('custom_project_id, client_type, subscription_tier').eq('status', 'active'),
         supabase.from('deliveries').select('created_at').gte('created_at', weeks[0].start.toISOString()),
         supabase.from('deliveries').select('id, title, due_date, status, delivery_type').in('status', ['pending', 'in_progress', 'revision']).not('due_date', 'is', null).lte('due_date', in24h).order('due_date', { ascending: true }).limit(10),
       ]);
 
-      // MRR (depends on activeProjects result)
-      let mrr = 0;
+      let customMRR = 0;
+      let subscriptionMRR = 0;
       const activeProjects = activeProjectsRes.data;
       if (activeProjects && activeProjects.length > 0) {
-        const projectIds = [...new Set(activeProjects.map((p: any) => p.custom_project_id))];
-        const { data: projects } = await supabase
-          .from('custom_projects')
-          .select('id, monthly_value')
-          .in('id', projectIds);
+        const projectIds = [...new Set(activeProjects.map((p: any) => p.custom_project_id).filter(Boolean))];
+        const { data: projects } = projectIds.length > 0
+          ? await supabase.from('custom_projects').select('id, monthly_value').in('id', projectIds)
+          : { data: [] };
 
         const valueMap = new Map((projects || []).map((p: any) => [p.id, Number(p.monthly_value)]));
-        mrr = activeProjects.reduce((sum: number, p: any) => sum + (valueMap.get(p.custom_project_id) || 0), 0);
+        customMRR = activeProjects.reduce((sum: number, p: any) => sum + (valueMap.get(p.custom_project_id) || 0), 0);
+        subscriptionMRR = activeProjects
+          .filter((up: any) => up.client_type === 'subscription' && up.subscription_tier)
+          .reduce((sum: number, up: any) => sum + (SUBSCRIPTION_TIER_VALUES[up.subscription_tier] ?? 0), 0);
       }
 
       setKpis({
         activeClients: activeClientsRes.count || 0,
         pendingDeliveries: pendingRes.count || 0,
         lateDeliveries: lateRes.count || 0,
-        mrr,
+        mrr: customMRR + subscriptionMRR,
+        customMRR,
+        subscriptionMRR,
       });
 
       const weekCounts = weeks.map((w) => ({
@@ -113,7 +127,13 @@ const AdminOverview = () => {
     { label: 'Clientes Ativos', value: kpis?.activeClients || 0, icon: Users, color: 'text-primary' },
     { label: 'Entregas Pendentes', value: kpis?.pendingDeliveries || 0, icon: Package, color: 'text-[hsl(45,93%,47%)]' },
     { label: 'Entregas Atrasadas', value: kpis?.lateDeliveries || 0, icon: AlertTriangle, color: 'text-destructive' },
-    { label: 'MRR', value: `R$ ${(kpis?.mrr || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, icon: DollarSign, color: 'text-primary' },
+    {
+      label: 'MRR',
+      value: `R$ ${(kpis?.mrr || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`,
+      subtitle: `Custom: R$ ${(kpis?.customMRR || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })} · Assin: R$ ${(kpis?.subscriptionMRR || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`,
+      icon: DollarSign,
+      color: 'text-primary',
+    },
   ];
 
   return (
@@ -129,6 +149,9 @@ const AdminOverview = () => {
               <kpi.icon className={`h-4 w-4 ${kpi.color}`} />
             </div>
             <p className="text-lg sm:text-2xl font-bold text-card-foreground break-all">{kpi.value}</p>
+            {'subtitle' in kpi && kpi.subtitle && (
+              <p className="text-[9px] font-mono text-muted-foreground">{kpi.subtitle}</p>
+            )}
           </Card>
         ))}
       </div>
