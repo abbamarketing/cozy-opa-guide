@@ -181,6 +181,14 @@ const AdminEditors = () => {
                     {e.status === 'available' ? 'Disponível' : e.status === 'busy' ? 'Ocupado' : 'Inativo'}
                   </Badge>
                 </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
+                  onClick={() => setEditorToDelete(e)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-sm">
