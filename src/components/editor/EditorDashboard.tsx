@@ -298,6 +298,7 @@ const EditorDashboard = () => {
   const { editor, isLoading: editorLoading } = useEditor();
   const isMobile = useIsMobile();
   const [deliveries, setDeliveries] = useState<EditorDelivery[]>([]);
+  const [subscriptionQueue, setSubscriptionQueue] = useState<SubscriptionQueueItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
