@@ -283,7 +283,7 @@ const NewDeliveryModal = ({
       }
 
       let fullDescription = values.description;
-      if (project.include_script && scriptContent.trim()) {
+      if (project?.include_script && scriptContent.trim()) {
         fullDescription += `\n\n---\n${aiScript ? 'Ideias para roteiro IA' : 'Roteiro'}:\n${scriptContent}`;
       }
 
