@@ -490,15 +490,169 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
             </>
           )}
 
-          {/* Step 3 placeholder */}
+          {/* Step 3 — Audiência e Referências */}
           {currentStep === 3 && (
-            <div className="text-center py-12">
-              <h1 className="text-2xl font-bold mb-2">Preferências de Edição</h1>
-              <p className="text-muted-foreground">Passo 3 em breve</p>
-              <Button className="mt-6" onClick={handleSubmit} disabled={saving}>
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Finalizar'}
-              </Button>
-            </div>
+            <>
+              <div className="text-center mb-8">
+                <h1 className="text-2xl font-bold mb-2">Audiência e Referências</h1>
+                <p className="text-sm text-muted-foreground">
+                  Detalhes finais sobre sua marca e público
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                {/* Target Audience */}
+                <div className="space-y-2">
+                  <Label htmlFor="target_audience">Público-alvo</Label>
+                  <Input
+                    id="target_audience"
+                    placeholder="Ex: Empreendedores 30-45 anos"
+                    className="bg-secondary border-border"
+                    value={formData.target_audience}
+                    onChange={(e) => update('target_audience', e.target.value)}
+                  />
+                </div>
+
+                {/* Brand Description */}
+                <div className="space-y-2">
+                  <Label htmlFor="brand_description">Descreva sua marca em uma frase</Label>
+                  <Input
+                    id="brand_description"
+                    placeholder="Ex: Educação financeira para iniciantes"
+                    className="bg-secondary border-border"
+                    value={formData.brand_description}
+                    onChange={(e) => update('brand_description', e.target.value)}
+                  />
+                </div>
+
+                {/* Reference Channels */}
+                <div className="space-y-2">
+                  <Label>Canais de referência</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="URL ou nome do canal"
+                      className="bg-secondary border-border flex-1"
+                      value={channelInput}
+                      onChange={(e) => setChannelInput(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addChannel())}
+                    />
+                    <Button type="button" variant="secondary" size="icon" onClick={addChannel}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {formData.reference_channels.length > 0 && (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {formData.reference_channels.map((ch) => (
+                        <span
+                          key={ch}
+                          className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs text-foreground"
+                        >
+                          {ch}
+                          <button type="button" onClick={() => removeChannel(ch)} className="hover:text-destructive">
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Brand Fonts */}
+                <div className="space-y-2">
+                  <Label htmlFor="brand_fonts">Fontes da marca</Label>
+                  <Input
+                    id="brand_fonts"
+                    placeholder="Ex: Montserrat, Open Sans"
+                    className="bg-secondary border-border"
+                    value={formData.brand_fonts}
+                    onChange={(e) => update('brand_fonts', e.target.value)}
+                  />
+                </div>
+
+                {/* Intro Upload */}
+                <div className="space-y-2">
+                  <Label>Intro personalizada (opcional)</Label>
+                  {introFile ? (
+                    <div className="flex items-center gap-3 rounded-lg border border-border p-3">
+                      <span className="text-sm truncate flex-1">{introFile.name}</span>
+                      <Button type="button" variant="ghost" size="icon" onClick={() => setIntroFile(null)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => document.getElementById('intro-input')?.click()}
+                    >
+                      <Upload className="h-4 w-4 mr-2" /> Selecionar arquivo
+                    </Button>
+                  )}
+                  <input
+                    id="intro-input"
+                    type="file"
+                    accept="video/*,audio/*,.mov,.mp4"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) setIntroFile(f); }}
+                    className="hidden"
+                  />
+                </div>
+
+                {/* Outro Upload */}
+                <div className="space-y-2">
+                  <Label>Outro personalizado (opcional)</Label>
+                  {outroFile ? (
+                    <div className="flex items-center gap-3 rounded-lg border border-border p-3">
+                      <span className="text-sm truncate flex-1">{outroFile.name}</span>
+                      <Button type="button" variant="ghost" size="icon" onClick={() => setOutroFile(null)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => document.getElementById('outro-input')?.click()}
+                    >
+                      <Upload className="h-4 w-4 mr-2" /> Selecionar arquivo
+                    </Button>
+                  )}
+                  <input
+                    id="outro-input"
+                    type="file"
+                    accept="video/*,audio/*,.mov,.mp4"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) setOutroFile(f); }}
+                    className="hidden"
+                  />
+                </div>
+
+                {/* Additional Notes */}
+                <div className="space-y-2">
+                  <Label htmlFor="additional_notes">Notas adicionais</Label>
+                  <Textarea
+                    id="additional_notes"
+                    placeholder="Alguma observação para o editor?"
+                    className="bg-secondary border-border min-h-[80px]"
+                    value={formData.additional_notes}
+                    onChange={(e) => update('additional_notes', e.target.value)}
+                  />
+                </div>
+
+                {/* Submit */}
+                <Button
+                  onClick={handleSubmit}
+                  disabled={saving}
+                  className="w-full"
+                  size="lg"
+                >
+                  {saving ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : null}
+                  {saving ? 'Salvando...' : 'Concluir'}
+                </Button>
+              </div>
+            </>
           )}
 
           {/* Navigation */}
