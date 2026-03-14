@@ -185,6 +185,17 @@ Deno.serve(async (req) => {
             .maybeSingle();
 
           if (existingUp) {
+            // Verificar se o slug já está em uso por outro projeto
+            const { data: existingSlug } = await supabase
+              .from('user_projects')
+              .select('id')
+              .eq('subscription_slug', slug)
+              .neq('id', existingUp.id)
+              .maybeSingle();
+
+            if (existingSlug) {
+              slug = generateSlug(brandName, Date.now());
+            }
             await supabase
               .from("user_projects")
               .update({
