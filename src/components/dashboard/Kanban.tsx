@@ -43,11 +43,24 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const [showNewModal, setShowNewModal] = useState(false);
   const [showCaptureModal, setShowCaptureModal] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [activeColumn, setActiveColumn] = useState('todo');
+  const [activeColumn, setActiveColumn] = useState(() =>
+    userProject.client_type === 'subscription' ? 'queue' : 'todo'
+  );
   const [hasScheduledCapture, setHasScheduledCapture] = useState(false);
   const [captureLeadDays, setCaptureLeadDays] = useState(30);
   const [captureCheckDone, setCaptureCheckDone] = useState(false);
   const isMobile = useIsMobile();
+
+  const isSubscription = userProject.client_type === 'subscription';
+
+  // Filter visible columns: queue column visible for subscription clients or when queue deliveries exist
+  const COLUMNS = useMemo(() => {
+    return ALL_COLUMNS.filter((col) => {
+      if (col.id !== 'queue') return true;
+      if (isSubscription) return true;
+      return deliveries.some((d) => d.status === 'queue');
+    });
+  }, [isSubscription, deliveries]);
 
   const requiresCapture = userProject.custom_project?.include_capture ?? false;
   const checkCapture = useCallback(async () => {
