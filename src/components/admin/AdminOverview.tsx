@@ -34,33 +34,37 @@ const AdminOverview = () => {
     const fetchAll = async () => {
       setLoading(true);
 
-      // Active clients
-      const { count: activeClients } = await supabase
-        .from('user_projects')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
+      const in24h = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      const weeks: { week: string; start: Date; end: Date }[] = [];
+      for (let i = 7; i >= 0; i--) {
+        const d = subWeeks(new Date(), i);
+        weeks.push({
+          week: format(startOfWeek(d, { locale: ptBR }), 'dd/MM'),
+          start: startOfWeek(d, { locale: ptBR }),
+          end: endOfWeek(d, { locale: ptBR }),
+        });
+      }
 
-      // Pending deliveries
-      const { count: pendingDeliveries } = await supabase
-        .from('deliveries')
-        .select('*', { count: 'exact', head: true })
-        .in('status', ['pending', 'in_progress', 'revision']);
+      // All independent queries in parallel
+      const [
+        activeClientsRes,
+        pendingRes,
+        lateRes,
+        activeProjectsRes,
+        recentRes,
+        urgentRes,
+      ] = await Promise.all([
+        supabase.from('user_projects').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+        supabase.from('deliveries').select('*', { count: 'exact', head: true }).in('status', ['pending', 'in_progress', 'revision']),
+        supabase.from('deliveries').select('*', { count: 'exact', head: true }).in('status', ['pending', 'in_progress', 'revision']).not('due_date', 'is', null).lt('due_date', new Date().toISOString()),
+        supabase.from('user_projects').select('custom_project_id').eq('status', 'active'),
+        supabase.from('deliveries').select('created_at').gte('created_at', weeks[0].start.toISOString()),
+        supabase.from('deliveries').select('id, title, due_date, status, delivery_type').in('status', ['pending', 'in_progress', 'revision']).not('due_date', 'is', null).lte('due_date', in24h).order('due_date', { ascending: true }).limit(10),
+      ]);
 
-      // Late deliveries
-      const { count: lateDeliveries } = await supabase
-        .from('deliveries')
-        .select('*', { count: 'exact', head: true })
-        .in('status', ['pending', 'in_progress', 'revision'])
-        .not('due_date', 'is', null)
-        .lt('due_date', new Date().toISOString());
-
-      // MRR
-      const { data: activeProjects } = await supabase
-        .from('user_projects')
-        .select('custom_project_id')
-        .eq('status', 'active');
-
+      // MRR (depends on activeProjects result)
       let mrr = 0;
+      const activeProjects = activeProjectsRes.data;
       if (activeProjects && activeProjects.length > 0) {
         const projectIds = [...new Set(activeProjects.map((p: any) => p.custom_project_id))];
         const { data: projects } = await supabase
@@ -73,48 +77,21 @@ const AdminOverview = () => {
       }
 
       setKpis({
-        activeClients: activeClients || 0,
-        pendingDeliveries: pendingDeliveries || 0,
-        lateDeliveries: lateDeliveries || 0,
+        activeClients: activeClientsRes.count || 0,
+        pendingDeliveries: pendingRes.count || 0,
+        lateDeliveries: lateRes.count || 0,
         mrr,
       });
 
-      // Weekly deliveries (last 8 weeks)
-      const weeks: { week: string; start: Date; end: Date }[] = [];
-      for (let i = 7; i >= 0; i--) {
-        const d = subWeeks(new Date(), i);
-        weeks.push({
-          week: format(startOfWeek(d, { locale: ptBR }), 'dd/MM'),
-          start: startOfWeek(d, { locale: ptBR }),
-          end: endOfWeek(d, { locale: ptBR }),
-        });
-      }
-
-      const { data: recentDeliveries } = await supabase
-        .from('deliveries')
-        .select('created_at')
-        .gte('created_at', weeks[0].start.toISOString());
-
       const weekCounts = weeks.map((w) => ({
         week: w.week,
-        count: (recentDeliveries || []).filter(
+        count: (recentRes.data || []).filter(
           (d: any) => new Date(d.created_at) >= w.start && new Date(d.created_at) <= w.end
         ).length,
       }));
       setWeeklyData(weekCounts);
 
-      // Urgent deliveries (next 24h)
-      const in24h = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-      const { data: urgent } = await supabase
-        .from('deliveries')
-        .select('id, title, due_date, status, delivery_type')
-        .in('status', ['pending', 'in_progress', 'revision'])
-        .not('due_date', 'is', null)
-        .lte('due_date', in24h)
-        .order('due_date', { ascending: true })
-        .limit(10);
-
-      setUrgentDeliveries(urgent || []);
+      setUrgentDeliveries(urgentRes.data || []);
       setLoading(false);
     };
 
