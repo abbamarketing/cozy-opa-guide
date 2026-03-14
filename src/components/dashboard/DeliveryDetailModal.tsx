@@ -387,6 +387,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
           open={showRevisionModal}
           onOpenChange={setShowRevisionModal}
           delivery={delivery}
+          userProject={userProject}
           onRevisionSent={() => {
             setShowRevisionModal(false);
             onOpenChange(false);

@@ -301,6 +301,7 @@ const DeliveryCalendar = ({ userProject }: DeliveryCalendarProps) => {
           onOpenChange={() => setSelectedDelivery(null)}
           delivery={selectedDelivery}
           onUpdated={fetchDeliveries}
+          userProject={userProject}
         />
       </Suspense>
     </div>
