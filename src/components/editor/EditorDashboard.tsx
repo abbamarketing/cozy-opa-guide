@@ -387,6 +387,13 @@ const EditorDashboard = () => {
           client_name: profileMap.get(d.user_project?.user_id)?.full_name || null,
           subscription_tier: d.user_project?.subscription_tier || null,
           sla_hours: d.user_project?.sla_hours || null,
+          description: d.description || null,
+          raw_file_url: d.raw_file_url || null,
+          raw_drive_link: d.raw_drive_link || null,
+          client_notes: d.client_notes || null,
+          is_exception: d.is_exception ?? null,
+          revision_count: d.revision_count ?? null,
+          max_revisions: d.max_revisions ?? null,
         }))
       );
     }
