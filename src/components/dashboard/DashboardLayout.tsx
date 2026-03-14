@@ -46,6 +46,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Skeleton } from '@/components/ui/skeleton';
 import QuotaCard from '@/components/dashboard/QuotaCard';
+import SubscriptionStatusCard from '@/components/dashboard/SubscriptionStatusCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 type DashboardTab = 'deliveries' | 'calendar' | 'history' | 'scripts' | 'brand' | 'settings';
@@ -174,9 +175,14 @@ const DashboardSidebar = ({
         </SidebarGroup>
       </SidebarContent>
       {/* QuotaCard at sidebar bottom (desktop only) */}
-      {!collapsed && userProject && (
+      {!collapsed && userProject && userProject.client_type === 'custom' && (
         <div className="mt-auto p-2 border-t border-border/50">
           <QuotaCard userProject={userProject} />
+        </div>
+      )}
+      {!collapsed && userProject && userProject.client_type === 'subscription' && (
+        <div className="mt-auto p-2 border-t border-border/50">
+          <SubscriptionStatusCard userProject={userProject} />
         </div>
       )}
     </Sidebar>
@@ -307,7 +313,12 @@ const DashboardLayout = () => {
             isLoading ? (
               <Skeleton className="h-12 w-full rounded-lg" />
             ) : userProject ? (
-              activeTab !== 'settings' && <QuotaCard userProject={userProject} />
+              activeTab !== 'settings' && (
+                <>
+                  {userProject.client_type === 'custom' && <QuotaCard userProject={userProject} />}
+                  {userProject.client_type === 'subscription' && <SubscriptionStatusCard userProject={userProject} />}
+                </>
+              )
             ) : (
               activeTab === 'deliveries' && (
                 <div className="rounded-lg glass p-4 text-center text-sm text-muted-foreground">
