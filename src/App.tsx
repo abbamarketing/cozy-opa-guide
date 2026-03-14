@@ -104,6 +104,7 @@ const App = () => (
                 <Route path="/payment" element={<PaymentGate />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/waiting" element={<Waiting />} />
+                <Route path="/studio" element={<Studio />} />
               </Route>
 
               {/* Any authenticated user */}
