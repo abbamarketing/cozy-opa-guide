@@ -313,7 +313,12 @@ const DashboardLayout = () => {
             isLoading ? (
               <Skeleton className="h-12 w-full rounded-lg" />
             ) : userProject ? (
-              activeTab !== 'settings' && <QuotaCard userProject={userProject} />
+              activeTab !== 'settings' && (
+                <>
+                  {userProject.client_type === 'custom' && <QuotaCard userProject={userProject} />}
+                  {userProject.client_type === 'subscription' && <SubscriptionStatusCard userProject={userProject} />}
+                </>
+              )
             ) : (
               activeTab === 'deliveries' && (
                 <div className="rounded-lg glass p-4 text-center text-sm text-muted-foreground">
