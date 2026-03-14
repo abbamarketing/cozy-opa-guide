@@ -55,16 +55,22 @@ const Index = () => {
     }
   }, [profileLoading, authLoading, user, profile, roles, checkProjectStatus]);
 
-  // Polling for clients without project
+  // Realtime subscription for clients without project
   useEffect(() => {
-    if (!roles.includes('client') || assignedProjectId !== null || assignedProjectId === undefined) return;
+    if (!user || !roles.includes('client') || assignedProjectId !== null || assignedProjectId === undefined) return;
 
-    const interval = setInterval(() => {
-      checkProjectStatus();
-    }, 10000);
+    const channel = supabase
+      .channel(`profile-${user.id}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'profiles',
+        filter: `user_id=eq.${user.id}`,
+      }, () => { checkProjectStatus(); })
+      .subscribe();
 
-    return () => clearInterval(interval);
-  }, [roles, assignedProjectId, checkProjectStatus]);
+    return () => { supabase.removeChannel(channel); };
+  }, [user, roles, assignedProjectId, checkProjectStatus]);
 
   // Loading states
   if (authLoading || profileLoading || checkingProject) {
