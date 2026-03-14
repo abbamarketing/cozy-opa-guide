@@ -48,6 +48,8 @@ const STATUS_MAP: Record<string, { label: string; variant: 'default' | 'secondar
   cancelled: { label: 'Cancelado', variant: 'secondary' },
 };
 
+const PAGE_SIZE = 20;
+
 const AdminClients = () => {
   const isMobile = useIsMobile();
   const [clients, setClients] = useState<ClientRow[]>([]);
@@ -55,6 +57,8 @@ const AdminClients = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
   const [confirmAction, setConfirmAction] = useState<{
     type: 'suspend' | 'activate' | 'delete' | null;
     userId: string | null;
