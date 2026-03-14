@@ -46,6 +46,7 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import EditorBriefingModal from '@/components/editor/EditorBriefingModal';
 import NotificationBell from '@/components/shared/NotificationBell';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { logger } from '@/lib/logger';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 
@@ -303,6 +304,7 @@ const EditorDashboard = () => {
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [activeColumn, setActiveColumn] = useState('todo');
+  const [startingProduction, setStartingProduction] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
 
   // Filters
@@ -471,6 +473,35 @@ const EditorDashboard = () => {
 
   const uniqueClients = [...new Set(deliveries.map((d) => d.client_name).filter(Boolean))] as string[];
   const uniqueTypes = [...new Set(deliveries.map((d) => d.delivery_type))];
+
+  // Subscription queue: count in-progress and start production
+  const inProgressSubCount = subscriptionQueue.filter((d) => d.status === 'in_progress').length;
+  const canStartProduction = inProgressSubCount < 2 && subscriptionQueue.some((d) => d.status === 'queue');
+
+  const handleStartProduction = async () => {
+    if (!canStartProduction) return;
+    setStartingProduction(true);
+
+    try {
+      // Get next queue item (already sorted by priority_level DESC, created_at ASC)
+      const nextItem = subscriptionQueue.find((d) => d.status === 'queue');
+      if (!nextItem) return;
+
+      const { error } = await supabase
+        .from('deliveries')
+        .update({ status: 'in_progress' } as any)
+        .eq('id', nextItem.id);
+
+      if (error) {
+        toast.error('Erro ao iniciar produção');
+      } else {
+        toast.success(`"${nextItem.title}" movido para produção`);
+        fetchDeliveries();
+      }
+    } finally {
+      setStartingProduction(false);
+    }
+  };
 
   // Drag and drop (desktop only)
   const handleDragStart = (deliveryId: string) => (e: React.DragEvent) => {
@@ -641,12 +672,36 @@ const EditorDashboard = () => {
         {subscriptionQueue.length > 0 && (
           <div className="px-4 pt-3">
             <div className="mb-2 flex items-center justify-between">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Fila de Produção
-              </h2>
-              <Badge variant="secondary" className="text-[10px]">
-                {subscriptionQueue.length}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Fila de Produção
+                </h2>
+                <Badge variant="secondary" className="text-[10px]">
+                  {subscriptionQueue.length}
+                </Badge>
+              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button
+                      size="sm"
+                      className="h-7 text-[10px]"
+                      disabled={!canStartProduction || startingProduction}
+                      onClick={handleStartProduction}
+                    >
+                      {startingProduction ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
+                      Iniciar produção
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                {!canStartProduction && (
+                  <TooltipContent>
+                    {inProgressSubCount >= 2
+                      ? 'Limite de 2 produções simultâneas atingido'
+                      : 'Nenhum item na fila'}
+                  </TooltipContent>
+                )}
+              </Tooltip>
             </div>
             <div className="space-y-2">
               {subscriptionQueue.map((item) => (
@@ -776,6 +831,30 @@ const EditorDashboard = () => {
             <Badge variant="secondary" className="text-xs">
               {subscriptionQueue.length} {subscriptionQueue.length === 1 ? 'item' : 'itens'}
             </Badge>
+            <div className="ml-auto">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button
+                      size="sm"
+                      className="h-8"
+                      disabled={!canStartProduction || startingProduction}
+                      onClick={handleStartProduction}
+                    >
+                      {startingProduction ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Play className="mr-1.5 h-3.5 w-3.5" />}
+                      Iniciar produção
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                {!canStartProduction && (
+                  <TooltipContent>
+                    {inProgressSubCount >= 2
+                      ? 'Limite de 2 produções simultâneas atingido'
+                      : 'Nenhum item na fila'}
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </div>
           </div>
           <div className="grid grid-cols-2 xl:grid-cols-3 gap-2 mb-4">
             {subscriptionQueue.map((item) => (
