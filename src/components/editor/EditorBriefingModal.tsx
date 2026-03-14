@@ -273,6 +273,63 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
 
               {/* TAB 1: Briefing */}
               <TabsContent value="briefing" className="space-y-4 mt-4">
+                {/* Arquivo do Cliente */}
+                {(delivery.raw_file_url || delivery.raw_drive_link || delivery.client_notes || delivery.is_exception) && (
+                  <div className="space-y-3 rounded-lg border border-border/50 bg-muted/20 p-4">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                      <FileText className="h-3 w-3" /> Arquivo do Cliente
+                    </h4>
+
+                    {delivery.is_exception && (
+                      <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-3 space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <Badge className="bg-amber-500 text-white text-[10px]">⚠️ Exceção ao briefing</Badge>
+                        </div>
+                        {delivery.exception_notes && (
+                          <p className="text-sm text-amber-700 dark:text-amber-300 whitespace-pre-wrap">{delivery.exception_notes}</p>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap gap-2">
+                      {delivery.raw_file_url && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1.5"
+                          onClick={() => window.open(delivery.raw_file_url!, '_blank')}
+                        >
+                          <Download className="h-3.5 w-3.5" /> Baixar arquivo bruto
+                        </Button>
+                      )}
+                      {delivery.raw_drive_link && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1.5"
+                          asChild
+                        >
+                          <a href={delivery.raw_drive_link} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-3.5 w-3.5" /> Abrir link externo
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+
+                    {delivery.client_notes && (
+                      <div className="space-y-1">
+                        <p className="text-[10px] uppercase text-muted-foreground font-semibold">Observações do cliente</p>
+                        <Textarea
+                          value={delivery.client_notes}
+                          readOnly
+                          className="text-sm resize-none bg-background/50 cursor-default"
+                          rows={3}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {delivery.description && (
                   <div className="space-y-1">
                     <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Descrição</h4>

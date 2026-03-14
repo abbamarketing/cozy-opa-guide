@@ -23,6 +23,11 @@ const mapDelivery = (d: any): DeliveryData => ({
   approved_at: d.approved_at,
   revision_notes: d.revision_notes,
   user_project_id: d.user_project_id,
+  raw_file_url: d.raw_file_url,
+  raw_drive_link: d.raw_drive_link,
+  client_notes: d.client_notes,
+  is_exception: d.is_exception,
+  exception_notes: d.exception_notes,
 });
 
 async function fetchDeliveries(userProjectId: string): Promise<DeliveryData[]> {
