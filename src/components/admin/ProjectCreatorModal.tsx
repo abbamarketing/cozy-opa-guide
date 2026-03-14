@@ -280,6 +280,16 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
                 {...register('description')}
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="custom_slug">Slug do cliente (URL amigável)</Label>
+              <Input
+                id="custom_slug"
+                placeholder="ex: marca-cliente"
+                className="bg-secondary border-border font-mono"
+                {...register('custom_slug')}
+              />
+              {errors.custom_slug && <p className="text-xs text-destructive">{errors.custom_slug.message}</p>}
+            </div>
           </section>
 
           {/* B) Deliverables */}
