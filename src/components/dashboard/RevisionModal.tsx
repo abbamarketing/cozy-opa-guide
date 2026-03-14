@@ -34,6 +34,7 @@ interface RevisionModalProps {
   onOpenChange: (open: boolean) => void;
   delivery: DeliveryData;
   onRevisionSent: () => void;
+  userProject: any;
 }
 
 const FEEDBACK_CATEGORIES = [
