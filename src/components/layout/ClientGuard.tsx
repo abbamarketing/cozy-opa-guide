@@ -17,7 +17,7 @@ interface ClientGuardProps {
 export default function ClientGuard({ children, requireStep }: ClientGuardProps) {
   const { userProject, isLoading: projectLoading } = useUserProject();
   const { profile, isLoading: profileLoading } = useProfile();
-  const { hasRole, loading: roleLoading } = useRole();
+  
 
   if (projectLoading || profileLoading || roleLoading) {
     return (
