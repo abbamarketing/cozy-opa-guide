@@ -132,7 +132,16 @@ export default function ScriptGenerator() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ prompt: prompt.trim() }),
+        body: JSON.stringify({
+          content_type: 'short_video',
+          topic: prompt.trim(),
+          objective: 'engajamento',
+          tone: briefing?.content_style || '',
+          audience: briefing?.target_audience || '',
+          audience_level: 'intermediate',
+          reference: (briefing?.reference_channels || []).join(', '),
+          keywords: '',
+        }),
         signal: controller.signal,
       });
 
