@@ -106,9 +106,8 @@ interface StudioScriptPipelineProps {
 
 const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) => {
   const { user } = useAuth();
-  const { hasRole } = useRole();
   const { userProject } = useUserProject();
-  const isAdmin = hasRole('admin');
+  // REMOVIDO em PRD v5 — admin não tem privilégios de produto, apenas de gestão
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<ScriptFormData>(INITIAL_DATA);
   const [generating, setGenerating] = useState(false);
