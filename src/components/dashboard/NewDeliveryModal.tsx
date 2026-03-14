@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { addBusinessHours } from '@/lib/business-hours';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 import { useDeliveries } from '@/hooks/useDeliveries';
 import {
   Dialog,
@@ -29,7 +30,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Video, Camera, Image, Layers, Upload, Link, Clock } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Loader2, Video, Camera, Image, Layers, Upload, Link, Clock, X, AlertTriangle } from 'lucide-react';
 import type { UserProjectData } from '@/hooks/useUserProject';
 
 interface NewDeliveryModalProps {
@@ -40,9 +42,10 @@ interface NewDeliveryModalProps {
 }
 
 type DeliveryType = 'youtube_video' | 'instagram_video' | 'thumbnail' | 'cover';
-type MaterialOption = 'upload' | 'drive' | 'later';
+type RawMaterialTab = 'upload' | 'link';
 
-const driveUrlRegex = /^https:\/\/(drive\.google\.com|docs\.google\.com)\/.+/;
+const ACCEPTED_VIDEO_TYPES = '.mp4,.mov,.avi,.mkv';
+const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
 
 const formSchema = z.object({
   delivery_type: z.enum(['youtube_video', 'instagram_video', 'thumbnail', 'cover'], {
@@ -82,9 +85,20 @@ const NewDeliveryModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [aiScript, setAiScript] = useState(false);
   const [scriptContent, setScriptContent] = useState('');
-  const [materialOption, setMaterialOption] = useState<MaterialOption>('later');
-  const [driveLink, setDriveLink] = useState('');
-  const [driveLinkError, setDriveLinkError] = useState('');
+
+  // Raw material state
+  const [rawTab, setRawTab] = useState<RawMaterialTab>('upload');
+  const [rawFile, setRawFile] = useState<File | null>(null);
+  const [rawFileUrl, setRawFileUrl] = useState<string | null>(null);
+  const [rawDriveLink, setRawDriveLink] = useState('');
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Extra fields
+  const [clientNotes, setClientNotes] = useState('');
+  const [isException, setIsException] = useState(false);
+  const [exceptionNotes, setExceptionNotes] = useState('');
 
   const project = userProject.custom_project;
 
@@ -99,6 +113,11 @@ const NewDeliveryModal = ({
 
   const selectedType = form.watch('delivery_type');
   const isVideo = selectedType === 'youtube_video' || selectedType === 'instagram_video';
+
+  // Check if raw material is provided
+  const hasRawMaterial = isVideo
+    ? (rawTab === 'upload' && rawFileUrl) || (rawTab === 'link' && rawDriveLink.trim().length > 0)
+    : true; // non-video types don't require raw material
 
   // Build quota info
   const quotas = useMemo<QuotaInfo[]>(() => {
@@ -150,24 +169,81 @@ const NewDeliveryModal = ({
     return result;
   }, [userProject, project]);
 
-  // Deadline calculation - always use project default
+  // Deadline calculation
   const getDeadlineHours = () => {
     return project.deadline === '24h' ? 24 : project.deadline === '48h' ? 48 : 72;
+  };
+
+  // Handle file upload
+  const handleFileSelect = async (file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error('Arquivo muito grande', { description: 'O tamanho máximo é 500MB' });
+      return;
+    }
+    setRawFile(file);
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `${user!.id}/${Date.now()}-${file.name}`;
+
+      // Simulate progress since supabase doesn't provide upload progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => Math.min(prev + 10, 90));
+      }, 300);
+
+      const { error } = await supabase.storage.from('raw-files').upload(path, file);
+      clearInterval(progressInterval);
+
+      if (error) {
+        toast.error('Erro no upload', { description: error.message });
+        setRawFile(null);
+        setUploadProgress(0);
+      } else {
+        setUploadProgress(100);
+        // Get signed URL for private bucket
+        const { data: urlData } = await supabase.storage.from('raw-files').createSignedUrl(path, 60 * 60 * 24 * 365);
+        setRawFileUrl(urlData?.signedUrl || path);
+        toast.success('Arquivo enviado com sucesso!');
+      }
+    } catch {
+      toast.error('Erro ao enviar arquivo');
+      setRawFile(null);
+      setUploadProgress(0);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const clearFile = () => {
+    setRawFile(null);
+    setRawFileUrl(null);
+    setUploadProgress(0);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const resetForm = () => {
+    form.reset();
+    setScriptContent('');
+    setAiScript(false);
+    setRawTab('upload');
+    setRawFile(null);
+    setRawFileUrl(null);
+    setRawDriveLink('');
+    setUploadProgress(0);
+    setClientNotes('');
+    setIsException(false);
+    setExceptionNotes('');
   };
 
   const onSubmit = async (values: FormValues) => {
     if (!user) return;
 
-    // Validate drive link if selected
-    if (isVideo && materialOption === 'drive') {
-      if (!driveLink.trim()) {
-        setDriveLinkError('Insira o link do Google Drive');
-        return;
-      }
-      if (!driveUrlRegex.test(driveLink.trim())) {
-        setDriveLinkError('Link inválido. Use um link do Google Drive');
-        return;
-      }
+    // Validate raw material for videos
+    if (isVideo && !hasRawMaterial) {
+      toast.error('Envie o arquivo bruto ou insira um link para continuar');
+      return;
     }
 
     setIsSubmitting(true);
@@ -175,19 +251,11 @@ const NewDeliveryModal = ({
     try {
       const dueDate = addBusinessHours(new Date(), getDeadlineHours()).toISOString();
 
-      // Build description with extras
       let fullDescription = values.description;
       if (project.include_script && scriptContent.trim()) {
         fullDescription += `\n\n---\n${aiScript ? 'Ideias para roteiro IA' : 'Roteiro'}:\n${scriptContent}`;
       }
-      if (isVideo && materialOption === 'drive' && driveLink.trim()) {
-        fullDescription += `\n\nMaterial: ${driveLink.trim()}`;
-      }
-      if (isVideo && materialOption === 'later') {
-        fullDescription += '\n\nMaterial: será enviado depois';
-      }
 
-      // 1. Create delivery via mutation
       const insertData: Record<string, any> = {
         user_project_id: userProject.id,
         delivery_type: values.delivery_type,
@@ -198,9 +266,27 @@ const NewDeliveryModal = ({
         max_revisions: project.max_revisions,
       };
 
-      // Store drive link in dedicated column
-      if (isVideo && materialOption === 'drive' && driveLink.trim()) {
-        insertData.drive_link = driveLink.trim();
+      // Raw material fields
+      if (isVideo) {
+        if (rawTab === 'upload' && rawFileUrl) {
+          insertData.raw_file_url = rawFileUrl;
+        }
+        if (rawTab === 'link' && rawDriveLink.trim()) {
+          insertData.raw_drive_link = rawDriveLink.trim();
+        }
+      }
+
+      // Client notes
+      if (clientNotes.trim()) {
+        insertData.client_notes = clientNotes.trim();
+      }
+
+      // Exception
+      if (isException) {
+        insertData.is_exception = true;
+        if (exceptionNotes.trim()) {
+          insertData.exception_notes = exceptionNotes.trim();
+        }
       }
 
       await createDelivery.mutateAsync(insertData);
@@ -208,11 +294,7 @@ const NewDeliveryModal = ({
       logger.info('Entrega criada', { delivery_type: values.delivery_type, title: values.title }, 'delivery');
       toast.success('Solicitação criada com sucesso!');
       onOpenChange(false);
-      form.reset();
-      setScriptContent('');
-      setDriveLink('');
-      setMaterialOption('later');
-      setAiScript(false);
+      resetForm();
       onCreated();
     } catch (err: any) {
       toast.error(err.message || 'Erro ao criar solicitação');
@@ -324,7 +406,7 @@ const NewDeliveryModal = ({
                   <div className="flex justify-between">
                     <FormMessage />
                     <span className="text-[10px] text-muted-foreground">
-                      {field.value.length}/5000 (min 50)
+                      {field.value.length}/5000 (min 20)
                     </span>
                   </div>
                 </FormItem>
@@ -357,54 +439,151 @@ const NewDeliveryModal = ({
               </div>
             )}
 
-            {/* 5. Material bruto (condicional - vídeos) */}
+            {/* 5. Arquivo bruto (vídeos) */}
             {isVideo && (
               <div className="space-y-3 rounded-lg border border-border/50 p-3">
-                <Label className="text-sm">Material Bruto</Label>
-                <RadioGroup
-                  value={materialOption}
-                  onValueChange={(v) => {
-                    setMaterialOption(v as MaterialOption);
-                    setDriveLinkError('');
-                  }}
-                  className="space-y-2"
-                >
-                  <label className="flex cursor-pointer items-center gap-2 text-sm text-card-foreground">
-                    <RadioGroupItem value="drive" />
-                    <Link className="h-3.5 w-3.5 text-muted-foreground" />
-                    Link do Google Drive
-                  </label>
-                  <label className="flex cursor-pointer items-center gap-2 text-sm text-card-foreground">
-                    <RadioGroupItem value="later" />
-                    <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                    Vou enviar depois
-                  </label>
-                </RadioGroup>
+                <Label className="text-sm font-medium">
+                  Enviar arquivo bruto <span className="text-destructive">*</span>
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Sem arquivo bruto, o editor não poderá iniciar a edição.
+                </p>
 
-                {materialOption === 'drive' && (
-                  <div>
-                    <Input
-                      value={driveLink}
-                      onChange={(e) => {
-                        setDriveLink(e.target.value);
-                        setDriveLinkError('');
-                      }}
-                      placeholder="https://drive.google.com/..."
-                      maxLength={500}
-                    />
-                    {driveLinkError && (
-                      <p className="mt-1 text-xs text-destructive">{driveLinkError}</p>
+                {/* Tabs */}
+                <div className="flex gap-1 rounded-lg bg-secondary p-1">
+                  <button
+                    type="button"
+                    onClick={() => setRawTab('upload')}
+                    className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                      rawTab === 'upload'
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <Upload className="mr-1.5 inline h-3.5 w-3.5" />
+                    Upload direto
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRawTab('link')}
+                    className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                      rawTab === 'link'
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <Link className="mr-1.5 inline h-3.5 w-3.5" />
+                    Link externo
+                  </button>
+                </div>
+
+                {/* Upload tab */}
+                {rawTab === 'upload' && (
+                  <div className="space-y-2">
+                    {rawFile ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-3 rounded-lg border border-border p-3">
+                          <Video className="h-4 w-4 shrink-0 text-primary" />
+                          <span className="flex-1 truncate text-sm">{rawFile.name}</span>
+                          <span className="shrink-0 text-xs text-muted-foreground">
+                            {(rawFile.size / (1024 * 1024)).toFixed(1)}MB
+                          </span>
+                          {!isUploading && (
+                            <Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={clearFile}>
+                              <X className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
+                        </div>
+                        {(isUploading || uploadProgress > 0) && (
+                          <Progress value={uploadProgress} className="h-1.5" />
+                        )}
+                      </div>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full border-dashed"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploading}
+                      >
+                        <Upload className="mr-2 h-4 w-4" />
+                        Selecionar vídeo (.mp4, .mov, .avi, .mkv)
+                      </Button>
                     )}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept={ACCEPTED_VIDEO_TYPES}
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleFileSelect(f);
+                      }}
+                      className="hidden"
+                    />
                   </div>
+                )}
+
+                {/* Link tab */}
+                {rawTab === 'link' && (
+                  <Input
+                    value={rawDriveLink}
+                    onChange={(e) => setRawDriveLink(e.target.value)}
+                    placeholder="https://drive.google.com/... ou link do Dropbox"
+                    maxLength={500}
+                  />
+                )}
+
+                {/* Warning if no material */}
+                {!hasRawMaterial && (
+                  <p className="flex items-center gap-1.5 text-xs text-destructive">
+                    <AlertTriangle className="h-3.5 w-3.5" />
+                    Arquivo obrigatório para enviar a solicitação
+                  </p>
                 )}
               </div>
             )}
 
+            {/* 6. Observações específicas */}
+            <div className="space-y-2">
+              <Label htmlFor="client_notes" className="text-sm">
+                Observações específicas
+              </Label>
+              <Textarea
+                id="client_notes"
+                value={clientNotes}
+                onChange={(e) => setClientNotes(e.target.value)}
+                placeholder="Observações específicas para este vídeo (diferente do seu briefing padrão?)"
+                rows={2}
+                maxLength={2000}
+              />
+            </div>
+
+            {/* 7. Exceção */}
+            <div className="space-y-3 rounded-lg border border-border/50 p-3">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-sm">É uma exceção?</Label>
+                  <p className="text-[10px] text-muted-foreground">
+                    Este vídeo tem instruções diferentes do seu briefing padrão?
+                  </p>
+                </div>
+                <Switch checked={isException} onCheckedChange={setIsException} />
+              </div>
+              {isException && (
+                <Textarea
+                  value={exceptionNotes}
+                  onChange={(e) => setExceptionNotes(e.target.value)}
+                  placeholder="Descreva as diferenças em relação ao seu briefing padrão..."
+                  rows={3}
+                  maxLength={2000}
+                />
+              )}
+            </div>
 
             {/* Submit */}
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isUploading || (isVideo && !hasRawMaterial)}
               className="w-full gap-2"
             >
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
