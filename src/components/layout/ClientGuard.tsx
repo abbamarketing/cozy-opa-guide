@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useUserProject } from '@/hooks/useUserProject';
 import { useProfile } from '@/hooks/useProfile';
+import { useRole } from '@/hooks/useRole';
 import { Loader2 } from 'lucide-react';
 
 interface ClientGuardProps {
@@ -11,18 +12,24 @@ interface ClientGuardProps {
 
 /**
  * Enforces the client journey order: Waiting → Payment → Onboarding → Dashboard.
- * Wraps client pages to prevent skipping steps via direct URL navigation.
+ * Admins bypass all guards to access any client page freely.
  */
 export default function ClientGuard({ children, requireStep }: ClientGuardProps) {
   const { userProject, isLoading: projectLoading } = useUserProject();
   const { profile, isLoading: profileLoading } = useProfile();
+  const { hasRole, loading: roleLoading } = useRole();
 
-  if (projectLoading || profileLoading) {
+  if (projectLoading || profileLoading || roleLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
+  }
+
+  // Admins bypass the client journey flow entirely
+  if (hasRole('admin')) {
+    return <>{children}</>;
   }
 
   // No project at all → waiting
@@ -36,7 +43,6 @@ export default function ClientGuard({ children, requireStep }: ClientGuardProps)
 
   switch (requireStep) {
     case 'payment':
-      // If already paid, skip payment page
       if (isActive) {
         return onboardingDone
           ? <Navigate to="/dashboard" replace />
@@ -45,22 +51,18 @@ export default function ClientGuard({ children, requireStep }: ClientGuardProps)
       return <>{children}</>;
 
     case 'onboarding':
-      // Must pay first
       if (isPendingPayment) {
         return <Navigate to="/payment" replace />;
       }
-      // If onboarding already done, go to dashboard
       if (onboardingDone) {
         return <Navigate to="/dashboard" replace />;
       }
       return <>{children}</>;
 
     case 'dashboard':
-      // Must pay first
       if (isPendingPayment) {
         return <Navigate to="/payment" replace />;
       }
-      // Must complete onboarding first
       if (!onboardingDone) {
         return <Navigate to="/onboarding" replace />;
       }
