@@ -61,8 +61,8 @@ const Kanban = ({ userProject }: KanbanProps) => {
       .eq('id', userProject.custom_project.id)
       .single();
 
-    if (proj && (proj as any).capture_lead_days) {
-      setCaptureLeadDays((proj as any).capture_lead_days);
+    if (proj && proj.capture_lead_days) {
+      setCaptureLeadDays(proj.capture_lead_days);
     }
 
     // Check for any scheduled/confirmed capture in current period
