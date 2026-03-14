@@ -142,7 +142,23 @@ const AdminEditors = () => {
     }
   };
 
-  if (loading) {
+  const handleDeleteEditor = async () => {
+    if (!editorToDelete) return;
+    // Desatribuir entregas ativas
+    await supabase
+      .from('deliveries')
+      .update({ editor_id: null })
+      .eq('editor_id', editorToDelete.id)
+      .in('status', ['pending', 'in_progress', 'revision']);
+    // Remover editor
+    await supabase.from('editors').delete().eq('id', editorToDelete.id);
+    // Remover role
+    await supabase.from('user_roles').delete().eq('user_id', editorToDelete.user_id);
+    toast.success('Editor removido. Entregas ativas foram desatribuídas.');
+    setEditorToDelete(null);
+    fetchEditors();
+  };
+
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[1, 2, 3].map((i) => <Skeleton key={i} className="h-40 rounded-xl" />)}
