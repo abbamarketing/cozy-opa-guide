@@ -41,6 +41,7 @@ const AdminEditors = () => {
   const [email, setEmail] = useState('');
   const [creating, setCreating] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [editorToDelete, setEditorToDelete] = useState<EditorCard | null>(null);
 
   const fetchEditors = async () => {
     setLoading(true);
