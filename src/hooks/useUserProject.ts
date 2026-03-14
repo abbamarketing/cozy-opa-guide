@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 
@@ -40,36 +40,23 @@ export interface UserProjectData {
 
 export const useUserProject = () => {
   const { user } = useAuth();
-  const [userProject, setUserProject] = useState<UserProjectData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!user) {
-      setUserProject(null);
-      setIsLoading(false);
-      return;
-    }
-
-    const fetch = async () => {
-      setIsLoading(true);
+  const { data: userProject = null, isLoading, error } = useQuery({
+    queryKey: ['user-project', user?.id],
+    queryFn: async () => {
       const { data, error: err } = await supabase
         .from('user_projects')
         .select('*, custom_project:custom_projects(*)')
-        .eq('user_id', user.id)
+        .eq('user_id', user!.id)
         .in('status', ['active', 'pending_payment'])
         .maybeSingle();
 
-      if (err) {
-        setError(err.message);
-      } else {
-        setUserProject(data as unknown as UserProjectData);
-      }
-      setIsLoading(false);
-    };
+      if (err) throw new Error(err.message);
+      return (data as unknown as UserProjectData) ?? null;
+    },
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+  });
 
-    fetch();
-  }, [user]);
-
-  return { userProject, isLoading, error };
+  return { userProject, isLoading, error: error?.message ?? null };
 };
