@@ -17,6 +17,7 @@ const Index = () => {
   const { user, isLoading: authLoading } = useAuth();
   const { profile, roles, primaryRole, isLoading: profileLoading } = useProfile();
   const [projectStatus, setProjectStatus] = useState<string | null>(null);
+  const [clientType, setClientType] = useState<string | null>(null);
   const [checkingProject, setCheckingProject] = useState(false);
   const [assignedProjectId, setAssignedProjectId] = useState<string | null | undefined>(undefined);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
