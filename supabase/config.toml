@@ -25,3 +25,5 @@ project_id = "iqrypgqdhpanqjqnxtap"
     verify_jwt = false
   [functions.generate-script-v2]
     verify_jwt = false
+  [functions.reset-studio-credits]
+    verify_jwt = false
