@@ -35,6 +35,7 @@ export interface UserProjectData {
     payment_frequency: string;
     max_revisions: number;
     deadline: string;
+    capture_lead_days: number;
   };
 }
 
