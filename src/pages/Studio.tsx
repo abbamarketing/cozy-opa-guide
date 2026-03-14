@@ -11,7 +11,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { FileText, Camera, Sparkles, Loader2 } from "lucide-react";
+import { FileText, Camera, Sparkles, Loader2, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 // REMOVIDO em PRD v5 — useRole não é mais necessário para bypasses de produto
@@ -159,22 +159,29 @@ const Studio = () => {
         </Card>
       </div>
 
-      {/* Upsell 1 — Card permanente para studio-only users */}
+      {/* Upsell — Card permanente para studio-only users */}
       {userProject?.client_type === 'studio' && (
         <div className="max-w-3xl mt-6">
           <Card className="border-primary/20 bg-primary/5">
-            <CardContent className="p-6 space-y-3">
-              <h3 className="text-base font-semibold text-foreground">
-                Quer ver seu roteiro ganhar vida?
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Com o plano Standard, você envia o vídeo gravado e nossa equipe
-                edita em até 72h — com sua identidade visual. A partir de R$490/mês,
-                fila ilimitada, cancele quando quiser.
-              </p>
-              <Button asChild variant="default" size="sm">
-                <Link to="/plans">Ver planos de edição</Link>
-              </Button>
+            <CardContent className="flex items-start gap-4 p-6">
+              <Sparkles className="h-6 w-6 text-primary shrink-0 mt-0.5" />
+              <div className="space-y-2">
+                <h3 className="text-base font-semibold text-foreground">
+                  Quer ter seus vídeos editados também?
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Combine o Studio com uma assinatura AbbaVideo e receba seus Reels,
+                  Shorts e TikToks editados toda semana.
+                </p>
+                <Button
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => window.open('/', '_blank')}
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  Ver planos de assinatura
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
