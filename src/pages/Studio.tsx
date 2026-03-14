@@ -100,12 +100,9 @@ const Studio = () => {
           </h1>
         </div>
 
+        {/* REMOVIDO em PRD v5 — admin não exibe créditos ilimitados */}
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-        ) : isAdmin ? (
-          <Badge variant="secondary" className="text-sm px-3 py-1">
-            ∞ créditos (admin)
-          </Badge>
         ) : (
           <Badge
             variant={credits === 0 ? "destructive" : "secondary"}
