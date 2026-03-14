@@ -15,23 +15,17 @@ interface DeliveryChecklistProps {
 }
 
 const DeliveryChecklist = ({ userProjectId }: DeliveryChecklistProps) => {
+  const { user } = useAuth();
   const [items, setItems] = useState<ChecklistItem[]>([]);
 
   useEffect(() => {
+    if (!user) return;
+
     const fetchBriefing = async () => {
-      // Get user_id from user_project
-      const { data: up } = await supabase
-        .from('user_projects')
-        .select('user_id')
-        .eq('id', userProjectId)
-        .maybeSingle();
-
-      if (!up) return;
-
       const { data: briefing } = await supabase
         .from('onboarding_briefings')
         .select('brand_name, brand_fonts, brand_colors, content_style, primary_color, secondary_color, legend_style, jump_cuts, remove_silences, use_emojis, use_icons')
-        .eq('user_id', up.user_id)
+        .eq('user_id', user.id)
         .maybeSingle();
 
       if (!briefing) return;
