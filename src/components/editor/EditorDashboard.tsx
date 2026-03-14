@@ -57,6 +57,18 @@ interface EditorDelivery extends DeliveryData {
   logo_url: string | null;
 }
 
+interface SubscriptionQueueItem {
+  id: string;
+  title: string;
+  delivery_type: string;
+  status: string;
+  created_at: string;
+  due_date: string | null;
+  priority_level: number | null;
+  client_name: string | null;
+  subscription_tier: string | null;
+}
+
 interface Column {
   id: string;
   title: string;
@@ -86,6 +98,14 @@ const typeLabels: Record<string, string> = {
   cover: 'Capa',
 };
 
+const PRIORITY_CONFIG: Record<number, { label: string; color: string }> = {
+  5: { label: 'Agência', color: 'bg-purple-700 text-white' },
+  4: { label: 'Premium', color: 'bg-blue-600 text-white' },
+  3: { label: 'Business', color: 'bg-emerald-600 text-white' },
+  2: { label: 'Pro', color: 'bg-yellow-500 text-black' },
+  1: { label: 'Standard', color: 'bg-muted text-muted-foreground' },
+};
+
 const getDeadlineInfo = (dueDate: string | null) => {
   if (!dueDate) return { hours: null, color: 'text-muted-foreground', label: 'Sem prazo' };
   const bizMin = remainingBusinessMinutes(new Date(dueDate));
@@ -95,6 +115,50 @@ const getDeadlineInfo = (dueDate: string | null) => {
   if (bizHours <= 6) return { hours: bizHours, color: 'text-destructive', label };
   if (bizHours <= 12) return { hours: bizHours, color: 'text-[hsl(45,93%,47%)]', label };
   return { hours: bizHours, color: 'text-primary', label };
+};
+
+/* ─── Subscription Queue Card ─── */
+const SubscriptionQueueCard = ({ item }: { item: SubscriptionQueueItem }) => {
+  const Icon = typeIcons[item.delivery_type] || Video;
+  const priority = PRIORITY_CONFIG[item.priority_level ?? 1] || PRIORITY_CONFIG[1];
+  const isInProgress = item.status === 'in_progress';
+
+  return (
+    <Card className="border-border/40 bg-card p-3">
+      <div className="flex items-center gap-3">
+        {/* Priority badge */}
+        <Badge className={`shrink-0 text-[10px] font-bold px-2 py-0.5 ${priority.color}`}>
+          P{item.priority_level ?? 1}
+        </Badge>
+
+        {/* Icon */}
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10">
+          <Icon className="h-3.5 w-3.5 text-primary" />
+        </div>
+
+        {/* Info */}
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium leading-tight text-card-foreground line-clamp-1">
+            {item.title}
+          </p>
+          <p className="text-[10px] text-muted-foreground truncate">
+            {item.client_name || '—'} · {item.subscription_tier || priority.label}
+          </p>
+        </div>
+
+        {/* Status */}
+        {isInProgress ? (
+          <Badge variant="default" className="shrink-0 bg-emerald-600 text-[10px] text-white">
+            EM PRODUÇÃO
+          </Badge>
+        ) : (
+          <Badge variant="secondary" className="shrink-0 text-[10px]">
+            NA FILA
+          </Badge>
+        )}
+      </div>
+    </Card>
+  );
 };
 
 /* ─── Editor Card ─── */
