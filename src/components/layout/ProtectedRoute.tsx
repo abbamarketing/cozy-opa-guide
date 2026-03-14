@@ -14,7 +14,7 @@ export default function ProtectedRoute({ requireRole }: ProtectedRouteProps) {
   if (authLoading || roleLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-primary">Carregando...</div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
   }
