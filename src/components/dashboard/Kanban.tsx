@@ -1,5 +1,5 @@
-import { useEffect, useState, lazy, Suspense, useCallback } from 'react';
-import { Plus, Camera, AlertCircle, Video } from 'lucide-react';
+import { useEffect, useState, lazy, Suspense, useCallback, useMemo } from 'react';
+import { Plus, Camera, AlertCircle, Video, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -26,11 +26,13 @@ interface Column {
   description: string;
 }
 
-const COLUMNS: Column[] = [
-  { id: 'todo', title: 'A FAZER', statuses: ['pending'], description: 'Aguardando início' },
-  { id: 'production', title: 'PRODUÇÃO', statuses: ['in_progress', 'revision'], description: 'Editor trabalhando' },
-  { id: 'review', title: 'REVISAR', statuses: ['review'], description: 'Pronto para aprovação' },
-  { id: 'done', title: 'CONCLUÍDO', statuses: ['approved'], description: 'Aprovado e finalizado' },
+const ALL_COLUMNS: Column[] = [
+  { id: 'queue',      title: 'NA FILA',    statuses: ['queue'],        description: 'Aguardando editor disponível' },
+  { id: 'todo',       title: 'A FAZER',    statuses: ['pending'],      description: 'Aguardando início' },
+  { id: 'production', title: 'PRODUÇÃO',   statuses: ['in_progress'],  description: 'Editor produzindo' },
+  { id: 'revision',   title: 'EM REVISÃO', statuses: ['revision'],     description: 'Editor revisando' },
+  { id: 'review',     title: 'REVISAR',    statuses: ['review'],       description: 'Pronto para aprovação' },
+  { id: 'done',       title: 'CONCLUÍDO',  statuses: ['approved'],     description: 'Aprovado e finalizado' },
 ];
 
 const PAGE_SIZE = 20;
@@ -41,11 +43,24 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const [showNewModal, setShowNewModal] = useState(false);
   const [showCaptureModal, setShowCaptureModal] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [activeColumn, setActiveColumn] = useState('todo');
+  const [activeColumn, setActiveColumn] = useState(() =>
+    userProject.client_type === 'subscription' ? 'queue' : 'todo'
+  );
   const [hasScheduledCapture, setHasScheduledCapture] = useState(false);
   const [captureLeadDays, setCaptureLeadDays] = useState(30);
   const [captureCheckDone, setCaptureCheckDone] = useState(false);
   const isMobile = useIsMobile();
+
+  const isSubscription = userProject.client_type === 'subscription';
+
+  // Filter visible columns: queue column visible for subscription clients or when queue deliveries exist
+  const COLUMNS = useMemo(() => {
+    return ALL_COLUMNS.filter((col) => {
+      if (col.id !== 'queue') return true;
+      if (isSubscription) return true;
+      return deliveries.some((d) => d.status === 'queue');
+    });
+  }, [isSubscription, deliveries]);
 
   const requiresCapture = userProject.custom_project?.include_capture ?? false;
   const checkCapture = useCallback(async () => {
@@ -239,11 +254,20 @@ const Kanban = ({ userProject }: KanbanProps) => {
                 </div>
               ) : (
                 items.map((d) => (
-                  <DeliveryCard
-                    key={d.id}
-                    delivery={d}
-                    onClick={() => setSelectedDelivery(d)}
-                  />
+                  <div key={d.id} className="relative">
+                    {activeColumn === 'queue' && (
+                      <div className="absolute top-2 right-2 z-10">
+                        <Badge variant="secondary" className="text-[9px] font-mono gap-1">
+                          <Clock className="h-2.5 w-2.5" />
+                          Aguardando editor
+                        </Badge>
+                      </div>
+                    )}
+                    <DeliveryCard
+                      delivery={d}
+                      onClick={() => setSelectedDelivery(d)}
+                    />
+                  </div>
                 ))
               )}
             </div>
@@ -319,7 +343,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
       {isLoading ? (
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-          {COLUMNS.map((c) => (
+          {ALL_COLUMNS.filter(c => c.id !== 'queue' || isSubscription).map((c) => (
             <div key={c.id} className="rounded-lg border border-border/30 bg-muted/15 p-2.5 min-w-[240px] space-y-2">
               <div className="flex items-center justify-between px-1 mb-1">
                 <Skeleton className="h-3 w-20" />
@@ -376,11 +400,20 @@ const Kanban = ({ userProject }: KanbanProps) => {
                       </div>
                     ) : (
                       items.map((d) => (
-                        <DeliveryCard
-                          key={d.id}
-                          delivery={d}
-                          onClick={() => setSelectedDelivery(d)}
-                        />
+                        <div key={d.id} className="relative">
+                          {col.id === 'queue' && (
+                            <div className="absolute top-2 right-2 z-10">
+                              <Badge variant="secondary" className="text-[9px] font-mono gap-1">
+                                <Clock className="h-2.5 w-2.5" />
+                                Aguardando editor
+                              </Badge>
+                            </div>
+                          )}
+                          <DeliveryCard
+                            delivery={d}
+                            onClick={() => setSelectedDelivery(d)}
+                          />
+                        </div>
                       ))
                     )}
                     {hasMore && (
