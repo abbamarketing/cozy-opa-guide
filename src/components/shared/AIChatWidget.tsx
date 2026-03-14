@@ -67,6 +67,18 @@ const AIChatWidget = () => {
       const session = sessionResult.data.session;
       if (!session) return;
 
+      const resp = await fetch(CHAT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
+          role: primaryRole,
+        }),
+      });
+
       if (!resp.ok || !resp.body) {
         const errData = await resp.json().catch(() => ({}));
         throw new Error(errData.error || 'Erro na comunicação');
