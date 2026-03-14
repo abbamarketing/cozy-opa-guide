@@ -10,7 +10,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from '@/components/ui/dialog';
-import { Plus, Loader2, Video, CheckCircle } from 'lucide-react';
+import {
+  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
+} from '@/components/ui/alert-dialog';
+import { Plus, Loader2, Video, CheckCircle, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
@@ -37,6 +41,7 @@ const AdminEditors = () => {
   const [email, setEmail] = useState('');
   const [creating, setCreating] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [editorToDelete, setEditorToDelete] = useState<EditorCard | null>(null);
 
   const fetchEditors = async () => {
     setLoading(true);
@@ -137,6 +142,23 @@ const AdminEditors = () => {
     }
   };
 
+  const handleDeleteEditor = async () => {
+    if (!editorToDelete) return;
+    // Desatribuir entregas ativas
+    await supabase
+      .from('deliveries')
+      .update({ editor_id: null })
+      .eq('editor_id', editorToDelete.id)
+      .in('status', ['pending', 'in_progress', 'revision']);
+    // Remover editor
+    await supabase.from('editors').delete().eq('id', editorToDelete.id);
+    // Remover role
+    await supabase.from('user_roles').delete().eq('user_id', editorToDelete.user_id);
+    toast.success('Editor removido. Entregas ativas foram desatribuídas.');
+    setEditorToDelete(null);
+    fetchEditors();
+  };
+
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -176,6 +198,14 @@ const AdminEditors = () => {
                     {e.status === 'available' ? 'Disponível' : e.status === 'busy' ? 'Ocupado' : 'Inativo'}
                   </Badge>
                 </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
+                  onClick={() => setEditorToDelete(e)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-sm">
@@ -241,6 +271,25 @@ const AdminEditors = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Editor Confirmation */}
+      <AlertDialog open={!!editorToDelete} onOpenChange={(open) => !open && setEditorToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remover editor?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Remover {editorToDelete?.display_name}? Esta ação é irreversível.
+              O editor perderá acesso ao sistema e suas entregas ativas serão desatribuídas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteEditor} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Remover
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
