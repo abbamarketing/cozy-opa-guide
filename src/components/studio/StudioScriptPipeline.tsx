@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { useRole } from "@/hooks/useRole";
 import { toast } from "sonner";
 
 export interface ScriptFormData {
