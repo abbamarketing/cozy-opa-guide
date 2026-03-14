@@ -41,6 +41,7 @@ interface DeliveryDetailModalProps {
   onOpenChange: (open: boolean) => void;
   delivery: DeliveryData | null;
   onUpdated: () => void;
+  userProject?: any;
 }
 
 interface RevisionRecord {
@@ -50,7 +51,7 @@ interface RevisionRecord {
   created_at: string;
 }
 
-const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: DeliveryDetailModalProps) => {
+const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProject }: DeliveryDetailModalProps) => {
   const { user } = useAuth();
   const { updateDelivery } = useDeliveries(delivery?.user_project_id ?? '');
   const [revisions, setRevisions] = useState<RevisionRecord[]>([]);
@@ -386,6 +387,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: Delive
           open={showRevisionModal}
           onOpenChange={setShowRevisionModal}
           delivery={delivery}
+          userProject={userProject}
           onRevisionSent={() => {
             setShowRevisionModal(false);
             onOpenChange(false);

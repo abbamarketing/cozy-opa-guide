@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { countWeekdayHours } from '@/lib/business-hours';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,6 +34,7 @@ interface RevisionModalProps {
   onOpenChange: (open: boolean) => void;
   delivery: DeliveryData;
   onRevisionSent: () => void;
+  userProject: any;
 }
 
 const FEEDBACK_CATEGORIES = [
@@ -61,7 +63,7 @@ const revisionSchema = z.object({
 
 type RevisionValues = z.infer<typeof revisionSchema>;
 
-const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent }: RevisionModalProps) => {
+const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProject }: RevisionModalProps) => {
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const remaining = delivery.max_revisions - delivery.revision_count;
@@ -90,13 +92,21 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent }: Revisio
       });
       if (revError) throw revError;
 
+      const updateData: Record<string, any> = {
+        status: 'revision',
+        revision_count: delivery.revision_count + 1,
+        revision_notes: formattedNotes,
+      };
+
+      // Recalcular SLA deadline para clientes de assinatura
+      if (userProject?.client_type === 'subscription' && userProject?.sla_hours) {
+        const newDeadline = countWeekdayHours(new Date(), userProject.sla_hours);
+        updateData.sla_deadline = newDeadline.toISOString();
+      }
+
       const { error: delError } = await supabase
         .from('deliveries')
-        .update({
-          status: 'revision',
-          revision_count: delivery.revision_count + 1,
-          revision_notes: formattedNotes,
-        })
+        .update(updateData)
         .eq('id', delivery.id);
       if (delError) throw delError;
 
