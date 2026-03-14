@@ -36,6 +36,7 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [currentStep] = useState(1);
 
   const {
     register,
