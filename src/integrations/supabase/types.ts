@@ -897,6 +897,8 @@ export type Database = {
           current_period_end: string
           current_period_start: string
           custom_project_id: string
+          custom_slug: string | null
+          deleted_at: string | null
           editor_id: string | null
           id: string
           instagram_approved: number
@@ -907,6 +909,7 @@ export type Database = {
           status: Database["public"]["Enums"]["user_project_status"]
           stripe_subscription_id: string | null
           studio_access: boolean | null
+          subscription_slug: string | null
           subscription_tier: string | null
           thumbnails_approved: number
           thumbnails_reserved: number
@@ -927,6 +930,8 @@ export type Database = {
           current_period_end?: string
           current_period_start?: string
           custom_project_id: string
+          custom_slug?: string | null
+          deleted_at?: string | null
           editor_id?: string | null
           id?: string
           instagram_approved?: number
@@ -937,6 +942,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["user_project_status"]
           stripe_subscription_id?: string | null
           studio_access?: boolean | null
+          subscription_slug?: string | null
           subscription_tier?: string | null
           thumbnails_approved?: number
           thumbnails_reserved?: number
@@ -957,6 +963,8 @@ export type Database = {
           current_period_end?: string
           current_period_start?: string
           custom_project_id?: string
+          custom_slug?: string | null
+          deleted_at?: string | null
           editor_id?: string | null
           id?: string
           instagram_approved?: number
@@ -967,6 +975,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["user_project_status"]
           stripe_subscription_id?: string | null
           studio_access?: boolean | null
+          subscription_slug?: string | null
           subscription_tier?: string | null
           thumbnails_approved?: number
           thumbnails_reserved?: number
