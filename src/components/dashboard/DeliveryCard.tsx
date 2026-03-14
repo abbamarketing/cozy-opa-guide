@@ -24,6 +24,11 @@ export interface DeliveryData {
   approved_at: string | null;
   revision_notes: string | null;
   user_project_id: string;
+  raw_file_url: string | null;
+  raw_drive_link: string | null;
+  client_notes: string | null;
+  is_exception: boolean | null;
+  exception_notes: string | null;
 }
 
 export const typeConfig: Record<string, { icon: React.ComponentType<{ className?: string }>; label: string }> = {
