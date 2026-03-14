@@ -485,8 +485,8 @@ const EditorDashboard = () => {
 
   const pendingCount = deliveries.filter((d) => ['pending', 'in_progress', 'revision'].includes(d.status)).length;
 
-  const uniqueClients = [...new Set(deliveries.map((d) => d.client_name).filter(Boolean))] as string[];
-  const uniqueTypes = [...new Set(deliveries.map((d) => d.delivery_type))];
+  const uniqueClients = useMemo(() => [...new Set(deliveries.map((d) => d.client_name).filter(Boolean))] as string[], [deliveries]);
+  const uniqueTypes = useMemo(() => [...new Set(deliveries.map((d) => d.delivery_type))], [deliveries]);
 
   // Subscription queue: count in-progress and start production
   const inProgressSubCount = subscriptionQueue.filter((d) => d.status === 'in_progress').length;
