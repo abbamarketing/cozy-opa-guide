@@ -51,7 +51,7 @@ interface RevisionRecord {
   created_at: string;
 }
 
-const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated }: DeliveryDetailModalProps) => {
+const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProject }: DeliveryDetailModalProps) => {
   const { user } = useAuth();
   const { updateDelivery } = useDeliveries(delivery?.user_project_id ?? '');
   const [revisions, setRevisions] = useState<RevisionRecord[]>([]);
