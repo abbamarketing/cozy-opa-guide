@@ -17,6 +17,7 @@ const Index = () => {
   const { user, isLoading: authLoading } = useAuth();
   const { profile, roles, primaryRole, isLoading: profileLoading } = useProfile();
   const [projectStatus, setProjectStatus] = useState<string | null>(null);
+  const [clientType, setClientType] = useState<string | null>(null);
   const [checkingProject, setCheckingProject] = useState(false);
   const [assignedProjectId, setAssignedProjectId] = useState<string | null | undefined>(undefined);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -37,11 +38,12 @@ const Index = () => {
     if ((data as any).assigned_project_id) {
       const { data: up } = await supabase
         .from('user_projects')
-        .select('status')
+        .select('status, client_type')
         .eq('user_id', user.id)
         .maybeSingle();
 
       setProjectStatus(up?.status || null);
+      setClientType((up as any)?.client_type || null);
     }
     setCheckingProject(false);
   }, [user]);
@@ -87,13 +89,13 @@ const Index = () => {
 
   // If user has only one role, redirect directly
   if (roles.length <= 1) {
-    return handleSingleRoleRedirect(primaryRole, assignedProjectId, profile, projectStatus);
+    return handleSingleRoleRedirect(primaryRole, assignedProjectId, profile, projectStatus, clientType);
   }
 
   // If user selected a role, redirect
   if (selectedRole) {
     if (selectedRole === 'client') {
-      return handleSingleRoleRedirect('client', assignedProjectId, profile, projectStatus);
+      return handleSingleRoleRedirect('client', assignedProjectId, profile, projectStatus, clientType);
     }
     const config = ROLE_CONFIG[selectedRole];
     if (config) return <Navigate to={config.path} replace />;
@@ -147,6 +149,7 @@ function handleSingleRoleRedirect(
   assignedProjectId: string | null | undefined,
   profile: { onboarding_complete: boolean } | null,
   projectStatus: string | null,
+  clientType: string | null,
 ) {
   switch (role) {
     case 'admin':
@@ -161,6 +164,17 @@ function handleSingleRoleRedirect(
       if (projectStatus === 'pending_payment') {
         return <Navigate to="/payment" replace />;
       }
+      // Route based on client_type
+      if (clientType === 'studio') {
+        return <Navigate to="/studio" replace />;
+      }
+      if (clientType === 'subscription') {
+        if (!profile?.onboarding_complete) {
+          return <Navigate to="/onboarding" replace />;
+        }
+        return <Navigate to="/dashboard" replace />;
+      }
+      // Default (custom) — existing flow
       if (!profile?.onboarding_complete) {
         return <Navigate to="/onboarding" replace />;
       }
