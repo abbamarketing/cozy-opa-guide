@@ -175,9 +175,14 @@ const DashboardSidebar = ({
         </SidebarGroup>
       </SidebarContent>
       {/* QuotaCard at sidebar bottom (desktop only) */}
-      {!collapsed && userProject && (
+      {!collapsed && userProject && userProject.client_type === 'custom' && (
         <div className="mt-auto p-2 border-t border-border/50">
           <QuotaCard userProject={userProject} />
+        </div>
+      )}
+      {!collapsed && userProject && userProject.client_type === 'subscription' && (
+        <div className="mt-auto p-2 border-t border-border/50">
+          <SubscriptionStatusCard userProject={userProject} />
         </div>
       )}
     </Sidebar>
