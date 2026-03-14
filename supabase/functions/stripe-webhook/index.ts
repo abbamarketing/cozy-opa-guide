@@ -175,7 +175,7 @@ Deno.serve(async (req) => {
           const brandName = session.metadata?.brand_name
             || session.customer_details?.name
             || 'cliente';
-          const slug = generateSlug(brandName);
+          let slug = generateSlug(brandName);
 
           // If user already has a user_project, update it; otherwise INSERT new record
           const { data: existingUp } = await supabase
@@ -185,6 +185,17 @@ Deno.serve(async (req) => {
             .maybeSingle();
 
           if (existingUp) {
+            // Verificar se o slug já está em uso por outro projeto
+            const { data: existingSlug } = await supabase
+              .from('user_projects')
+              .select('id')
+              .eq('subscription_slug', slug)
+              .neq('id', existingUp.id)
+              .maybeSingle();
+
+            if (existingSlug) {
+              slug = generateSlug(brandName, Date.now());
+            }
             await supabase
               .from("user_projects")
               .update({
