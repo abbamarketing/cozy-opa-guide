@@ -172,7 +172,7 @@ const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
                 SEU PLANO
               </p>
               <p className="text-sm font-mono font-semibold text-primary mt-0.5">
-                {project.project_name}
+                {userProject.custom_project?.project_name ?? userProject.subscription_tier ?? 'Assinatura'}
               </p>
             </div>
             <div className="flex items-center gap-2">
