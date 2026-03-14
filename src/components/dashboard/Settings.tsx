@@ -44,6 +44,14 @@ export default function Settings() {
       setName(data.full_name || '');
     }
     setEmail(user?.email || '');
+
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (authUser?.user_metadata?.email_notifications !== undefined) {
+      setEmailNotifications(authUser.user_metadata.email_notifications);
+    }
+    if (authUser?.user_metadata?.push_notifications !== undefined) {
+      setPushNotifications(authUser.user_metadata.push_notifications);
+    }
   };
 
   const handleUpdateProfile = async () => {
