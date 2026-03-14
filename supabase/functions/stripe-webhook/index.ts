@@ -4,6 +4,15 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const STRIPE_API = "https://api.stripe.com/v1";
 
+function generateSlug(name: string, suffix?: number): string {
+  const base = name
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  return suffix ? `${base}-${suffix}` : base;
+}
+
 // Minimal HMAC-SHA256 webhook signature verification using Web Crypto API
 async function verifyStripeSignature(
   payload: string,
@@ -163,7 +172,12 @@ Deno.serve(async (req) => {
           const now = new Date().toISOString();
           const periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-          // If user already has a user_project, update it; otherwise this is handled by admin flow
+          const brandName = session.metadata?.brand_name
+            || session.customer_details?.name
+            || 'cliente';
+          const slug = generateSlug(brandName);
+
+          // If user already has a user_project, update it; otherwise INSERT new record
           const { data: existingUp } = await supabase
             .from("user_projects")
             .select("id")
@@ -180,12 +194,30 @@ Deno.serve(async (req) => {
                 sla_hours: sla,
                 priority_level: priority,
                 studio_access: true,
+                subscription_slug: slug,
                 payment_confirmed_at: now,
                 stripe_subscription_id: session.subscription,
                 current_period_start: now,
                 current_period_end: periodEnd,
               })
               .eq("id", existingUp.id);
+          } else {
+            // New user — insert user_project record
+            await supabase.from("user_projects").insert({
+              user_id: userId,
+              custom_project_id: session.metadata?.custom_project_id || null,
+              status: "active",
+              client_type: "subscription",
+              subscription_tier: tier,
+              sla_hours: sla,
+              priority_level: priority,
+              studio_access: true,
+              subscription_slug: slug,
+              stripe_subscription_id: session.subscription,
+              current_period_start: now,
+              current_period_end: periodEnd,
+              payment_confirmed_at: now,
+            });
           }
 
           // Grant Studio credits
