@@ -33,6 +33,10 @@ import SubtaskTemplateEditor, { type SubtaskTemplate } from './SubtaskTemplateEd
 const projectSchema = z.object({
   project_name: z.string().trim().min(1, 'Nome é obrigatório').max(100),
   description: z.string().max(500).optional().or(z.literal('')),
+  custom_slug: z.string().max(60).optional().or(z.literal('')).refine(
+    (v) => !v || /^[a-z0-9-]+$/.test(v),
+    { message: 'Apenas letras minúsculas, números e hifens (a-z, 0-9, -)' }
+  ),
   youtube_videos: z.number().min(0).max(30),
   instagram_videos: z.number().min(0).max(30),
   include_thumbnails: z.boolean(),
@@ -88,6 +92,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
     defaultValues: {
       project_name: '',
       description: '',
+      custom_slug: '',
       youtube_videos: 0,
       instagram_videos: 0,
       include_thumbnails: false,
@@ -110,6 +115,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
       reset({
         project_name: editingProject.project_name,
         description: editingProject.description || '',
+        custom_slug: (editingProject as any).custom_slug || '',
         youtube_videos: editingProject.youtube_videos,
         instagram_videos: editingProject.instagram_videos,
         include_thumbnails: editingProject.include_thumbnails,
@@ -175,6 +181,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
     const payload = {
       ...data,
       description: data.description || null,
+      custom_slug: data.custom_slug?.trim() || null,
       created_by: user.id,
     };
 
@@ -272,6 +279,16 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
                 rows={3}
                 {...register('description')}
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="custom_slug">Slug do cliente (URL amigável)</Label>
+              <Input
+                id="custom_slug"
+                placeholder="ex: marca-cliente"
+                className="bg-secondary border-border font-mono"
+                {...register('custom_slug')}
+              />
+              {errors.custom_slug && <p className="text-xs text-destructive">{errors.custom_slug.message}</p>}
             </div>
           </section>
 
