@@ -215,6 +215,7 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           },
           body: JSON.stringify({
             ...formData,
@@ -242,8 +243,10 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
       const data = await res.json();
       setGeneratedScript(data.script || "");
 
-      // Update credits locally
-      setCredits((c) => (c !== null ? Math.max(0, c - 1) : 0));
+      // Update credits locally (skip for admins)
+      if (!isAdmin) {
+        setCredits((c) => (c !== null ? Math.max(0, c - 1) : 0));
+      }
       onCreditsChanged?.();
     } catch {
       toast.error("Erro de conexão. Tente novamente.");
