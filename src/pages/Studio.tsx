@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import StudioScriptPipeline from "@/components/studio/StudioScriptPipeline";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -66,17 +67,15 @@ const Studio = () => {
 
   if (showPipeline) {
     return (
-      <div className="min-h-screen bg-background p-6">
+      <div className="min-h-screen bg-background p-6 md:p-10">
         <Button
           variant="ghost"
           onClick={() => setShowPipeline(false)}
-          className="mb-4 text-muted-foreground"
+          className="mb-6 text-muted-foreground"
         >
           ← Voltar ao Studio
         </Button>
-        <div className="flex items-center justify-center py-20">
-          <p className="text-muted-foreground">Pipeline de roteiro — em construção</p>
-        </div>
+        <StudioScriptPipeline />
       </div>
     );
   }
