@@ -38,11 +38,12 @@ const Index = () => {
     if ((data as any).assigned_project_id) {
       const { data: up } = await supabase
         .from('user_projects')
-        .select('status')
+        .select('status, client_type')
         .eq('user_id', user.id)
         .maybeSingle();
 
       setProjectStatus(up?.status || null);
+      setClientType((up as any)?.client_type || null);
     }
     setCheckingProject(false);
   }, [user]);
