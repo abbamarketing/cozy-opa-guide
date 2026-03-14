@@ -26,10 +26,13 @@ export default function Settings() {
   // Notifications
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
+  const [notifyNewMessage, setNotifyNewMessage] = useState(true);
+  const [prefsLoading, setPrefsLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
       loadProfile();
+      loadPreferences();
     }
   }, [user]);
 
@@ -44,14 +47,22 @@ export default function Settings() {
       setName(data.full_name || '');
     }
     setEmail(user?.email || '');
+  };
 
-    const { data: { user: authUser } } = await supabase.auth.getUser();
-    if (authUser?.user_metadata?.email_notifications !== undefined) {
-      setEmailNotifications(authUser.user_metadata.email_notifications);
+  const loadPreferences = async () => {
+    setPrefsLoading(true);
+    const { data: prefs } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', user!.id)
+      .maybeSingle();
+
+    if (prefs) {
+      setEmailNotifications((prefs as any).notify_delivery_approved);
+      setPushNotifications((prefs as any).notify_delivery_revision);
+      setNotifyNewMessage((prefs as any).notify_new_message);
     }
-    if (authUser?.user_metadata?.push_notifications !== undefined) {
-      setPushNotifications(authUser.user_metadata.push_notifications);
-    }
+    setPrefsLoading(false);
   };
 
   const handleUpdateProfile = async () => {
