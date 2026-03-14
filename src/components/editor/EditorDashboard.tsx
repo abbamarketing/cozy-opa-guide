@@ -353,6 +353,7 @@ const EditorDashboard = () => {
       .from('deliveries')
       .select(`
         id, title, delivery_type, status, created_at, due_date, priority_level,
+        description, raw_file_url, raw_drive_link, client_notes, is_exception, revision_count, max_revisions,
         user_project:user_projects!inner(
           user_id, client_type, subscription_tier, priority_level, sla_hours
         )
