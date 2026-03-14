@@ -23,7 +23,22 @@ const PaymentSuccess = () => {
       setConfirmed(true);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (pollRef.current) clearTimeout(pollRef.current);
-      navigate('/onboarding', { replace: true });
+
+      // Check client_type to route accordingly
+      const { data: up } = await supabase
+        .from('user_projects')
+        .select('client_type')
+        .eq('user_id', user!.id)
+        .maybeSingle();
+
+      const ct = (up as any)?.client_type;
+      if (ct === 'studio') {
+        navigate('/studio', { replace: true });
+      } else if (ct === 'subscription') {
+        navigate('/onboarding', { replace: true });
+      } else {
+        navigate('/onboarding', { replace: true });
+      }
     };
 
     const checkExisting = async () => {
