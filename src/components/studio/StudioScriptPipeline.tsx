@@ -122,13 +122,10 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
     setFormData((prev) => ({ ...prev, [field]: value }));
 
   // Fetch credits
+  // REMOVIDO em PRD v5 — admin não tem créditos de Studio gratuitos
   useEffect(() => {
     if (!user) return;
-    if (isAdmin) {
-      setCredits(Infinity);
-      return;
-    }
-    const fetch = async () => {
+    const fetchCredits = async () => {
       const { data } = await supabase
         .from("studio_credits")
         .select("credits_remaining")
@@ -136,8 +133,8 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
         .maybeSingle();
       setCredits(data?.credits_remaining ?? 0);
     };
-    fetch();
-  }, [user, isAdmin]);
+    fetchCredits();
+  }, [user]);
 
   // Fetch history
   useEffect(() => {
