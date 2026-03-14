@@ -278,6 +278,8 @@ const DashboardLayout = () => {
         return <DeliveryHistory />;
       case 'scripts':
         return <ScriptGenerator />;
+      case 'brand':
+        return <BrandProfile />;
       case 'settings':
         return <SettingsComponent />;
       default:
