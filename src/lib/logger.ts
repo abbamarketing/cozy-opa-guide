@@ -28,7 +28,9 @@ async function flushLogs() {
     user_id: user?.id || null,
   }));
 
-  const { error } = await supabase.from('system_logs' as any).insert(rows);
+  // system_logs é uma tabela de sistema não incluída nos tipos gerados do Supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).from('system_logs').insert(rows);
   if (error) {
     console.error('[Logger] Failed to flush logs:', error.message);
   }
