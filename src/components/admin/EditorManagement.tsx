@@ -116,6 +116,12 @@ const EditorManagement = () => {
   const [editEmail, setEditEmail] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // Remove states
+  const [blockedEditor, setBlockedEditor] = useState<{ editor: EditorData; count: number; titles: string[] } | null>(null);
+  const [blockedModalOpen, setBlockedModalOpen] = useState(false);
+  const [confirmRemoveEditor, setConfirmRemoveEditor] = useState<EditorData | null>(null);
+  const [removing, setRemoving] = useState(false);
+
   const fetchEditors = useCallback(async () => {
     setLoading(true);
 
