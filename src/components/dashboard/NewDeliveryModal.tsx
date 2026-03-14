@@ -535,7 +535,7 @@ const NewDeliveryModal = ({
 
                 {/* Warning if no material */}
                 {!hasRawMaterial && (
-                  <p className="flex items-center gap-1.5 text-xs text-amber-500">
+                  <p className="flex items-center gap-1.5 text-xs text-destructive">
                     <AlertTriangle className="h-3.5 w-3.5" />
                     Arquivo obrigatório para enviar a solicitação
                   </p>
