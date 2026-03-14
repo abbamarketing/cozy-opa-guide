@@ -68,6 +68,7 @@ interface SubscriptionQueueItem {
   priority_level: number | null;
   client_name: string | null;
   subscription_tier: string | null;
+  sla_hours: number | null;
 }
 
 interface Column {
