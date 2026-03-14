@@ -89,7 +89,7 @@ const QuotaCard = ({ userProject }: QuotaCardProps) => {
       label: 'Capa',
       icon: <Layers className="h-3.5 w-3.5 text-muted-foreground" />,
       used: userProject.covers_reserved + userProject.covers_approved,
-      total: project.instagram_videos,
+      total: (project as any).cover_limit ?? project.instagram_videos,
     });
   }
 
