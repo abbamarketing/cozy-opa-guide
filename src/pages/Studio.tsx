@@ -23,7 +23,7 @@ const Studio = () => {
   const { user } = useAuth();
   const { hasRole } = useRole();
   const { userProject } = useUserProject();
-  const isAdmin = hasRole('admin');
+  // REMOVIDO em PRD v5 — admin não tem privilégios de produto, apenas de gestão
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [showPipeline, setShowPipeline] = useState(false);
