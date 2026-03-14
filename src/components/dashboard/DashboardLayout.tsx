@@ -250,6 +250,7 @@ const DashboardLayout = () => {
     ...(userProject?.custom_project?.include_script
       ? [{ id: 'scripts' as DashboardTab, label: 'Roteiros', shortLabel: 'ROTEIRO', icon: FileText }]
       : []),
+    { id: 'brand', label: 'Minha Marca', shortLabel: 'MARCA', icon: Palette },
     { id: 'settings', label: 'Configurações', shortLabel: 'CONFIG', icon: Settings },
   ];
 
