@@ -47,14 +47,14 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const [captureCheckDone, setCaptureCheckDone] = useState(false);
   const isMobile = useIsMobile();
 
-  const requiresCapture = userProject.custom_project.include_capture;
+  const requiresCapture = userProject.custom_project?.include_capture ?? false;
   const checkCapture = useCallback(async () => {
     if (!requiresCapture) {
       setCaptureCheckDone(true);
       return;
     }
 
-    setCaptureLeadDays(userProject.custom_project.capture_lead_days ?? 30);
+    setCaptureLeadDays(userProject.custom_project?.capture_lead_days ?? 30);
 
     // Check for any scheduled/confirmed capture in current period
     const { data: captures } = await supabase
@@ -68,7 +68,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
     setHasScheduledCapture(!!captures && captures.length > 0);
     setCaptureCheckDone(true);
-  }, [requiresCapture, userProject.id, userProject.custom_project.id, userProject.current_period_start, userProject.current_period_end]);
+  }, [requiresCapture, userProject.id, userProject.current_period_start, userProject.current_period_end]);
 
   useEffect(() => {
     checkCapture();
