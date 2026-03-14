@@ -54,6 +54,9 @@ const INITIAL_DATA: BriefingFormData = {
   use_emojis: true,
   use_icons: true,
   additional_notes: '',
+  brand_fonts: '',
+  intro_url: null,
+  outro_url: null,
 };
 
 interface BriefingFormProps {
