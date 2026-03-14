@@ -223,6 +223,7 @@ Deno.serve(async (req) => {
               subscription_tier: tier,
               sla_hours: sla,
               priority_level: priority,
+              monthly_quota: monthly_quota,
               studio_access: true,
               subscription_slug: slug,
               stripe_subscription_id: session.subscription,
