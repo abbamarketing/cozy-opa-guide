@@ -72,6 +72,9 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [channelInput, setChannelInput] = useState('');
+  const [introFile, setIntroFile] = useState<File | null>(null);
+  const [outroFile, setOutroFile] = useState<File | null>(null);
 
   const update = <K extends keyof BriefingFormData>(field: K, value: BriefingFormData[K]) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
