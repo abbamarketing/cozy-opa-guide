@@ -492,7 +492,7 @@ const PRO_TIERS = [
 
 /* ─── Main Landing ─── */
 const Landing = () => {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  
   const [activeDemo, setActiveDemo] = useState<DemoTab>('dashboard');
   const [surveyOpen, setSurveyOpen] = useState(false);
   const [proExpanded, setProExpanded] = useState(false);
