@@ -472,6 +472,36 @@ const EditorDashboard = () => {
   const uniqueClients = [...new Set(deliveries.map((d) => d.client_name).filter(Boolean))] as string[];
   const uniqueTypes = [...new Set(deliveries.map((d) => d.delivery_type))];
 
+  // Subscription queue: count in-progress and start production
+  const inProgressSubCount = subscriptionQueue.filter((d) => d.status === 'in_progress').length;
+  const canStartProduction = inProgressSubCount < 2 && subscriptionQueue.some((d) => d.status === 'queue');
+  const [startingProduction, setStartingProduction] = useState(false);
+
+  const handleStartProduction = async () => {
+    if (!canStartProduction) return;
+    setStartingProduction(true);
+
+    try {
+      // Get next queue item (already sorted by priority_level DESC, created_at ASC)
+      const nextItem = subscriptionQueue.find((d) => d.status === 'queue');
+      if (!nextItem) return;
+
+      const { error } = await supabase
+        .from('deliveries')
+        .update({ status: 'in_progress' } as any)
+        .eq('id', nextItem.id);
+
+      if (error) {
+        toast.error('Erro ao iniciar produção');
+      } else {
+        toast.success(`"${nextItem.title}" movido para produção`);
+        fetchDeliveries();
+      }
+    } finally {
+      setStartingProduction(false);
+    }
+  };
+
   // Drag and drop (desktop only)
   const handleDragStart = (deliveryId: string) => (e: React.DragEvent) => {
     setDraggedId(deliveryId);
