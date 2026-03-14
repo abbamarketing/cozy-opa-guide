@@ -196,7 +196,7 @@ export default function Settings() {
             </div>
 
             <Button onClick={handleUpdateNotifications} className="w-full h-10">
-              Salvar Preferencias
+              Salvar Preferências
             </Button>
           </CardContent>
         </Card>
