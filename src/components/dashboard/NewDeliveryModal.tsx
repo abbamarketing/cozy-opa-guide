@@ -259,6 +259,8 @@ const NewDeliveryModal = ({
         priorityLevel = (userProject as any).priority_level ?? 1;
       } else {
         dueDate = addBusinessHours(new Date(), getDeadlineHours()).toISOString();
+        // Para clientes custom, usar o priority_level configurado no projeto
+        priorityLevel = (userProject as any).priority_level ?? 1;
       }
 
       let fullDescription = values.description;
