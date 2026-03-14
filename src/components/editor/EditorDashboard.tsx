@@ -57,6 +57,18 @@ interface EditorDelivery extends DeliveryData {
   logo_url: string | null;
 }
 
+interface SubscriptionQueueItem {
+  id: string;
+  title: string;
+  delivery_type: string;
+  status: string;
+  created_at: string;
+  due_date: string | null;
+  priority_level: number | null;
+  client_name: string | null;
+  subscription_tier: string | null;
+}
+
 interface Column {
   id: string;
   title: string;
@@ -86,6 +98,14 @@ const typeLabels: Record<string, string> = {
   cover: 'Capa',
 };
 
+const PRIORITY_CONFIG: Record<number, { label: string; color: string }> = {
+  5: { label: 'Agência', color: 'bg-purple-700 text-white' },
+  4: { label: 'Premium', color: 'bg-blue-600 text-white' },
+  3: { label: 'Business', color: 'bg-emerald-600 text-white' },
+  2: { label: 'Pro', color: 'bg-yellow-500 text-black' },
+  1: { label: 'Standard', color: 'bg-muted text-muted-foreground' },
+};
+
 const getDeadlineInfo = (dueDate: string | null) => {
   if (!dueDate) return { hours: null, color: 'text-muted-foreground', label: 'Sem prazo' };
   const bizMin = remainingBusinessMinutes(new Date(dueDate));
@@ -95,6 +115,50 @@ const getDeadlineInfo = (dueDate: string | null) => {
   if (bizHours <= 6) return { hours: bizHours, color: 'text-destructive', label };
   if (bizHours <= 12) return { hours: bizHours, color: 'text-[hsl(45,93%,47%)]', label };
   return { hours: bizHours, color: 'text-primary', label };
+};
+
+/* ─── Subscription Queue Card ─── */
+const SubscriptionQueueCard = ({ item }: { item: SubscriptionQueueItem }) => {
+  const Icon = typeIcons[item.delivery_type] || Video;
+  const priority = PRIORITY_CONFIG[item.priority_level ?? 1] || PRIORITY_CONFIG[1];
+  const isInProgress = item.status === 'in_progress';
+
+  return (
+    <Card className="border-border/40 bg-card p-3">
+      <div className="flex items-center gap-3">
+        {/* Priority badge */}
+        <Badge className={`shrink-0 text-[10px] font-bold px-2 py-0.5 ${priority.color}`}>
+          P{item.priority_level ?? 1}
+        </Badge>
+
+        {/* Icon */}
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10">
+          <Icon className="h-3.5 w-3.5 text-primary" />
+        </div>
+
+        {/* Info */}
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium leading-tight text-card-foreground line-clamp-1">
+            {item.title}
+          </p>
+          <p className="text-[10px] text-muted-foreground truncate">
+            {item.client_name || '—'} · {item.subscription_tier || priority.label}
+          </p>
+        </div>
+
+        {/* Status */}
+        {isInProgress ? (
+          <Badge variant="default" className="shrink-0 bg-emerald-600 text-[10px] text-white">
+            EM PRODUÇÃO
+          </Badge>
+        ) : (
+          <Badge variant="secondary" className="shrink-0 text-[10px]">
+            NA FILA
+          </Badge>
+        )}
+      </div>
+    </Card>
+  );
 };
 
 /* ─── Editor Card ─── */
@@ -234,6 +298,7 @@ const EditorDashboard = () => {
   const { editor, isLoading: editorLoading } = useEditor();
   const isMobile = useIsMobile();
   const [deliveries, setDeliveries] = useState<EditorDelivery[]>([]);
+  const [subscriptionQueue, setSubscriptionQueue] = useState<SubscriptionQueueItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
@@ -247,22 +312,72 @@ const EditorDashboard = () => {
 
   const activeFilterCount = [clientFilter !== 'all', typeFilter !== 'all', lateOnly].filter(Boolean).length;
 
-  const fetchDeliveries = useCallback(async () => {
+  const fetchSubscriptionQueue = useCallback(async () => {
     if (!editor) return;
-    setIsLoading(true);
 
     const { data, error } = await supabase
       .from('deliveries')
       .select(`
-        *,
+        id, title, delivery_type, status, created_at, due_date, priority_level,
         user_project:user_projects!inner(
-          user_id,
-          custom_project_id,
-          custom_project:custom_projects(project_name)
+          user_id, client_type, subscription_tier, priority_level
         )
       `)
       .eq('editor_id', editor.id)
-      .order('due_date', { ascending: true });
+      .in('status', ['queue', 'in_progress'])
+      .order('priority_level', { ascending: false })
+      .order('created_at', { ascending: true });
+
+    if (!error && data) {
+      // Filter to subscription client_type only
+      const subItems = (data as any[]).filter((d) => d.user_project?.client_type === 'subscription');
+      const userIds = [...new Set(subItems.map((d) => d.user_project?.user_id).filter(Boolean))];
+
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name')
+        .in('user_id', userIds);
+
+      const profileMap = new Map((profiles || []).map((p: any) => [p.user_id, p]));
+
+      setSubscriptionQueue(
+        subItems.map((d) => ({
+          id: d.id,
+          title: d.title,
+          delivery_type: d.delivery_type,
+          status: d.status,
+          created_at: d.created_at,
+          due_date: d.due_date,
+          priority_level: d.priority_level ?? d.user_project?.priority_level ?? 1,
+          client_name: profileMap.get(d.user_project?.user_id)?.full_name || null,
+          subscription_tier: d.user_project?.subscription_tier || null,
+        }))
+      );
+    }
+  }, [editor]);
+
+  const fetchDeliveries = useCallback(async () => {
+    if (!editor) return;
+    setIsLoading(true);
+
+    // Fetch both in parallel
+    const [, deliveriesResult] = await Promise.all([
+      fetchSubscriptionQueue(),
+      supabase
+        .from('deliveries')
+        .select(`
+          *,
+          user_project:user_projects!inner(
+            user_id,
+            custom_project_id,
+            custom_project:custom_projects(project_name)
+          )
+        `)
+        .eq('editor_id', editor.id)
+        .order('due_date', { ascending: true }),
+    ]);
+
+    const { data, error } = deliveriesResult;
 
     if (!error && data) {
       const userIds = [...new Set(data.map((d: any) => d.user_project?.user_id).filter(Boolean))];
@@ -316,7 +431,7 @@ const EditorDashboard = () => {
       );
     }
     setIsLoading(false);
-  }, [editor]);
+  }, [editor, fetchSubscriptionQueue]);
 
   useEffect(() => {
     if (editor) fetchDeliveries();
@@ -522,6 +637,25 @@ const EditorDashboard = () => {
           </div>
         </div>
 
+        {/* Subscription Queue - Mobile */}
+        {subscriptionQueue.length > 0 && (
+          <div className="px-4 pt-3">
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Fila de Produção
+              </h2>
+              <Badge variant="secondary" className="text-[10px]">
+                {subscriptionQueue.length}
+              </Badge>
+            </div>
+            <div className="space-y-2">
+              {subscriptionQueue.map((item) => (
+                <SubscriptionQueueCard key={item.id} item={item} />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Cards */}
         <main className="flex-1 px-4 py-3">
           {isLoading ? (
@@ -631,6 +765,25 @@ const EditorDashboard = () => {
           </div>
         </div>
       </header>
+
+      {/* Subscription Queue - Desktop */}
+      {subscriptionQueue.length > 0 && (
+        <div className="px-4 pt-4">
+          <div className="mb-3 flex items-center gap-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              Fila de Produção
+            </h2>
+            <Badge variant="secondary" className="text-xs">
+              {subscriptionQueue.length} {subscriptionQueue.length === 1 ? 'item' : 'itens'}
+            </Badge>
+          </div>
+          <div className="grid grid-cols-2 xl:grid-cols-3 gap-2 mb-4">
+            {subscriptionQueue.map((item) => (
+              <SubscriptionQueueCard key={item.id} item={item} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Kanban desktop */}
       <main className="flex-1 overflow-x-auto p-4">
