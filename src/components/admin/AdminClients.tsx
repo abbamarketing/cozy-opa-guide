@@ -127,7 +127,7 @@ const AdminClients = () => {
     setLoading(false);
   };
 
-  useEffect(() => { fetchClients(); }, []);
+  useEffect(() => { fetchClients(); }, [page]);
 
   const debouncedSearch = useDebouncedValue(search, 300);
 
