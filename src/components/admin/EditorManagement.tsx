@@ -688,6 +688,50 @@ const EditorManagement = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* ═══ Blocked Remove Modal ═══ */}
+      <Dialog open={blockedModalOpen} onOpenChange={setBlockedModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remoção Bloqueada</DialogTitle>
+            <DialogDescription>
+              Este editor tem <strong>{blockedEditor?.count}</strong> entrega(s) em produção. Conclua ou reatribua antes de remover.
+            </DialogDescription>
+          </DialogHeader>
+          {blockedEditor && blockedEditor.titles.length > 0 && (
+            <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
+              {blockedEditor.titles.map((t, i) => (
+                <li key={i}>{t}</li>
+              ))}
+            </ul>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBlockedModalOpen(false)}>Fechar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══ Confirm Remove Modal ═══ */}
+      <Dialog open={!!confirmRemoveEditor} onOpenChange={(open) => { if (!open) setConfirmRemoveEditor(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Remoção</DialogTitle>
+            <DialogDescription>
+              Remover <strong>"{confirmRemoveEditor?.display_name}"</strong> como editor? Entregas na fila serão liberadas para reatribuição.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmRemoveEditor(null)}>Cancelar</Button>
+            <Button
+              variant="destructive"
+              disabled={removing}
+              onClick={() => confirmRemoveEditor && confirmRemove(confirmRemoveEditor)}
+            >
+              {removing ? 'Removendo…' : 'Remover'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
