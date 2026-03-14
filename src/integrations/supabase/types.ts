@@ -1068,6 +1068,7 @@ export type Database = {
         | "revision"
         | "approved"
         | "cancelled"
+        | "queue"
       delivery_type: "youtube_video" | "instagram_video" | "thumbnail" | "cover"
       editor_status: "available" | "busy" | "inactive"
       payment_frequency_type: "monthly" | "quarterly" | "annual"
@@ -1219,6 +1220,7 @@ export const Constants = {
         "revision",
         "approved",
         "cancelled",
+        "queue",
       ],
       delivery_type: ["youtube_video", "instagram_video", "thumbnail", "cover"],
       editor_status: ["available", "busy", "inactive"],
