@@ -72,7 +72,19 @@ export default function Settings() {
   };
 
   const handleUpdateNotifications = async () => {
-    toast.success('Preferencias salvas');
+    setLoading(true);
+    const { error } = await supabase.auth.updateUser({
+      data: {
+        email_notifications: emailNotifications,
+        push_notifications: pushNotifications,
+      }
+    });
+    setLoading(false);
+    if (error) {
+      toast.error('Erro ao salvar', { description: error.message });
+    } else {
+      toast.success('Preferências salvas');
+    }
   };
 
   const handleOpenStripePortal = async () => {
