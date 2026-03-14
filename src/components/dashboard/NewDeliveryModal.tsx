@@ -150,7 +150,7 @@ const NewDeliveryModal = ({
         available: project.youtube_videos - used,
       });
     }
-    if (project.instagram_videos > 0) {
+    if (project && project.instagram_videos > 0) {
       const used = userProject.instagram_reserved + userProject.instagram_approved;
       result.push({
         type: 'instagram_video',
