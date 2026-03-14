@@ -129,13 +129,13 @@ const getDeadlineInfo = (dueDate: string | null) => {
 };
 
 /* ─── Subscription Queue Card ─── */
-const SubscriptionQueueCard = ({ item }: { item: SubscriptionQueueItem }) => {
+const SubscriptionQueueCard = ({ item, onClick }: { item: SubscriptionQueueItem; onClick?: () => void }) => {
   const Icon = typeIcons[item.delivery_type] || Video;
   const priority = PRIORITY_CONFIG[item.priority_level ?? 1] || PRIORITY_CONFIG[1];
   const isInProgress = item.status === 'in_progress';
 
   return (
-    <Card className="border-border/40 bg-card p-3">
+    <Card className="cursor-pointer border-border/40 bg-card p-3 transition-all hover:border-primary/30" onClick={onClick}>
       <div className="flex items-center gap-3">
         {/* Priority badge */}
         <Badge className={`shrink-0 text-[10px] font-bold px-2 py-0.5 ${priority.color}`}>
