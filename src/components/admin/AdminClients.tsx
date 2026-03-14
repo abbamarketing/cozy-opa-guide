@@ -86,10 +86,14 @@ const AdminClients = () => {
 
     if (userIds.length === 0) { setClients([]); setLoading(false); return; }
 
-    const { data: profiles } = await supabase
+    const { data: profiles, count: profilesCount } = await supabase
       .from('profiles')
-      .select('user_id, full_name, avatar_url, created_at')
-      .in('user_id', userIds);
+      .select('user_id, full_name, avatar_url, created_at', { count: 'exact' })
+      .in('user_id', userIds)
+      .order('created_at', { ascending: false })
+      .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+
+    setTotalCount(profilesCount || 0);
 
     const { data: userProjects } = await supabase
       .from('user_projects')
