@@ -1,8 +1,4 @@
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, stripe-signature",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
