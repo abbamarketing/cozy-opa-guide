@@ -131,7 +131,7 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
       if (onComplete) {
         onComplete();
       } else {
-        navigate('/onboarding/payment');
+        navigate('/dashboard');
       }
     }
     setSaving(false);
