@@ -107,6 +107,7 @@ interface StudioScriptPipelineProps {
 const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) => {
   const { user } = useAuth();
   const { hasRole } = useRole();
+  const { userProject } = useUserProject();
   const isAdmin = hasRole('admin');
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<ScriptFormData>(INITIAL_DATA);
