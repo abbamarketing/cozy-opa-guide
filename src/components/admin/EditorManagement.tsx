@@ -12,14 +12,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import {
   Plus, Loader2, Video, CheckCircle, Clock, Eye, Pencil, Power,
-  Copy, AlertTriangle, User, BarChart3, Package,
+  Copy, AlertTriangle, User, BarChart3, Package, Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -115,6 +115,12 @@ const EditorManagement = () => {
   const [editName, setEditName] = useState('');
   const [editEmail, setEditEmail] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // Remove states
+  const [blockedEditor, setBlockedEditor] = useState<{ editor: EditorData; count: number; titles: string[] } | null>(null);
+  const [blockedModalOpen, setBlockedModalOpen] = useState(false);
+  const [confirmRemoveEditor, setConfirmRemoveEditor] = useState<EditorData | null>(null);
+  const [removing, setRemoving] = useState(false);
 
   const fetchEditors = useCallback(async () => {
     setLoading(true);
@@ -230,6 +236,56 @@ const EditorManagement = () => {
       toast.success(newStatus === 'available' ? 'Editor ativado' : 'Editor desativado');
       fetchEditors();
     }
+  };
+
+  /* ─── Remove Editor ─── */
+  const handleRemoveEditor = async (editor: EditorData) => {
+    const { count: inProd, data: inProdData } = await supabase
+      .from('deliveries')
+      .select('title', { count: 'exact' })
+      .eq('editor_id', editor.id)
+      .eq('status', 'in_progress');
+
+    if ((inProd ?? 0) > 0) {
+      setBlockedEditor({
+        editor,
+        count: inProd ?? 0,
+        titles: (inProdData || []).map((d: any) => d.title),
+      });
+      setBlockedModalOpen(true);
+      return;
+    }
+
+    setConfirmRemoveEditor(editor);
+  };
+
+  const confirmRemove = async (editor: EditorData) => {
+    setRemoving(true);
+
+    // Release queued/revision deliveries
+    await supabase
+      .from('deliveries')
+      .update({ editor_id: null })
+      .eq('editor_id', editor.id)
+      .in('status', ['queue', 'revision']);
+
+    // Remove editor role
+    await supabase
+      .from('user_roles')
+      .delete()
+      .eq('user_id', editor.user_id)
+      .eq('role', 'editor');
+
+    // Set editor status to inactive
+    await supabase
+      .from('editors')
+      .update({ status: 'inactive' })
+      .eq('id', editor.id);
+
+    toast.success('Editor removido');
+    setConfirmRemoveEditor(null);
+    setRemoving(false);
+    fetchEditors();
   };
 
   /* ─── View Details ─── */
@@ -392,6 +448,14 @@ const EditorManagement = () => {
                 onClick={() => handleToggleStatus(e)}
               >
                 <Power className={`h-3.5 w-3.5 ${e.status === 'available' ? 'text-primary' : 'text-muted-foreground'}`} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 text-xs text-destructive hover:text-destructive"
+                onClick={() => handleRemoveEditor(e)}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
               </Button>
             </div>
           </Card>
@@ -622,6 +686,50 @@ const EditorManagement = () => {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══ Blocked Remove Modal ═══ */}
+      <Dialog open={blockedModalOpen} onOpenChange={setBlockedModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remoção Bloqueada</DialogTitle>
+            <DialogDescription>
+              Este editor tem <strong>{blockedEditor?.count}</strong> entrega(s) em produção. Conclua ou reatribua antes de remover.
+            </DialogDescription>
+          </DialogHeader>
+          {blockedEditor && blockedEditor.titles.length > 0 && (
+            <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
+              {blockedEditor.titles.map((t, i) => (
+                <li key={i}>{t}</li>
+              ))}
+            </ul>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBlockedModalOpen(false)}>Fechar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══ Confirm Remove Modal ═══ */}
+      <Dialog open={!!confirmRemoveEditor} onOpenChange={(open) => { if (!open) setConfirmRemoveEditor(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Remoção</DialogTitle>
+            <DialogDescription>
+              Remover <strong>"{confirmRemoveEditor?.display_name}"</strong> como editor? Entregas na fila serão liberadas para reatribuição.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmRemoveEditor(null)}>Cancelar</Button>
+            <Button
+              variant="destructive"
+              disabled={removing}
+              onClick={() => confirmRemoveEditor && confirmRemove(confirmRemoveEditor)}
+            >
+              {removing ? 'Removendo…' : 'Remover'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
