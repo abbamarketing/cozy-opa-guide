@@ -172,7 +172,7 @@ const NewDeliveryModal = ({
         available: project.youtube_videos - used,
       });
     }
-    if (project.include_covers) {
+    if (project?.include_covers) {
       const used = userProject.covers_reserved + userProject.covers_approved;
       result.push({
         type: 'cover',
