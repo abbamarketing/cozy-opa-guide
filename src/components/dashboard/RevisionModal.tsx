@@ -92,13 +92,21 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProje
       });
       if (revError) throw revError;
 
+      const updateData: Record<string, any> = {
+        status: 'revision',
+        revision_count: delivery.revision_count + 1,
+        revision_notes: formattedNotes,
+      };
+
+      // Recalcular SLA deadline para clientes de assinatura
+      if (userProject?.client_type === 'subscription' && userProject?.sla_hours) {
+        const newDeadline = countWeekdayHours(new Date(), userProject.sla_hours);
+        updateData.sla_deadline = newDeadline.toISOString();
+      }
+
       const { error: delError } = await supabase
         .from('deliveries')
-        .update({
-          status: 'revision',
-          revision_count: delivery.revision_count + 1,
-          revision_notes: formattedNotes,
-        })
+        .update(updateData)
         .eq('id', delivery.id);
       if (delError) throw delError;
 
