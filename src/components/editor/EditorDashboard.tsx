@@ -81,10 +81,11 @@ interface Column {
 }
 
 const COLUMNS: Column[] = [
-  { id: 'todo', title: 'A FAZER', statuses: ['pending'], description: 'Aguardando início', editorCanDrop: true },
-  { id: 'production', title: 'EM PRODUÇÃO', statuses: ['in_progress'], description: 'Em andamento', editorCanDrop: true },
-  { id: 'review', title: 'REVISAR', statuses: ['review'], description: 'Aguardando aprovação do cliente', editorCanDrop: true },
-  { id: 'done', title: 'CONCLUÍDO', statuses: ['approved'], description: 'Aprovado pelo cliente', editorCanDrop: false },
+  { id: 'todo',       title: 'A FAZER',     statuses: ['pending'],     description: 'Aguardando início',      editorCanDrop: true  },
+  { id: 'production', title: 'EM PRODUÇÃO', statuses: ['in_progress'], description: 'Em andamento',           editorCanDrop: true  },
+  { id: 'revising',   title: 'EM REVISÃO',  statuses: ['revision'],    description: 'Cliente pediu revisão',  editorCanDrop: true  },
+  { id: 'review',     title: 'REVISAR',     statuses: ['review'],      description: 'Aguardando aprovação',   editorCanDrop: true  },
+  { id: 'done',       title: 'CONCLUÍDO',   statuses: ['approved'],    description: 'Aprovado pelo cliente',  editorCanDrop: false },
 ];
 
 const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -223,6 +224,22 @@ const EditorDeliveryCard = ({
       <p className={`mt-1.5 text-[11px] text-muted-foreground truncate ${onDragStart ? 'pl-[42px]' : 'pl-8'}`}>
         {delivery.client_name || '—'}
       </p>
+
+      {/* Revision badge + notes */}
+      {delivery.status === 'revision' && (
+        <div className={`mt-1.5 space-y-1 ${onDragStart ? 'pl-[42px]' : 'pl-8'}`}>
+          <Badge className="bg-orange-500/15 text-orange-600 border-orange-500/30 text-[10px] font-mono">
+            Revisão solicitada
+          </Badge>
+          {delivery.revision_notes && (
+            <p className="text-[10px] text-muted-foreground line-clamp-2 italic">
+              {delivery.revision_notes.length > 80
+                ? delivery.revision_notes.slice(0, 80) + '…'
+                : delivery.revision_notes}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Brand colors */}
       {(delivery.brand_colors.length > 0 || delivery.logo_url) && (
