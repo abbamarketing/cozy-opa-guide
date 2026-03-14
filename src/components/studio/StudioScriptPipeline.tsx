@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { useRole } from "@/hooks/useRole";
 import { toast } from "sonner";
 
 export interface ScriptFormData {
@@ -103,6 +104,8 @@ interface StudioScriptPipelineProps {
 
 const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) => {
   const { user } = useAuth();
+  const { hasRole } = useRole();
+  const isAdmin = hasRole('admin');
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<ScriptFormData>(INITIAL_DATA);
   const [generating, setGenerating] = useState(false);
@@ -119,6 +122,10 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
   // Fetch credits
   useEffect(() => {
     if (!user) return;
+    if (isAdmin) {
+      setCredits(Infinity);
+      return;
+    }
     const fetch = async () => {
       const { data } = await supabase
         .from("studio_credits")
@@ -128,7 +135,7 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
       setCredits(data?.credits_remaining ?? 0);
     };
     fetch();
-  }, [user]);
+  }, [user, isAdmin]);
 
   // Fetch history
   useEffect(() => {
