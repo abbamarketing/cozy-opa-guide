@@ -87,6 +87,7 @@ export type Database = {
           created_at: string
           created_by: string
           deadline: Database["public"]["Enums"]["deadline_type"]
+          deleted_at: string | null
           description: string | null
           id: string
           include_capture: boolean
@@ -110,6 +111,7 @@ export type Database = {
           created_at?: string
           created_by: string
           deadline?: Database["public"]["Enums"]["deadline_type"]
+          deleted_at?: string | null
           description?: string | null
           id?: string
           include_capture?: boolean
@@ -133,6 +135,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           deadline?: Database["public"]["Enums"]["deadline_type"]
+          deleted_at?: string | null
           description?: string | null
           id?: string
           include_capture?: boolean
