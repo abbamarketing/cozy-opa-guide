@@ -254,6 +254,25 @@ const AdminEditors = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Editor Confirmation */}
+      <AlertDialog open={!!editorToDelete} onOpenChange={(open) => !open && setEditorToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remover editor?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Remover {editorToDelete?.display_name}? Esta ação é irreversível.
+              O editor perderá acesso ao sistema e suas entregas ativas serão desatribuídas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteEditor} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Remover
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
