@@ -81,10 +81,11 @@ interface Column {
 }
 
 const COLUMNS: Column[] = [
-  { id: 'todo', title: 'A FAZER', statuses: ['pending'], description: 'Aguardando início', editorCanDrop: true },
-  { id: 'production', title: 'EM PRODUÇÃO', statuses: ['in_progress'], description: 'Em andamento', editorCanDrop: true },
-  { id: 'review', title: 'REVISAR', statuses: ['review'], description: 'Aguardando aprovação do cliente', editorCanDrop: true },
-  { id: 'done', title: 'CONCLUÍDO', statuses: ['approved'], description: 'Aprovado pelo cliente', editorCanDrop: false },
+  { id: 'todo',       title: 'A FAZER',     statuses: ['pending'],     description: 'Aguardando início',      editorCanDrop: true  },
+  { id: 'production', title: 'EM PRODUÇÃO', statuses: ['in_progress'], description: 'Em andamento',           editorCanDrop: true  },
+  { id: 'revising',   title: 'EM REVISÃO',  statuses: ['revision'],    description: 'Cliente pediu revisão',  editorCanDrop: true  },
+  { id: 'review',     title: 'REVISAR',     statuses: ['review'],      description: 'Aguardando aprovação',   editorCanDrop: true  },
+  { id: 'done',       title: 'CONCLUÍDO',   statuses: ['approved'],    description: 'Aprovado pelo cliente',  editorCanDrop: false },
 ];
 
 const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
