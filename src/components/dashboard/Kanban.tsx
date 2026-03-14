@@ -54,16 +54,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
       return;
     }
 
-    // Get capture_lead_days from custom_projects
-    const { data: proj } = await supabase
-      .from('custom_projects')
-      .select('capture_lead_days')
-      .eq('id', userProject.custom_project.id)
-      .single();
-
-    if (proj && proj.capture_lead_days) {
-      setCaptureLeadDays(proj.capture_lead_days);
-    }
+    setCaptureLeadDays(userProject.custom_project.capture_lead_days ?? 30);
 
     // Check for any scheduled/confirmed capture in current period
     const { data: captures } = await supabase
