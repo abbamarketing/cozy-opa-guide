@@ -22,6 +22,7 @@ import { Link } from "react-router-dom";
 const Studio = () => {
   const { user } = useAuth();
   const { hasRole } = useRole();
+  const { userProject } = useUserProject();
   const isAdmin = hasRole('admin');
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
