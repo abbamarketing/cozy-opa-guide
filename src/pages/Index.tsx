@@ -161,6 +161,17 @@ function handleSingleRoleRedirect(
       if (projectStatus === 'pending_payment') {
         return <Navigate to="/payment" replace />;
       }
+      // Route based on client_type
+      if (clientType === 'studio') {
+        return <Navigate to="/studio" replace />;
+      }
+      if (clientType === 'subscription') {
+        if (!profile?.onboarding_complete) {
+          return <Navigate to="/onboarding" replace />;
+        }
+        return <Navigate to="/dashboard" replace />;
+      }
+      // Default (custom) — existing flow
       if (!profile?.onboarding_complete) {
         return <Navigate to="/onboarding" replace />;
       }
