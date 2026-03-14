@@ -23,7 +23,7 @@ export default function ProtectedRoute({ requireRole }: ProtectedRouteProps) {
     return <Navigate to="/auth" replace />
   }
 
-  if (requireRole && !hasRole(requireRole)) {
+  if (requireRole && !hasRole(requireRole) && !hasRole('admin')) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-8">
         <div className="glass p-8 rounded-lg max-w-md text-center">
