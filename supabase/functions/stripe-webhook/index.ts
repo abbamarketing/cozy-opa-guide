@@ -90,6 +90,15 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ received: true }), { status: 200 });
   }
 
+  // ─── Subscription tier mapping ───
+  const SUBSCRIPTION_TIERS: Record<string, { tier: string; sla: number; priority: number }> = {
+    "abbavideo_standard": { tier: "standard_72h", sla: 72, priority: 1 },
+    "abbavideo_pro":      { tier: "pro_48h",      sla: 48, priority: 2 },
+    "abbavideo_business": { tier: "business_24h", sla: 24, priority: 3 },
+    "abbavideo_premium":  { tier: "premium_8h",   sla: 8,  priority: 4 },
+    "abbavideo_agency":   { tier: "agency_4h",    sla: 4,  priority: 5 },
+  };
+
   try {
     switch (event.type) {
       // ─── checkout.session.completed ───
@@ -97,14 +106,110 @@ Deno.serve(async (req) => {
         const session = event.data.object;
         const userProjectId = session.metadata?.user_project_id;
         const userId = session.metadata?.user_id;
+        const productId = session.metadata?.product_id;
+        const priceId = session.metadata?.price_id;
 
-        if (!userProjectId) {
-          console.error("checkout.session.completed: missing user_project_id in metadata");
+        if (!userId) {
+          console.error("checkout.session.completed: missing user_id in metadata");
           break;
         }
 
         if (session.payment_status !== "paid") {
           console.warn(`Session ${session.id} payment_status is ${session.payment_status}, skipping`);
+          break;
+        }
+
+        // ─── Handler Studio (pagamento único) ───
+        if (productId === "abbavideo_studio") {
+          console.log(`Processing Studio purchase for user: ${userId}`);
+
+          await supabase.from("studio_credits").upsert({
+            user_id: userId,
+            credits_remaining: 10,
+            credits_used_month: 0,
+            last_reset_at: new Date().toISOString().split("T")[0],
+          }, { onConflict: "user_id" });
+
+          // If user already has a user_project, just enable studio_access
+          const { data: existingUp } = await supabase
+            .from("user_projects")
+            .select("id")
+            .eq("user_id", userId)
+            .maybeSingle();
+
+          if (existingUp) {
+            await supabase
+              .from("user_projects")
+              .update({ studio_access: true })
+              .eq("id", existingUp.id);
+          }
+
+          await supabase.from("system_logs").insert({
+            level: "info",
+            message: `Studio purchase completed for user ${userId}`,
+            source: "stripe-webhook",
+            user_id: userId,
+            context: { event_id: event.id, session_id: session.id, product_id: productId },
+          });
+
+          break;
+        }
+
+        // ─── Handler Subscription Tiers ───
+        if (productId && SUBSCRIPTION_TIERS[productId]) {
+          const { tier, sla, priority } = SUBSCRIPTION_TIERS[productId];
+          console.log(`Processing subscription ${tier} for user: ${userId}`);
+
+          const now = new Date().toISOString();
+          const periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+          // If user already has a user_project, update it; otherwise this is handled by admin flow
+          const { data: existingUp } = await supabase
+            .from("user_projects")
+            .select("id")
+            .eq("user_id", userId)
+            .maybeSingle();
+
+          if (existingUp) {
+            await supabase
+              .from("user_projects")
+              .update({
+                status: "active",
+                client_type: "subscription",
+                subscription_tier: tier,
+                sla_hours: sla,
+                priority_level: priority,
+                studio_access: true,
+                payment_confirmed_at: now,
+                stripe_subscription_id: session.subscription,
+                current_period_start: now,
+                current_period_end: periodEnd,
+              })
+              .eq("id", existingUp.id);
+          }
+
+          // Grant Studio credits
+          await supabase.from("studio_credits").upsert({
+            user_id: userId,
+            credits_remaining: 10,
+            credits_used_month: 0,
+            last_reset_at: new Date().toISOString().split("T")[0],
+          }, { onConflict: "user_id" });
+
+          await supabase.from("system_logs").insert({
+            level: "info",
+            message: `Subscription ${tier} activated for user ${userId}`,
+            source: "stripe-webhook",
+            user_id: userId,
+            context: { event_id: event.id, session_id: session.id, product_id: productId, tier },
+          });
+
+          break;
+        }
+
+        // ─── Handler clientes especiais (existente) ───
+        if (!userProjectId) {
+          console.error("checkout.session.completed: missing user_project_id in metadata");
           break;
         }
 
@@ -128,7 +233,6 @@ Deno.serve(async (req) => {
           console.log(`user_project ${userProjectId} activated successfully`);
         }
 
-        // Log to system_logs
         await supabase.from("system_logs").insert({
           level: "info",
           message: `Payment confirmed for project ${userProjectId}`,
