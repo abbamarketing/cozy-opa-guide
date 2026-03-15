@@ -278,7 +278,7 @@ const DashboardLayout = () => {
   }, [tabFromUrl]);
 
   // Redirect to waiting if no project — god bypasses
-  if (!isLoading && !userProject && !isGod()) {
+  if (!isLoading && !roleLoading && !userProject && !isGod()) {
     return <Navigate to="/waiting" replace />;
   }
 
