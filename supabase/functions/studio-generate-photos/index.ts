@@ -1,45 +1,48 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { getCorsHeaders } from '../_shared/cors.ts'
+import { logAiUsage } from '../_shared/log-ai-usage.ts'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
-// Prompts de cenário para Imagen 3
+// Prompts de cenário para geração de retratos
 const SCENARIO_PROMPTS: Record<string, string> = {
-  executive_office: `Professional executive portrait of SUBJECTPERSON in a modern high-rise office, floor-to-ceiling windows with city skyline at golden hour, wearing a well-tailored dark navy suit with white dress shirt and silk tie. Subject stands confidently with hands clasped, slight 3/4 angle toward camera. Shot on Canon EOS R5, 85mm f/1.4, shallow depth of field, warm directional window light creating soft shadows. Cinematic editorial quality, photorealistic.`,
-
-  startup_workspace: `Professional portrait of SUBJECTPERSON in a contemporary startup office, exposed brick walls, Edison bulb pendant lights, whiteboard with sticky notes blurred in background, lush green plants. Wearing smart casual: charcoal blazer over black t-shirt. Leaning slightly against a wooden standing desk, relaxed confident posture, genuine expression. Shot on Sony A7R IV, 85mm f/1.8, natural window light from left, warm ambient fill. Editorial tech magazine quality.`,
-
-  boardroom: `Corporate portrait of SUBJECTPERSON standing at the head of a mahogany boardroom table, leather executive chairs receding in background, screen displaying business analytics. Wearing impeccably fitted navy blue suit, white shirt, silver tie. Poised, authoritative stance, direct eye contact with camera. Shot on Canon EOS R5, 70mm f/2.0, balanced fluorescent + window light, clean corporate aesthetic. Fortune 500 annual report quality.`,
-
-  consulting_office: `Professional consulting portrait of SUBJECTPERSON in a premium private office, warm wood bookshelf filled with books visible behind, elegant desk lamp creating warm accent light. Wearing business casual: navy chinos, white oxford shirt, cognac leather belt. Seated at a clean minimal desk, one hand resting naturally, engaged and approachable expression. Shot on Nikon Z9, 85mm f/1.4, warm key light + cool window fill. McKinsey-level professional imagery.`,
-
-  outdoor_business: `Environmental business portrait of SUBJECTPERSON on a rooftop terrace of a modern office building, glass facades of city buildings behind, overcast sky creating perfect diffused light. Wearing charcoal wool coat over dark turtleneck. Standing near a glass railing, looking slightly off-camera with a thoughtful expression. Shot on Leica SL2, 90mm Summicron, natural overcast diffused light, subtle architectural bokeh. Premium brand campaign quality.`,
+  executive_office: `Professional executive portrait of this exact person in a modern high-rise office, floor-to-ceiling windows with city skyline at golden hour, wearing a well-tailored dark navy suit with white dress shirt and silk tie. Standing confidently with hands clasped, slight 3/4 angle toward camera. Shot on Canon EOS R5, 85mm f/1.4, shallow depth of field, warm directional window light creating soft shadows. Cinematic editorial quality, photorealistic.`,
+  startup_workspace: `Professional portrait of this exact person in a contemporary startup office, exposed brick walls, Edison bulb pendant lights, whiteboard with sticky notes blurred in background, lush green plants. Wearing smart casual: charcoal blazer over black t-shirt. Leaning slightly against a wooden standing desk, relaxed confident posture, genuine expression. Shot on Sony A7R IV, 85mm f/1.8, natural window light from left, warm ambient fill. Editorial tech magazine quality.`,
+  boardroom: `Corporate portrait of this exact person standing at the head of a mahogany boardroom table, leather executive chairs receding in background, screen displaying business analytics. Wearing impeccably fitted navy blue suit, white shirt, silver tie. Poised, authoritative stance, direct eye contact with camera. Shot on Canon EOS R5, 70mm f/2.0, balanced fluorescent + window light, clean corporate aesthetic. Fortune 500 annual report quality.`,
+  consulting_office: `Professional consulting portrait of this exact person in a premium private office, warm wood bookshelf filled with books visible behind, elegant desk lamp creating warm accent light. Wearing business casual: navy chinos, white oxford shirt, cognac leather belt. Seated at a clean minimal desk, one hand resting naturally, engaged and approachable expression. Shot on Nikon Z9, 85mm f/1.4, warm key light + cool window fill. McKinsey-level professional imagery.`,
+  outdoor_business: `Environmental business portrait of this exact person on a rooftop terrace of a modern office building, glass facades of city buildings behind, overcast sky creating perfect diffused light. Wearing charcoal wool coat over dark turtleneck. Standing near a glass railing, looking slightly off-camera with a thoughtful expression. Shot on Leica SL2, 90mm Summicron, natural overcast diffused light, subtle architectural bokeh. Premium brand campaign quality.`,
 }
 
-// Créditos por quantidade de fotos
 const CREDIT_COSTS: Record<number, number> = { 1: 1, 3: 2, 5: 3 }
+const AI_GATEWAY = 'https://ai.gateway.lovable.dev/v1/chat/completions'
+const IMAGE_MODEL = 'google/gemini-3-pro-image-preview'
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+  const corsHeaders = getCorsHeaders(req)
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders })
 
   try {
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')
+    if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY is not configured')
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
 
-    const authHeader = req.headers.get('Authorization')!
-    const { data: { user } } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''))
-    if (!user) throw new Error('Unauthorized')
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''))
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
 
     const { scenario, quantity, profile_id } = await req.json()
-    // scenario: keyof SCENARIO_PROMPTS
-    // quantity: 1 | 3 | 5
-    // profile_id: string
-
     const creditCost = CREDIT_COSTS[quantity] ?? 3
 
     // 1. Verifica créditos
@@ -55,10 +58,10 @@ serve(async (req) => {
       throw new Error(`Créditos insuficientes. Necessário: ${creditCost}, disponível: ${credits?.credits_available ?? 0}`)
     }
 
-    // 2. Busca perfil com reference_image_url
+    // 2. Busca perfil com profile_document e reference_image_url
     const { data: profile } = await supabase
       .from('client_photo_profiles')
-      .select('reference_image_url, lora_url, training_status')
+      .select('reference_image_url, lora_url, training_status, profile_document')
       .eq('id', profile_id)
       .eq('user_id', user.id)
       .single()
@@ -74,7 +77,6 @@ serve(async (req) => {
     // 3. Baixa a imagem de referência e converte para base64
     const refImageResponse = await fetch(profile.reference_image_url)
     const refImageBuffer = await refImageResponse.arrayBuffer()
-    // Chunked base64 to avoid stack overflow on large buffers
     const bytes = new Uint8Array(refImageBuffer)
     const chunkSize = 8192
     let binary = ''
@@ -85,79 +87,126 @@ serve(async (req) => {
       }
     }
     const refImageBase64 = btoa(binary)
+    const mimeType = refImageResponse.headers.get('content-type') || 'image/jpeg'
 
-    // 4. Chama Imagen 3 via Vertex AI com referenceImages
+    // 4. Build person description from profile_document
+    const doc = profile.profile_document as Record<string, any> | null
+    const personDescription = doc?.person_summary
+      ? `This person: ${doc.person_summary}. Generate a photo of THIS EXACT person.`
+      : 'Generate a professional portrait of this exact person shown in the reference image.'
+
     const scenarioPrompt = SCENARIO_PROMPTS[scenario] ?? SCENARIO_PROMPTS.executive_office
-    const geminiApiKey = Deno.env.get('GEMINI_API_KEY')!
-
-    // Vertex AI Imagen 3 endpoint com subject reference
-    const imagenEndpoint = `https://us-central1-aiplatform.googleapis.com/v1/projects/${Deno.env.get('GCLOUD_PROJECT_ID')}/locations/us-central1/publishers/google/models/imagegeneration@006:predict`
 
     const generatedUrls: string[] = []
     const generatedPaths: string[] = []
 
     for (let i = 0; i < quantity; i++) {
-      // Variação de seed para fotos diferentes mas mesma pessoa
-      const seed = Math.floor(Math.random() * 1000000)
-
-      const imagenPayload = {
-        instances: [{
-          prompt: scenarioPrompt,
-          referenceImages: [{
-            referenceType: 'REFERENCE_TYPE_SUBJECT',
-            referenceId: 1,
-            referenceImage: {
-              bytesBase64Encoded: refImageBase64,
-              mimeType: 'image/jpeg',
-            },
-            subjectImageConfig: {
-              subjectType: 'SUBJECT_TYPE_PERSON',
-            },
-          }],
-        }],
-        parameters: {
-          sampleCount: 1,
-          seed: seed,
-          aspectRatio: '9:16', // 1080x1920 portrait
-          safetySetting: 'block_some',
-          addWatermark: false,
-          personGeneration: 'allow_all',
-        },
-      }
-
-      const imagenResponse = await fetch(imagenEndpoint, {
+      // 5. Chama Lovable AI Gateway com modelo de geração de imagem
+      const aiResponse = await fetch(AI_GATEWAY, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${geminiApiKey}`,
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(imagenPayload),
+        body: JSON.stringify({
+          model: IMAGE_MODEL,
+          messages: [
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'image_url',
+                  image_url: { url: `data:${mimeType};base64,${refImageBase64}` },
+                },
+                {
+                  type: 'text',
+                  text: `${personDescription}\n\n${scenarioPrompt}\n\nGenerate a single photorealistic image. The person in the generated image MUST look identical to the person in the reference photo — same facial features, skin tone, hair, and overall appearance. Only change the clothing, pose, and background as described in the scenario.`,
+                },
+              ],
+            },
+          ],
+        }),
       })
 
-      if (!imagenResponse.ok) {
-        const errText = await imagenResponse.text()
-        throw new Error(`Imagen 3 error: ${errText}`)
+      if (!aiResponse.ok) {
+        const errText = await aiResponse.text()
+        console.error('AI gateway error:', aiResponse.status, errText)
+        if (aiResponse.status === 429) {
+          return new Response(JSON.stringify({ error: 'Limite de requisições excedido, tente novamente em breve.' }), {
+            status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          })
+        }
+        if (aiResponse.status === 402) {
+          return new Response(JSON.stringify({ error: 'Créditos da plataforma esgotados.' }), {
+            status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          })
+        }
+        throw new Error(`Image generation failed: ${aiResponse.status}`)
       }
 
-      const imagenData = await imagenResponse.json()
-      const generatedBase64 = imagenData.predictions?.[0]?.bytesBase64Encoded
+      const aiData = await aiResponse.json()
 
-      if (!generatedBase64) throw new Error('Imagen 3 retornou sem imagem')
+      // Log AI usage
+      logAiUsage({
+        userId: user.id,
+        functionName: 'studio-generate-photos',
+        model: IMAGE_MODEL,
+        promptTokens: aiData.usage?.prompt_tokens ?? 0,
+        completionTokens: aiData.usage?.completion_tokens ?? 0,
+        totalTokens: aiData.usage?.total_tokens ?? 0,
+      })
 
-      // 5. Salva foto gerada no Supabase Storage com TTL de 7 dias
-      const buffer = Uint8Array.from(atob(generatedBase64), c => c.charCodeAt(0))
-      const filePath = `${user.id}/${profile_id}/${scenario}_${Date.now()}_${i}.jpg`
+      // Extract generated image from response
+      // Gemini image models return inline_data in parts
+      const parts = aiData.choices?.[0]?.message?.content
+      let imageBase64: string | null = null
+      let imageMime = 'image/png'
+
+      if (typeof parts === 'string') {
+        // Try to extract base64 image from markdown or data URI
+        const dataUriMatch = parts.match(/data:(image\/[^;]+);base64,([A-Za-z0-9+/=]+)/)
+        if (dataUriMatch) {
+          imageMime = dataUriMatch[1]
+          imageBase64 = dataUriMatch[2]
+        }
+      } else if (Array.isArray(parts)) {
+        // Multi-part response with inline images
+        for (const part of parts) {
+          if (part.type === 'image_url' && part.image_url?.url) {
+            const match = part.image_url.url.match(/data:(image\/[^;]+);base64,(.+)/)
+            if (match) {
+              imageMime = match[1]
+              imageBase64 = match[2]
+              break
+            }
+          }
+          if (part.inline_data) {
+            imageMime = part.inline_data.mime_type || 'image/png'
+            imageBase64 = part.inline_data.data
+            break
+          }
+        }
+      }
+
+      if (!imageBase64) {
+        console.error('No image in AI response:', JSON.stringify(aiData).substring(0, 500))
+        throw new Error('O modelo não retornou uma imagem. Tente novamente.')
+      }
+
+      // 6. Salva foto gerada no Storage
+      const ext = imageMime.includes('png') ? 'png' : 'jpg'
+      const buffer = Uint8Array.from(atob(imageBase64), c => c.charCodeAt(0))
+      const filePath = `${user.id}/${profile_id}/${scenario}_${Date.now()}_${i}.${ext}`
 
       const { error: uploadErr } = await supabase.storage
         .from('studio-generated-photos')
         .upload(filePath, buffer, {
-          contentType: 'image/jpeg',
+          contentType: imageMime,
           upsert: false,
         })
 
       if (uploadErr) throw uploadErr
 
-      // URL com 7 dias de validade
       const { data: signedData } = await supabase.storage
         .from('studio-generated-photos')
         .createSignedUrl(filePath, 60 * 60 * 24 * 7)
@@ -166,8 +215,8 @@ serve(async (req) => {
       if (signedData?.signedUrl) generatedUrls.push(signedData.signedUrl)
     }
 
-    // 6. Registra a sessão
-    const { data: shoot } = await supabase
+    // 7. Registra a sessão
+    await supabase
       .from('photo_shoots')
       .insert({
         user_id: user.id,
@@ -178,10 +227,8 @@ serve(async (req) => {
         lora_url: profile.lora_url,
         credits_used: creditCost,
       })
-      .select()
-      .single()
 
-    // 7. Desconta créditos
+    // 8. Desconta créditos
     await supabase
       .from('studio_credits')
       .update({
@@ -193,14 +240,13 @@ serve(async (req) => {
       .limit(1)
 
     return new Response(
-      JSON.stringify({ success: true, photos: generatedUrls, shoot_id: shoot?.id }),
+      JSON.stringify({ success: true, photos: generatedUrls }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
-
   } catch (error) {
     console.error('studio-generate-photos error:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: (error as Error).message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
