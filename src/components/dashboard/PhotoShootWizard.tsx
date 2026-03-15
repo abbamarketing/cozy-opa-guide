@@ -165,7 +165,7 @@ export default function PhotoShootWizard({ onBack }: PhotoShootWizardProps) {
   // ── STEP: READY ──
   if (step === 'ready') return (
     <div className="flex flex-col items-center justify-center py-16 space-y-6">
-      <div className="text-5xl">✅</div>
+      <CheckCircle2 className="h-12 w-12 text-primary" />
       <div className="text-center space-y-2">
         <h3 className="text-lg font-mono font-semibold text-foreground">Perfil criado!</h3>
         <p className="text-sm text-muted-foreground">
