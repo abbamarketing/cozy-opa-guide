@@ -23,13 +23,13 @@ type WizardView = 'home' | 'step1' | 'step2' | 'step3' | 'step4' | 'result';
 
 const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/studio-generate`;
 
-const LOCATIONS: { value: RecordingLocation; label: string; emoji: string }[] = [
-  { value: 'home', label: 'Em casa', emoji: '🏠' },
-  { value: 'studio', label: 'Estúdio', emoji: '🎬' },
-  { value: 'office', label: 'Escritório', emoji: '🏢' },
-  { value: 'clinic', label: 'Consultório', emoji: '⚕️' },
-  { value: 'outdoor', label: 'Área externa', emoji: '🌳' },
-  { value: 'other', label: 'Outro', emoji: '📍' },
+const LOCATIONS: { value: RecordingLocation; label: string; icon: string }[] = [
+  { value: 'home', label: 'Em casa', icon: 'home' },
+  { value: 'studio', label: 'Estúdio', icon: 'studio' },
+  { value: 'office', label: 'Escritório', icon: 'office' },
+  { value: 'clinic', label: 'Consultório', icon: 'clinic' },
+  { value: 'outdoor', label: 'Área externa', icon: 'outdoor' },
+  { value: 'other', label: 'Outro', icon: 'other' },
 ];
 
 function StepHeader({ step, total, title, onBack }: { step: number; total: number; title: string; onBack: () => void }) {
@@ -285,7 +285,7 @@ export default function StudioModule() {
                         : 'border-border text-muted-foreground hover:border-border/80'
                     }`}
                   >
-                    <span className="text-base">{loc.emoji}</span>
+                    <MapPin className="h-4 w-4" />
                     <span>{loc.label}</span>
                   </button>
                 ))}

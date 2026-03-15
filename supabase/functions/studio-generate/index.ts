@@ -159,23 +159,23 @@ ${locationInstructions}
 
 O roteiro DEVE seguir esta estrutura em Markdown:
 
-## 🎯 Títulos
+## Títulos
 Título principal e 2 variações alternativas.
 
-## 🪝 Gancho de Abertura (Hook)
+## Gancho de Abertura (Hook)
 Os primeiros 3-5 segundos são CRÍTICOS. Crie um gancho visual + verbal poderoso:
 - **Gancho Visual**: Descreva exatamente o que aparece na tela (enquadramento, gesto, texto sobreposto, objeto)
 - **Gancho Verbal**: A frase exata que a pessoa vai falar (deve criar curiosidade ou choque)
 - **Texto na tela**: O texto que aparece sobreposto no vídeo nos primeiros segundos
 
-## 🎬 Roteiro Completo
+## Roteiro Completo
 Escreva o roteiro com timestamps sugeridos. Para cada bloco inclua:
 - **[Timestamp]** (ex: **[0:00-0:03]**, **[0:15-0:30]**)
 - **Fala**: O texto exato que a pessoa vai dizer
 - **Visual**: O que aparece na tela (B-roll, texto animado, corte, gesto)
 - **Gancho de retenção**: A cada 15-30 segundos, inclua um micro-gancho para manter atenção (pergunta retórica, revelação, "mas espera...", zoom dramático)
 
-## 📱 Ganchos Visuais
+## Ganchos Visuais
 Liste 5-8 sugestões de elementos visuais que devem aparecer ao longo do vídeo:
 - Textos animados
 - Cortes dinâmicos
@@ -184,16 +184,16 @@ Liste 5-8 sugestões de elementos visuais que devem aparecer ao longo do vídeo:
 - Objetos ou props
 - Mudanças de ângulo
 
-## 📣 CTA Final
+## CTA Final
 Chamada para ação clara e direta. Inclua:
 - Fala exata do CTA
 - Texto na tela do CTA
 - Sugestão de gesto/enquadramento final
 
-## #️⃣ Hashtags
+## Hashtags
 5-8 hashtags otimizadas para alcance e nicho.
 
-## 💡 Dicas de Gravação
+## Dicas de Gravação
 3-5 dicas práticas específicas para este roteiro (iluminação, ângulo, edição).
 
 REGRAS IMPORTANTES:
@@ -202,7 +202,7 @@ REGRAS IMPORTANTES:
 - Cada gancho visual deve ser ESPECÍFICO e ACIONÁVEL (não genérico)
 - Os timestamps devem ser realistas para o formato escolhido
 - Use negrito (**texto**) para destacar falas e instruções visuais
-- Use emojis nos títulos das seções para facilitar a leitura
+- NÃO use emojis em nenhuma parte do roteiro
 - Formate o texto como Markdown válido`;
 
   // ─── LLM call via Lovable AI Gateway ───
@@ -222,7 +222,7 @@ REGRAS IMPORTANTES:
     body: JSON.stringify({
       model: 'google/gemini-3-flash-preview',
       messages: [
-        { role: 'system', content: 'Você é um roteirista profissional e estrategista de conteúdo para redes sociais brasileiras. Você cria roteiros envolventes, otimizados para retenção e com ganchos visuais específicos. Sempre formate sua resposta como Markdown válido e bem estruturado.' },
+        { role: 'system', content: 'Você é um roteirista profissional e estrategista de conteúdo para redes sociais brasileiras. Você cria roteiros envolventes, otimizados para retenção e com ganchos visuais específicos. Sempre formate sua resposta como Markdown válido e bem estruturado. NUNCA use emojis.' },
         { role: 'user', content: prompt },
       ],
       stream: true,
