@@ -73,9 +73,9 @@ serve(async (req) => {
     .maybeSingle();
 
   const isScriptCreditsClient = userProject && ['subscription', 'custom'].includes(userProject.client_type || '');
+  let studioCredits: { credits_remaining: number; credits_used_month: number } | null = null;
 
   if (isScriptCreditsClient) {
-    // Use script_credits from user_projects
     if ((userProject.script_credits ?? 0) <= 0) {
       return new Response(
         JSON.stringify({ error: "Créditos de roteiro esgotados" }),
@@ -83,7 +83,6 @@ serve(async (req) => {
       );
     }
   } else {
-    // Studio client — use studio_credits
     const { data: credits } = await supabaseAdmin
       .from("studio_credits")
       .select("credits_remaining, credits_used_month")
@@ -96,8 +95,7 @@ serve(async (req) => {
         { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    // Store credits ref for later debit
-    (globalThis as any).__studioCredits = credits;
+    studioCredits = credits;
   }
 
   // Contexto do briefing de marca
