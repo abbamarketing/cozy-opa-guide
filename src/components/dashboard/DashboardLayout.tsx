@@ -258,21 +258,21 @@ const DashboardLayout = () => {
   const isMobile = useIsMobile();
 
   const isStudio = userProject?.client_type === 'studio';
-  const defaultTab: DashboardTab = isStudio ? 'studio' : 'deliveries';
 
-  const [activeTab, setActiveTab] = useState<DashboardTab>(tabFromUrl || defaultTab);
+  const [activeTab, setActiveTab] = useState<DashboardTab>(tabFromUrl || 'deliveries');
   const [lockedTabAttempt, setLockedTabAttempt] = useState<DashboardTab | null>(null);
 
-  // Update default tab when userProject loads
+  // Defina a aba correta assim que o projeto carregar
   useEffect(() => {
-    if (!tabFromUrl && userProject) {
-      setActiveTab(userProject.client_type === 'studio' ? 'studio' : 'deliveries');
-    }
-  }, [userProject?.client_type]);
+    if (isLoading) return;
+    if (tabFromUrl) return;
+    setActiveTab(isStudio ? 'studio' : 'deliveries');
+  }, [isLoading, isStudio, tabFromUrl]);
 
-  // Sync tab from URL
+  // Sync tab da URL
   useEffect(() => {
-    if (tabFromUrl && ['studio', 'deliveries', 'calendar', 'history', 'scripts', 'brand', 'settings'].includes(tabFromUrl)) {
+    const valid: DashboardTab[] = ['studio', 'deliveries', 'calendar', 'history', 'scripts', 'brand', 'settings'];
+    if (tabFromUrl && valid.includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl]);
