@@ -136,10 +136,22 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProje
           </DialogDescription>
         </DialogHeader>
 
-        <div className="rounded-lg border border-border/50 bg-muted/30 p-3 text-sm text-muted-foreground">
-          Você tem <span className="font-semibold text-foreground">{remaining}</span>{' '}
-          {remaining === 1 ? 'revisão restante' : 'revisões restantes'}
-        </div>
+        {remaining !== null ? (
+          remaining > 0 ? (
+            <div className="rounded-lg border border-border/50 bg-muted/30 p-3 text-sm text-muted-foreground">
+              Você tem <span className="font-semibold text-foreground">{remaining}</span>{' '}
+              {remaining === 1 ? 'revisão restante' : 'revisões restantes'}
+            </div>
+          ) : (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+              Limite de revisões atingido. Entre em contato com o suporte para solicitar mais revisões.
+            </div>
+          )
+        ) : (
+          <div className="rounded-lg border border-border/50 bg-muted/30 p-3 text-sm text-muted-foreground">
+            Revisões ilimitadas
+          </div>
+        )}
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
