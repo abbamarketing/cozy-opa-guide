@@ -183,6 +183,7 @@ serve(async (req) => {
               ],
             },
           ],
+          modalities: ['image', 'text'],
         }),
       })
 
@@ -215,21 +216,29 @@ serve(async (req) => {
       })
 
       // Extract generated image from response
-      // Gemini image models return inline_data in parts
-      const parts = aiData.choices?.[0]?.message?.content
+      // Lovable AI gateway returns images in message.images[]
+      const message = aiData.choices?.[0]?.message
       let imageBase64: string | null = null
       let imageMime = 'image/png'
 
-      if (typeof parts === 'string') {
-        // Try to extract base64 image from markdown or data URI
-        const dataUriMatch = parts.match(/data:(image\/[^;]+);base64,([A-Za-z0-9+/=]+)/)
-        if (dataUriMatch) {
-          imageMime = dataUriMatch[1]
-          imageBase64 = dataUriMatch[2]
+      // Primary: check message.images[] (Lovable AI gateway format)
+      if (message?.images && Array.isArray(message.images)) {
+        for (const img of message.images) {
+          const url = img?.image_url?.url || img?.url
+          if (url) {
+            const match = url.match(/data:(image\/[^;]+);base64,(.+)/)
+            if (match) {
+              imageMime = match[1]
+              imageBase64 = match[2]
+              break
+            }
+          }
         }
-      } else if (Array.isArray(parts)) {
-        // Multi-part response with inline images
-        for (const part of parts) {
+      }
+
+      // Fallback: check content as array (multi-part)
+      if (!imageBase64 && Array.isArray(message?.content)) {
+        for (const part of message.content) {
           if (part.type === 'image_url' && part.image_url?.url) {
             const match = part.image_url.url.match(/data:(image\/[^;]+);base64,(.+)/)
             if (match) {
@@ -243,6 +252,15 @@ serve(async (req) => {
             imageBase64 = part.inline_data.data
             break
           }
+        }
+      }
+
+      // Fallback: check content as string with data URI
+      if (!imageBase64 && typeof message?.content === 'string') {
+        const dataUriMatch = message.content.match(/data:(image\/[^;]+);base64,([A-Za-z0-9+/=]+)/)
+        if (dataUriMatch) {
+          imageMime = dataUriMatch[1]
+          imageBase64 = dataUriMatch[2]
         }
       }
 
