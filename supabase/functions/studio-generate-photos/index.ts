@@ -60,7 +60,7 @@ serve(async (req) => {
     // 2. Fetch profile
     const { data: profile } = await supabase
       .from('client_photo_profiles')
-      .select('reference_image_url, lora_url, training_status, profile_document')
+      .select('reference_image_url, lora_url, training_status, profile_document, reference_photo_paths')
       .eq('id', profile_id)
       .eq('user_id', user.id)
       .single()
