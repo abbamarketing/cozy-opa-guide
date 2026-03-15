@@ -142,7 +142,29 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
     fetchCredits();
   }, [user]);
 
-  // Fetch history
+  // Pre-fill from briefing
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('onboarding_briefings')
+      .select('target_audience, content_style')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          setFormData((prev) => {
+            const newTone = !prev.tone && data.content_style ? data.content_style : prev.tone;
+            const newAudience = !prev.audience && data.target_audience ? data.target_audience : prev.audience;
+            setBriefingPrefilled({
+              tone: !prev.tone && !!data.content_style,
+              audience: !prev.audience && !!data.target_audience,
+            });
+            return { ...prev, tone: newTone, audience: newAudience };
+          });
+        }
+      });
+  }, [user]);
+
   useEffect(() => {
     if (!user) return;
     const fetchHistory = async () => {
