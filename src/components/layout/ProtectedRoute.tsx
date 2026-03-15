@@ -23,10 +23,9 @@ export default function ProtectedRoute({ requireRole }: ProtectedRouteProps) {
     return <Navigate to="/auth" replace />
   }
 
-  // GOD bypasses any role requirement
-  if (isGod()) return <Outlet />
+  // God users skip role checks but still require authentication (checked above)
 
-  if (requireRole && !hasRole(requireRole) && !hasRole('admin')) {
+  if (requireRole && !isGod() && !hasRole(requireRole) && !hasRole('admin')) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-8">
         <div className="bg-abba-surface p-8 rounded-[20px] max-w-md text-center">
