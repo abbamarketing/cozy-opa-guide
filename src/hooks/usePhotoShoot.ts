@@ -63,7 +63,10 @@ export const usePhotoShoot = (): UsePhotoShootReturn => {
       // 1. Cria registro do perfil
       const { data: newProfile, error: profileError } = await supabase
         .from('client_photo_profiles')
-        .insert({ user_id: user.id, training_status: 'uploading' })
+        .upsert(
+          { user_id: user.id, training_status: 'uploading' },
+          { onConflict: 'user_id', ignoreDuplicates: false }
+        )
         .select()
         .single();
 
