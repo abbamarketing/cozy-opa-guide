@@ -186,7 +186,7 @@ const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
       )}
 
       <p className="text-[10px] font-mono text-muted-foreground">
-        Revisoes: {delivery.revision_count}/{delivery.max_revisions}
+        Revisões: {delivery.revision_count}/{delivery.max_revisions}
       </p>
     </Card>
   );
