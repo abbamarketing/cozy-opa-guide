@@ -299,9 +299,9 @@ const DashboardLayout = () => {
     { id: 'calendar', label: 'Calendário', shortLabel: 'AGENDA', icon: Calendar, locked: isStudio },
     { id: 'history', label: 'Histórico', shortLabel: 'HIST.', icon: CheckCircle2, locked: isStudio },
     ...((userProject?.custom_project?.include_script || ['subscription', 'custom'].includes(userProject?.client_type || ''))
-      ? [{ id: 'scripts' as DashboardTab, label: 'Roteiros', shortLabel: 'ROTEIRO', icon: FileText, locked: isStudio }]
+      ? [{ id: 'studio' as DashboardTab, label: 'Studio', shortLabel: 'STUDIO', icon: Clapperboard, locked: isStudio }]
       : isStudio
-      ? [{ id: 'scripts' as DashboardTab, label: 'Roteiros', shortLabel: 'ROTEIRO', icon: FileText, locked: true }]
+      ? [{ id: 'studio' as DashboardTab, label: 'Studio', shortLabel: 'STUDIO', icon: Clapperboard, locked: true }]
       : []),
     { id: 'brand', label: 'Minha Marca', shortLabel: 'MARCA', icon: Palette, locked: isStudio },
     { id: 'settings', label: 'Configurações', shortLabel: 'CONFIG', icon: Settings, locked: false },
