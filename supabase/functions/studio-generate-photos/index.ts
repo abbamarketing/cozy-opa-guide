@@ -9,6 +9,20 @@ const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const IMAGE_MODEL = "google/gemini-3-pro-image-preview";
 
+// Chunked base64 conversion to avoid stack overflow on large buffers
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  const chunkSize = 8192;
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+    for (let j = 0; j < chunk.length; j++) {
+      binary += String.fromCharCode(chunk[j]);
+    }
+  }
+  return btoa(binary);
+}
+
 // Credit cost per quantity
 const CREDIT_COST: Record<number, number> = { 1: 1, 3: 2, 5: 3 };
 
@@ -200,7 +214,7 @@ serve(async (req) => {
       if (!data?.signedUrl) continue;
       const resp = await fetch(data.signedUrl);
       const arrayBuffer = await resp.arrayBuffer();
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+      const base64 = arrayBufferToBase64(arrayBuffer);
       const mimeType = resp.headers.get("content-type") || "image/jpeg";
       refDataUrls.push(`data:${mimeType};base64,${base64}`);
     }
