@@ -74,7 +74,15 @@ export default function ScriptGenerator() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ topic: brainstormTopic.trim(), userId: user.id }),
+        body: JSON.stringify({
+          topic: brainstormTopic.trim(),
+          userId: user.id,
+          brandContext: {
+            tone: briefing?.content_style || '',
+            audience: briefing?.target_audience || '',
+            references: briefing?.reference_channels || [],
+          },
+        }),
       });
 
       if (!resp.ok) {
@@ -141,6 +149,7 @@ export default function ScriptGenerator() {
           audience_level: 'intermediate',
           reference: (briefing?.reference_channels || []).join(', '),
           keywords: '',
+          brand_name: briefing?.brand_name || '',
         }),
         signal: controller.signal,
       });
