@@ -178,7 +178,7 @@ export default function Settings() {
 
             <Button onClick={handleUpdateProfile} disabled={loading} className="w-full gap-2 h-10">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              {loading ? 'Salvando...' : 'Salvar Alteracoes'}
+              {loading ? 'Salvando...' : 'Salvar Alterações'}
             </Button>
           </CardContent>
         </Card>
