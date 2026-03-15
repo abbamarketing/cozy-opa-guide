@@ -62,7 +62,7 @@ serve(async (req) => {
     const { error: zipUploadError } = await supabase.storage
       .from("studio-reference-photos")
       .upload(zipPath, zipBlob, {
-        contentType: "application/zip",
+        contentType: "application/octet-stream",
         upsert: true,
       });
     if (zipUploadError) throw zipUploadError;
