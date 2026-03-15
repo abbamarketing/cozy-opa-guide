@@ -258,21 +258,21 @@ const DashboardLayout = () => {
   const isMobile = useIsMobile();
 
   const isStudio = userProject?.client_type === 'studio';
-  const defaultTab: DashboardTab = isStudio ? 'studio' : 'deliveries';
 
-  const [activeTab, setActiveTab] = useState<DashboardTab>(tabFromUrl || defaultTab);
+  const [activeTab, setActiveTab] = useState<DashboardTab>(tabFromUrl || 'deliveries');
   const [lockedTabAttempt, setLockedTabAttempt] = useState<DashboardTab | null>(null);
 
-  // Update default tab when userProject loads
+  // Defina a aba correta assim que o projeto carregar
   useEffect(() => {
-    if (!tabFromUrl && userProject) {
-      setActiveTab(userProject.client_type === 'studio' ? 'studio' : 'deliveries');
-    }
-  }, [userProject?.client_type]);
+    if (isLoading) return;
+    if (tabFromUrl) return;
+    setActiveTab(isStudio ? 'studio' : 'deliveries');
+  }, [isLoading, isStudio, tabFromUrl]);
 
-  // Sync tab from URL
+  // Sync tab da URL
   useEffect(() => {
-    if (tabFromUrl && ['studio', 'deliveries', 'calendar', 'history', 'scripts', 'brand', 'settings'].includes(tabFromUrl)) {
+    const valid: DashboardTab[] = ['studio', 'deliveries', 'calendar', 'history', 'scripts', 'brand', 'settings'];
+    if (tabFromUrl && valid.includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl]);
@@ -356,31 +356,32 @@ const DashboardLayout = () => {
         <DashboardHeader />
 
         <main className={`flex-1 overflow-y-auto p-3 md:p-6 space-y-4 ${isMobile ? 'pb-20' : ''}`}>
-          {isMobile && (
-            isLoading ? (
+          {isLoading ? (
+            <div className="space-y-3">
               <Skeleton className="h-12 w-full rounded-[20px]" />
-            ) : userProject ? (
-              activeTab !== 'settings' && activeTab !== 'studio' && (
+              <Skeleton className="h-48 w-full rounded-[20px]" />
+              <Skeleton className="h-48 w-full rounded-[20px]" />
+            </div>
+          ) : (
+            <>
+              {isMobile && userProject && activeTab !== 'settings' && activeTab !== 'studio' && (
                 <>
                   {['custom', 'studio'].includes(userProject.client_type || '') && <QuotaCard userProject={userProject} />}
                   {userProject.client_type === 'subscription' && <SubscriptionStatusCard userProject={userProject} />}
                 </>
-              )
-            ) : (
-              activeTab === 'deliveries' && (
-                <div className="rounded-[20px] bg-abba-surface p-4 text-center text-sm text-muted-foreground">
-                  Nenhum projeto ativo encontrado.
-                </div>
-              )
-            )
+              )}
+              {renderContent()}
+            </>
           )}
-
-          {renderContent()}
         </main>
       </div>
 
       {isMobile && (
-        <MobileBottomNav activeTab={activeTab} onTabChange={handleTabChange} navItems={navItems} />
+        <MobileBottomNav activeTab={activeTab} onTabChange={handleTabChange} navItems={
+          isStudio
+            ? navItems.filter(item => ['studio', 'deliveries', 'scripts', 'brand', 'settings'].includes(item.id))
+            : navItems
+        } />
       )}
 
       {/* Upsell overlay for locked tabs */}
