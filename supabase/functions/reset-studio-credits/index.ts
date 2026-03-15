@@ -29,15 +29,22 @@ serve(async (req) => {
 
   const userIds = [...new Set(projects.map((p: any) => p.user_id))];
 
-  // Reset: credits_remaining = 10, credits_used_month = 0, last_reset_at = hoje
+  // Reset: insert new period rows with credits_available = 10
+  const now = new Date();
+  const periodStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+
+  const rows = userIds.map((uid: string) => ({
+    user_id: uid,
+    credits_available: 10,
+    credits_used: 0,
+    period_start: periodStart,
+    period_end: periodEnd,
+  }));
+
   const { error } = await supabaseAdmin
     .from("studio_credits")
-    .update({
-      credits_remaining: 10,
-      credits_used_month: 0,
-      last_reset_at: new Date().toISOString().split("T")[0],
-    })
-    .in("user_id", userIds);
+    .upsert(rows, { onConflict: "user_id,period_start" });
 
   if (error) {
     console.error("Reset studio credits error:", error);

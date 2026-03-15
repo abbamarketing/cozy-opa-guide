@@ -210,8 +210,8 @@ DURAÇÃO ESTIMADA: [Xmin Ys]`;
     await supabaseAdmin
       .from("studio_credits")
       .update({
-        credits_remaining: (studioCredits.credits_remaining ?? 1) - 1,
-        credits_used_month: (studioCredits.credits_used_month ?? 0) + 1,
+        credits_available: (studioCredits.credits_available ?? 1) - 1,
+        credits_used: (studioCredits.credits_used ?? 0) + 1,
       })
       .eq("user_id", userId);
   }
