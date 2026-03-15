@@ -55,7 +55,13 @@ const Index = () => {
     if (profileLoading || authLoading || !user || !profile) return;
     if (roles.includes('client')) {
       setCheckingProject(true);
-      checkProjectStatus();
+      (async () => {
+        try {
+          await checkProjectStatus();
+        } finally {
+          setCheckingProject(false);
+        }
+      })();
     }
   }, [profileLoading, authLoading, user, profile, roles, checkProjectStatus]);
 
