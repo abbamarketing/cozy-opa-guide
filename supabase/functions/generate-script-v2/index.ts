@@ -201,6 +201,17 @@ DURAÇÃO ESTIMADA: [Xmin Ys]`;
   const generatedScript =
     aiData.choices?.[0]?.message?.content || "";
 
+  // Log AI usage
+  const aiUsage = aiData.usage;
+  logAiUsage({
+    userId,
+    functionName: 'generate-script-v2',
+    model: 'google/gemini-3-flash-preview',
+    promptTokens: aiUsage?.prompt_tokens,
+    completionTokens: aiUsage?.completion_tokens,
+    totalTokens: aiUsage?.total_tokens,
+  });
+
   // Debit credits based on client type
   if (isScriptCreditsClient) {
     await supabaseAdmin

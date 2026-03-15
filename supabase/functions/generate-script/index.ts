@@ -74,6 +74,12 @@ Regras:
       );
     }
 
+    logAiUsage({
+      functionName: 'generate-script',
+      model: 'google/gemini-3-flash-preview',
+      isStreaming: true,
+    });
+
     return new Response(response.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });

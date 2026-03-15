@@ -256,6 +256,17 @@ REGRAS IMPORTANTES:
     .eq('id', credits.id)
     .then();
 
+  // ─── Log AI usage (fire-and-forget) ───
+  const authHeader = req.headers.get('Authorization') ?? '';
+  const jwt = authHeader.replace('Bearer ', '');
+  const { data: { user: authUser } } = await supabase.auth.getUser(jwt);
+  logAiUsage({
+    userId: authUser?.id,
+    functionName: 'studio-generate',
+    model: 'google/gemini-3-flash-preview',
+    isStreaming: true,
+  });
+
   return new Response(llmRes.body, {
     headers: {
       ...corsHeaders,
