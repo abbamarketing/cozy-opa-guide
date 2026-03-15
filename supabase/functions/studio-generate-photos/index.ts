@@ -224,7 +224,7 @@ serve(async (req) => {
                 role: 'user',
                 content: [
                   { type: 'image_url', image_url: { url: `data:${mimeType};base64,${refImageBase64}` } },
-                  { type: 'text', text: `${personDescription}\n\n${scenarioPrompt}\n\nGenerate a single photorealistic image. The person in the generated image MUST look identical to the person in the reference photo — same facial features, skin tone, hair, and overall appearance. Only change the clothing, pose, and background as described in the scenario.` },
+                  { type: 'text', text: `${personDescription}\n\n${finalPrompt}\n\nGenerate a single photorealistic image. The person in the generated image MUST look identical to the person in the reference photo — same facial features, skin tone, hair, and overall appearance. Only change the clothing, pose, and background as described in the scenario.` },
                 ],
               }],
               modalities: ['image', 'text'],
