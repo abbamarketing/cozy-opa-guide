@@ -10,6 +10,8 @@ import {
   Loader2, ChevronRight, ChevronLeft, Zap, MapPin
 } from 'lucide-react';
 import PhotoShootWizard from './PhotoShootWizard';
+import { PhotoShootGallery } from '@/components/studio/PhotoShootGallery';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { useStudioCredits } from '@/hooks/useStudioCredits';
 import { supabase } from '@/integrations/supabase/client';
