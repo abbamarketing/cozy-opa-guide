@@ -540,7 +540,7 @@ const AdminClients = () => {
                           <DropdownMenuContent align="end">
                             {c.status !== 'active' && c.status !== 'no_project' && (
                               <DropdownMenuItem
-                                onClick={() => setConfirmAction({ type: 'activate', userId: c.user_id, clientName: c.full_name })}
+                                onClick={() => setConfirmAction({ type: 'activate', userId: c.user_id, clientName: c.full_name, clientType: c.client_type })}
                               >
                                 <Play className="mr-2 h-4 w-4" /> Ativar
                               </DropdownMenuItem>
