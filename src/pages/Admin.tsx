@@ -113,7 +113,11 @@ const Admin = () => {
                 <span className="text-sm font-medium text-foreground">{activeTabConfig.label}</span>
               </div>
             )}
-            <span className="text-xs text-muted-foreground font-mono ml-1 hidden md:inline">Admin</span>
+            {isGod() ? (
+              <span className="text-[10px] font-bold uppercase tracking-widest bg-abba-lime text-[#111] px-2 py-0.5 rounded-full ml-1">GOD</span>
+            ) : (
+              <span className="text-xs text-muted-foreground font-sans ml-1 hidden md:inline">Admin</span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <NotificationBell />
