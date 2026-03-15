@@ -39,3 +39,5 @@ project_id = "iqrypgqdhpanqjqnxtap"
     verify_jwt = false
   [functions.studio-train-lora]
     verify_jwt = false
+  [functions.studio-train-lora-webhook]
+    verify_jwt = false
