@@ -486,7 +486,7 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Tom de voz *</Label>
+                <Label>Tom de voz *{briefingPrefilled.tone && <span className="text-xs text-muted-foreground ml-1 font-normal">(do seu briefing)</span>}</Label>
                 <Select
                   value={formData.tone}
                   onValueChange={(v) => update("tone", v)}
