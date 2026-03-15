@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { format } from 'date-fns';
 import { remainingBusinessMinutes, formatBusinessCountdown, countWeekdayHours } from '@/lib/business-hours';
 import { ptBR } from 'date-fns/locale';
+import abbaLogo from '@/assets/abba-logo.png';
 import {
   Play,
   LogOut,
