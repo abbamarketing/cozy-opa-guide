@@ -1,4 +1,4 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { logAiUsage } from '../_shared/log-ai-usage.ts'
@@ -70,8 +70,66 @@ serve(async (req) => {
       throw new Error('Perfil de fotos não está pronto. Complete o treinamento primeiro.')
     }
 
+    // If reference image is missing but LoRA exists, generate it on-demand
+    if (!profile.reference_image_url && profile.lora_url) {
+      const FAL_KEY = Deno.env.get('FAL_AI_KEY')
+      if (!FAL_KEY) throw new Error('FAL_AI_KEY not configured')
+
+      const triggerWord = 'SUBJECTPERSON'
+      const refResponse = await fetch('https://fal.run/fal-ai/flux-lora', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Key ${FAL_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: `professional portrait photo of ${triggerWord}, neutral expression, looking directly at camera, plain white background, studio lighting, sharp focus, high resolution headshot`,
+          negative_prompt: 'blurry, distorted, cartoon, painting, illustration, bad anatomy, multiple people',
+          loras: [{ path: profile.lora_url, scale: 1.0 }],
+          num_images: 1,
+          image_size: 'portrait_4_3',
+          num_inference_steps: 28,
+          guidance_scale: 3.5,
+          enable_safety_checker: true,
+        }),
+      })
+
+      if (!refResponse.ok) {
+        throw new Error('Falha ao gerar imagem de referência automaticamente.')
+      }
+
+      const refResult = await refResponse.json()
+      const refUrl = refResult?.images?.[0]?.url
+
+      if (!refUrl) {
+        throw new Error('Imagem de referência não pôde ser gerada.')
+      }
+
+      // Download and persist to storage
+      const imgResp = await fetch(refUrl)
+      const imgBuf = await imgResp.arrayBuffer()
+      const storagePath = `${user.id}/${profile_id}/canonical_reference.jpg`
+
+      await supabase.storage
+        .from('studio-lora-references')
+        .upload(storagePath, imgBuf, { contentType: 'image/jpeg', upsert: true })
+
+      const { data: signedRef } = await supabase.storage
+        .from('studio-lora-references')
+        .createSignedUrl(storagePath, 60 * 60 * 24 * 365)
+
+      const finalRefUrl = signedRef?.signedUrl ?? refUrl
+
+      await supabase
+        .from('client_photo_profiles')
+        .update({ reference_image_url: finalRefUrl })
+        .eq('id', profile_id)
+
+      profile.reference_image_url = finalRefUrl
+    }
+
     if (!profile.reference_image_url) {
-      throw new Error('Imagem de referência não encontrada.')
+      throw new Error('Imagem de referência não encontrada e não há LoRA para gerar uma.')
     }
 
     // 3. Baixa a imagem de referência e converte para base64
