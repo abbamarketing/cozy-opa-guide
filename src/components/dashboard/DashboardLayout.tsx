@@ -378,7 +378,7 @@ const DashboardLayout = () => {
       {isMobile && (
         <MobileBottomNav activeTab={activeTab} onTabChange={handleTabChange} navItems={
           isStudio
-            ? navItems.filter(item => ['studio', 'deliveries', 'scripts', 'brand', 'settings'].includes(item.id))
+            ? navItems.filter(item => ['studio', 'deliveries', 'brand', 'settings'].includes(item.id))
             : navItems
         } />
       )}
