@@ -110,10 +110,10 @@ const AdminClients = () => {
 
     const { data: userProjects } = await supabase
       .from('user_projects')
-      .select('user_id, status, custom_project_id')
+      .select('user_id, status, custom_project_id, client_type, subscription_tier')
       .in('user_id', userIds);
 
-    const projectIds = [...new Set((userProjects || []).map((up: any) => up.custom_project_id))];
+    const projectIds = [...new Set((userProjects || []).filter((up: any) => up.custom_project_id).map((up: any) => up.custom_project_id))];
     const { data: projects } = await supabase
       .from('custom_projects')
       .select('id, project_name, monthly_value')
@@ -124,15 +124,31 @@ const AdminClients = () => {
 
     const rows: ClientRow[] = (profiles || []).map((p: any) => {
       const up = upMap.get(p.user_id);
-      const proj = up ? projectMap.get(up.custom_project_id) : null;
+      const proj = up?.custom_project_id ? projectMap.get(up.custom_project_id) : null;
+
+      const planValue = proj
+        ? Number(proj.monthly_value)
+        : (up?.client_type === 'subscription' && up?.subscription_tier)
+          ? (SUBSCRIPTION_VALUES[up.subscription_tier] ?? null)
+          : null;
+
+      const displayName = proj?.project_name
+        || (up?.client_type === 'subscription'
+            ? `Assinatura ${up?.subscription_tier ? up.subscription_tier.charAt(0).toUpperCase() + up.subscription_tier.slice(1) : ''}`.trim()
+            : null)
+        || (up?.client_type === 'studio' ? 'Studio' : null)
+        || 'Sem projeto';
+
       return {
         user_id: p.user_id,
         full_name: p.full_name,
         avatar_url: p.avatar_url,
         created_at: p.created_at,
-        project_name: proj?.project_name || null,
-        plan_value: proj ? Number(proj.monthly_value) : null,
+        project_name: displayName,
+        plan_value: planValue,
         status: up?.status || 'no_project',
+        client_type: up?.client_type || null,
+        subscription_tier: up?.subscription_tier || null,
       };
     });
 
