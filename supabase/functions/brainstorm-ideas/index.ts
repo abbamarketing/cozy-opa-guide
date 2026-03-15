@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { logAiUsage } from "../_shared/log-ai-usage.ts";
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
@@ -130,6 +131,19 @@ Responda SEMPRE em português brasileiro.`;
     }
 
     const result = await response.json();
+
+    // Log usage with token data from response
+    const usage = result.usage;
+    logAiUsage({
+      userId: userId || undefined,
+      functionName: 'brainstorm-ideas',
+      model: 'google/gemini-3-flash-preview',
+      promptTokens: usage?.prompt_tokens,
+      completionTokens: usage?.completion_tokens,
+      totalTokens: usage?.total_tokens,
+    });
+
+    const toolCall = result.choices?.[0]?.message?.tool_calls?.[0];
     const toolCall = result.choices?.[0]?.message?.tool_calls?.[0];
 
     if (!toolCall?.function?.arguments) {

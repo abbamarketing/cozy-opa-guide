@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { logAiUsage } from '../_shared/log-ai-usage.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -254,6 +255,17 @@ REGRAS IMPORTANTES:
     .update({ credits_available: credits.credits_available - 1, credits_used: credits.credits_used + 1 })
     .eq('id', credits.id)
     .then();
+
+  // ─── Log AI usage (fire-and-forget) ───
+  const authHeader = req.headers.get('Authorization') ?? '';
+  const jwt = authHeader.replace('Bearer ', '');
+  const { data: { user: authUser } } = await supabase.auth.getUser(jwt);
+  logAiUsage({
+    userId: authUser?.id,
+    functionName: 'studio-generate',
+    model: 'google/gemini-3-flash-preview',
+    isStreaming: true,
+  });
 
   return new Response(llmRes.body, {
     headers: {

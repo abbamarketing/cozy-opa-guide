@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { logAiUsage } from "../_shared/log-ai-usage.ts";
 
 const personality = `Você é a Olívia, assistente virtual da plataforma de edição de vídeo AbbaVideo. Você é esperta, inteligente e bem-humorada — inspirada no espírito da banda ABBA: otimista, elegante e com um toque de diversão.
 
@@ -157,6 +158,14 @@ REGRAS ADICIONAIS:
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Log AI usage
+    logAiUsage({
+      userId: user?.id,
+      functionName: 'support-chat',
+      model: 'google/gemini-3-flash-preview',
+      isStreaming: true,
+    });
 
     return new Response(response.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { logAiUsage } from "../_shared/log-ai-usage.ts";
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
@@ -199,6 +200,17 @@ DURAÇÃO ESTIMADA: [Xmin Ys]`;
   const aiData = await aiResponse.json();
   const generatedScript =
     aiData.choices?.[0]?.message?.content || "";
+
+  // Log AI usage
+  const aiUsage = aiData.usage;
+  logAiUsage({
+    userId,
+    functionName: 'generate-script-v2',
+    model: 'google/gemini-3-flash-preview',
+    promptTokens: aiUsage?.prompt_tokens,
+    completionTokens: aiUsage?.completion_tokens,
+    totalTokens: aiUsage?.total_tokens,
+  });
 
   // Debit credits based on client type
   if (isScriptCreditsClient) {

@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { format, subMonths, startOfMonth, endOfMonth, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, BarChart, Bar,
 } from 'recharts';
-import { DollarSign, Users, Video, Clock, TrendingUp, TrendingDown, Download, AlertTriangle, ShieldAlert, CheckCircle, Trophy } from 'lucide-react';
+import { DollarSign, Users, Video, Clock, TrendingUp, TrendingDown, Download, AlertTriangle, ShieldAlert, CheckCircle, Trophy, Cpu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { downloadCSV } from '@/lib/csv';
 
@@ -33,6 +33,12 @@ const AdminMetrics = () => {
   const [slaBreached, setSlaBreached] = useState<number>(0);
   const [slaRate, setSlaRate] = useState<number | null>(null);
   const [editorRanking, setEditorRanking] = useState<[string, number][]>([]);
+  const [aiUsage, setAiUsage] = useState<{
+    totalCalls: number;
+    totalTokens: number;
+    byFunction: { name: string; calls: number; tokens: number }[];
+    dailyData: { day: string; calls: number }[];
+  }>({ totalCalls: 0, totalTokens: 0, byFunction: [], dailyData: [] });
 
   // Real-time SLA polling every 60s
   useEffect(() => {
@@ -217,6 +223,38 @@ const AdminMetrics = () => {
         },
       ]);
 
+      // ─── AI Usage ───
+      const thirtyDaysAgo = subDays(new Date(), 30).toISOString();
+      const { data: aiLogs } = await supabase
+        .from('ai_usage_logs')
+        .select('function_name, total_tokens, created_at')
+        .gte('created_at', thirtyDaysAgo)
+        .order('created_at', { ascending: true });
+
+      if (aiLogs && aiLogs.length > 0) {
+        const byFunc: Record<string, { calls: number; tokens: number }> = {};
+        const byDay: Record<string, number> = {};
+        let totalTokens = 0;
+
+        aiLogs.forEach((log: any) => {
+          const fn = log.function_name;
+          if (!byFunc[fn]) byFunc[fn] = { calls: 0, tokens: 0 };
+          byFunc[fn].calls++;
+          byFunc[fn].tokens += log.total_tokens || 0;
+          totalTokens += log.total_tokens || 0;
+
+          const day = format(new Date(log.created_at), 'dd/MM');
+          byDay[day] = (byDay[day] || 0) + 1;
+        });
+
+        setAiUsage({
+          totalCalls: aiLogs.length,
+          totalTokens,
+          byFunction: Object.entries(byFunc).map(([name, data]) => ({ name, ...data })).sort((a, b) => b.calls - a.calls),
+          dailyData: Object.entries(byDay).map(([day, calls]) => ({ day, calls })),
+        });
+      }
+
       setLoading(false);
     };
 
@@ -391,6 +429,73 @@ const AdminMetrics = () => {
               <Bar dataKey="count" radius={[0, 4, 4, 0]} name="Entregas" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.20)" strokeWidth={1} />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* AI Usage Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="kpi-dark" style={{ minHeight: 'auto' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <Cpu className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-sans font-semibold text-white">Uso de IA — Últimos 30 dias</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="rounded-[16px] bg-white/5 p-3">
+              <p className="text-[10px] font-sans uppercase tracking-widest text-white/50">Total de Chamadas</p>
+              <p className="text-2xl font-sans font-extrabold text-white mt-1">{aiUsage.totalCalls}</p>
+            </div>
+            <div className="rounded-[16px] bg-white/5 p-3">
+              <p className="text-[10px] font-sans uppercase tracking-widest text-white/50">Total de Tokens</p>
+              <p className="text-2xl font-sans font-extrabold text-white mt-1">
+                {aiUsage.totalTokens > 1000 ? `${(aiUsage.totalTokens / 1000).toFixed(1)}k` : aiUsage.totalTokens}
+              </p>
+            </div>
+          </div>
+          {aiUsage.byFunction.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-[10px] font-sans uppercase tracking-widest text-white/50">Por Função</p>
+              {aiUsage.byFunction.map((fn) => {
+                const fnLabels: Record<string, string> = {
+                  'studio-generate': 'Studio (Roteiro)',
+                  'support-chat': 'Chat de Suporte',
+                  'generate-script': 'Gerador de Roteiro',
+                  'generate-script-v2': 'Gerador V2',
+                  'brainstorm-ideas': 'Brainstorm',
+                };
+                return (
+                  <div key={fn.name} className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white/5">
+                    <span className="text-xs font-sans text-white/80">{fnLabels[fn.name] || fn.name}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-mono text-white/40">{fn.tokens > 1000 ? `${(fn.tokens / 1000).toFixed(1)}k tok` : `${fn.tokens} tok`}</span>
+                      <span className="text-xs font-sans font-semibold text-primary">{fn.calls}x</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="kpi-dark" style={{ minHeight: 'auto' }}>
+          <h3 className="text-sm font-sans font-semibold mb-1 text-white">Chamadas IA / Dia</h3>
+          <p className="text-[11px] font-sans text-white/60 mb-4">Últimos 30 dias</p>
+          {aiUsage.dailyData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={aiUsage.dailyData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+                <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.5)' }} />
+                <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} allowDecimals={false} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#1A231B', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', fontSize: '12px' }}
+                />
+                <Bar dataKey="calls" radius={[4, 4, 0, 0]} name="Chamadas" fill="hsl(var(--primary))" />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-[220px]">
+              <p className="text-xs text-white/40 font-sans">Nenhum dado de uso ainda</p>
+            </div>
+          )}
         </div>
       </div>
 

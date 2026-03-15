@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { logAiUsage } from "../_shared/log-ai-usage.ts";
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
@@ -72,6 +73,12 @@ Regras:
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    logAiUsage({
+      functionName: 'generate-script',
+      model: 'google/gemini-3-flash-preview',
+      isStreaming: true,
+    });
 
     return new Response(response.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
