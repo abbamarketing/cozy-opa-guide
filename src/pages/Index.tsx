@@ -57,7 +57,7 @@ const Index = () => {
   // Initial check for client role
   useEffect(() => {
     if (profileLoading || authLoading || !user || !profile) return;
-    if (roles.includes('client')) {
+    if (isClient()) {
       setCheckingProject(true);
       (async () => {
         try {
