@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import abbaLogo from '@/assets/abba-logo.png';
+import { useRole } from '@/hooks/useRole';
 import { Navigate } from 'react-router-dom';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
@@ -239,6 +240,7 @@ const DashboardLayout = () => {
   const tabFromUrl = searchParams.get('tab') as DashboardTab | null;
   const [activeTab, setActiveTab] = useState<DashboardTab>(tabFromUrl || 'deliveries');
   const { userProject, isLoading } = useUserProject();
+  const { isGod } = useRole();
   const isMobile = useIsMobile();
 
   // Sync tab from URL
@@ -248,8 +250,8 @@ const DashboardLayout = () => {
     }
   }, [tabFromUrl]);
 
-  // Redirect to root if no project (root handles WaitingForProject)
-  if (!isLoading && !userProject) {
+  // Redirect to root if no project (root handles WaitingForProject) — god bypasses
+  if (!isLoading && !userProject && !isGod()) {
     return <Navigate to="/waiting" replace />;
   }
 

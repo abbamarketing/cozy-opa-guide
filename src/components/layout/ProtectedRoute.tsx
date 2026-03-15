@@ -9,7 +9,7 @@ type ProtectedRouteProps = {
 
 export default function ProtectedRoute({ requireRole }: ProtectedRouteProps) {
   const { user, isLoading: authLoading } = useAuth()
-  const { hasRole, loading: roleLoading } = useRole()
+  const { hasRole, isGod, loading: roleLoading } = useRole()
 
   if (authLoading || roleLoading) {
     return (
@@ -23,10 +23,13 @@ export default function ProtectedRoute({ requireRole }: ProtectedRouteProps) {
     return <Navigate to="/auth" replace />
   }
 
+  // GOD bypasses any role requirement
+  if (isGod()) return <Outlet />
+
   if (requireRole && !hasRole(requireRole) && !hasRole('admin')) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-8">
-        <div className="glass p-8 rounded-lg max-w-md text-center">
+        <div className="bg-abba-surface p-8 rounded-[20px] max-w-md text-center">
           <h1 className="text-2xl font-bold text-destructive mb-4">
             Acesso Negado
           </h1>

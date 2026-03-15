@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, BookOpen, Menu } from 'lucide-react';
 import abbaLogo from '@/assets/abba-logo.png';
+import { useRole } from '@/hooks/useRole';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -30,6 +31,7 @@ const TABS = [
 
 const Admin = () => {
   const { signOut } = useAuth();
+  const { isGod } = useRole();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'overview';
   const isMobile = useIsMobile();
@@ -111,7 +113,11 @@ const Admin = () => {
                 <span className="text-sm font-medium text-foreground">{activeTabConfig.label}</span>
               </div>
             )}
-            <span className="text-xs text-muted-foreground font-mono ml-1 hidden md:inline">Admin</span>
+            {isGod() ? (
+              <span className="text-[10px] font-bold uppercase tracking-widest bg-abba-lime text-[#111] px-2 py-0.5 rounded-full ml-1">GOD</span>
+            ) : (
+              <span className="text-xs text-muted-foreground font-sans ml-1 hidden md:inline">Admin</span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <NotificationBell />

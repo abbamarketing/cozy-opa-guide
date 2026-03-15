@@ -1105,7 +1105,7 @@ export type Database = {
       reset_monthly_quotas: { Args: never; Returns: undefined }
     }
     Enums: {
-      app_role: "admin" | "editor" | "client"
+      app_role: "admin" | "editor" | "client" | "god"
       capture_session_status:
         | "scheduled"
         | "confirmed"
@@ -1256,7 +1256,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "editor", "client"],
+      app_role: ["admin", "editor", "client", "god"],
       capture_session_status: [
         "scheduled",
         "confirmed",
