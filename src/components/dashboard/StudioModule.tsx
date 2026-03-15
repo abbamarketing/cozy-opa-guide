@@ -21,7 +21,7 @@ type Objective = 'educate' | 'sell' | 'entertain' | 'authority' | 'viral';
 type Tone = 'direct' | 'didactic' | 'casual' | 'inspirational' | 'provocative';
 type AudienceLevel = 'beginner' | 'intermediate' | 'advanced';
 type RecordingLocation = 'home' | 'studio' | 'office' | 'clinic' | 'outdoor' | 'other';
-type WizardView = 'home' | 'step1' | 'step2' | 'step3' | 'step4' | 'result';
+type WizardView = 'home' | 'step1' | 'step2' | 'step3' | 'step4' | 'result' | 'photoShoot';
 
 const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/studio-generate`;
 
