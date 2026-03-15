@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { useProfile } from '@/hooks/useProfile';
+import { useRole } from '@/hooks/useRole';
 import { Loader2, Shield, Film, User } from 'lucide-react';
 import abbaLogo from '@/assets/abba-logo.png';
 import { Card } from '@/components/ui/card';
@@ -18,6 +19,7 @@ const ROLE_CONFIG: Record<string, { label: string; description: string; icon: Re
 const Index = () => {
   const { user, isLoading: authLoading } = useAuth();
   const { profile, roles, primaryRole, isLoading: profileLoading } = useProfile();
+  const { isClient } = useRole();
   const [projectStatus, setProjectStatus] = useState<string | null>(null);
   const [clientType, setClientType] = useState<string | null>(null);
   const [checkingProject, setCheckingProject] = useState(false);
@@ -55,7 +57,7 @@ const Index = () => {
   // Initial check for client role
   useEffect(() => {
     if (profileLoading || authLoading || !user || !profile) return;
-    if (roles.includes('client')) {
+    if (isClient()) {
       setCheckingProject(true);
       (async () => {
         try {
@@ -69,7 +71,7 @@ const Index = () => {
 
   // Realtime subscription for clients without project
   useEffect(() => {
-    if (!user || !roles.includes('client') || assignedProjectId !== null || assignedProjectId === undefined) return;
+    if (!user || !isClient() || assignedProjectId !== null || assignedProjectId === undefined) return;
 
     const channel = supabase
       .channel(`profile-${user.id}`)

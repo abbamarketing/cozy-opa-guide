@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
+import { useRole } from '@/hooks/useRole';
 
 interface Profile {
   id: string;
@@ -17,41 +18,30 @@ interface Profile {
 
 export const useProfile = () => {
   const { user } = useAuth();
+  const { roles, loading: roleLoading, isGod, isAdmin, isEditor } = useRole();
 
-  const { data, isLoading } = useQuery({
+  const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['profile', user?.id],
     queryFn: async () => {
-      const [profileRes, rolesRes] = await Promise.all([
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', user!.id)
-          .maybeSingle(),
-        supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user!.id),
-      ]);
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user!.id)
+        .maybeSingle();
 
-      const profile = profileRes.data ? (profileRes.data as unknown as Profile) : null;
-      const roles = rolesRes.data ? rolesRes.data.map((r) => r.role) : [];
-
-      return { profile, roles };
+      return data ? (data as unknown as Profile) : null;
     },
     enabled: !!user?.id,
     staleTime: 10 * 60 * 1000,
   });
 
-  const profile = data?.profile ?? null;
-  const roles = data?.roles ?? [];
-
-  const primaryRole = roles.includes('god')
+  const primaryRole = isGod()
     ? 'god'
-    : roles.includes('admin')
+    : isAdmin()
     ? 'admin'
-    : roles.includes('editor')
+    : isEditor()
     ? 'editor'
     : 'client';
 
-  return { profile, roles, primaryRole, isLoading };
+  return { profile: profile ?? null, roles, primaryRole, isLoading: profileLoading || roleLoading };
 };
