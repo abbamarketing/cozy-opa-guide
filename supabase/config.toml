@@ -37,3 +37,5 @@ project_id = "iqrypgqdhpanqjqnxtap"
     verify_jwt = false
   [functions.studio-generate-photos]
     verify_jwt = false
+  [functions.studio-train-lora]
+    verify_jwt = false
