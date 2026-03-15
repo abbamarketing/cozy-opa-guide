@@ -180,9 +180,13 @@ const DashboardSidebar = ({
           <QuotaCard userProject={userProject} />
         </div>
       )}
-      {!collapsed && userProject && userProject.client_type === 'subscription' && (
+      {!collapsed && userProject && ['subscription', 'studio'].includes(userProject.client_type || '') && (
         <div className="mt-auto p-2 border-t border-border/50">
-          <SubscriptionStatusCard userProject={userProject} />
+          {userProject.client_type === 'subscription' ? (
+            <SubscriptionStatusCard userProject={userProject} />
+          ) : (
+            <QuotaCard userProject={userProject} />
+          )}
         </div>
       )}
     </Sidebar>
