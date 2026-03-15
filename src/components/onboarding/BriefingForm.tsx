@@ -14,7 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Play, ArrowRight, ArrowLeft, Loader2, Upload, X, Palette, Plus } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Loader2, Upload, X, Palette, Plus } from 'lucide-react';
+import abbaLogo from '@/assets/abba-logo.png';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 
@@ -245,9 +246,7 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
       <div className="w-full max-w-lg relative z-10">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          <div className="h-10 w-10 rounded-xl gradient-neon flex items-center justify-center">
-            <Play className="h-5 w-5 text-primary-foreground" />
-          </div>
+          <img src={abbaLogo} alt="AbbaVideo" className="h-10 w-10 rounded-xl" />
           <span className="text-2xl font-bold">
             Abba<span className="text-primary">Video</span>
           </span>

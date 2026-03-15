@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Play, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import abbaLogo from '@/assets/abba-logo.png';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
 import { lovable } from '@/integrations/lovable/index';
@@ -60,9 +61,7 @@ const AuthPage = () => {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.1, duration: 0.4 }}
         >
-          <div className="h-12 w-12 rounded-xl gradient-neon flex items-center justify-center neon-glow">
-            <Play className="h-6 w-6 text-primary-foreground" />
-          </div>
+          <img src={abbaLogo} alt="AbbaVideo" className="h-12 w-12 rounded-xl" />
           <div>
             <span className="text-2xl font-bold">
               Abba<span className="text-primary">Video</span>

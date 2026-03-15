@@ -1,4 +1,4 @@
-import { Play } from 'lucide-react';
+import abbaLogo from '@/assets/abba-logo.png';
 import { Link } from 'react-router-dom';
 
 const PRIVACY_SECTIONS = [
@@ -19,9 +19,7 @@ const Privacy = () => {
     <div className="min-h-screen bg-background p-8">
       <div className="container mx-auto max-w-3xl">
         <div className="flex items-center gap-2 mb-8">
-          <div className="h-8 w-8 rounded-lg gradient-neon flex items-center justify-center">
-            <Play className="h-4 w-4 text-primary-foreground" />
-          </div>
+          <img src={abbaLogo} alt="AbbaVideo" className="h-8 w-8 rounded-lg" />
           <span className="text-lg font-bold">
             Abba<span className="text-primary">Video</span>
           </span>
