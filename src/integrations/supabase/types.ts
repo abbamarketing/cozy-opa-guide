@@ -119,28 +119,43 @@ export type Database = {
       client_photo_profiles: {
         Row: {
           created_at: string
+          fal_request_id: string | null
           id: string
+          lora_url: string | null
           photos_analyzed: number
           profile_document: Json
+          reference_image_url: string | null
           reference_photo_paths: string[]
+          training_status: string | null
+          trigger_word: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          fal_request_id?: string | null
           id?: string
+          lora_url?: string | null
           photos_analyzed?: number
           profile_document?: Json
+          reference_image_url?: string | null
           reference_photo_paths?: string[]
+          training_status?: string | null
+          trigger_word?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          fal_request_id?: string | null
           id?: string
+          lora_url?: string | null
           photos_analyzed?: number
           profile_document?: Json
+          reference_image_url?: string | null
           reference_photo_paths?: string[]
+          training_status?: string | null
+          trigger_word?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -708,7 +723,9 @@ export type Database = {
           error_message: string | null
           generated_photo_paths: string[] | null
           id: string
+          lora_url: string | null
           quantity: number
+          reference_image_url: string | null
           scenario: string
           status: string
           updated_at: string
@@ -720,7 +737,9 @@ export type Database = {
           error_message?: string | null
           generated_photo_paths?: string[] | null
           id?: string
+          lora_url?: string | null
           quantity: number
+          reference_image_url?: string | null
           scenario: string
           status?: string
           updated_at?: string
@@ -732,7 +751,9 @@ export type Database = {
           error_message?: string | null
           generated_photo_paths?: string[] | null
           id?: string
+          lora_url?: string | null
           quantity?: number
+          reference_image_url?: string | null
           scenario?: string
           status?: string
           updated_at?: string
