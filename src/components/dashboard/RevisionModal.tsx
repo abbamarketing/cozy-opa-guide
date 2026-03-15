@@ -224,7 +224,7 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProje
               )}
             />
 
-            <Button type="submit" disabled={isSubmitting} className="w-full gap-2">
+            <Button type="submit" disabled={isSubmitting || (remaining !== null && remaining <= 0)} className="w-full gap-2">
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
               Enviar Solicitação de Ajuste
             </Button>
