@@ -14,6 +14,18 @@ const FLUSH_INTERVAL = 3000;
 let logBuffer: LogEntry[] = [];
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
 
+const redactSensitive = (data: Record<string, unknown>): Record<string, unknown> => {
+  const redacted = { ...data };
+  if (typeof redacted.email === 'string') {
+    const [local, domain] = redacted.email.split('@');
+    redacted.email = `${local.slice(0, 2)}***@${domain}`;
+  }
+  if (typeof redacted.user_id === 'string') {
+    redacted.user_id = `${redacted.user_id.slice(0, 8)}...`;
+  }
+  return redacted;
+};
+
 async function flushLogs() {
   if (logBuffer.length === 0) return;
 
@@ -23,7 +35,7 @@ async function flushLogs() {
   const rows = batch.map((entry) => ({
     level: entry.level,
     message: entry.message,
-    context: entry.context || {},
+    context: entry.context ? redactSensitive(entry.context) : {},
     source: entry.source || 'app',
     user_id: user?.id || null,
   }));
