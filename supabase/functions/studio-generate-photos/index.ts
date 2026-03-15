@@ -183,6 +183,7 @@ serve(async (req) => {
               ],
             },
           ],
+          modalities: ['image', 'text'],
         }),
       })
 
