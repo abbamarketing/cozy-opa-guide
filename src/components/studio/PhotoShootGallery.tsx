@@ -149,8 +149,8 @@ export const PhotoShootGallery = () => {
           <p className="text-[10px] text-muted-foreground">{totalPhotos} fotos disponíveis</p>
         </div>
         {expiringToday > 0 && (
-          <span className="text-[10px] text-destructive font-mono">
-            ⚠️ {expiringToday} ensaio{expiringToday > 1 ? 's' : ''} expira{expiringToday > 1 ? 'm' : ''} hoje
+          <span className="text-[10px] text-destructive font-mono flex items-center gap-1">
+            <AlertTriangle className="h-3 w-3" /> {expiringToday} ensaio{expiringToday > 1 ? 's' : ''} expira{expiringToday > 1 ? 'm' : ''} hoje
           </span>
         )}
       </div>

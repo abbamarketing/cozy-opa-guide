@@ -249,7 +249,7 @@ export default function PhotoShootWizard({ onBack }: PhotoShootWizardProps) {
   // ── STEP: GENERATING ──
   if (step === 'generating') return (
     <div className="flex flex-col items-center justify-center py-16 space-y-6">
-      <div className="text-5xl">📷</div>
+      <Loader2 className="h-12 w-12 text-primary animate-spin" />
       <div className="text-center space-y-3 max-w-xs">
         <p className="text-sm font-mono font-semibold text-foreground">
           Gerando suas fotos profissionais...

@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Clapperboard, Camera, Sparkles, Copy, Check, StopCircle,
-  Loader2, ChevronRight, ChevronLeft, Zap, MapPin
+  Loader2, ChevronRight, ChevronLeft, Zap, MapPin, FolderOpen
 } from 'lucide-react';
 import PhotoShootWizard from './PhotoShootWizard';
 import { PhotoShootGallery } from '@/components/studio/PhotoShootGallery';
