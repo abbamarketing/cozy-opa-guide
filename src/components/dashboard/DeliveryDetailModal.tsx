@@ -357,7 +357,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
                         variant="outline"
                         size="sm"
                         className="gap-1.5"
-                        onClick={() => window.open(delivery.file_url!, '_blank')}
+                        onClick={() => openSafeUrl(delivery.file_url)}
                       >
                         <Download className="h-3.5 w-3.5" /> Baixar
                       </Button>
