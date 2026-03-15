@@ -13,6 +13,7 @@ interface StudioGenerateRequest {
   tone: 'direct' | 'didactic' | 'casual' | 'inspirational' | 'provocative';
   audience: string;
   audience_level: 'beginner' | 'intermediate' | 'advanced';
+  recording_location?: string;
   reference_channel?: string;
   keywords?: string;
 }
@@ -83,7 +84,6 @@ serve(async (req) => {
 
   const now = new Date();
 
-  // Lazy renewal: if period expired, reset credits
   if (credits && new Date(credits.period_end) < now) {
     const periodStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
@@ -96,7 +96,6 @@ serve(async (req) => {
     credits = renewed;
   }
 
-  // First-time user: create credits row
   if (!credits) {
     const periodStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
@@ -132,23 +131,79 @@ serve(async (req) => {
     ? 'Short Video (até 90 segundos — Instagram Reels, YouTube Shorts, TikTok)'
     : 'Vídeo YouTube (3-20 minutos)';
 
+  const locationContext = body.recording_location
+    ? `\n**Local de gravação**: ${body.recording_location}`
+    : '';
+
+  const locationInstructions = body.recording_location
+    ? `
+INSTRUÇÕES DE CENÁRIO E LOCAL DE GRAVAÇÃO:
+- O vídeo será gravado em: ${body.recording_location}
+- Adapte as instruções visuais e de cenário para este ambiente específico
+- Inclua sugestões práticas de posicionamento de câmera para este local
+- Sugira elementos visuais do ambiente que podem ser usados como B-roll ou cenário
+- Adapte o tom e a energia do roteiro ao contexto do local (ex: consultório = mais profissional; casa = mais íntimo e acolhedor; estúdio = mais produzido; escritório = autoridade corporativa)
+`
+    : '';
+
   const prompt = `Crie um roteiro profissional completo para ${contentTypeLabel}.
 
 **Tema**: ${body.theme}
 **Objetivo**: ${objectiveLabels[body.objective]}
 **Tom de voz**: ${toneLabels[body.tone]}
-**Público-alvo**: ${body.audience} (nível: ${audienceLevelLabels[body.audience_level]})
+**Público-alvo**: ${body.audience} (nível: ${audienceLevelLabels[body.audience_level]})${locationContext}
 ${body.reference_channel ? `**Referência de estilo**: ${body.reference_channel}` : ''}
 ${body.keywords ? `**Palavras-chave obrigatórias**: ${body.keywords}` : ''}
 
-O roteiro deve incluir:
-1. Título principal e 2 variações
-2. Hook de abertura (primeiros 3 segundos)
-3. Desenvolvimento com timestamps sugeridos
-4. CTA final
-5. Sugestões de hashtags (5-8 tags)
+${locationInstructions}
 
-Escreva em português brasileiro.`;
+O roteiro DEVE seguir esta estrutura em Markdown:
+
+## 🎯 Títulos
+Título principal e 2 variações alternativas.
+
+## 🪝 Gancho de Abertura (Hook)
+Os primeiros 3-5 segundos são CRÍTICOS. Crie um gancho visual + verbal poderoso:
+- **Gancho Visual**: Descreva exatamente o que aparece na tela (enquadramento, gesto, texto sobreposto, objeto)
+- **Gancho Verbal**: A frase exata que a pessoa vai falar (deve criar curiosidade ou choque)
+- **Texto na tela**: O texto que aparece sobreposto no vídeo nos primeiros segundos
+
+## 🎬 Roteiro Completo
+Escreva o roteiro com timestamps sugeridos. Para cada bloco inclua:
+- **[Timestamp]** (ex: **[0:00-0:03]**, **[0:15-0:30]**)
+- **Fala**: O texto exato que a pessoa vai dizer
+- **Visual**: O que aparece na tela (B-roll, texto animado, corte, gesto)
+- **Gancho de retenção**: A cada 15-30 segundos, inclua um micro-gancho para manter atenção (pergunta retórica, revelação, "mas espera...", zoom dramático)
+
+## 📱 Ganchos Visuais
+Liste 5-8 sugestões de elementos visuais que devem aparecer ao longo do vídeo:
+- Textos animados
+- Cortes dinâmicos
+- Zoom dramático
+- Gestos ou expressões faciais
+- Objetos ou props
+- Mudanças de ângulo
+
+## 📣 CTA Final
+Chamada para ação clara e direta. Inclua:
+- Fala exata do CTA
+- Texto na tela do CTA
+- Sugestão de gesto/enquadramento final
+
+## #️⃣ Hashtags
+5-8 hashtags otimizadas para alcance e nicho.
+
+## 💡 Dicas de Gravação
+3-5 dicas práticas específicas para este roteiro (iluminação, ângulo, edição).
+
+REGRAS IMPORTANTES:
+- Escreva em português brasileiro
+- Use linguagem natural e conversacional
+- Cada gancho visual deve ser ESPECÍFICO e ACIONÁVEL (não genérico)
+- Os timestamps devem ser realistas para o formato escolhido
+- Use negrito (**texto**) para destacar falas e instruções visuais
+- Use emojis nos títulos das seções para facilitar a leitura
+- Formate o texto como Markdown válido`;
 
   // ─── LLM call via Lovable AI Gateway ───
   const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
@@ -167,11 +222,11 @@ Escreva em português brasileiro.`;
     body: JSON.stringify({
       model: 'google/gemini-3-flash-preview',
       messages: [
-        { role: 'system', content: 'Você é um especialista em criação de conteúdo para redes sociais brasileiras. Cria roteiros profissionais, envolventes e otimizados para retenção.' },
+        { role: 'system', content: 'Você é um roteirista profissional e estrategista de conteúdo para redes sociais brasileiras. Você cria roteiros envolventes, otimizados para retenção e com ganchos visuais específicos. Sempre formate sua resposta como Markdown válido e bem estruturado.' },
         { role: 'user', content: prompt },
       ],
       stream: true,
-      max_tokens: 2000,
+      max_tokens: 3000,
     }),
   });
 

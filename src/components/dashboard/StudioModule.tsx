@@ -7,19 +7,30 @@ import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Clapperboard, Camera, Sparkles, Copy, Check, StopCircle,
-  Loader2, ChevronRight, ChevronLeft, Zap
+  Loader2, ChevronRight, ChevronLeft, Zap, MapPin
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStudioCredits } from '@/hooks/useStudioCredits';
 import { supabase } from '@/integrations/supabase/client';
+import ScriptRenderer from './ScriptRenderer';
 
 type ContentType = 'short_video' | 'youtube_video';
 type Objective = 'educate' | 'sell' | 'entertain' | 'authority' | 'viral';
 type Tone = 'direct' | 'didactic' | 'casual' | 'inspirational' | 'provocative';
 type AudienceLevel = 'beginner' | 'intermediate' | 'advanced';
+type RecordingLocation = 'home' | 'studio' | 'office' | 'clinic' | 'outdoor' | 'other';
 type WizardView = 'home' | 'step1' | 'step2' | 'step3' | 'step4' | 'result';
 
 const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/studio-generate`;
+
+const LOCATIONS: { value: RecordingLocation; label: string; emoji: string }[] = [
+  { value: 'home', label: 'Em casa', emoji: '🏠' },
+  { value: 'studio', label: 'Estúdio', emoji: '🎬' },
+  { value: 'office', label: 'Escritório', emoji: '🏢' },
+  { value: 'clinic', label: 'Consultório', emoji: '⚕️' },
+  { value: 'outdoor', label: 'Área externa', emoji: '🌳' },
+  { value: 'other', label: 'Outro', emoji: '📍' },
+];
 
 function StepHeader({ step, total, title, onBack }: { step: number; total: number; title: string; onBack: () => void }) {
   return (
@@ -51,12 +62,19 @@ export default function StudioModule() {
   const [tone, setTone] = useState<Tone>('direct');
   const [audience, setAudience] = useState('');
   const [audienceLevel, setAudienceLevel] = useState<AudienceLevel>('beginner');
+  const [recordingLocation, setRecordingLocation] = useState<RecordingLocation>('home');
+  const [customLocation, setCustomLocation] = useState('');
   const [referenceChannel, setReferenceChannel] = useState('');
   const [keywords, setKeywords] = useState('');
   const [loading, setLoading] = useState(false);
   const [generatedScript, setGeneratedScript] = useState('');
   const [copied, setCopied] = useState(false);
   const [abortController, setAbortController] = useState<AbortController | null>(null);
+
+  const getLocationLabel = () => {
+    if (recordingLocation === 'other') return customLocation.trim() || 'Outro';
+    return LOCATIONS.find(l => l.value === recordingLocation)?.label ?? recordingLocation;
+  };
 
   const handleGenerate = async () => {
     if (!theme.trim() || !audience.trim()) {
@@ -77,6 +95,7 @@ export default function StudioModule() {
         body: JSON.stringify({
           content_type: contentType, theme: theme.trim(), objective, tone,
           audience: audience.trim(), audience_level: audienceLevel,
+          recording_location: getLocationLabel(),
           reference_channel: referenceChannel.trim() || undefined,
           keywords: keywords.trim() || undefined,
         }),
@@ -133,9 +152,11 @@ export default function StudioModule() {
   const handleReset = () => {
     setView('home'); setTheme(''); setAudience(''); setReferenceChannel(''); setKeywords('');
     setContentType('short_video'); setObjective('educate'); setTone('direct');
-    setAudienceLevel('beginner'); setGeneratedScript('');
+    setAudienceLevel('beginner'); setRecordingLocation('home'); setCustomLocation('');
+    setGeneratedScript('');
   };
 
+  // ─── HOME ───
   if (view === 'home') {
     return (
       <div className="space-y-4">
@@ -187,6 +208,7 @@ export default function StudioModule() {
     );
   }
 
+  // ─── STEP 1: Content Type ───
   if (view === 'step1') {
     return (
       <div className="space-y-4">
@@ -211,6 +233,7 @@ export default function StudioModule() {
     );
   }
 
+  // ─── STEP 2: Context + Location ───
   if (view === 'step2') {
     const objectives: { value: Objective; label: string }[] = [
       { value: 'educate', label: 'Educar' }, { value: 'sell', label: 'Vender' },
@@ -247,6 +270,37 @@ export default function StudioModule() {
                 ))}
               </div>
             </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-mono flex items-center gap-1.5">
+                <MapPin className="h-3 w-3" /> Local de gravação *
+              </Label>
+              <div className="grid grid-cols-3 gap-2">
+                {LOCATIONS.map((loc) => (
+                  <button
+                    key={loc.value}
+                    onClick={() => setRecordingLocation(loc.value)}
+                    className={`flex flex-col items-center gap-1 px-2 py-2.5 rounded-lg text-xs font-mono border transition-colors ${
+                      recordingLocation === loc.value
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border text-muted-foreground hover:border-border/80'
+                    }`}
+                  >
+                    <span className="text-base">{loc.emoji}</span>
+                    <span>{loc.label}</span>
+                  </button>
+                ))}
+              </div>
+              {recordingLocation === 'other' && (
+                <Textarea
+                  placeholder="Descreva o local (ex: parque, café, academia...)"
+                  value={customLocation}
+                  onChange={(e) => setCustomLocation(e.target.value)}
+                  rows={1}
+                  maxLength={100}
+                  className="resize-none mt-1"
+                />
+              )}
+            </div>
           </CardContent>
         </Card>
         <Button className="w-full gap-2" onClick={() => setView('step3')} disabled={!theme.trim()}>Próximo <ChevronRight className="h-4 w-4" /></Button>
@@ -254,6 +308,7 @@ export default function StudioModule() {
     );
   }
 
+  // ─── STEP 3: Audience ───
   if (view === 'step3') {
     const levels: { value: AudienceLevel; label: string }[] = [
       { value: 'beginner', label: 'Iniciante' }, { value: 'intermediate', label: 'Intermediário' }, { value: 'advanced', label: 'Avançado' },
@@ -282,6 +337,7 @@ export default function StudioModule() {
     );
   }
 
+  // ─── STEP 4: References + Generate ───
   if (view === 'step4') {
     return (
       <div className="space-y-4">
@@ -309,6 +365,7 @@ export default function StudioModule() {
     );
   }
 
+  // ─── RESULT ───
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -330,9 +387,8 @@ export default function StudioModule() {
               <span className="text-sm text-muted-foreground font-mono">Gerando roteiro...</span>
             </div>
           ) : (
-            <div className="whitespace-pre-wrap text-sm text-card-foreground leading-relaxed rounded-lg bg-muted/20 p-4 border border-border/30 min-h-[200px]">
-              {generatedScript}
-              {loading && <span className="inline-block w-1.5 h-4 bg-primary/60 animate-pulse ml-0.5 align-text-bottom" />}
+            <div className="rounded-lg bg-muted/20 p-4 border border-border/30 min-h-[200px]">
+              <ScriptRenderer content={generatedScript} isStreaming={loading} />
             </div>
           )}
         </CardContent>
