@@ -9,6 +9,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import type { UserProjectData } from '@/hooks/useUserProject';
 
+const TIER_LABELS: Record<string, string> = {
+  standard: 'Standard',
+  pro: 'Pro',
+  business: 'Business',
+  premium: 'Premium',
+  agency: 'Agency',
+};
+
+const getTierLabel = (tier?: string | null) =>
+  TIER_LABELS[tier ?? ''] || 'Plano de Assinatura';
+
 interface QuotaCardProps {
   userProject: UserProjectData;
 }
@@ -121,7 +132,7 @@ const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
           className="w-full glass rounded-lg p-2.5 flex items-center gap-3"
         >
           <p className="text-xs font-mono font-semibold text-primary truncate shrink-0">
-            {userProject.custom_project?.project_name ?? userProject.subscription_tier ?? 'Assinatura'}
+            {userProject.custom_project?.project_name ?? getTierLabel(userProject.subscription_tier)}
           </p>
           <div className="flex-1 flex items-center gap-2 overflow-hidden">
             <div className="flex items-center gap-1 shrink-0">
@@ -172,7 +183,7 @@ const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
                 SEU PLANO
               </p>
               <p className="text-sm font-mono font-semibold text-primary mt-0.5">
-                {userProject.custom_project?.project_name ?? userProject.subscription_tier ?? 'Assinatura'}
+                {userProject.custom_project?.project_name ?? getTierLabel(userProject.subscription_tier)}
               </p>
             </div>
             <div className="flex items-center gap-2">
