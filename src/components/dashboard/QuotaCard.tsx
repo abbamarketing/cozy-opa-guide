@@ -9,6 +9,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import type { UserProjectData } from '@/hooks/useUserProject';
 
+const TIER_LABELS: Record<string, string> = {
+  standard: 'Standard',
+  pro: 'Pro',
+  business: 'Business',
+  premium: 'Premium',
+  agency: 'Agency',
+};
+
+const getTierLabel = (tier?: string | null) =>
+  TIER_LABELS[tier ?? ''] || 'Plano de Assinatura';
+
 interface QuotaCardProps {
   userProject: UserProjectData;
 }
