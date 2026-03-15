@@ -51,7 +51,7 @@ function scheduleFlush() {
 function addLog(entry: LogEntry) {
   logBuffer.push(entry);
   if (logBuffer.length >= LOG_BATCH_SIZE) {
-    flushLogs();
+    void flushLogs();
   } else {
     scheduleFlush();
   }
