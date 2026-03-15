@@ -78,7 +78,10 @@ const AdminClients = () => {
     clientName: string | null;
   }>({ type: null, userId: null, clientName: null });
 
-  const fetchClients = async () => {
+  const hasActiveFilter = (s: string, st: string, t: string) =>
+    s.trim() !== '' || st !== 'all' || t !== 'all';
+
+  const fetchClients = async (searchTerm: string, status: string, type: string, currentPage: number) => {
     setLoading(true);
 
     const { data: clientRoles } = await supabase
@@ -97,21 +100,36 @@ const AdminClients = () => {
       .map((r) => r.user_id)
       .filter((id) => !editorUserIds.has(id));
 
-    if (userIds.length === 0) { setClients([]); setLoading(false); return; }
+    if (userIds.length === 0) { setClients([]); setTotalCount(0); setLoading(false); return; }
 
-    const { data: profiles, count: profilesCount } = await supabase
+    const filtering = hasActiveFilter(searchTerm, status, type);
+
+    // Build profiles query — apply server-side name filter & skip pagination when filtering
+    let profilesQuery = supabase
       .from('profiles')
       .select('user_id, full_name, avatar_url, created_at', { count: 'exact' })
       .in('user_id', userIds)
-      .order('created_at', { ascending: false })
-      .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+      .order('created_at', { ascending: false });
+
+    if (searchTerm.trim()) {
+      profilesQuery = profilesQuery.ilike('full_name', `%${searchTerm.trim()}%`);
+    }
+
+    if (!filtering) {
+      profilesQuery = profilesQuery.range(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE - 1);
+    }
+
+    const { data: profiles, count: profilesCount } = await profilesQuery;
 
     setTotalCount(profilesCount || 0);
+
+    const profileUserIds = (profiles || []).map((p: any) => p.user_id);
+    if (profileUserIds.length === 0) { setClients([]); setLoading(false); return; }
 
     const { data: userProjects } = await supabase
       .from('user_projects')
       .select('user_id, status, custom_project_id, client_type, subscription_tier')
-      .in('user_id', userIds);
+      .in('user_id', profileUserIds);
 
     const projectIds = [...new Set((userProjects || []).filter((up: any) => up.custom_project_id).map((up: any) => up.custom_project_id))];
     const { data: projects } = await supabase
@@ -122,7 +140,7 @@ const AdminClients = () => {
     const projectMap = new Map((projects || []).map((p: any) => [p.id, p]));
     const upMap = new Map((userProjects || []).map((up: any) => [up.user_id, up]));
 
-    const rows: ClientRow[] = (profiles || []).map((p: any) => {
+    let rows: ClientRow[] = (profiles || []).map((p: any) => {
       const up = upMap.get(p.user_id);
       const proj = up?.custom_project_id ? projectMap.get(up.custom_project_id) : null;
 
@@ -152,28 +170,30 @@ const AdminClients = () => {
       };
     });
 
+    // Apply client-side filters for status and type (not available server-side on profiles)
+    if (status !== 'all') {
+      rows = rows.filter((c) => c.status === status);
+    }
+    if (type !== 'all') {
+      rows = rows.filter((c) => c.client_type === type);
+    }
+
     setClients(rows);
     setLoading(false);
   };
 
-  useEffect(() => { fetchClients(); }, [page]);
-
   const debouncedSearch = useDebouncedValue(search, 300);
 
-  const filtered = useMemo(() => {
-    let result = clients;
-    if (statusFilter !== 'all') {
-      result = result.filter((c) => c.status === statusFilter);
+  const isFiltering = hasActiveFilter(debouncedSearch, statusFilter, typeFilter);
+
+  useEffect(() => {
+    // Reset to page 0 when filters change
+    if (isFiltering && page !== 0) {
+      setPage(0);
+      return; // the page change will trigger the fetch
     }
-    if (typeFilter !== 'all') {
-      result = result.filter((c) => c.client_type === typeFilter);
-    }
-    if (debouncedSearch.trim()) {
-      const q = debouncedSearch.toLowerCase();
-      result = result.filter((c) => c.full_name?.toLowerCase().includes(q));
-    }
-    return result;
-  }, [clients, statusFilter, typeFilter, debouncedSearch]);
+    fetchClients(debouncedSearch, statusFilter, typeFilter, page);
+  }, [page, debouncedSearch, statusFilter, typeFilter]);
 
   const handleStatusChange = async () => {
     if (!confirmAction.userId || !confirmAction.type) return;
