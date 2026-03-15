@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,34 +6,50 @@
 
 @layer base {
   :root {
-    --background: 0 0% 20%;
-    --foreground: 0 0% 94%;
-    --card: 0 0% 16%;
-    --card-foreground: 0 0% 94%;
-    --popover: 0 0% 16%;
-    --popover-foreground: 0 0% 94%;
-    --primary: 101 72% 67%;
-    --primary-foreground: 0 0% 7%;
-    --secondary: 0 0% 24%;
-    --secondary-foreground: 0 0% 94%;
-    --muted: 0 0% 24%;
-    --muted-foreground: 0 0% 68%;
-    --accent: 101 72% 67%;
-    --accent-foreground: 0 0% 7%;
-    --destructive: 0 65% 51%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 28%;
-    --input: 0 0% 28%;
-    --ring: 101 72% 67%;
-    --radius: 0.375rem;
+    /* Paleta Abba oficial */
+    --bg-dark:         #1A231B;
+    --surface-dark:    #2D3926;
+    --accent-primary:  #A0E870;
+    --accent-light:    #BAFF8D;
 
-    --sidebar-background: 0 0% 14%;
-    --sidebar-foreground: 0 0% 94%;
+    /* Mapeamento para variáveis shadcn/radix existentes */
+    --background:      26 15% 11%;
+    --foreground:      0 0% 100%;
+
+    --card:            33 18% 19%;
+    --card-foreground: 0 0% 100%;
+
+    --popover:         33 18% 19%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary:         101 72% 67%;
+    --primary-foreground: 0 0% 7%;
+
+    --secondary:       33 18% 19%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted:           33 18% 16%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent:          101 72% 77%;
+    --accent-foreground: 0 0% 7%;
+
+    --destructive:     0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border:          33 18% 25%;
+    --input:           33 18% 22%;
+    --ring:            101 72% 67%;
+
+    --radius:          1.125rem;
+
+    --sidebar-background: 26 15% 9%;
+    --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 101 72% 67%;
     --sidebar-primary-foreground: 0 0% 7%;
-    --sidebar-accent: 0 0% 22%;
-    --sidebar-accent-foreground: 0 0% 94%;
-    --sidebar-border: 0 0% 28%;
+    --sidebar-accent: 33 18% 19%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 33 18% 20%;
     --sidebar-ring: 101 72% 67%;
 
     /* Semantic energy states */
@@ -62,13 +78,13 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6,
   button, label, nav,
   [data-ui-label] {
-    font-family: 'Roboto Mono', monospace;
+    font-family: 'Inter', system-ui, sans-serif;
   }
 
   input, select, textarea {
@@ -77,54 +93,72 @@
 }
 
 @layer utilities {
-  .font-mono-code {
-    font-family: 'Roboto Mono', monospace;
+  /* KPI Card — lime */
+  .kpi-lime {
+    background: #A0E870;
+    border-radius: 20px;
+    padding: 16px;
+    min-height: 188px;
+    position: relative;
+    overflow: hidden;
+    color: #111;
   }
 
-  .font-body {
-    font-family: 'Lato', sans-serif;
+  /* KPI Card — dark */
+  .kpi-dark {
+    background: #2D3926;
+    border-radius: 20px;
+    padding: 16px;
+    min-height: 188px;
+    position: relative;
+    overflow: hidden;
+    color: #fff;
   }
 
-  /* Glassmorphism card */
-  .glass {
-    background: hsl(var(--card) / 0.4);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid hsl(0 0% 100% / 0.1);
+  /* Watermark rings — obrigatório nos KPI cards */
+  .kpi-lime::before, .kpi-dark::before {
+    content: '';
+    position: absolute; right: -28px; top: -28px;
+    width: 120px; height: 120px; border-radius: 50%;
+    border: 20px solid rgba(0,0,0,0.10);
+    box-shadow: 0 0 0 18px rgba(0,0,0,0.06), 0 0 0 38px rgba(0,0,0,0.035);
+    pointer-events: none;
   }
 
-  .glass-hover:hover {
-    background: hsl(var(--card) / 0.55);
-    border-color: hsl(var(--primary) / 0.25);
-    box-shadow: 0 0 20px hsl(var(--primary) / 0.08), 0 4px 16px hsl(0 0% 0% / 0.2);
+  /* Barra de progresso grossa */
+  .progress-track {
+    height: 44px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.06);
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 999px;
+    background: #A0E870;
+    display: flex; align-items: center; padding: 0 20px;
+    font-size: 15px; font-weight: 700; color: #111;
   }
 
-  /* Hover elevation for delivery cards */
-  .card-elevate {
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  }
-  .card-elevate:hover {
-    transform: translateY(-1px);
-    border-color: hsl(var(--primary) / 0.2);
-    box-shadow: 0 0 16px hsl(var(--primary) / 0.06), 0 8px 24px hsl(0 0% 0% / 0.25);
-  }
-  .card-elevate:active {
-    transform: translateY(0);
+  /* FAB */
+  .fab {
+    background: #A0E870;
+    border-radius: 50%;
+    width: 52px; height: 52px;
+    box-shadow: 0 4px 16px rgba(130,210,80,0.40), 0 1px 4px rgba(0,0,0,0.20);
+    color: #111;
+    display: flex; align-items: center; justify-content: center;
   }
 
-  /* Legacy neon utilities mapped to primary */
-  .neon-glow {
-    box-shadow: 0 1px 3px hsl(var(--primary) / 0.15);
+  /* Glass apenas em micro-elementos */
+  .glass-micro {
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
   }
-
-  .gradient-neon {
-    background: hsl(var(--primary));
-  }
-
-  .text-neon-glow {
-    color: hsl(var(--primary));
-  }
-
 
   /* Safe area for mobile bottom nav */
   .safe-area-bottom {
