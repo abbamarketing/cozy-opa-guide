@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { logAiUsage } from "../_shared/log-ai-usage.ts";
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
