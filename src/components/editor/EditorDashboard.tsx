@@ -184,14 +184,23 @@ const EditorDeliveryCard = ({
   onClick,
   onDragStart,
   isDragging,
+  onMoveStatus,
 }: {
   delivery: EditorDelivery;
   onClick: () => void;
   onDragStart?: (e: React.DragEvent) => void;
   isDragging?: boolean;
+  onMoveStatus?: (deliveryId: string, targetColumn: Column) => void;
 }) => {
   const Icon = typeIcons[delivery.delivery_type] || Video;
   const deadline = getDeadlineInfo(delivery.due_date);
+
+  // Compute prev/next columns for mobile status buttons
+  const currentColIndex = COLUMNS.findIndex((c) => c.statuses.includes(delivery.status));
+  const prevCol = currentColIndex > 0 ? COLUMNS[currentColIndex - 1] : null;
+  const nextCol = currentColIndex < COLUMNS.length - 1 ? COLUMNS[currentColIndex + 1] : null;
+  const canGoPrev = prevCol?.editorCanDrop;
+  const canGoNext = nextCol?.editorCanDrop;
 
   return (
     <Card
@@ -268,6 +277,33 @@ const EditorDeliveryCard = ({
           <span className={`ml-auto text-[10px] font-medium ${deadline.color}`}>
             {deadline.label}
           </span>
+        </div>
+      )}
+
+      {/* Mobile status navigation buttons */}
+      {onMoveStatus && (canGoPrev || canGoNext) && (
+        <div className="mt-2 flex items-center gap-2 md:hidden" onClick={(e) => e.stopPropagation()}>
+          {canGoPrev && prevCol && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2 text-[10px] text-muted-foreground"
+              onClick={(e) => { e.stopPropagation(); onMoveStatus(delivery.id, prevCol); }}
+            >
+              ← {prevCol.title}
+            </Button>
+          )}
+          <div className="flex-1" />
+          {canGoNext && nextCol && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2 text-[10px] text-muted-foreground"
+              onClick={(e) => { e.stopPropagation(); onMoveStatus(delivery.id, nextCol); }}
+            >
+              {nextCol.title} →
+            </Button>
+          )}
         </div>
       )}
     </Card>
@@ -591,6 +627,33 @@ const EditorDashboard = () => {
     setDraggedId(null);
   };
 
+  const handleMoveStatus = async (deliveryId: string, targetCol: Column) => {
+    if (!targetCol.editorCanDrop) return;
+    const delivery = deliveries.find((d) => d.id === deliveryId);
+    if (!delivery) return;
+
+    const newStatus = targetCol.statuses[0];
+    if (delivery.status === newStatus) return;
+
+    const updateData: Record<string, any> = { status: newStatus };
+    if (newStatus === 'review') {
+      updateData.delivered_at = new Date().toISOString();
+    }
+
+    const { error } = await supabase
+      .from('deliveries')
+      .update(updateData)
+      .eq('id', deliveryId);
+
+    if (error) {
+      toast.error('Erro ao mover entrega');
+    } else {
+      logger.info('Editor moveu entrega (mobile)', { delivery_id: deliveryId, to: targetCol.title }, 'editor');
+      toast.success(`Movido para ${targetCol.title}`);
+      fetchDeliveries();
+    }
+  };
+
   const handleDragOver = (col: Column) => (e: React.DragEvent) => {
     if (col.editorCanDrop) {
       e.preventDefault();
@@ -679,11 +742,14 @@ const EditorDashboard = () => {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-1 px-2">
+                  <Button variant="ghost" size="sm" className="gap-1.5 px-2">
                     <Avatar className="h-6 w-6">
                       <AvatarImage src={profile?.avatar_url || undefined} />
                       <AvatarFallback className="bg-primary/20 text-[10px] text-primary">{initials}</AvatarFallback>
                     </Avatar>
+                    <span className="text-sm font-medium truncate max-w-[120px]">
+                      {profile?.full_name || editor?.display_name || 'Editor'}
+                    </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40">
@@ -783,6 +849,7 @@ const EditorDashboard = () => {
                   key={d.id}
                   delivery={d}
                   onClick={() => setSelectedDelivery(d)}
+                  onMoveStatus={handleMoveStatus}
                 />
               ))}
             </div>
