@@ -281,7 +281,7 @@ export default function Settings() {
               {loading ? 'Abrindo portal...' : 'Portal de Pagamento'}
             </Button>
             <p className="text-[10px] text-muted-foreground text-center font-mono">
-              Atualizar cartao, faturas, upgrade ou cancelar
+              Atualizar cartão, faturas, upgrade ou cancelar
             </p>
           </CardContent>
         </Card>

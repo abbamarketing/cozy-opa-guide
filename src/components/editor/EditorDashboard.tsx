@@ -125,7 +125,7 @@ const getDeadlineInfo = (dueDate: string | null) => {
   const label = formatBusinessCountdown(bizMin);
   if (bizMin < 0) return { hours: bizHours, color: 'text-destructive', label: 'Atrasado' };
   if (bizHours <= 6) return { hours: bizHours, color: 'text-destructive', label };
-  if (bizHours <= 12) return { hours: bizHours, color: 'text-[hsl(45,93%,47%)]', label };
+  if (bizHours <= 12) return { hours: bizHours, color: 'text-queue-yellow', label };
   return { hours: bizHours, color: 'text-primary', label };
 };
 
