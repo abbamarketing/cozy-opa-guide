@@ -10,7 +10,6 @@ import NotificationBell from '@/components/shared/NotificationBell';
 import ContextualTour, { restartTour } from '@/components/dashboard/ContextualTour';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  Play,
   HelpCircle,
   Video,
   Calendar,
