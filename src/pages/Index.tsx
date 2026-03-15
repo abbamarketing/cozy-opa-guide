@@ -3,7 +3,8 @@ import { Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { useProfile } from '@/hooks/useProfile';
-import { Loader2, Shield, Film, User, Play } from 'lucide-react';
+import { Loader2, Shield, Film, User } from 'lucide-react';
+import abbaLogo from '@/assets/abba-logo.png';
 import { Card } from '@/components/ui/card';
 
 
