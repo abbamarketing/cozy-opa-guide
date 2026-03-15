@@ -212,6 +212,11 @@ export default function StudioModule() {
     );
   }
 
+  // ─── PHOTO SHOOT ───
+  if (view === 'photoShoot') {
+    return <PhotoShootWizard onBack={() => setView('home')} />;
+  }
+
   // ─── STEP 1: Content Type ───
   if (view === 'step1') {
     return (
