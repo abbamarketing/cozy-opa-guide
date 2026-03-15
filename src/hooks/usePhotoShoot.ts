@@ -10,6 +10,7 @@ interface PhotoProfile {
   training_status: TrainingStatus;
   reference_image_url: string | null;
   lora_url: string | null;
+  updated_at: string;
 }
 
 interface UsePhotoShootReturn {
@@ -30,65 +31,99 @@ export const usePhotoShoot = (): UsePhotoShootReturn => {
   const [trainingStatus, setTrainingStatus] = useState<TrainingStatus>('idle');
   const [generatedPhotos, setGeneratedPhotos] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Fetch existing profile on mount
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollingAttemptsRef = useRef(0);
+
+  const clearPolling = useCallback(() => {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+    pollingAttemptsRef.current = 0;
+  }, []);
+
+  // Fetch existing profile on mount / polling
   const fetchProfile = useCallback(async () => {
-    if (!user) return;
+    if (!user) return null;
+
     const { data } = await supabase
       .from('client_photo_profiles')
-      .select('id, training_status, reference_image_url, lora_url')
+      .select('id, training_status, reference_image_url, lora_url, updated_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
 
-    if (data) {
-      const status = data.training_status as TrainingStatus;
-      setProfile(data as PhotoProfile);
-      setTrainingStatus(status);
-      return status;
+    if (!data) return null;
+
+    let status = (data.training_status ?? 'idle') as TrainingStatus;
+    let profileData = data;
+
+    // Auto-heal stale status: if LoRA exists but status stuck in generating_reference for >3min
+    if (status === 'generating_reference' && data.lora_url) {
+      const elapsedMs = Date.now() - new Date(data.updated_at).getTime();
+      if (elapsedMs > 3 * 60 * 1000) {
+        const { error } = await supabase
+          .from('client_photo_profiles')
+          .update({ training_status: 'completed' })
+          .eq('id', data.id)
+          .eq('user_id', user.id);
+
+        if (!error) {
+          status = 'completed';
+          profileData = { ...data, training_status: 'completed' };
+        }
+      }
     }
-    return null;
+
+    setProfile(profileData as PhotoProfile);
+    setTrainingStatus(status);
+    return status;
   }, [user]);
 
-  // Load profile on mount
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
 
-  // Poll DB while training is in progress
   const startPolling = useCallback(() => {
     if (pollingRef.current) return;
+
+    pollingAttemptsRef.current = 0;
     pollingRef.current = setInterval(async () => {
+      pollingAttemptsRef.current += 1;
       const status = await fetchProfile();
+
       if (status === 'completed') {
-        if (pollingRef.current) clearInterval(pollingRef.current);
-        pollingRef.current = null;
+        clearPolling();
         toast.success('Perfil criado! Agora você pode gerar fotos profissionais.');
-      } else if (status === 'failed') {
-        if (pollingRef.current) clearInterval(pollingRef.current);
-        pollingRef.current = null;
+        return;
+      }
+
+      if (status === 'failed') {
+        clearPolling();
         toast.error('O treinamento falhou. Tente novamente.');
+        return;
+      }
+
+      // Safety timeout to avoid endless loading
+      if (pollingAttemptsRef.current >= 72) {
+        clearPolling();
+        toast.error('Treinamento demorou além do esperado. Atualize a página para sincronizar o status.');
       }
     }, 5000);
-  }, [fetchProfile]);
+  }, [fetchProfile, clearPolling]);
 
-  // Cleanup polling on unmount
-  useEffect(() => {
-    return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
-    };
-  }, []);
+  useEffect(() => () => clearPolling(), [clearPolling]);
 
-  // Auto-start polling if profile is in training state
   useEffect(() => {
-    if (trainingStatus === 'training' || trainingStatus === 'generating_reference' || trainingStatus === 'uploading') {
+    if (trainingStatus === 'uploading' || trainingStatus === 'training' || trainingStatus === 'generating_reference') {
       startPolling();
+    } else {
+      clearPolling();
     }
-  }, [trainingStatus, startPolling]);
+  }, [trainingStatus, startPolling, clearPolling]);
 
-  // Upload photos + start async training
   const uploadAndTrain = useCallback(async (files: File[]) => {
     if (!user) return;
     if (files.length < 5 || files.length > 15) {
@@ -117,9 +152,11 @@ export const usePhotoShoot = (): UsePhotoShootReturn => {
       for (const file of files) {
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
         const path = `${user.id}/${newProfile.id}/${Date.now()}_${safeName}`;
+
         const { error: uploadError } = await supabase.storage
           .from('studio-reference-photos')
           .upload(path, file);
+
         if (uploadError) throw uploadError;
 
         const { data: signedData } = await supabase.storage
@@ -132,16 +169,15 @@ export const usePhotoShoot = (): UsePhotoShootReturn => {
       setTrainingStatus('training');
       setProfile({ ...newProfile, training_status: 'training' } as PhotoProfile);
 
-      // 3. Call Edge Function (now returns immediately)
+      // 3. Call Edge Function (returns immediately)
       const { error } = await supabase.functions.invoke('studio-train-lora', {
         body: { photo_urls: photoUrls, profile_id: newProfile.id },
       });
 
       if (error) throw error;
 
-      // 4. Start polling for completion
+      // 4. Keep polling for async completion
       startPolling();
-
     } catch (err: any) {
       setTrainingStatus('failed');
       toast.error(`Erro no treinamento: ${err.message}`);
@@ -150,9 +186,8 @@ export const usePhotoShoot = (): UsePhotoShootReturn => {
     }
   }, [user, startPolling]);
 
-  // Generate photos for a scenario
   const generatePhotos = useCallback(async (scenario: string, quantity: 1 | 3 | 5) => {
-    if (!profile?.id || profile.training_status !== 'completed') {
+    if (!profile?.id || trainingStatus !== 'completed') {
       toast.error('Complete o treinamento do perfil primeiro');
       return;
     }
@@ -174,7 +209,7 @@ export const usePhotoShoot = (): UsePhotoShootReturn => {
     } finally {
       setIsGenerating(false);
     }
-  }, [profile]);
+  }, [profile, trainingStatus]);
 
   const resetGenerated = useCallback(() => setGeneratedPhotos([]), []);
 
