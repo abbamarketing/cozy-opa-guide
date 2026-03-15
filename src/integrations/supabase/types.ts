@@ -721,6 +721,7 @@ export type Database = {
           created_at: string
           credits_used: number
           error_message: string | null
+          expires_at: string | null
           generated_photo_paths: string[] | null
           id: string
           lora_url: string | null
@@ -735,6 +736,7 @@ export type Database = {
           created_at?: string
           credits_used: number
           error_message?: string | null
+          expires_at?: string | null
           generated_photo_paths?: string[] | null
           id?: string
           lora_url?: string | null
@@ -749,6 +751,7 @@ export type Database = {
           created_at?: string
           credits_used?: number
           error_message?: string | null
+          expires_at?: string | null
           generated_photo_paths?: string[] | null
           id?: string
           lora_url?: string | null
