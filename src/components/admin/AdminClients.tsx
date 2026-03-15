@@ -257,7 +257,7 @@ const AdminClients = () => {
 
   const exportCSV = () => {
     downloadCSV(
-      filtered.map((c) => ({
+      clients.map((c) => ({
         Nome: c.full_name || 'Sem nome',
         Plano: c.project_name || '—',
         'Valor Mensal': c.plan_value ? `R$ ${c.plan_value.toFixed(2)}` : '—',
