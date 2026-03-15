@@ -72,6 +72,12 @@ export default {
           yellow: "hsl(var(--queue-yellow))",
           green: "hsl(var(--queue-green))",
         },
+        abba: {
+          dark: "#1A231B",
+          surface: "#2D3926",
+          lime: "#A0E870",
+          light: "#BAFF8D",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

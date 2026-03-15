@@ -15,6 +15,7 @@ const NewDeliveryModal = lazy(() => import('./NewDeliveryModal'));
 const DeliveryDetailModal = lazy(() => import('./DeliveryDetailModal'));
 const CaptureScheduleModal = lazy(() => import('./CaptureScheduleModal'));
 
+// Interfaces
 interface KanbanProps {
   userProject: UserProjectData;
 }
@@ -53,7 +54,6 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
   const isSubscription = userProject.client_type === 'subscription';
 
-  // Filter visible columns: queue column visible for subscription clients or when queue deliveries exist
   const COLUMNS = useMemo(() => {
     return ALL_COLUMNS.filter((col) => {
       if (col.id !== 'queue') return true;
@@ -71,7 +71,6 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
     setCaptureLeadDays(userProject.custom_project?.capture_lead_days ?? 30);
 
-    // Check for any scheduled/confirmed capture in current period
     const { data: captures } = await supabase
       .from('capture_sessions')
       .select('id')
@@ -128,7 +127,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const CaptureBanner = () => {
     if (!needsCaptureFirst) return null;
     return (
-      <div className="flex items-center gap-3 rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-3">
+      <div className="flex items-center gap-3 rounded-[20px] border border-yellow-500/30 bg-yellow-500/5 p-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-500/15">
           <Camera className="h-4 w-4 text-yellow-500" />
         </div>
@@ -165,14 +164,14 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-mono font-semibold text-foreground">Entregas</h2>
+          <h2 className="text-base font-sans font-semibold text-foreground">Entregas</h2>
           <Tooltip>
             <TooltipTrigger asChild>
               <span>
                 <Button
                   size="sm"
                   disabled={!canCreateDelivery}
-                  className="gap-1.5 h-9"
+                  className="gap-1.5 h-9 bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light"
                   onClick={handleNewClick}
                   data-tour="new-delivery-btn"
                 >
@@ -197,13 +196,13 @@ const Kanban = ({ userProject }: KanbanProps) => {
         {/* Column Tabs */}
         {isLoading ? (
           <div className="space-y-3">
-            <div className="flex gap-1 bg-secondary/50 rounded-lg p-1">
+            <div className="flex gap-2 p-1">
               {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="flex-1 h-8 rounded-md" />
+                <Skeleton key={i} className="flex-1 h-8 rounded-full" />
               ))}
             </div>
             {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded-lg border border-border/20 bg-card/50 p-3 space-y-2">
+              <div key={i} className="rounded-[20px] bg-abba-surface border border-white/8 p-3 space-y-2">
                 <Skeleton className="h-3.5 w-3/4" />
                 <Skeleton className="h-2.5 w-1/2" />
                 <Skeleton className="h-2.5 w-1/3" />
@@ -212,7 +211,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
           </div>
         ) : (
           <>
-            <div className="flex gap-1 bg-secondary rounded-lg p-1" data-tour="kanban-board">
+            <div className="flex gap-2 p-1" data-tour="kanban-board">
               {COLUMNS.map((col) => {
                 const count = getDeliveriesForColumn(col).length;
                 const isActive = activeColumn === col.id;
@@ -220,15 +219,15 @@ const Kanban = ({ userProject }: KanbanProps) => {
                   <button
                     key={col.id}
                     onClick={() => setActiveColumn(col.id)}
-                    className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-md text-[10px] font-mono font-medium tracking-wider transition-colors ${
+                    className={`flex-1 flex items-center justify-center gap-1 py-2 px-3 rounded-full text-[11px] font-sans font-semibold tracking-wide transition-colors ${
                       isActive
-                        ? 'bg-card text-foreground shadow-sm'
-                        : 'text-muted-foreground'
+                        ? 'bg-abba-surface text-white shadow-sm'
+                        : 'text-white/50 hover:text-white/80'
                     }`}
                   >
                     {col.title}
                     {count > 0 && (
-                      <span className={`text-[9px] ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                      <span className={`text-[9px] ${isActive ? 'text-abba-lime' : 'text-white/50'}`}>
                         {count}
                       </span>
                     )}
@@ -240,13 +239,13 @@ const Kanban = ({ userProject }: KanbanProps) => {
             {/* Cards */}
             <div className="space-y-2">
               {items.length === 0 ? (
-                <div className="rounded-lg glass p-8 text-center space-y-3">
+                <div className="rounded-[20px] bg-abba-surface/40 border border-white/6 p-8 text-center space-y-3">
                   <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
-                  <p className="text-xs font-mono text-muted-foreground">
+                  <p className="text-xs font-sans text-muted-foreground">
                     Nenhuma entrega aqui
                   </p>
                   {activeColumn === 'todo' && canCreateDelivery && (
-                    <Button size="sm" variant="outline" onClick={handleNewClick} className="text-xs">
+                    <Button size="sm" variant="outline" onClick={handleNewClick} className="text-xs rounded-full">
                       <Plus className="h-3 w-3 mr-1" />
                       Criar primeira entrega
                     </Button>
@@ -257,7 +256,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
                   <div key={d.id} className="relative">
                     {activeColumn === 'queue' && (
                       <div className="absolute top-2 right-2 z-10">
-                        <Badge variant="secondary" className="text-[9px] font-mono gap-1">
+                        <Badge variant="secondary" className="text-[9px] font-sans gap-1">
                           <Clock className="h-2.5 w-2.5" />
                           Aguardando editor
                         </Badge>
@@ -312,14 +311,14 @@ const Kanban = ({ userProject }: KanbanProps) => {
       <CaptureBanner />
 
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-mono font-semibold text-foreground">Minhas Entregas</h2>
+        <h2 className="text-lg font-sans font-semibold text-foreground">Minhas Entregas</h2>
         <Tooltip>
           <TooltipTrigger asChild>
             <span>
               <Button
                 size="sm"
                 disabled={!canCreateDelivery}
-                className="gap-1.5"
+                className="gap-1.5 bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light"
                 onClick={handleNewClick}
                 data-tour="new-delivery-btn"
               >
@@ -344,13 +343,13 @@ const Kanban = ({ userProject }: KanbanProps) => {
       {isLoading ? (
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
           {ALL_COLUMNS.filter(c => c.id !== 'queue' || isSubscription).map((c) => (
-            <div key={c.id} className="rounded-lg border border-border/30 bg-muted/15 p-2.5 min-w-[240px] space-y-2">
+            <div key={c.id} className="rounded-[20px] bg-abba-surface/40 border border-white/6 p-2.5 min-w-[240px] space-y-2">
               <div className="flex items-center justify-between px-1 mb-1">
                 <Skeleton className="h-3 w-20" />
                 <Skeleton className="h-5 w-5 rounded-md" />
               </div>
               {[1, 2, 3].map((i) => (
-                <div key={i} className="rounded-lg border border-border/20 bg-card/50 p-3 space-y-2">
+                <div key={i} className="rounded-[20px] bg-abba-surface border border-white/8 p-3 space-y-2">
                   <Skeleton className="h-3.5 w-3/4" />
                   <Skeleton className="h-2.5 w-1/2" />
                   <Skeleton className="h-2.5 w-1/3" />
@@ -368,16 +367,16 @@ const Kanban = ({ userProject }: KanbanProps) => {
             return (
               <div
                 key={col.id}
-                className="flex flex-col rounded-lg glass p-2"
+                className="flex flex-col rounded-[20px] bg-abba-surface/40 border border-white/6 p-2"
               >
                 <div className="mb-2 px-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[10px] font-mono font-semibold uppercase tracking-widest text-muted-foreground">
+                    <h3 className="text-[10px] font-sans font-semibold uppercase tracking-widest text-muted-foreground">
                       {col.title}
                     </h3>
                     <Badge
                       variant="secondary"
-                      className="h-5 min-w-[20px] justify-center px-1.5 text-[10px] font-mono"
+                      className="h-5 min-w-[20px] justify-center px-1.5 text-[10px] font-sans"
                     >
                       {allItems.length}
                     </Badge>
@@ -390,9 +389,9 @@ const Kanban = ({ userProject }: KanbanProps) => {
                     {items.length === 0 ? (
                       <div className="py-8 text-center space-y-3">
                         <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
-                        <p className="text-[10px] font-mono text-muted-foreground/50">Nenhuma entrega aqui</p>
+                        <p className="text-[10px] font-sans text-muted-foreground/50">Nenhuma entrega aqui</p>
                         {col.id === 'todo' && canCreateDelivery && (
-                          <Button size="sm" variant="outline" onClick={handleNewClick} className="text-xs">
+                          <Button size="sm" variant="outline" onClick={handleNewClick} className="text-xs rounded-full">
                             <Plus className="h-3 w-3 mr-1" />
                             Criar primeira entrega
                           </Button>
@@ -403,7 +402,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
                         <div key={d.id} className="relative">
                           {col.id === 'queue' && (
                             <div className="absolute top-2 right-2 z-10">
-                              <Badge variant="secondary" className="text-[9px] font-mono gap-1">
+                              <Badge variant="secondary" className="text-[9px] font-sans gap-1">
                                 <Clock className="h-2.5 w-2.5" />
                                 Aguardando editor
                               </Badge>

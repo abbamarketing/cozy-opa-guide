@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -12,7 +11,7 @@ import { DollarSign, Users, Video, Clock, TrendingUp, TrendingDown, Download, Al
 import { Button } from '@/components/ui/button';
 import { downloadCSV } from '@/lib/csv';
 
-const COLORS = ['hsl(142, 72%, 73%)', 'hsl(200, 80%, 60%)', 'hsl(45, 93%, 47%)', 'hsl(280, 70%, 60%)'];
+const COLORS = ['hsl(101, 72%, 67%)', 'hsl(200, 80%, 60%)', 'hsl(45, 93%, 47%)', 'hsl(280, 70%, 60%)'];
 
 interface KPI {
   title: string;
@@ -134,7 +133,6 @@ const AdminMetrics = () => {
       });
       setRevisionData(Object.entries(revCounts).map(([label, count]) => ({ label, count })));
 
-      // ── Correção: tempo médio baseado em created_at → delivered_at ──
       const completedDeliveries = (deliveries || []).filter((d: any) => d.delivered_at && d.created_at);
       let avgHours = 0;
       if (completedDeliveries.length > 0) {
@@ -144,7 +142,6 @@ const AdminMetrics = () => {
         avgHours = Math.round(avgTime / (1000 * 60 * 60));
       }
 
-      // ── Taxa de SLA cumprido (mês atual) ──
       const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
       const approvedMonth = (deliveries || []).filter((d: any) =>
         d.status === 'approved' && d.approved_at && new Date(d.approved_at) >= monthStart
@@ -158,7 +155,6 @@ const AdminMetrics = () => {
         : null;
       setSlaRate(rate);
 
-      // ── Ranking de entregas por editor (mês atual) ──
       const { data: byEditor } = await supabase
         .from('deliveries')
         .select('editor_id, editors!inner(display_name)')
@@ -174,7 +170,6 @@ const AdminMetrics = () => {
       ).sort(([, a], [, b]) => (b as number) - (a as number)) as [string, number][];
       setEditorRanking(ranking);
 
-      // Build KPIs
       const currentMrr = mrrMonthly[mrrMonthly.length - 1]?.mrr || 0;
       const prevMrr = mrrMonthly[mrrMonthly.length - 2]?.mrr || 0;
       const mrrChange = prevMrr > 0 ? Math.round(((currentMrr - prevMrr) / prevMrr) * 100) : 0;
@@ -194,7 +189,7 @@ const AdminMetrics = () => {
           change: `${mrrChange >= 0 ? '+' : ''}${mrrChange}%`,
           trend: mrrChange >= 0 ? 'up' : 'down',
           icon: DollarSign,
-          color: 'text-primary',
+          color: 'text-abba-lime',
         },
         {
           title: 'Clientes Ativos',
@@ -202,7 +197,7 @@ const AdminMetrics = () => {
           change: `${subsMonthly[subsMonthly.length - 1]?.count || 0} novos`,
           trend: 'up',
           icon: Users,
-          color: 'text-blue-400',
+          color: 'text-white',
         },
         {
           title: 'Entregas/Mês',
@@ -210,7 +205,7 @@ const AdminMetrics = () => {
           change: `${totalDeliveries} total`,
           trend: 'up',
           icon: Video,
-          color: 'text-purple-400',
+          color: 'text-abba-lime',
         },
         {
           title: 'Tempo Médio',
@@ -218,7 +213,7 @@ const AdminMetrics = () => {
           change: completedDeliveries.length > 0 ? `${completedDeliveries.length} entregas` : 'N/A',
           trend: 'down',
           icon: Clock,
-          color: 'text-primary',
+          color: 'text-white',
         },
       ]);
 
@@ -232,10 +227,10 @@ const AdminMetrics = () => {
     return (
       <div className="space-y-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
+          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-[188px] rounded-[20px]" />)}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-72 rounded-xl" />)}
+          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-72 rounded-[20px]" />)}
         </div>
       </div>
     );
@@ -248,7 +243,7 @@ const AdminMetrics = () => {
         <Button
           variant="outline"
           size="sm"
-          className="gap-1.5"
+          className="gap-1.5 rounded-full"
           onClick={() => {
             const rows = [
               ...kpis.map((k) => ({ Categoria: 'KPI', Métrica: k.title, Valor: k.value, Variação: k.change })),
@@ -267,53 +262,54 @@ const AdminMetrics = () => {
 
       {/* SLA Alert Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Card className="border-yellow-500/40 bg-yellow-500/5 p-4 space-y-1">
+        <div className="kpi-dark flex flex-col justify-between" style={{ minHeight: 'auto' }}>
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-yellow-500" />
-            <span className="text-xs font-medium text-yellow-500">SLA em Risco</span>
+            <span className="text-[11px] font-sans font-semibold uppercase tracking-widest text-yellow-500">SLA em Risco</span>
           </div>
-          <p className="text-2xl font-bold text-card-foreground">{slaRisk}</p>
-          <p className="text-xs text-muted-foreground">Deadline em menos de 4h</p>
-        </Card>
+          <p className="text-[42px] font-sans font-extrabold leading-none tracking-[-0.045em] text-white mt-2">{slaRisk}</p>
+          <p className="text-[11px] font-sans text-white/60 mt-1">Deadline em menos de 4h</p>
+        </div>
 
-        <Card className="border-destructive/40 bg-destructive/5 p-4 space-y-1">
+        <div className="kpi-dark flex flex-col justify-between" style={{ minHeight: 'auto' }}>
           <div className="flex items-center gap-2">
             <ShieldAlert className="h-4 w-4 text-destructive" />
-            <span className="text-xs font-medium text-destructive">SLA Estourado</span>
+            <span className="text-[11px] font-sans font-semibold uppercase tracking-widest text-destructive">SLA Estourado</span>
           </div>
-          <p className="text-2xl font-bold text-card-foreground">{slaBreached}</p>
-          <p className="text-xs text-muted-foreground">Deadline ultrapassado</p>
-        </Card>
+          <p className="text-[42px] font-sans font-extrabold leading-none tracking-[-0.045em] text-white mt-2">{slaBreached}</p>
+          <p className="text-[11px] font-sans text-white/60 mt-1">Deadline ultrapassado</p>
+        </div>
 
-        <Card className="border-primary/40 bg-primary/5 p-4 space-y-1">
+        <div className="kpi-dark flex flex-col justify-between" style={{ minHeight: 'auto' }}>
           <div className="flex items-center gap-2">
-            <CheckCircle className="h-4 w-4 text-primary" />
-            <span className="text-xs font-medium text-primary">Taxa de SLA — Mês Atual</span>
+            <CheckCircle className="h-4 w-4 text-abba-lime" />
+            <span className="text-[11px] font-sans font-semibold uppercase tracking-widest text-abba-lime">Taxa de SLA — Mês Atual</span>
           </div>
-          <p className="text-2xl font-bold text-card-foreground">
+          <p className="text-[42px] font-sans font-extrabold leading-none tracking-[-0.045em] text-white mt-2">
             {slaRate !== null ? `${slaRate}%` : 'N/A'}
           </p>
-          <p className="text-xs text-muted-foreground">Entregas dentro do prazo</p>
-        </Card>
+          <p className="text-[11px] font-sans text-white/60 mt-1">Entregas dentro do prazo</p>
+        </div>
       </div>
 
-      {/* KPI Cards */}
+      {/* KPI Cards — alternating lime/dark */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {kpis.map((kpi) => {
+        {kpis.map((kpi, idx) => {
           const Icon = kpi.icon;
           const TrendIcon = kpi.trend === 'up' ? TrendingUp : TrendingDown;
+          const isLime = idx % 2 === 0;
           return (
-            <Card key={kpi.title} className="glass border-border/40 p-4 space-y-2">
+            <div key={kpi.title} className={isLime ? 'kpi-lime' : 'kpi-dark'}>
               <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">{kpi.title}</span>
-                <Icon className={`h-4 w-4 ${kpi.color}`} />
+                <span className={`text-[11px] font-sans font-semibold uppercase tracking-widest ${isLime ? 'opacity-60' : 'opacity-60'}`}>{kpi.title}</span>
+                <Icon className={`h-4 w-4 ${isLime ? 'text-[#111]/60' : 'text-white/60'}`} />
               </div>
-              <p className="text-2xl font-bold text-card-foreground">{kpi.value}</p>
-              <div className="flex items-center gap-1 text-xs">
-                <TrendIcon className={`h-3 w-3 ${kpi.trend === 'up' ? 'text-primary' : 'text-destructive'}`} />
-                <span className="text-muted-foreground">{kpi.change}</span>
+              <p className={`text-[42px] font-sans font-extrabold leading-none tracking-[-0.045em] mt-2 ${isLime ? 'text-[#111]' : 'text-white'}`}>{kpi.value}</p>
+              <div className="flex items-center gap-1 text-xs mt-2">
+                <TrendIcon className={`h-3 w-3 ${kpi.trend === 'up' ? (isLime ? 'text-[#111]/70' : 'text-abba-lime') : 'text-destructive'}`} />
+                <span className={isLime ? 'text-[#111]/60' : 'text-white/60'}>{kpi.change}</span>
               </div>
-            </Card>
+            </div>
           );
         })}
       </div>
@@ -321,44 +317,44 @@ const AdminMetrics = () => {
       {/* Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* MRR */}
-        <Card className="glass border-border/40 p-5">
-          <h3 className="text-sm font-semibold mb-1 text-card-foreground">Receita Mensal (MRR)</h3>
-          <p className="text-xs text-muted-foreground mb-4">Últimos 6 meses</p>
+        <div className="kpi-dark" style={{ minHeight: 'auto' }}>
+          <h3 className="text-sm font-sans font-semibold mb-1 text-white">Receita Mensal (MRR)</h3>
+          <p className="text-[11px] font-sans text-white/60 mb-4">Últimos 6 meses</p>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={mrrData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(0 0% 16%)" />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'hsl(0 0% 55%)' }} />
-              <YAxis tick={{ fontSize: 11, fill: 'hsl(0 0% 55%)' }} tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} />
+              <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
               <Tooltip
-                contentStyle={{ backgroundColor: 'hsl(0 0% 8%)', border: '1px solid hsl(0 0% 16%)', borderRadius: '8px', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: '#1A231B', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', fontSize: '12px' }}
                 formatter={(v: number) => [`R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 'MRR']}
               />
-              <Line type="monotone" dataKey="mrr" stroke="hsl(142, 72%, 73%)" strokeWidth={2} dot={{ fill: 'hsl(142, 72%, 73%)', r: 4 }} />
+              <Line type="monotone" dataKey="mrr" stroke="#A0E870" strokeWidth={2} dot={{ fill: '#A0E870', r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
-        </Card>
+        </div>
 
         {/* Subscriptions */}
-        <Card className="glass border-border/40 p-5">
-          <h3 className="text-sm font-semibold mb-1 text-card-foreground">Novas Assinaturas</h3>
-          <p className="text-xs text-muted-foreground mb-4">Por mês</p>
+        <div className="kpi-dark" style={{ minHeight: 'auto' }}>
+          <h3 className="text-sm font-sans font-semibold mb-1 text-white">Novas Assinaturas</h3>
+          <p className="text-[11px] font-sans text-white/60 mb-4">Por mês</p>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={subsData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(0 0% 16%)" />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'hsl(0 0% 55%)' }} />
-              <YAxis tick={{ fontSize: 11, fill: 'hsl(0 0% 55%)' }} allowDecimals={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} />
+              <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} allowDecimals={false} />
               <Tooltip
-                contentStyle={{ backgroundColor: 'hsl(0 0% 8%)', border: '1px solid hsl(0 0% 16%)', borderRadius: '8px', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: '#1A231B', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', fontSize: '12px' }}
               />
-              <Bar dataKey="count" fill="hsl(142, 72%, 73%)" radius={[4, 4, 0, 0]} name="Assinaturas" />
+              <Bar dataKey="count" radius={[4, 4, 0, 0]} name="Assinaturas" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.20)" strokeWidth={1} />
             </BarChart>
           </ResponsiveContainer>
-        </Card>
+        </div>
 
         {/* Type distribution */}
-        <Card className="glass border-border/40 p-5">
-          <h3 className="text-sm font-semibold mb-1 text-card-foreground">Entregas por Tipo</h3>
-          <p className="text-xs text-muted-foreground mb-4">Este mês</p>
+        <div className="kpi-dark" style={{ minHeight: 'auto' }}>
+          <h3 className="text-sm font-sans font-semibold mb-1 text-white">Entregas por Tipo</h3>
+          <p className="text-[11px] font-sans text-white/60 mb-4">Este mês</p>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie
@@ -374,49 +370,49 @@ const AdminMetrics = () => {
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{ backgroundColor: 'hsl(0 0% 8%)', border: '1px solid hsl(0 0% 16%)', borderRadius: '8px', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: '#1A231B', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', fontSize: '12px' }}
               />
             </PieChart>
           </ResponsiveContainer>
-        </Card>
+        </div>
 
         {/* Satisfaction */}
-        <Card className="glass border-border/40 p-5">
-          <h3 className="text-sm font-semibold mb-1 text-card-foreground">Satisfação (Revisões)</h3>
-          <p className="text-xs text-muted-foreground mb-4">Menos revisões = mais satisfação</p>
+        <div className="kpi-dark" style={{ minHeight: 'auto' }}>
+          <h3 className="text-sm font-sans font-semibold mb-1 text-white">Satisfação (Revisões)</h3>
+          <p className="text-[11px] font-sans text-white/60 mb-4">Menos revisões = mais satisfação</p>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={revisionData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(0 0% 16%)" />
-              <XAxis type="number" tick={{ fontSize: 11, fill: 'hsl(0 0% 55%)' }} allowDecimals={false} />
-              <YAxis type="category" dataKey="label" tick={{ fontSize: 11, fill: 'hsl(0 0% 55%)' }} width={100} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+              <XAxis type="number" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} allowDecimals={false} />
+              <YAxis type="category" dataKey="label" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} width={100} />
               <Tooltip
-                contentStyle={{ backgroundColor: 'hsl(0 0% 8%)', border: '1px solid hsl(0 0% 16%)', borderRadius: '8px', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: '#1A231B', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', fontSize: '12px' }}
               />
-              <Bar dataKey="count" fill="hsl(142, 72%, 73%)" radius={[0, 4, 4, 0]} name="Entregas" />
+              <Bar dataKey="count" radius={[0, 4, 4, 0]} name="Entregas" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.20)" strokeWidth={1} />
             </BarChart>
           </ResponsiveContainer>
-        </Card>
+        </div>
       </div>
 
       {/* Editor Ranking */}
       {editorRanking.length > 0 && (
-        <Card className="glass border-border/40 p-5">
+        <div className="kpi-dark" style={{ minHeight: 'auto' }}>
           <div className="flex items-center gap-2 mb-4">
             <Trophy className="h-4 w-4 text-yellow-500" />
-            <h3 className="text-sm font-semibold text-card-foreground">Entregas por Editor — Mês Atual</h3>
+            <h3 className="text-sm font-sans font-semibold text-white">Entregas por Editor — Mês Atual</h3>
           </div>
           <div className="space-y-2">
             {editorRanking.map(([name, count], i) => (
-              <div key={name} className="flex items-center justify-between py-2 px-3 rounded-lg bg-muted/30">
+              <div key={name} className="flex items-center justify-between py-2 px-3 rounded-[20px] bg-white/5">
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-bold text-muted-foreground w-6">{i + 1}º</span>
-                  <span className="text-sm text-card-foreground">{name}</span>
+                  <span className="text-sm font-sans font-extrabold text-abba-lime w-6">{i + 1}º</span>
+                  <span className="text-sm font-sans text-white">{name}</span>
                 </div>
-                <span className="text-sm font-semibold text-primary">{count} {count === 1 ? 'entrega' : 'entregas'}</span>
+                <span className="text-sm font-sans font-semibold text-abba-lime">{count} {count === 1 ? 'entrega' : 'entregas'}</span>
               </div>
             ))}
           </div>
-        </Card>
+        </div>
       )}
     </div>
   );

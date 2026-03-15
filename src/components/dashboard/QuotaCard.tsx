@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Video, Camera, Image, Layers, ChevronDown, ChevronUp, MapPin, FileText } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,31 +30,23 @@ interface QuotaLine {
   total: number;
 }
 
-const getBarColor = (pct: number) => {
-  if (pct >= 90) return 'bg-destructive';
-  if (pct >= 70) return 'bg-[hsl(var(--queue-yellow))]';
-  return 'bg-primary';
-};
-
 const QuotaRow = ({ label, icon, used, total }: QuotaLine) => {
   const pct = total > 0 ? Math.round((used / total) * 100) : 0;
-  const barColor = getBarColor(pct);
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex items-center gap-1.5 min-w-[80px]">
+    <div className="space-y-1">
+      <div className="flex items-center gap-1.5">
         {icon}
-        <span className="text-xs font-mono text-foreground">{label}</span>
+        <span className={`text-xs font-sans ${pct >= 90 ? 'text-destructive' : 'text-foreground'}`}>{label}</span>
       </div>
-      <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+      <div className="progress-track" style={{ height: '32px' }}>
         <div
-          className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+          className="progress-fill text-[11px]"
           style={{ width: `${Math.min(pct, 100)}%` }}
-        />
+        >
+          {used}/{total}
+        </div>
       </div>
-      <span className="text-[10px] font-mono text-muted-foreground min-w-[32px] text-right">
-        {used}/{total}
-      </span>
     </div>
   );
 };
@@ -80,26 +71,23 @@ const StudioQuotaCard = () => {
 
   const total = 10;
   const used = total - (credits ?? 0);
-  const pct = Math.round((used / total) * 100);
 
   return (
     <div data-tour="quota-card">
-      <Card className="glass">
-        <CardContent className="p-3 md:p-4 space-y-2">
-          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            CRÉDITOS DE ROTEIRO
-          </p>
-          <QuotaRow
-            label="Roteiros"
-            icon={<FileText className="h-3.5 w-3.5 text-primary" />}
-            used={used}
-            total={total}
-          />
-          <p className="text-[10px] font-mono text-muted-foreground">
-            {credits ?? 0} créditos de roteiro restantes
-          </p>
-        </CardContent>
-      </Card>
+      <div className="kpi-dark" style={{ minHeight: 'auto' }}>
+        <p className="text-[10px] font-sans uppercase tracking-widest text-white/60 mb-2">
+          CRÉDITOS DE ROTEIRO
+        </p>
+        <QuotaRow
+          label="Roteiros"
+          icon={<FileText className="h-3.5 w-3.5 text-abba-lime" />}
+          used={used}
+          total={total}
+        />
+        <p className="text-[10px] font-sans text-white/60 mt-2">
+          {credits ?? 0} créditos de roteiro restantes
+        </p>
+      </div>
     </div>
   );
 };
@@ -119,7 +107,7 @@ const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
 
   const quota: QuotaLine = {
     label: 'Reels / Shorts / TikToks',
-    icon: <Video className="h-3.5 w-3.5 text-primary" />,
+    icon: <Video className="h-3.5 w-3.5 text-abba-lime" />,
     used: usedVideos,
     total: totalVideos,
   };
@@ -129,42 +117,42 @@ const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
       <div data-tour="quota-card">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full glass rounded-lg p-2.5 flex items-center gap-3"
+          className="w-full rounded-[20px] bg-abba-surface border border-white/8 p-2.5 flex items-center gap-3"
         >
-          <p className="text-xs font-mono font-semibold text-primary truncate shrink-0">
+          <p className="text-xs font-sans font-semibold text-abba-lime truncate shrink-0">
             {userProject.custom_project?.project_name ?? getTierLabel(userProject.subscription_tier)}
           </p>
           <div className="flex-1 flex items-center gap-2 overflow-hidden">
             <div className="flex items-center gap-1 shrink-0">
-              <Video className="h-3.5 w-3.5 text-primary" />
-              <span className="text-[10px] font-mono text-muted-foreground">
+              <Video className="h-3.5 w-3.5 text-abba-lime" />
+              <span className="text-[10px] font-sans text-white/60">
                 {remaining} restantes
               </span>
             </div>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-[10px] font-mono text-muted-foreground">
+            <span className="text-[10px] font-sans text-white/60">
               {daysUntilRenewal > 0 ? `${daysUntilRenewal}d` : 'hoje'}
             </span>
             {expanded ? (
-              <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
+              <ChevronUp className="h-3.5 w-3.5 text-white/60" />
             ) : (
-              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+              <ChevronDown className="h-3.5 w-3.5 text-white/60" />
             )}
           </div>
         </button>
         {expanded && (
-          <Card className="mt-1 glass">
-            <CardContent className="p-3 space-y-1.5">
+          <div className="mt-1 kpi-dark" style={{ minHeight: 'auto' }}>
+            <div className="space-y-2">
               <QuotaRow {...quota} />
-              <Separator className="bg-border/50" />
-              <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground">
+              <Separator className="bg-white/10" />
+              <div className="flex items-center justify-between text-[10px] font-sans text-white/60">
                 <span>
                   Período: {format(new Date(userProject.current_period_start), 'dd/MM', { locale: ptBR })} – {format(periodEnd, 'dd/MM', { locale: ptBR })}
                 </span>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
       </div>
     );
@@ -172,41 +160,39 @@ const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
 
   return (
     <div data-tour="quota-card">
-      <Card className="glass">
-        <CardHeader className="p-3 md:p-4 pb-0">
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="flex items-center justify-between w-full text-left"
-          >
-            <div>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                SEU PLANO
-              </p>
-              <p className="text-sm font-mono font-semibold text-primary mt-0.5">
-                {userProject.custom_project?.project_name ?? getTierLabel(userProject.subscription_tier)}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono text-muted-foreground">
-                Renova em {daysUntilRenewal > 0 ? `${daysUntilRenewal}d` : 'hoje'}
-              </span>
-              {expanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
-            </div>
-          </button>
-        </CardHeader>
+      <div className="kpi-dark" style={{ minHeight: 'auto' }}>
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center justify-between w-full text-left"
+        >
+          <div>
+            <p className="text-[10px] font-sans font-semibold uppercase tracking-widest text-abba-lime">
+              SEU PLANO
+            </p>
+            <p className="text-sm font-sans font-semibold text-abba-lime mt-0.5">
+              {userProject.custom_project?.project_name ?? getTierLabel(userProject.subscription_tier)}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-sans text-white/60">
+              Renova em {daysUntilRenewal > 0 ? `${daysUntilRenewal}d` : 'hoje'}
+            </span>
+            {expanded ? <ChevronUp className="h-4 w-4 text-white/60" /> : <ChevronDown className="h-4 w-4 text-white/60" />}
+          </div>
+        </button>
 
         {expanded && (
-          <CardContent className="p-3 md:p-4 pt-2 space-y-2">
+          <div className="pt-3 space-y-2">
             <QuotaRow {...quota} />
-            <Separator className="bg-border/50" />
-            <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground">
+            <Separator className="bg-white/10" />
+            <div className="flex items-center justify-between text-[10px] font-sans text-white/60">
               <span>
                 Período: {format(new Date(userProject.current_period_start), 'dd/MM', { locale: ptBR })} – {format(periodEnd, 'dd/MM', { locale: ptBR })}
               </span>
             </div>
-          </CardContent>
+          </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 };
@@ -233,7 +219,7 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
   if (project.instagram_videos > 0) {
     quotas.push({
       label: 'IG',
-      icon: <Camera className="h-3.5 w-3.5 text-primary" />,
+      icon: <Camera className="h-3.5 w-3.5 text-abba-lime" />,
       used: userProject.instagram_reserved + userProject.instagram_approved,
       total: project.instagram_videos,
     });
@@ -242,7 +228,7 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
   if (project.include_thumbnails) {
     quotas.push({
       label: 'Thumb',
-      icon: <Image className="h-3.5 w-3.5 text-muted-foreground" />,
+      icon: <Image className="h-3.5 w-3.5 text-white/60" />,
       used: userProject.thumbnails_reserved + userProject.thumbnails_approved,
       total: (project as any).thumbnail_limit ?? project.youtube_videos,
     });
@@ -251,7 +237,7 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
   if (project.include_covers) {
     quotas.push({
       label: 'Capa',
-      icon: <Layers className="h-3.5 w-3.5 text-muted-foreground" />,
+      icon: <Layers className="h-3.5 w-3.5 text-white/60" />,
       used: userProject.covers_reserved + userProject.covers_approved,
       total: (project as any).cover_limit ?? project.instagram_videos,
     });
@@ -260,7 +246,7 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
   if (project.include_capture) {
     quotas.push({
       label: 'Captação',
-      icon: <MapPin className="h-3.5 w-3.5 text-primary" />,
+      icon: <MapPin className="h-3.5 w-3.5 text-abba-lime" />,
       used: (userProject.captures_reserved || 0) + (userProject.captures_approved || 0),
       total: project.max_captures || 1,
     });
@@ -271,46 +257,46 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
       <div data-tour="quota-card">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full glass rounded-lg p-2.5 flex items-center gap-3"
+          className="w-full rounded-[20px] bg-abba-surface border border-white/8 p-2.5 flex items-center gap-3"
         >
-          <p className="text-xs font-mono font-semibold text-primary truncate shrink-0">
+          <p className="text-xs font-sans font-semibold text-abba-lime truncate shrink-0">
             {project.project_name}
           </p>
           <div className="flex-1 flex items-center gap-2 overflow-hidden">
             {quotas.slice(0, 3).map((q) => (
               <div key={q.label} className="flex items-center gap-1 shrink-0">
                 {q.icon}
-                <span className="text-[10px] font-mono text-muted-foreground">
+                <span className="text-[10px] font-sans text-white/60">
                   {q.used}/{q.total}
                 </span>
               </div>
             ))}
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-[10px] font-mono text-muted-foreground">
+            <span className="text-[10px] font-sans text-white/60">
               {daysUntilRenewal > 0 ? `${daysUntilRenewal}d` : 'hoje'}
             </span>
             {expanded ? (
-              <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
+              <ChevronUp className="h-3.5 w-3.5 text-white/60" />
             ) : (
-              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+              <ChevronDown className="h-3.5 w-3.5 text-white/60" />
             )}
           </div>
         </button>
         {expanded && (
-          <Card className="mt-1 glass">
-            <CardContent className="p-3 space-y-1.5">
+          <div className="mt-1 kpi-dark" style={{ minHeight: 'auto' }}>
+            <div className="space-y-2">
               {quotas.map((q) => (
                 <QuotaRow key={q.label} {...q} />
               ))}
-              <Separator className="bg-border/50" />
-              <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground">
+              <Separator className="bg-white/10" />
+              <div className="flex items-center justify-between text-[10px] font-sans text-white/60">
                 <span>
                   Período: {format(new Date(userProject.current_period_start), 'dd/MM', { locale: ptBR })} – {format(periodEnd, 'dd/MM', { locale: ptBR })}
                 </span>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
       </div>
     );
@@ -318,45 +304,43 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
 
   return (
     <div data-tour="quota-card">
-      <Card className="glass">
-        <CardHeader className="p-3 md:p-4 pb-0">
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="flex items-center justify-between w-full text-left"
-          >
-            <div>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                SEU PROJETO
-              </p>
-              <p className="text-sm font-mono font-semibold text-primary mt-0.5">
-                {project.project_name}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono text-muted-foreground">
-                Renova em {daysUntilRenewal > 0 ? `${daysUntilRenewal}d` : 'hoje'}
-              </span>
-              {expanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
-            </div>
-          </button>
-        </CardHeader>
+      <div className="kpi-dark" style={{ minHeight: 'auto' }}>
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center justify-between w-full text-left"
+        >
+          <div>
+            <p className="text-[10px] font-sans font-semibold uppercase tracking-widest text-abba-lime">
+              SEU PROJETO
+            </p>
+            <p className="text-sm font-sans font-semibold text-abba-lime mt-0.5">
+              {project.project_name}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-sans text-white/60">
+              Renova em {daysUntilRenewal > 0 ? `${daysUntilRenewal}d` : 'hoje'}
+            </span>
+            {expanded ? <ChevronUp className="h-4 w-4 text-white/60" /> : <ChevronDown className="h-4 w-4 text-white/60" />}
+          </div>
+        </button>
 
         {expanded && (
-          <CardContent className="p-3 md:p-4 pt-2 space-y-2">
-            <div className="space-y-1.5">
+          <div className="pt-3 space-y-2">
+            <div className="space-y-2">
               {quotas.map((q) => (
                 <QuotaRow key={q.label} {...q} />
               ))}
             </div>
-            <Separator className="bg-border/50" />
-            <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground">
+            <Separator className="bg-white/10" />
+            <div className="flex items-center justify-between text-[10px] font-sans text-white/60">
               <span>
                 Período: {format(new Date(userProject.current_period_start), 'dd/MM', { locale: ptBR })} – {format(periodEnd, 'dd/MM', { locale: ptBR })}
               </span>
             </div>
-          </CardContent>
+          </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 };
