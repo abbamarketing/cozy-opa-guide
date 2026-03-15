@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { Bell, Check, CheckCheck, Package, RefreshCw, Zap, Clock, UserPlus, MessageSquare, ThumbsUp, ListChecks, MapPin, Camera } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -130,12 +131,20 @@ const NotificationBell = () => {
   const markAllAsRead = async () => {
     const unreadIds = notifications.filter((n) => !n.read).map((n) => n.id);
     if (unreadIds.length === 0) return;
+    const previousNotifications = [...notifications];
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('user_id', user!.id)
-      .eq('read', false);
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('user_id', user!.id)
+        .eq('read', false);
+      if (error) throw error;
+    } catch (err) {
+      console.error('Erro ao marcar notificações como lidas:', err);
+      setNotifications(previousNotifications);
+      toast.error('Erro ao atualizar notificações');
+    }
   };
 
   const handleClick = (notif: Notification) => {
