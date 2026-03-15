@@ -152,6 +152,7 @@ function handleSingleRoleRedirect(
   clientType: string | null,
 ) {
   switch (role) {
+    case 'god':
     case 'admin':
       return <Navigate to="/admin" replace />;
     case 'editor':

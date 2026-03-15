@@ -239,6 +239,7 @@ const DashboardLayout = () => {
   const tabFromUrl = searchParams.get('tab') as DashboardTab | null;
   const [activeTab, setActiveTab] = useState<DashboardTab>(tabFromUrl || 'deliveries');
   const { userProject, isLoading } = useUserProject();
+  const { isGod } = useRole();
   const isMobile = useIsMobile();
 
   // Sync tab from URL
@@ -248,8 +249,8 @@ const DashboardLayout = () => {
     }
   }, [tabFromUrl]);
 
-  // Redirect to root if no project (root handles WaitingForProject)
-  if (!isLoading && !userProject) {
+  // Redirect to root if no project (root handles WaitingForProject) — god bypasses
+  if (!isLoading && !userProject && !isGod()) {
     return <Navigate to="/waiting" replace />;
   }
 
