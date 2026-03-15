@@ -432,6 +432,73 @@ const AdminMetrics = () => {
         </div>
       </div>
 
+      {/* AI Usage Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="kpi-dark" style={{ minHeight: 'auto' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <Cpu className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-sans font-semibold text-white">Uso de IA — Últimos 30 dias</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="rounded-[16px] bg-white/5 p-3">
+              <p className="text-[10px] font-sans uppercase tracking-widest text-white/50">Total de Chamadas</p>
+              <p className="text-2xl font-sans font-extrabold text-white mt-1">{aiUsage.totalCalls}</p>
+            </div>
+            <div className="rounded-[16px] bg-white/5 p-3">
+              <p className="text-[10px] font-sans uppercase tracking-widest text-white/50">Total de Tokens</p>
+              <p className="text-2xl font-sans font-extrabold text-white mt-1">
+                {aiUsage.totalTokens > 1000 ? `${(aiUsage.totalTokens / 1000).toFixed(1)}k` : aiUsage.totalTokens}
+              </p>
+            </div>
+          </div>
+          {aiUsage.byFunction.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-[10px] font-sans uppercase tracking-widest text-white/50">Por Função</p>
+              {aiUsage.byFunction.map((fn) => {
+                const fnLabels: Record<string, string> = {
+                  'studio-generate': 'Studio (Roteiro)',
+                  'support-chat': 'Chat de Suporte',
+                  'generate-script': 'Gerador de Roteiro',
+                  'generate-script-v2': 'Gerador V2',
+                  'brainstorm-ideas': 'Brainstorm',
+                };
+                return (
+                  <div key={fn.name} className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white/5">
+                    <span className="text-xs font-sans text-white/80">{fnLabels[fn.name] || fn.name}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-mono text-white/40">{fn.tokens > 1000 ? `${(fn.tokens / 1000).toFixed(1)}k tok` : `${fn.tokens} tok`}</span>
+                      <span className="text-xs font-sans font-semibold text-primary">{fn.calls}x</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="kpi-dark" style={{ minHeight: 'auto' }}>
+          <h3 className="text-sm font-sans font-semibold mb-1 text-white">Chamadas IA / Dia</h3>
+          <p className="text-[11px] font-sans text-white/60 mb-4">Últimos 30 dias</p>
+          {aiUsage.dailyData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={aiUsage.dailyData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+                <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.5)' }} />
+                <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} allowDecimals={false} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#1A231B', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', fontSize: '12px' }}
+                />
+                <Bar dataKey="calls" radius={[4, 4, 0, 0]} name="Chamadas" fill="hsl(var(--primary))" />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-[220px]">
+              <p className="text-xs text-white/40 font-sans">Nenhum dado de uso ainda</p>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Editor Ranking */}
       {editorRanking.length > 0 && (
         <div className="kpi-dark" style={{ minHeight: 'auto' }}>
