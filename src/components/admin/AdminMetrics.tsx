@@ -83,7 +83,7 @@ const AdminMetrics = () => {
         .select('id, monthly_value');
 
       const TIER_VALUES: Record<string, number> = {
-        standard: 490, pro: 660, business: 1100, premium: 2970, agency: 5590,
+        pro: 690,
       };
 
       const valueMap = new Map((allProjects || []).map((p: any) => [p.id, Number(p.monthly_value)]));
