@@ -88,21 +88,27 @@ export default function Settings() {
   };
 
   const handleUpdateNotifications = async () => {
-    setLoading(true);
-    const { error } = await supabase
-      .from('user_preferences')
-      .upsert({
-        user_id: user!.id,
-        notify_delivery_approved: emailNotifications,
-        notify_delivery_revision: pushNotifications,
-        notify_new_message: notifyNewMessage,
-        updated_at: new Date().toISOString(),
-      } as any);
-    setLoading(false);
-    if (error) {
-      toast.error('Erro ao salvar preferências.', { description: error.message });
-    } else {
-      toast.success('Preferências salvas com sucesso.');
+    try {
+      setLoading(true);
+      const { error } = await supabase
+        .from('user_preferences')
+        .upsert({
+          user_id: user!.id,
+          notify_delivery_approved: emailNotifications,
+          notify_delivery_revision: pushNotifications,
+          notify_new_message: notifyNewMessage,
+          updated_at: new Date().toISOString(),
+        } as any);
+      if (error) {
+        toast.error('Erro ao salvar preferências.', { description: error.message });
+      } else {
+        toast.success('Preferências salvas com sucesso.');
+      }
+    } catch (err) {
+      console.error('Erro ao salvar preferências:', err);
+      toast.error('Erro ao salvar preferências. Tente novamente.');
+    } finally {
+      setLoading(false);
     }
   };
 
