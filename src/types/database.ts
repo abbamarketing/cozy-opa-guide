@@ -7,7 +7,7 @@
 export type DeliveryStatus = 'pending' | 'in_progress' | 'review' | 'revision' | 'approved' | 'cancelled';
 export type DeliveryType = 'youtube_video' | 'instagram_video' | 'thumbnail' | 'cover';
 export type UserProjectStatus = 'pending_payment' | 'active' | 'suspended' | 'cancelled';
-export type AppRole = 'admin' | 'editor' | 'client';
+export type AppRole = 'admin' | 'editor' | 'client' | 'god';
 export type EditorStatus = 'available' | 'busy' | 'inactive';
 export type PaymentFrequency = 'monthly' | 'quarterly' | 'annual';
 export type DeadlineType = '24h' | '48h' | '72h';
