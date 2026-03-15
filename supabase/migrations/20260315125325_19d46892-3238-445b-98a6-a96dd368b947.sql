@@ -1,0 +1,1 @@
+UPDATE studio_credits SET credits_available = 9999, credits_used = 0 WHERE user_id = 'fa7a3a2d-348e-45bd-a44d-b0914bd37139';
