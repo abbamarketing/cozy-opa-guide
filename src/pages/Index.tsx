@@ -106,9 +106,7 @@ const Index = () => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-6">
       <div className="mb-8 flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl gradient-neon flex items-center justify-center">
-          <Play className="h-5 w-5 text-primary-foreground" />
-        </div>
+        <img src={abbaLogo} alt="AbbaVideo" className="h-10 w-10 rounded-xl" />
         <span className="text-2xl font-bold">
           Abba<span className="text-primary">Video</span>
         </span>

@@ -246,9 +246,7 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
       <div className="w-full max-w-lg relative z-10">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          <div className="h-10 w-10 rounded-xl gradient-neon flex items-center justify-center">
-            <Play className="h-5 w-5 text-primary-foreground" />
-          </div>
+          <img src={abbaLogo} alt="AbbaVideo" className="h-10 w-10 rounded-xl" />
           <span className="text-2xl font-bold">
             Abba<span className="text-primary">Video</span>
           </span>
