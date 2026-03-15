@@ -47,7 +47,7 @@ const Index = () => {
       setProjectStatus(up?.status || null);
       setClientType((up as any)?.client_type || null);
     }
-    setCheckingProject(false);
+    
   }, [user]);
 
   // Initial check for client role
