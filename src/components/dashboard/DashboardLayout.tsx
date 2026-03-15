@@ -97,7 +97,7 @@ const DashboardHeader = () => {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground glass-micro rounded-full">
+            <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground glass-micro rounded-full" aria-label="Ajuda e tour">
               <HelpCircle className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>

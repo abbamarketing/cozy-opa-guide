@@ -154,7 +154,7 @@ export default function Settings() {
       {activeSection === 'profile' && (
         <Card className="border-border bg-card shadow-sm">
           <CardHeader className="p-4">
-            <CardTitle className="text-sm font-mono">Informacoes Pessoais</CardTitle>
+            <CardTitle className="text-sm font-mono">Informações Pessoais</CardTitle>
             <CardDescription className="text-xs">Atualize seus dados cadastrais</CardDescription>
           </CardHeader>
           <CardContent className="p-4 pt-0 space-y-4">
@@ -172,13 +172,13 @@ export default function Settings() {
               <Label className="text-xs font-mono">Email</Label>
               <Input value={email} disabled className="opacity-60" />
               <p className="text-[10px] text-muted-foreground font-mono">
-                Email nao pode ser alterado.
+                Email não pode ser alterado.
               </p>
             </div>
 
             <Button onClick={handleUpdateProfile} disabled={loading} className="w-full gap-2 h-10">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              {loading ? 'Salvando...' : 'Salvar Alteracoes'}
+              {loading ? 'Salvando...' : 'Salvar Alterações'}
             </Button>
           </CardContent>
         </Card>
@@ -188,8 +188,8 @@ export default function Settings() {
       {activeSection === 'notifications' && (
         <Card className="border-border bg-card shadow-sm">
           <CardHeader className="p-4">
-            <CardTitle className="text-sm font-mono">Notificacoes</CardTitle>
-            <CardDescription className="text-xs">Como deseja receber atualizacoes</CardDescription>
+            <CardTitle className="text-sm font-mono">Notificações</CardTitle>
+            <CardDescription className="text-xs">Como deseja receber atualizações</CardDescription>
           </CardHeader>
           <CardContent className="p-4 pt-0 space-y-4">
             {prefsLoading ? (
@@ -271,7 +271,7 @@ export default function Settings() {
                 </div>
                 <p className="text-lg font-mono font-bold text-primary">
                   R$ {Number(userProject.custom_project.monthly_value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  <span className="text-[10px] text-muted-foreground font-normal">/mes</span>
+                  <span className="text-[10px] text-muted-foreground font-normal">/mês</span>
                 </p>
               </div>
             )}
@@ -281,7 +281,7 @@ export default function Settings() {
               {loading ? 'Abrindo portal...' : 'Portal de Pagamento'}
             </Button>
             <p className="text-[10px] text-muted-foreground text-center font-mono">
-              Atualizar cartao, faturas, upgrade ou cancelar
+              Atualizar cartão, faturas, upgrade ou cancelar
             </p>
           </CardContent>
         </Card>
