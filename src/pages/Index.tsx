@@ -35,9 +35,10 @@ const Index = () => {
 
     if (!data) return;
 
-    setAssignedProjectId((data as any).assigned_project_id);
+    const typedData = data as { assigned_project_id: string | null; onboarding_complete: boolean };
+    setAssignedProjectId(typedData.assigned_project_id);
 
-    if ((data as any).assigned_project_id) {
+    if (typedData.assigned_project_id) {
       const { data: up } = await supabase
         .from('user_projects')
         .select('status, client_type')
@@ -45,7 +46,8 @@ const Index = () => {
         .maybeSingle();
 
       setProjectStatus(up?.status || null);
-      setClientType((up as any)?.client_type || null);
+      const typedUp = up as { status: string; client_type: string | null } | null;
+      setClientType(typedUp?.client_type || null);
     }
     
   }, [user]);
