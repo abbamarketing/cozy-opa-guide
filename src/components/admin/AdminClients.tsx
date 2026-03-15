@@ -448,14 +448,14 @@ const AdminClients = () => {
                     <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
                   </TableCell>
                 </TableRow>
-              ) : filtered.length === 0 ? (
+              ) : clients.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                     Nenhum cliente encontrado.
                   </TableCell>
                 </TableRow>
               ) : (
-                filtered.map((c) => {
+                clients.map((c) => {
                   const st = STATUS_MAP[c.status] || { label: 'Sem projeto', variant: 'secondary' as const };
                   return (
                     <TableRow key={c.user_id} className="border-border/30">
