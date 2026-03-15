@@ -19,6 +19,7 @@ const ROLE_CONFIG: Record<string, { label: string; description: string; icon: Re
 const Index = () => {
   const { user, isLoading: authLoading } = useAuth();
   const { profile, roles, primaryRole, isLoading: profileLoading } = useProfile();
+  const { isClient } = useRole();
   const [projectStatus, setProjectStatus] = useState<string | null>(null);
   const [clientType, setClientType] = useState<string | null>(null);
   const [checkingProject, setCheckingProject] = useState(false);
