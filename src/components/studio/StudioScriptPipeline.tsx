@@ -513,7 +513,7 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
                 Audiência
               </h2>
               <div className="space-y-2">
-                <Label htmlFor="audience">Para quem é esse vídeo? *</Label>
+                <Label htmlFor="audience">Para quem é esse vídeo? *{briefingPrefilled.audience && <span className="text-xs text-muted-foreground ml-1 font-normal">(do seu briefing)</span>}</Label>
                 <Input
                   id="audience"
                   placeholder="Ex: Empreendedores 30-45 anos"
