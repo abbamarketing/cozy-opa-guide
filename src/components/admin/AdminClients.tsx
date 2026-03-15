@@ -227,7 +227,7 @@ const AdminClients = () => {
         }
 
         toast.success('Cliente Excluído', { description: 'Conta e dados removidos com sucesso.' });
-        fetchClients();
+        refetch();
       } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Erro desconhecido';
         toast.error('Erro ao excluir cliente', { description: message });
