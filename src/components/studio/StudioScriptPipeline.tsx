@@ -117,9 +117,15 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
   const [confirmNewOpen, setConfirmNewOpen] = useState(false);
   const [history, setHistory] = useState<HistoryScript[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
+  const [briefingPrefilled, setBriefingPrefilled] = useState<{ tone: boolean; audience: boolean }>({ tone: false, audience: false });
 
-  const update = (field: keyof ScriptFormData, value: string) =>
+  const update = (field: keyof ScriptFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    // Clear prefilled indicator when user manually changes
+    if (field === 'tone' || field === 'audience') {
+      setBriefingPrefilled((prev) => ({ ...prev, [field]: false }));
+    }
+  };
 
   // Fetch credits
   // REMOVIDO em PRD v5 — admin não tem créditos de Studio gratuitos
@@ -136,7 +142,29 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
     fetchCredits();
   }, [user]);
 
-  // Fetch history
+  // Pre-fill from briefing
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('onboarding_briefings')
+      .select('target_audience, content_style')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          setFormData((prev) => {
+            const newTone = !prev.tone && data.content_style ? data.content_style : prev.tone;
+            const newAudience = !prev.audience && data.target_audience ? data.target_audience : prev.audience;
+            setBriefingPrefilled({
+              tone: !prev.tone && !!data.content_style,
+              audience: !prev.audience && !!data.target_audience,
+            });
+            return { ...prev, tone: newTone, audience: newAudience };
+          });
+        }
+      });
+  }, [user]);
+
   useEffect(() => {
     if (!user) return;
     const fetchHistory = async () => {
@@ -458,7 +486,7 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Tom de voz *</Label>
+                <Label>Tom de voz *{briefingPrefilled.tone && <span className="text-xs text-muted-foreground ml-1 font-normal">(do seu briefing)</span>}</Label>
                 <Select
                   value={formData.tone}
                   onValueChange={(v) => update("tone", v)}
@@ -485,7 +513,7 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
                 Audiência
               </h2>
               <div className="space-y-2">
-                <Label htmlFor="audience">Para quem é esse vídeo? *</Label>
+                <Label htmlFor="audience">Para quem é esse vídeo? *{briefingPrefilled.audience && <span className="text-xs text-muted-foreground ml-1 font-normal">(do seu briefing)</span>}</Label>
                 <Input
                   id="audience"
                   placeholder="Ex: Empreendedores 30-45 anos"
