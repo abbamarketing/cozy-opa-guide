@@ -93,7 +93,7 @@ export default function PhotoShootWizard({ onBack }: PhotoShootWizardProps) {
         }`}
       >
         <input {...getInputProps()} />
-        <div className="text-4xl mb-3">📸</div>
+        <Upload className="h-10 w-10 text-muted-foreground mb-3" />
         <p className="text-sm font-medium text-foreground">Arraste suas fotos aqui</p>
         <p className="text-xs text-muted-foreground mt-1">
           ou clique para selecionar · JPG, PNG, WebP · máx. 15 fotos
