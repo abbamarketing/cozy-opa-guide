@@ -100,25 +100,20 @@ serve(async (req) => {
     // 5. Process in background using EdgeRuntime.waitUntil
     const backgroundTask = (async () => {
       try {
-        // Use one of the user's REAL uploaded photos as reference (not LoRA-generated)
-        // This avoids distortions like wrong eye color from the AI-generated reference
-        let referenceImageUrl: string | null = null
+        // Use the LoRA-generated reference image (higher quality, trained model)
+        let referenceImageUrl: string | null = profile.reference_image_url
 
-        // Try to get a real photo from reference_photo_paths
-        const realPhotoPaths = (profile as any).reference_photo_paths as string[] | null
-        if (realPhotoPaths && realPhotoPaths.length > 0) {
-          // Pick the first real photo
-          const { data: signedReal } = await supabase.storage
-            .from('studio-reference-photos')
-            .createSignedUrl(realPhotoPaths[0], 60 * 60)
-          if (signedReal?.signedUrl) {
-            referenceImageUrl = signedReal.signedUrl
-          }
-        }
-
-        // Fallback to the LoRA-generated reference if no real photos available
+        // Fallback to a real uploaded photo if LoRA reference is not available
         if (!referenceImageUrl) {
-          referenceImageUrl = profile.reference_image_url
+          const realPhotoPaths = (profile as any).reference_photo_paths as string[] | null
+          if (realPhotoPaths && realPhotoPaths.length > 0) {
+            const { data: signedReal } = await supabase.storage
+              .from('studio-reference-photos')
+              .createSignedUrl(realPhotoPaths[0], 60 * 60)
+            if (signedReal?.signedUrl) {
+              referenceImageUrl = signedReal.signedUrl
+            }
+          }
         }
 
         if (!referenceImageUrl) {
