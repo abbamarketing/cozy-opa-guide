@@ -66,7 +66,9 @@ type RevisionValues = z.infer<typeof revisionSchema>;
 const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProject }: RevisionModalProps) => {
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const remaining = delivery.max_revisions - delivery.revision_count;
+  const remaining = (delivery.max_revisions != null)
+    ? delivery.max_revisions - (delivery.revision_count ?? 0)
+    : null;
 
   const form = useForm<RevisionValues>({
     resolver: zodResolver(revisionSchema),
