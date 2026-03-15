@@ -547,7 +547,7 @@ const AdminClients = () => {
                             )}
                             {c.status === 'active' && (
                               <DropdownMenuItem
-                                onClick={() => setConfirmAction({ type: 'suspend', userId: c.user_id, clientName: c.full_name })}
+                                onClick={() => setConfirmAction({ type: 'suspend', userId: c.user_id, clientName: c.full_name, clientType: c.client_type })}
                                 className="text-destructive"
                               >
                                 <Pause className="mr-2 h-4 w-4" /> Suspender
