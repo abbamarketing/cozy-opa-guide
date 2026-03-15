@@ -222,7 +222,7 @@ REGRAS IMPORTANTES:
     body: JSON.stringify({
       model: 'google/gemini-3-flash-preview',
       messages: [
-        { role: 'system', content: 'Você é um roteirista profissional e estrategista de conteúdo para redes sociais brasileiras. Você cria roteiros envolventes, otimizados para retenção e com ganchos visuais específicos. Sempre formate sua resposta como Markdown válido e bem estruturado.' },
+        { role: 'system', content: 'Você é um roteirista profissional e estrategista de conteúdo para redes sociais brasileiras. Você cria roteiros envolventes, otimizados para retenção e com ganchos visuais específicos. Sempre formate sua resposta como Markdown válido e bem estruturado. NUNCA use emojis.' },
         { role: 'user', content: prompt },
       ],
       stream: true,
