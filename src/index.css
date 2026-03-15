@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,600;0,700;0,800;1,300&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,13 +6,6 @@
 
 @layer base {
   :root {
-    /* Paleta Abba oficial */
-    --bg-dark:         #1A231B;
-    --surface-dark:    #2D3926;
-    --accent-primary:  #A0E870;
-    --accent-light:    #BAFF8D;
-
-    /* Mapeamento para variáveis shadcn/radix existentes */
     --background:      26 15% 11%;
     --foreground:      0 0% 100%;
 
@@ -25,11 +18,11 @@
     --primary:         101 72% 67%;
     --primary-foreground: 0 0% 7%;
 
-    --secondary:       33 18% 19%;
+    --secondary:       33 18% 22%;
     --secondary-foreground: 0 0% 100%;
 
     --muted:           33 18% 16%;
-    --muted-foreground: 0 0% 60%;
+    --muted-foreground: 0 0% 58%;
 
     --accent:          101 72% 77%;
     --accent-foreground: 0 0% 7%;
@@ -37,20 +30,20 @@
     --destructive:     0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border:          33 18% 25%;
+    --border:          33 18% 26%;
     --input:           33 18% 22%;
     --ring:            101 72% 67%;
 
     --radius:          1.125rem;
 
-    --sidebar-background: 26 15% 9%;
+    --sidebar-background: 26 15% 8%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 101 72% 67%;
     --sidebar-primary-foreground: 0 0% 7%;
-    --sidebar-accent: 33 18% 19%;
+    --sidebar-accent:  33 18% 19%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 33 18% 20%;
-    --sidebar-ring: 101 72% 67%;
+    --sidebar-border:  33 18% 20%;
+    --sidebar-ring:    101 72% 67%;
 
     /* Semantic energy states */
     --energy-foco: 101 72% 67%;
@@ -151,13 +144,21 @@
     display: flex; align-items: center; justify-content: center;
   }
 
-  /* Glass apenas em micro-elementos */
+  /* Glass micro — apenas em botões e ícones de navegação */
   .glass-micro {
-    background: rgba(255,255,255,0.55);
-    border: 1px solid rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  /* Card elevate — hover sutil */
+  .card-elevate {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card-elevate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.30);
   }
 
   /* Safe area for mobile bottom nav */

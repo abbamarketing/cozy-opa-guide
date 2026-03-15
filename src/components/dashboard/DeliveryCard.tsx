@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Video, Camera, Image, Layers, Clock, AlertTriangle } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { remainingBusinessMinutes, formatBusinessCountdown } from '@/lib/business-hours';
 
@@ -125,19 +124,19 @@ const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
   const isCompleted = delivery.status === 'approved' || delivery.status === 'cancelled';
 
   return (
-    <Card
+    <div
       onClick={onClick}
-      className="cursor-pointer glass card-elevate p-3 space-y-2"
+      className="cursor-pointer card-elevate rounded-[20px] bg-abba-surface border border-white/8 p-4 space-y-3"
     >
       {/* Title row */}
       <div className="flex items-start gap-2">
-        <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+        <Icon className="mt-0.5 h-4 w-4 shrink-0 text-abba-lime" />
         <div className="min-w-0 flex-1 overflow-hidden">
-          <p className="truncate text-sm font-medium text-foreground">{delivery.title}</p>
+          <p className="truncate text-sm font-sans font-semibold text-foreground">{delivery.title}</p>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-[10px] font-mono text-muted-foreground">{config.label}</span>
+            <span className="text-[11px] font-sans text-white/60">{config.label}</span>
             {delivery.editor_name && (
-              <span className="text-[10px] font-mono text-muted-foreground">· {delivery.editor_name}</span>
+              <span className="text-[11px] font-sans text-white/60">· {delivery.editor_name}</span>
             )}
           </div>
         </div>
@@ -145,14 +144,14 @@ const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
 
       {/* SLA section */}
       {delivery.due_date && !isCompleted && (
-        <div className="space-y-1">
-          <div className="flex items-center gap-1.5 text-[10px] font-mono">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5 text-[11px] font-sans">
             {sla.level === 'overdue' ? (
               <AlertTriangle className={`h-3 w-3 ${sla.color}`} />
             ) : (
               <Clock className={`h-3 w-3 ${sla.color}`} />
             )}
-            <span className="text-muted-foreground">
+            <span className="text-white/60">
               {format(new Date(delivery.due_date), "dd/MM HH'h'", { locale: ptBR })}
             </span>
             <span className={`ml-auto font-medium ${sla.color}`}>
@@ -161,34 +160,33 @@ const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
           </div>
 
           {/* Progress bar */}
-          <div className="h-1 w-full rounded-full bg-muted overflow-hidden">
+          <div className="progress-track" style={{ height: '28px' }}>
             <div
-              className={`h-full rounded-full transition-all duration-500 ${
-                sla.level === 'overdue' || sla.level === 'danger'
-                  ? 'bg-destructive'
-                  : sla.level === 'warning'
-                  ? 'bg-[hsl(var(--queue-yellow))]'
-                  : 'bg-[hsl(var(--queue-green))]'
-              }`}
-              style={{ width: `${sla.progressPercent}%` }}
-            />
+              className="progress-fill text-[11px]"
+              style={{
+                width: `${sla.progressPercent}%`,
+                background: sla.level === 'danger' || sla.level === 'overdue' ? '#ef4444' : '#A0E870',
+              }}
+            >
+              {sla.label}
+            </div>
           </div>
         </div>
       )}
 
       {delivery.due_date && isCompleted && (
-        <div className="flex items-center gap-1.5 text-[10px] font-mono">
-          <Clock className="h-3 w-3 text-muted-foreground" />
-          <span className="text-muted-foreground">
+        <div className="flex items-center gap-1.5 text-[11px] font-sans">
+          <Clock className="h-3 w-3 text-white/60" />
+          <span className="text-white/60">
             {format(new Date(delivery.due_date), "dd/MM HH'h'", { locale: ptBR })}
           </span>
         </div>
       )}
 
-      <p className="text-[10px] font-mono text-muted-foreground">
+      <p className="text-[11px] font-sans text-white/60">
         Revisões: {delivery.revision_count}/{delivery.max_revisions}
       </p>
-    </Card>
+    </div>
   );
 };
 

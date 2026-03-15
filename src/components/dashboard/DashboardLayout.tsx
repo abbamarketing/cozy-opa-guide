@@ -75,24 +75,26 @@ const DashboardHeader = () => {
     : '?';
 
   return (
-    <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-border/50 bg-background/80 backdrop-blur-lg px-3 md:px-4 md:h-14">
+    <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-abba-surface bg-abba-dark/90 backdrop-blur-lg px-3 md:px-4 md:h-14">
       <div className="flex items-center gap-2">
         {!isMobile && <SidebarTrigger className="mr-1" />}
         <div className="flex items-center gap-1.5">
-          <div className="h-6 w-6 rounded-md bg-primary flex items-center justify-center">
-            <Play className="h-3 w-3 text-primary-foreground" />
+          <div className="h-6 w-6 rounded-md bg-abba-lime flex items-center justify-center">
+            <Play className="h-3 w-3 text-[#111]" />
           </div>
-          <span className="text-sm font-mono font-semibold tracking-tight">
+          <span className="text-sm font-sans font-bold tracking-tight">
             Abba<span className="text-primary">Video</span>
           </span>
         </div>
       </div>
 
       <div className="flex items-center gap-0.5">
-        <NotificationBell />
+        <div className="glass-micro rounded-full">
+          <NotificationBell />
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground">
+            <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground glass-micro rounded-full">
               <HelpCircle className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -105,10 +107,10 @@ const DashboardHeader = () => {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="ml-0.5 gap-1.5 px-1.5 h-9">
+            <Button variant="ghost" size="sm" className="ml-0.5 gap-1.5 px-1.5 h-9 glass-micro rounded-full">
               <Avatar className="h-6 w-6">
                 <AvatarImage src={profile?.avatar_url || undefined} />
-                <AvatarFallback className="bg-primary/15 text-[10px] font-mono text-primary">
+                <AvatarFallback className="bg-primary/15 text-[10px] font-sans text-primary">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -150,7 +152,7 @@ const DashboardSidebar = ({
   const collapsed = state === 'collapsed';
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="bg-abba-dark border-r border-abba-surface">
       <SidebarContent className="pt-2">
         <SidebarGroup>
           <SidebarGroupContent>
@@ -159,14 +161,14 @@ const DashboardSidebar = ({
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     onClick={() => setActiveTab(item.id)}
-                    className={`cursor-pointer ${
+                    className={`cursor-pointer rounded-xl ${
                       activeTab === item.id
-                        ? 'bg-muted text-primary font-medium'
-                        : 'text-muted-foreground hover:bg-muted/50'
+                        ? 'bg-abba-surface text-abba-lime font-semibold'
+                        : 'text-white/60 hover:bg-abba-surface/60 rounded-xl'
                     }`}
                   >
                     <item.icon className="h-4 w-4" />
-                    {!collapsed && <span>{item.label}</span>}
+                    {!collapsed && <span className="font-sans">{item.label}</span>}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -176,12 +178,12 @@ const DashboardSidebar = ({
       </SidebarContent>
       {/* QuotaCard at sidebar bottom (desktop only) */}
       {!collapsed && userProject && userProject.client_type === 'custom' && (
-        <div className="mt-auto p-2 border-t border-border/50">
+        <div className="mt-auto p-2 border-t border-abba-surface">
           <QuotaCard userProject={userProject} />
         </div>
       )}
       {!collapsed && userProject && ['subscription', 'studio'].includes(userProject.client_type || '') && (
-        <div className="mt-auto p-2 border-t border-border/50">
+        <div className="mt-auto p-2 border-t border-abba-surface">
           {userProject.client_type === 'subscription' ? (
             <SubscriptionStatusCard userProject={userProject} />
           ) : (
@@ -203,7 +205,7 @@ const MobileBottomNav = ({
   setActiveTab: (t: DashboardTab) => void;
   navItems: NavItem[];
 }) => (
-  <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/50 bg-background/80 backdrop-blur-lg safe-area-bottom">
+  <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-abba-surface bg-abba-dark/95 backdrop-blur-lg safe-area-bottom">
     <div className="flex items-stretch">
       {navItems.map((item) => {
         const isActive = activeTab === item.id;
@@ -213,18 +215,18 @@ const MobileBottomNav = ({
             onClick={() => setActiveTab(item.id)}
             className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors min-h-[56px] ${
               isActive
-                ? 'text-primary'
+                ? 'text-abba-lime'
                 : 'text-muted-foreground active:text-foreground'
             }`}
           >
-            <item.icon className={`h-5 w-5 ${isActive ? 'text-primary' : ''}`} />
-            <span className={`text-[10px] font-mono tracking-wider leading-none ${
-              isActive ? 'font-medium' : ''
+            <item.icon className={`h-5 w-5 ${isActive ? 'text-abba-lime' : ''}`} />
+            <span className={`text-[10px] font-sans font-semibold tracking-wider leading-none ${
+              isActive ? '' : ''
             }`}>
               {item.shortLabel}
             </span>
             {isActive && (
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full bg-primary" />
+              <div className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1 w-6 rounded-full bg-abba-lime" />
             )}
           </button>
         );
@@ -270,7 +272,7 @@ const DashboardLayout = () => {
         return userProject ? (
           <Kanban userProject={userProject} />
         ) : (
-          <div className="rounded-lg border border-border bg-card p-8 text-center">
+          <div className="rounded-[20px] border border-border bg-card p-8 text-center">
             <Video className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
             <p className="text-sm text-muted-foreground">Nenhum projeto ativo</p>
           </div>
@@ -279,7 +281,7 @@ const DashboardLayout = () => {
         return userProject ? (
           <DeliveryCalendar userProject={userProject} />
         ) : (
-          <div className="rounded-lg border border-border bg-card p-8 text-center">
+          <div className="rounded-[20px] border border-border bg-card p-8 text-center">
             <Calendar className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
             <p className="text-sm text-muted-foreground">Nenhum projeto ativo</p>
           </div>
@@ -315,7 +317,7 @@ const DashboardLayout = () => {
           {/* Quota Card - mobile only (desktop shows in sidebar) */}
           {isMobile && (
             isLoading ? (
-              <Skeleton className="h-12 w-full rounded-lg" />
+              <Skeleton className="h-12 w-full rounded-[20px]" />
             ) : userProject ? (
               activeTab !== 'settings' && (
                 <>
@@ -325,7 +327,7 @@ const DashboardLayout = () => {
               )
             ) : (
               activeTab === 'deliveries' && (
-                <div className="rounded-lg glass p-4 text-center text-sm text-muted-foreground">
+                <div className="rounded-[20px] bg-abba-surface p-4 text-center text-sm text-muted-foreground">
                   Nenhum projeto ativo encontrado.
                 </div>
               )
