@@ -58,7 +58,7 @@ function ShootCard({ shoot }: { shoot: PhotoShoot }) {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">{SCENARIO_ICONS[shoot.scenario] ?? '📷'}</span>
+          {(() => { const Icon = SCENARIO_ICONS[shoot.scenario] ?? Image; return <Icon className="h-6 w-6 text-muted-foreground" />; })()}
           <div>
             <p className="text-sm font-mono font-semibold text-foreground">{shoot.scenario_label}</p>
             <p className="text-[10px] text-muted-foreground">
