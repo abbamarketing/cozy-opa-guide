@@ -74,7 +74,17 @@ serve(async (req) => {
     // 3. Baixa a imagem de referência e converte para base64
     const refImageResponse = await fetch(profile.reference_image_url)
     const refImageBuffer = await refImageResponse.arrayBuffer()
-    const refImageBase64 = btoa(String.fromCharCode(...new Uint8Array(refImageBuffer)))
+    // Chunked base64 to avoid stack overflow on large buffers
+    const bytes = new Uint8Array(refImageBuffer)
+    const chunkSize = 8192
+    let binary = ''
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length))
+      for (let j = 0; j < chunk.length; j++) {
+        binary += String.fromCharCode(chunk[j])
+      }
+    }
+    const refImageBase64 = btoa(binary)
 
     // 4. Chama Imagen 3 via Vertex AI com referenceImages
     const scenarioPrompt = SCENARIO_PROMPTS[scenario] ?? SCENARIO_PROMPTS.executive_office
