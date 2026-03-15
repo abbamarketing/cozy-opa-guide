@@ -56,7 +56,7 @@ const revisionSchema = z.object({
   timestamp_marker: z
     .string()
     .trim()
-    .max(20, 'Máximo de 20 caracteres')
+    .regex(/^(\d{1,2}:)?\d{1,2}:\d{2}$/, 'Use o formato M:SS ou H:MM:SS (ex: 1:23 ou 0:45)')
     .optional()
     .or(z.literal('')),
 });
