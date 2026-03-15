@@ -216,7 +216,25 @@ export default function StudioModule() {
 
   // ─── PHOTO SHOOT ───
   if (view === 'photoShoot') {
-    return <PhotoShootWizard onBack={() => setView('home')} />;
+    return (
+      <div className="space-y-4">
+        <Button variant="ghost" size="sm" onClick={() => setView('home')} className="gap-1.5 -ml-2">
+          <ChevronLeft className="h-4 w-4" /> Voltar
+        </Button>
+        <Tabs defaultValue="new" className="w-full">
+          <TabsList className="w-full grid grid-cols-2">
+            <TabsTrigger value="new" className="gap-1.5 text-xs">📷 Novo Ensaio</TabsTrigger>
+            <TabsTrigger value="gallery" className="gap-1.5 text-xs">🗂 Meus Ensaios</TabsTrigger>
+          </TabsList>
+          <TabsContent value="new">
+            <PhotoShootWizard />
+          </TabsContent>
+          <TabsContent value="gallery">
+            <PhotoShootGallery />
+          </TabsContent>
+        </Tabs>
+      </div>
+    );
   }
 
   // ─── STEP 1: Content Type ───
