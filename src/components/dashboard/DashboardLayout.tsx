@@ -78,9 +78,7 @@ const DashboardHeader = () => {
       <div className="flex items-center gap-2">
         {!isMobile && <SidebarTrigger className="mr-1" />}
         <div className="flex items-center gap-1.5">
-          <div className="h-6 w-6 rounded-md bg-abba-lime flex items-center justify-center">
-            <Play className="h-3 w-3 text-[#111]" />
-          </div>
+           <img src={abbaLogo} alt="AbbaVideo" className="h-6 w-6 rounded-md" />
           <span className="text-sm font-sans font-bold tracking-tight">
             Abba<span className="text-primary">Video</span>
           </span>

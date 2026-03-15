@@ -86,9 +86,7 @@ const Landing = () => {
           className="mx-auto max-w-3xl space-y-6"
         >
           <motion.div variants={fadeUp} custom={0} className="mx-auto flex items-center gap-2">
-            <div className="h-10 w-10 rounded-xl bg-abba-lime flex items-center justify-center">
-              <Play className="h-5 w-5 text-[#111]" />
-            </div>
+            <img src={abbaLogo} alt="AbbaVideo" className="h-10 w-10 rounded-xl" />
             <span className="text-xl font-sans font-bold">
               Abba<span className="text-abba-lime">Video</span>
             </span>
