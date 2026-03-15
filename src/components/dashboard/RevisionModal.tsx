@@ -215,10 +215,11 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProje
                     <Input
                       {...field}
                       placeholder="Ex: 1:23"
-                      maxLength={20}
+                      maxLength={10}
                       className="font-mono"
                     />
                   </FormControl>
+                  <p className="text-xs text-muted-foreground mt-1">Ex: 0:45 ou 1:23 ou 1:02:30</p>
                   <FormMessage />
                 </FormItem>
               )}
