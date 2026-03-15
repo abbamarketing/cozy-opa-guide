@@ -182,16 +182,16 @@ export function countWeekdayHours(startDate: Date, slaHours: number): Date {
     }
     if (dayOfWeek === 6) {
       // Sábado: calcular horas até meia-noite e avançar para segunda
-      const hoursUntilMidnight = 24 - current.getHours();
-      current.setHours(current.getHours() + hoursUntilMidnight + 24); // sab->dom->seg meia-noite
+      const hoursUntilMidnight = 24 - current.getHours() - (current.getMinutes() / 60);
+      current.setTime(current.getTime() + (hoursUntilMidnight + 24) * 3600000);
       continue;
     }
 
     // É dia útil (seg-sex): verificar se chegamos no sábado antes de esgotar o SLA
-    const currentHour = current.getHours();
+    const currentHourFrac = current.getHours() + current.getMinutes() / 60;
     const hoursUntilWeekend = dayOfWeek === 5
-      ? (24 - currentHour) // sexta: horas até meia-noite
-      : (24 * (5 - dayOfWeek)) + (24 - currentHour); // horas até sexta meia-noite
+      ? (24 - currentHourFrac) // sexta: horas até meia-noite
+      : (24 * (5 - dayOfWeek)) + (24 - currentHourFrac); // horas até sexta meia-noite
 
     if (remaining <= hoursUntilWeekend) {
       current.setHours(current.getHours() + remaining);
