@@ -14,23 +14,27 @@ export const useStudioCredits = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchCredits = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
+    try {
+      const { data } = await supabase
+        .from('studio_credits')
+        .select('credits_available, credits_used, period_end')
+        .eq('user_id', user.id)
+        .order('period_start', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-    const { data } = await supabase
-      .from('studio_credits')
-      .select('credits_available, credits_used, period_end')
-      .eq('user_id', user.id)
-      .order('period_start', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    setCredits(data ? {
-      available: data.credits_available,
-      used: data.credits_used,
-      periodEnd: data.period_end,
-    } : { available: 10, used: 0, periodEnd: '' });
-
-    setIsLoading(false);
+      setCredits(data ? {
+        available: data.credits_available,
+        used: data.credits_used,
+        periodEnd: data.period_end,
+      } : { available: 10, used: 0, periodEnd: '' });
+    } finally {
+      setIsLoading(false);
+    }
   }, [user]);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { logAiUsage } from '../_shared/log-ai-usage.ts';
 
@@ -221,7 +221,7 @@ REGRAS IMPORTANTES:
       Authorization: `Bearer ${LOVABLE_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'google/gemini-3-flash-preview',
+      model: 'google/gemini-2.5-flash',
       messages: [
         { role: 'system', content: 'Você é um roteirista profissional e estrategista de conteúdo para redes sociais brasileiras. Você cria roteiros envolventes, otimizados para retenção e com ganchos visuais específicos. Sempre formate sua resposta como Markdown válido e bem estruturado. NUNCA use emojis.' },
         { role: 'user', content: prompt },
@@ -257,13 +257,10 @@ REGRAS IMPORTANTES:
     .then();
 
   // ─── Log AI usage (fire-and-forget) ───
-  const authHeader = req.headers.get('Authorization') ?? '';
-  const jwt = authHeader.replace('Bearer ', '');
-  const { data: { user: authUser } } = await supabase.auth.getUser(jwt);
   logAiUsage({
-    userId: authUser?.id,
+    userId: user.id,
     functionName: 'studio-generate',
-    model: 'google/gemini-3-flash-preview',
+    model: 'google/gemini-2.5-flash',
     isStreaming: true,
   });
 
