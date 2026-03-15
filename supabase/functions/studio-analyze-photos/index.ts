@@ -44,11 +44,24 @@ serve(async (req) => {
     }
 
     // 4. Download photos as base64 for the AI model
+    function arrayBufferToBase64(buffer: ArrayBuffer): string {
+      const bytes = new Uint8Array(buffer);
+      const chunkSize = 8192;
+      let binaryString = "";
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+        for (let j = 0; j < chunk.length; j++) {
+          binaryString += String.fromCharCode(chunk[j]);
+        }
+      }
+      return btoa(binaryString);
+    }
+
     const photoDataUrls: string[] = [];
     for (const url of signedUrls) {
       const resp = await fetch(url);
       const arrayBuffer = await resp.arrayBuffer();
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+      const base64 = arrayBufferToBase64(arrayBuffer);
       const mimeType = resp.headers.get("content-type") || "image/jpeg";
       photoDataUrls.push(`data:${mimeType};base64,${base64}`);
     }
