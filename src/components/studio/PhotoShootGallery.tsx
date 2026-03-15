@@ -1,17 +1,18 @@
 import { usePhotoShootGallery, PhotoShoot } from '@/hooks/usePhotoShootGallery';
 import { Button } from '@/components/ui/button';
-import { Download, Loader2, RefreshCw } from 'lucide-react';
+import { Download, Loader2, RefreshCw, Building2, Lightbulb, BarChart3, Armchair, Sunset, Camera, Image, AlertTriangle } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
-const SCENARIO_ICONS: Record<string, string> = {
-  executive_office: '🏙️',
-  startup_workspace: '💡',
-  boardroom: '📊',
-  consulting_office: '🪑',
-  outdoor_business: '🌆',
-  studio: '📸',
-  clinic: '🏥',
-  office: '🏢',
-  outdoor: '🌳',
+const SCENARIO_ICONS: Record<string, LucideIcon> = {
+  executive_office: Building2,
+  startup_workspace: Lightbulb,
+  boardroom: BarChart3,
+  consulting_office: Armchair,
+  outdoor_business: Sunset,
+  studio: Camera,
+  clinic: Building2,
+  office: Building2,
+  outdoor: Sunset,
 };
 
 function ExpiryBadge({ hoursRemaining }: { hoursRemaining: number }) {
