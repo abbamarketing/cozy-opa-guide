@@ -319,7 +319,7 @@ const DashboardLayout = () => {
             ) : userProject ? (
               activeTab !== 'settings' && (
                 <>
-                  {userProject.client_type === 'custom' && <QuotaCard userProject={userProject} />}
+                  {['custom', 'studio'].includes(userProject.client_type || '') && <QuotaCard userProject={userProject} />}
                   {userProject.client_type === 'subscription' && <SubscriptionStatusCard userProject={userProject} />}
                 </>
               )
