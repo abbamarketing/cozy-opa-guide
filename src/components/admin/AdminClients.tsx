@@ -357,6 +357,14 @@ const AdminClients = () => {
         </div>
       </div>
 
+      {/* Filter indicator */}
+      {isFiltering && !loading && (
+        <p className="text-xs text-muted-foreground">
+          Mostrando {clients.length} resultado{clients.length !== 1 ? 's' : ''}
+          {debouncedSearch.trim() ? ` para "${debouncedSearch.trim()}"` : ''}
+        </p>
+      )}
+
       {/* Mobile: Card List */}
       {isMobile ? (
         <div className="space-y-2">
