@@ -165,12 +165,15 @@ const AdminClients = () => {
     if (statusFilter !== 'all') {
       result = result.filter((c) => c.status === statusFilter);
     }
+    if (typeFilter !== 'all') {
+      result = result.filter((c) => c.client_type === typeFilter);
+    }
     if (debouncedSearch.trim()) {
       const q = debouncedSearch.toLowerCase();
       result = result.filter((c) => c.full_name?.toLowerCase().includes(q));
     }
     return result;
-  }, [clients, statusFilter, debouncedSearch]);
+  }, [clients, statusFilter, typeFilter, debouncedSearch]);
 
   const handleStatusChange = async () => {
     if (!confirmAction.userId || !confirmAction.type) return;
