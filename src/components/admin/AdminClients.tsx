@@ -76,7 +76,8 @@ const AdminClients = () => {
     type: 'suspend' | 'activate' | 'delete' | null;
     userId: string | null;
     clientName: string | null;
-  }>({ type: null, userId: null, clientName: null });
+    clientType: string | null;
+  }>({ type: null, userId: null, clientName: null, clientType: null });
 
   const hasActiveFilter = (s: string, st: string, t: string) =>
     s.trim() !== '' || st !== 'all' || t !== 'all';
