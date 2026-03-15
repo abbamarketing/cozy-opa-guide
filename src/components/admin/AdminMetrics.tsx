@@ -439,16 +439,23 @@ const AdminMetrics = () => {
             <Cpu className="h-4 w-4 text-primary" />
             <h3 className="text-sm font-sans font-semibold text-white">Uso de IA — Últimos 30 dias</h3>
           </div>
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="grid grid-cols-3 gap-3 mb-4">
             <div className="rounded-[16px] bg-white/5 p-3">
-              <p className="text-[10px] font-sans uppercase tracking-widest text-white/50">Total de Chamadas</p>
+              <p className="text-[10px] font-sans uppercase tracking-widest text-white/50">Chamadas</p>
               <p className="text-2xl font-sans font-extrabold text-white mt-1">{aiUsage.totalCalls}</p>
             </div>
             <div className="rounded-[16px] bg-white/5 p-3">
-              <p className="text-[10px] font-sans uppercase tracking-widest text-white/50">Total de Tokens</p>
+              <p className="text-[10px] font-sans uppercase tracking-widest text-white/50">Tokens</p>
               <p className="text-2xl font-sans font-extrabold text-white mt-1">
                 {aiUsage.totalTokens > 1000 ? `${(aiUsage.totalTokens / 1000).toFixed(1)}k` : aiUsage.totalTokens}
               </p>
+            </div>
+            <div className="rounded-[16px] bg-primary/10 border border-primary/20 p-3">
+              <p className="text-[10px] font-sans uppercase tracking-widest text-primary/70">Custo Est.</p>
+              <p className="text-2xl font-sans font-extrabold text-primary mt-1">
+                ${(aiUsage.totalTokens * 0.0000003).toFixed(2)}
+              </p>
+              <p className="text-[9px] font-mono text-white/30 mt-0.5">~$0.30/1M tok</p>
             </div>
           </div>
           {aiUsage.byFunction.length > 0 && (
