@@ -8,7 +8,7 @@ import DeliveryHistory from '@/components/dashboard/DeliveryHistory';
 import StudioModule from '@/components/dashboard/StudioModule';
 import BrandProfile from '@/components/dashboard/BrandProfile';
 import SettingsComponent from '@/components/dashboard/Settings';
-import StudioTab from '@/components/studio/StudioTab';
+
 import NotificationBell from '@/components/shared/NotificationBell';
 import ContextualTour, { restartTour } from '@/components/dashboard/ContextualTour';
 import { useNavigate, useSearchParams } from 'react-router-dom';
