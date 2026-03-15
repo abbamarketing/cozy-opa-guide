@@ -56,7 +56,7 @@ const revisionSchema = z.object({
   timestamp_marker: z
     .string()
     .trim()
-    .max(20, 'Máximo de 20 caracteres')
+    .regex(/^(\d{1,2}:)?\d{1,2}:\d{2}$/, 'Use o formato M:SS ou H:MM:SS (ex: 1:23 ou 0:45)')
     .optional()
     .or(z.literal('')),
 });
@@ -215,10 +215,11 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProje
                     <Input
                       {...field}
                       placeholder="Ex: 1:23"
-                      maxLength={20}
+                      maxLength={10}
                       className="font-mono"
                     />
                   </FormControl>
+                  <p className="text-xs text-muted-foreground mt-1">Ex: 0:45 ou 1:23 ou 1:02:30</p>
                   <FormMessage />
                 </FormItem>
               )}
