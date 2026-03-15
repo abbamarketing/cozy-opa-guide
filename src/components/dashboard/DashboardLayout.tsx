@@ -5,10 +5,10 @@ import { Navigate } from 'react-router-dom';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
 import DeliveryHistory from '@/components/dashboard/DeliveryHistory';
-import ScriptGenerator from '@/components/dashboard/ScriptGenerator';
+import StudioModule from '@/components/dashboard/StudioModule';
 import BrandProfile from '@/components/dashboard/BrandProfile';
 import SettingsComponent from '@/components/dashboard/Settings';
-import StudioTab from '@/components/studio/StudioTab';
+
 import NotificationBell from '@/components/shared/NotificationBell';
 import ContextualTour, { restartTour } from '@/components/dashboard/ContextualTour';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -17,7 +17,7 @@ import {
   Video,
   Calendar,
   CheckCircle2,
-  FileText,
+  Clapperboard,
   Settings,
   Palette,
   LogOut,
@@ -53,7 +53,7 @@ import QuotaCard from '@/components/dashboard/QuotaCard';
 import SubscriptionStatusCard from '@/components/dashboard/SubscriptionStatusCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-type DashboardTab = 'studio' | 'deliveries' | 'calendar' | 'history' | 'scripts' | 'brand' | 'settings';
+type DashboardTab = 'studio' | 'deliveries' | 'calendar' | 'history' | 'brand' | 'settings';
 
 interface NavItem {
   id: DashboardTab;
@@ -271,7 +271,7 @@ const DashboardLayout = () => {
 
   // Sync tab da URL
   useEffect(() => {
-    const valid: DashboardTab[] = ['studio', 'deliveries', 'calendar', 'history', 'scripts', 'brand', 'settings'];
+    const valid: DashboardTab[] = ['studio', 'deliveries', 'calendar', 'history', 'brand', 'settings'];
     if (tabFromUrl && valid.includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
     }
@@ -299,9 +299,9 @@ const DashboardLayout = () => {
     { id: 'calendar', label: 'Calendário', shortLabel: 'AGENDA', icon: Calendar, locked: isStudio },
     { id: 'history', label: 'Histórico', shortLabel: 'HIST.', icon: CheckCircle2, locked: isStudio },
     ...((userProject?.custom_project?.include_script || ['subscription', 'custom'].includes(userProject?.client_type || ''))
-      ? [{ id: 'scripts' as DashboardTab, label: 'Roteiros', shortLabel: 'ROTEIRO', icon: FileText, locked: isStudio }]
+      ? [{ id: 'studio' as DashboardTab, label: 'Studio', shortLabel: 'STUDIO', icon: Clapperboard, locked: isStudio }]
       : isStudio
-      ? [{ id: 'scripts' as DashboardTab, label: 'Roteiros', shortLabel: 'ROTEIRO', icon: FileText, locked: true }]
+      ? [{ id: 'studio' as DashboardTab, label: 'Studio', shortLabel: 'STUDIO', icon: Clapperboard, locked: true }]
       : []),
     { id: 'brand', label: 'Minha Marca', shortLabel: 'MARCA', icon: Palette, locked: isStudio },
     { id: 'settings', label: 'Configurações', shortLabel: 'CONFIG', icon: Settings, locked: false },
@@ -310,7 +310,7 @@ const DashboardLayout = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'studio':
-        return <StudioTab />;
+        return <StudioModule />;
       case 'deliveries':
         return userProject ? (
           <Kanban userProject={userProject} />
@@ -331,8 +331,7 @@ const DashboardLayout = () => {
         );
       case 'history':
         return <DeliveryHistory />;
-      case 'scripts':
-        return <ScriptGenerator />;
+      case 'brand':
       case 'brand':
         return <BrandProfile />;
       case 'settings':
@@ -379,7 +378,7 @@ const DashboardLayout = () => {
       {isMobile && (
         <MobileBottomNav activeTab={activeTab} onTabChange={handleTabChange} navItems={
           isStudio
-            ? navItems.filter(item => ['studio', 'deliveries', 'scripts', 'brand', 'settings'].includes(item.id))
+            ? navItems.filter(item => ['studio', 'deliveries', 'brand', 'settings'].includes(item.id))
             : navItems
         } />
       )}
