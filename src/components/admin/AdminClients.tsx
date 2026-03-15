@@ -352,7 +352,14 @@ const AdminClients = () => {
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium truncate">{c.full_name || 'Sem nome'}</p>
-                      <p className="text-[11px] text-muted-foreground truncate">{c.project_name || 'Sem projeto'}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-[11px] text-muted-foreground truncate">{c.project_name || 'Sem projeto'}</p>
+                        {c.client_type && CLIENT_TYPE_BADGE[c.client_type] && (
+                          <Badge variant="outline" className={`text-[9px] px-1.5 py-0 h-4 shrink-0 ${CLIENT_TYPE_BADGE[c.client_type].className}`}>
+                            {CLIENT_TYPE_BADGE[c.client_type].label}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     <Badge variant={st.variant} className="shrink-0 text-[10px]">{st.label}</Badge>
                   </div>
