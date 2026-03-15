@@ -71,7 +71,7 @@ const Index = () => {
 
   // Realtime subscription for clients without project
   useEffect(() => {
-    if (!user || !roles.includes('client') || assignedProjectId !== null || assignedProjectId === undefined) return;
+    if (!user || !isClient() || assignedProjectId !== null || assignedProjectId === undefined) return;
 
     const channel = supabase
       .channel(`profile-${user.id}`)
