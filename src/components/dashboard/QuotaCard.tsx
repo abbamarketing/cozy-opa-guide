@@ -61,10 +61,10 @@ const StudioQuotaCard = () => {
     const fetch = async () => {
       const { data } = await supabase
         .from('studio_credits')
-        .select('credits_remaining')
+        .select('credits_available')
         .eq('user_id', user.id)
         .maybeSingle();
-      setCredits(data?.credits_remaining ?? 0);
+      setCredits(data?.credits_available ?? 0);
     };
     fetch();
   }, [user]);
