@@ -214,7 +214,7 @@ serve(async (req) => {
       if (!data?.signedUrl) continue;
       const resp = await fetch(data.signedUrl);
       const arrayBuffer = await resp.arrayBuffer();
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+      const base64 = arrayBufferToBase64(arrayBuffer);
       const mimeType = resp.headers.get("content-type") || "image/jpeg";
       refDataUrls.push(`data:${mimeType};base64,${base64}`);
     }
