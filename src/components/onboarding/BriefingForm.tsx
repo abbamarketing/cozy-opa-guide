@@ -148,16 +148,24 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
     }
   };
 
+  const getBucketForFile = (file: File): string => {
+    if (file.type.startsWith('video/') || file.type.startsWith('audio/')) {
+      return 'brand-assets';
+    }
+    return 'brand-logos';
+  };
+
   const uploadMediaFile = async (file: File, folder: string): Promise<string | null> => {
     if (!user) return null;
     const ext = file.name.split('.').pop();
+    const bucketName = getBucketForFile(file);
     const path = `${user.id}/${folder}-${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from('brand-logos').upload(path, file);
+    const { error } = await supabase.storage.from(bucketName).upload(path, file);
     if (error) {
       toast.error(`Erro ao enviar ${folder}`, { description: error.message });
       return null;
     }
-    const { data } = supabase.storage.from('brand-logos').getPublicUrl(path);
+    const { data } = supabase.storage.from(bucketName).getPublicUrl(path);
     return data.publicUrl;
   };
 
