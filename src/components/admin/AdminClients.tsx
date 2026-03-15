@@ -291,7 +291,7 @@ const AdminClients = () => {
     }
 
     setActionLoading(null);
-    setConfirmAction({ type: null, userId: null, clientName: null });
+    setConfirmAction({ type: null, userId: null, clientName: null, clientType: null });
   };
 
   const exportCSV = () => {
