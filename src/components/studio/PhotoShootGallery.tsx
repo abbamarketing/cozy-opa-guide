@@ -127,7 +127,7 @@ export const PhotoShootGallery = () => {
 
   if (shoots.length === 0) return (
     <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
-      <span className="text-4xl">📷</span>
+      <Camera className="h-10 w-10 text-muted-foreground" />
       <div className="text-center">
         <p className="text-sm font-mono font-semibold text-foreground">Nenhum ensaio ainda</p>
         <p className="text-xs text-muted-foreground mt-1">Suas fotos geradas aparecerão aqui por 7 dias.</p>
