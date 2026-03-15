@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { useStudioCredits } from '@/hooks/useStudioCredits';
 import { supabase } from '@/integrations/supabase/client';
 import ScriptRenderer from './ScriptRenderer';
+import ScriptHistory from './ScriptHistory';
 
 type ContentType = 'short_video' | 'youtube_video';
 type Objective = 'educate' | 'sell' | 'entertain' | 'authority' | 'viral';
