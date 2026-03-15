@@ -141,6 +141,14 @@ const SubscriptionStatusCard = ({ userProject }: Props) => {
             Fila: {queueCount} vídeo(s) aguardando
           </div>
 
+          {/* Script credits */}
+          {['subscription', 'custom'].includes(userProject.client_type || '') && (
+            <div className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
+              <FileText className="h-3 w-3" />
+              <span>Roteiros: <strong className="text-foreground">{(userProject as any).script_credits ?? 0}</strong> créditos</span>
+            </div>
+          )}
+
           {/* Studio link */}
           {userProject.studio_access && studioCredits !== null && (
             <Link
