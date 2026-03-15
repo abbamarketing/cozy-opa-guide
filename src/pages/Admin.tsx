@@ -101,9 +101,7 @@ const Admin = () => {
                 </SheetContent>
               </Sheet>
             )}
-            <div className="h-8 w-8 rounded-lg gradient-neon flex items-center justify-center">
-              <Play className="h-4 w-4 text-primary-foreground" />
-            </div>
+            <img src={abbaLogo} alt="AbbaVideo" className="h-8 w-8 rounded-lg" />
             <span className="text-lg font-bold hidden md:inline">
               Abba<span className="text-primary">Video</span>
             </span>
