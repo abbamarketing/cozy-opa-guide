@@ -47,6 +47,19 @@ serve(async (req) => {
     });
   }
 
+  // Reset script_credits for subscription and custom clients
+  const { error: scriptError } = await supabaseAdmin
+    .from("user_projects")
+    .update({ script_credits: 12 })
+    .in("client_type", ["subscription", "custom"])
+    .eq("status", "active");
+
+  if (scriptError) {
+    console.error("Reset script credits error:", scriptError);
+  } else {
+    console.log("Script credits reset for subscription/custom clients");
+  }
+
   console.log(`Studio credits reset for ${userIds.length} users`);
 
   return new Response(
