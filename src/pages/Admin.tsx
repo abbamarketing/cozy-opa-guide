@@ -71,9 +71,7 @@ const Admin = () => {
                 </SheetTrigger>
                 <SheetContent side="left" className="w-64 p-0">
                   <div className="flex items-center gap-2 border-b border-border/50 px-4 py-4">
-                    <div className="h-7 w-7 rounded-lg gradient-neon flex items-center justify-center">
-                      <Play className="h-3.5 w-3.5 text-primary-foreground" />
-                    </div>
+                    <img src={abbaLogo} alt="AbbaVideo" className="h-7 w-7 rounded-lg" />
                     <span className="text-sm font-bold">
                       Abba<span className="text-primary">Video</span>
                     </span>
