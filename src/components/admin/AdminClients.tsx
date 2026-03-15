@@ -454,7 +454,7 @@ const AdminClients = () => {
                         size="sm"
                         className="h-7 text-xs gap-1 text-destructive"
                         disabled={actionLoading === c.user_id}
-                        onClick={() => setConfirmAction({ type: 'suspend', userId: c.user_id, clientName: c.full_name })}
+                        onClick={() => setConfirmAction({ type: 'suspend', userId: c.user_id, clientName: c.full_name, clientType: c.client_type })}
                       >
                         <Pause className="h-3 w-3" /> Suspender
                       </Button>
