@@ -312,7 +312,7 @@ const AdminClients = () => {
       {/* Confirmation Dialog */}
       <AlertDialog
         open={confirmAction.type !== null}
-        onOpenChange={(open) => !open && setConfirmAction({ type: null, userId: null, clientName: null })}
+        onOpenChange={(open) => !open && setConfirmAction({ type: null, userId: null, clientName: null, clientType: null })}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
