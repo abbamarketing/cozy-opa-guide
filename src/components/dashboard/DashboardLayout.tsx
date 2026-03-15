@@ -292,9 +292,6 @@ const DashboardLayout = () => {
   };
 
   const navItems: NavItem[] = [
-    ...(isStudio
-      ? [{ id: 'studio' as DashboardTab, label: 'Studio', shortLabel: 'STUDIO', icon: Sparkles, locked: false }]
-      : []),
     { id: 'deliveries', label: 'Minhas Entregas', shortLabel: 'ENTREGAS', icon: Video, locked: isStudio },
     { id: 'calendar', label: 'Calendário', shortLabel: 'AGENDA', icon: Calendar, locked: isStudio },
     { id: 'history', label: 'Histórico', shortLabel: 'HIST.', icon: CheckCircle2, locked: isStudio },
