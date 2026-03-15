@@ -14,7 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Play, ArrowRight, ArrowLeft, Loader2, Upload, X, Palette, Plus } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Loader2, Upload, X, Palette, Plus } from 'lucide-react';
+import abbaLogo from '@/assets/abba-logo.png';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 
