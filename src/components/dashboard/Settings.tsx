@@ -67,19 +67,23 @@ export default function Settings() {
   };
 
   const handleUpdateProfile = async () => {
-    setLoading(true);
+    try {
+      setLoading(true);
+      const { error } = await supabase
+        .from('profiles')
+        .update({ full_name: name })
+        .eq('user_id', user?.id);
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({ full_name: name })
-      .eq('user_id', user?.id);
-
-    setLoading(false);
-
-    if (error) {
-      toast.error('Erro ao atualizar', { description: error.message });
-    } else {
-      toast.success('Perfil atualizado');
+      if (error) {
+        toast.error('Erro ao atualizar', { description: error.message });
+      } else {
+        toast.success('Perfil atualizado');
+      }
+    } catch (err) {
+      console.error('Erro ao atualizar perfil:', err);
+      toast.error('Erro ao atualizar. Tente novamente.');
+    } finally {
+      setLoading(false);
     }
   };
 
