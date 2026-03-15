@@ -188,8 +188,8 @@ export default function Settings() {
       {activeSection === 'notifications' && (
         <Card className="border-border bg-card shadow-sm">
           <CardHeader className="p-4">
-            <CardTitle className="text-sm font-mono">Notificacoes</CardTitle>
-            <CardDescription className="text-xs">Como deseja receber atualizacoes</CardDescription>
+            <CardTitle className="text-sm font-mono">Notificações</CardTitle>
+            <CardDescription className="text-xs">Como deseja receber atualizações</CardDescription>
           </CardHeader>
           <CardContent className="p-4 pt-0 space-y-4">
             {prefsLoading ? (
