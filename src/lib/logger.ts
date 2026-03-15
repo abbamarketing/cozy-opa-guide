@@ -44,7 +44,7 @@ function scheduleFlush() {
   if (flushTimer) return;
   flushTimer = setTimeout(() => {
     flushTimer = null;
-    flushLogs();
+    void flushLogs();
   }, FLUSH_INTERVAL);
 }
 
