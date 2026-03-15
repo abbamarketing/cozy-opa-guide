@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import * as fal from "https://esm.sh/@fal-ai/serverless-client@0.15.0";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import JSZip from "https://esm.sh/jszip@3.10.1";
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
@@ -45,12 +46,41 @@ serve(async (req) => {
       .eq("id", profile_id)
       .eq("user_id", user.id);
 
+    // 2. Download all photos and create a zip file
+    const zip = new JSZip();
+    for (let i = 0; i < photo_urls.length; i++) {
+      const response = await fetch(photo_urls[i]);
+      if (!response.ok) throw new Error(`Failed to download photo ${i + 1}`);
+      const buffer = await response.arrayBuffer();
+      zip.file(`photo_${i + 1}.jpg`, buffer);
+    }
+
+    const zipBlob = await zip.generateAsync({ type: "uint8array" });
+
+    // 3. Upload zip to Supabase Storage and get a signed URL
+    const zipPath = `${user.id}/${profile_id}/training_photos.zip`;
+    const { error: zipUploadError } = await supabase.storage
+      .from("studio-reference-photos")
+      .upload(zipPath, zipBlob, {
+        contentType: "application/zip",
+        upsert: true,
+      });
+    if (zipUploadError) throw zipUploadError;
+
+    const { data: zipSignedData } = await supabase.storage
+      .from("studio-reference-photos")
+      .createSignedUrl(zipPath, 60 * 60); // 1 hour
+
+    if (!zipSignedData?.signedUrl) {
+      throw new Error("Failed to create signed URL for training zip");
+    }
+
     const triggerWord = "SUBJECTPERSON";
 
-    // 2. Train LoRA via Fal.ai
+    // 4. Train LoRA via Fal.ai with zip URL string
     const trainingResult = await fal.subscribe("fal-ai/flux-lora-fast-training", {
       input: {
-        images_data_url: photo_urls,
+        images_data_url: zipSignedData.signedUrl,
         trigger_word: triggerWord,
         steps: 1000,
         rank: 16,
@@ -68,7 +98,7 @@ serve(async (req) => {
 
     const loraUrl = trainingResult.diffusers_lora_file.url;
 
-    // 3. Update status and save lora_url
+    // 5. Update status and save lora_url
     await supabase
       .from("client_photo_profiles")
       .update({
@@ -78,7 +108,7 @@ serve(async (req) => {
       })
       .eq("id", profile_id);
 
-    // 4. Generate canonical reference photo with trained LoRA
+    // 6. Generate canonical reference photo with trained LoRA
     const referenceResult = await fal.run("fal-ai/flux-lora", {
       input: {
         prompt: `professional portrait photo of ${triggerWord}, neutral expression, looking directly at camera, plain white background, studio lighting, sharp focus, high resolution headshot`,
@@ -99,7 +129,7 @@ serve(async (req) => {
 
     const referenceImageUrl = referenceResult.images[0].url;
 
-    // 5. Download reference image and save to Supabase Storage
+    // 7. Download reference image and save to Supabase Storage
     const imageResponse = await fetch(referenceImageUrl);
     const imageBuffer = await imageResponse.arrayBuffer();
 
@@ -113,12 +143,12 @@ serve(async (req) => {
 
     if (uploadError) throw uploadError;
 
-    // 6. Get long-lived signed URL
+    // 8. Get long-lived signed URL
     const { data: signedData } = await supabase.storage
       .from("studio-lora-references")
       .createSignedUrl(storagePath, 60 * 60 * 24 * 365);
 
-    // 7. Mark profile as completed
+    // 9. Mark profile as completed
     await supabase
       .from("client_photo_profiles")
       .update({
