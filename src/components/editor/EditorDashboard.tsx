@@ -849,6 +849,7 @@ const EditorDashboard = () => {
                   key={d.id}
                   delivery={d}
                   onClick={() => setSelectedDelivery(d)}
+                  onMoveStatus={handleMoveStatus}
                 />
               ))}
             </div>
