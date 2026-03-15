@@ -64,6 +64,13 @@ export default function PaymentGate() {
   }
 
   const project = userProject.custom_project;
+  if (!project) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-muted-foreground">Carregando projeto...</p>
+      </div>
+    );
+  }
 
   const frequencyLabel =
     project.payment_frequency === 'monthly'
