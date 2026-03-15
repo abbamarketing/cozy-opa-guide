@@ -76,6 +76,17 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
     setShowCelebration(false);
   }, []);
 
+  const openSafeUrl = (url: string | null | undefined) => {
+    if (!url) return;
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch {
+      // URL inválida — não abrir
+    }
+  };
+
   if (!delivery) return null;
 
   const config = typeConfig[delivery.delivery_type] || typeConfig.youtube_video;
