@@ -627,6 +627,33 @@ const EditorDashboard = () => {
     setDraggedId(null);
   };
 
+  const handleMoveStatus = async (deliveryId: string, targetCol: Column) => {
+    if (!targetCol.editorCanDrop) return;
+    const delivery = deliveries.find((d) => d.id === deliveryId);
+    if (!delivery) return;
+
+    const newStatus = targetCol.statuses[0];
+    if (delivery.status === newStatus) return;
+
+    const updateData: Record<string, any> = { status: newStatus };
+    if (newStatus === 'review') {
+      updateData.delivered_at = new Date().toISOString();
+    }
+
+    const { error } = await supabase
+      .from('deliveries')
+      .update(updateData)
+      .eq('id', deliveryId);
+
+    if (error) {
+      toast.error('Erro ao mover entrega');
+    } else {
+      logger.info('Editor moveu entrega (mobile)', { delivery_id: deliveryId, to: targetCol.title }, 'editor');
+      toast.success(`Movido para ${targetCol.title}`);
+      fetchDeliveries();
+    }
+  };
+
   const handleDragOver = (col: Column) => (e: React.DragEvent) => {
     if (col.editorCanDrop) {
       e.preventDefault();
