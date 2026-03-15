@@ -47,7 +47,7 @@ const Index = () => {
       setProjectStatus(up?.status || null);
       setClientType((up as any)?.client_type || null);
     }
-    setCheckingProject(false);
+    
   }, [user]);
 
   // Initial check for client role
@@ -55,7 +55,13 @@ const Index = () => {
     if (profileLoading || authLoading || !user || !profile) return;
     if (roles.includes('client')) {
       setCheckingProject(true);
-      checkProjectStatus();
+      (async () => {
+        try {
+          await checkProjectStatus();
+        } finally {
+          setCheckingProject(false);
+        }
+      })();
     }
   }, [profileLoading, authLoading, user, profile, roles, checkProjectStatus]);
 
