@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Play, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import abbaLogo from '@/assets/abba-logo.png';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
 import { lovable } from '@/integrations/lovable/index';
