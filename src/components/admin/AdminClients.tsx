@@ -438,7 +438,16 @@ const AdminClients = () => {
                   return (
                     <TableRow key={c.user_id} className="border-border/30">
                       <TableCell className="font-medium">{c.full_name || 'Sem nome'}</TableCell>
-                      <TableCell className="text-sm">{c.project_name || '—'}</TableCell>
+                      <TableCell className="text-sm">
+                        <div className="flex items-center gap-1.5">
+                          <span>{c.project_name || '—'}</span>
+                          {c.client_type && CLIENT_TYPE_BADGE[c.client_type] && (
+                            <Badge variant="outline" className={`text-[9px] px-1.5 py-0 h-4 shrink-0 ${CLIENT_TYPE_BADGE[c.client_type].className}`}>
+                              {CLIENT_TYPE_BADGE[c.client_type].label}
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell className="text-sm font-mono">
                         {c.plan_value ? `R$ ${c.plan_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '—'}
                       </TableCell>
