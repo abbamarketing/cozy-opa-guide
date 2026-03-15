@@ -97,7 +97,8 @@ export const useUserProject = () => {
       if (data) return data as unknown as UserProjectData;
 
       if (isGodUser) {
-        return { ...GOD_MOCK_PROJECT, user_id: user!.id } as UserProjectData;
+        if (!user?.id) return null;
+        return { ...GOD_MOCK_PROJECT, user_id: user.id } as UserProjectData;
       }
 
       return null;
