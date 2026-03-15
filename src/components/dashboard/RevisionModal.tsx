@@ -66,7 +66,9 @@ type RevisionValues = z.infer<typeof revisionSchema>;
 const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProject }: RevisionModalProps) => {
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const remaining = delivery.max_revisions - delivery.revision_count;
+  const remaining = (delivery.max_revisions != null)
+    ? delivery.max_revisions - (delivery.revision_count ?? 0)
+    : null;
 
   const form = useForm<RevisionValues>({
     resolver: zodResolver(revisionSchema),
@@ -134,10 +136,22 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProje
           </DialogDescription>
         </DialogHeader>
 
-        <div className="rounded-lg border border-border/50 bg-muted/30 p-3 text-sm text-muted-foreground">
-          Você tem <span className="font-semibold text-foreground">{remaining}</span>{' '}
-          {remaining === 1 ? 'revisão restante' : 'revisões restantes'}
-        </div>
+        {remaining !== null ? (
+          remaining > 0 ? (
+            <div className="rounded-lg border border-border/50 bg-muted/30 p-3 text-sm text-muted-foreground">
+              Você tem <span className="font-semibold text-foreground">{remaining}</span>{' '}
+              {remaining === 1 ? 'revisão restante' : 'revisões restantes'}
+            </div>
+          ) : (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+              Limite de revisões atingido. Entre em contato com o suporte para solicitar mais revisões.
+            </div>
+          )
+        ) : (
+          <div className="rounded-lg border border-border/50 bg-muted/30 p-3 text-sm text-muted-foreground">
+            Revisões ilimitadas
+          </div>
+        )}
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -210,7 +224,7 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProje
               )}
             />
 
-            <Button type="submit" disabled={isSubmitting} className="w-full gap-2">
+            <Button type="submit" disabled={isSubmitting || (remaining !== null && remaining <= 0)} className="w-full gap-2">
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
               Enviar Solicitação de Ajuste
             </Button>
