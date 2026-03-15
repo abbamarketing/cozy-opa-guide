@@ -40,10 +40,10 @@ export const typeConfig: Record<string, { icon: React.ComponentType<{ className?
 
 export const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
   pending: { label: 'A Fazer', variant: 'secondary' },
-  in_progress: { label: 'Em Producao', variant: 'outline' },
+  in_progress: { label: 'Em Produção', variant: 'outline' },
   review: { label: 'Revisar', variant: 'default' },
-  revision: { label: 'Revisao', variant: 'destructive' },
-  approved: { label: 'Concluido', variant: 'default' },
+  revision: { label: 'Revisão', variant: 'destructive' },
+  approved: { label: 'Concluído', variant: 'default' },
   cancelled: { label: 'Cancelado', variant: 'destructive' },
 };
 
