@@ -217,63 +217,71 @@ export default function PhotoShootWizard({ onBack }: PhotoShootWizardProps) {
   );
 
   // ── STEP: SCENARIO ──
-  if (step === 'scenario') return (
-    <div className="space-y-6 p-4">
-      {onBack && (
+  if (step === 'scenario') {
+    const categories = Array.from(new Set(SCENARIOS.map(s => s.category)));
+    return (
+      <div className="space-y-6 p-4">
         <Button variant="ghost" size="sm" onClick={() => setStep('ready')} className="gap-1.5 -ml-2">
           <ChevronLeft className="h-4 w-4" /> Voltar
         </Button>
-      )}
 
-      <h3 className="text-sm font-mono font-semibold text-foreground">Escolha o ambiente</h3>
+        <h3 className="text-sm font-mono font-semibold text-foreground">Escolha o cenário</h3>
 
-      <div className="space-y-2">
-        {SCENARIOS.map(s => (
-          <button
-            key={s.id}
-            onClick={() => setSelectedScenario(s.id)}
-            className={`flex items-center gap-4 p-4 rounded-lg border text-left transition-colors w-full ${
-              selectedScenario === s.id
-                ? 'border-primary bg-primary/5'
-                : 'border-border hover:border-primary/40'
-            }`}
-          >
-            <s.Icon className="h-6 w-6 text-muted-foreground" />
-            <div>
-              <p className="text-sm font-medium text-foreground">{s.label}</p>
-              <p className="text-xs text-muted-foreground">{s.desc}</p>
+        <div className="space-y-4">
+          {categories.map(cat => (
+            <div key={cat} className="space-y-2">
+              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{cat}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {SCENARIOS.filter(s => s.category === cat).map(s => (
+                  <button
+                    key={s.id}
+                    onClick={() => setSelectedScenario(s.id)}
+                    className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-colors w-full ${
+                      selectedScenario === s.id
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/40'
+                    }`}
+                  >
+                    <span className="text-lg">{s.icon}</span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground">{s.label}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{s.desc}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
-          </button>
-        ))}
-      </div>
-
-      <div className="space-y-3">
-        <p className="text-xs font-mono text-muted-foreground">Quantas fotos?</p>
-        <div className="grid grid-cols-3 gap-2">
-          {QUANTITIES.map(q => (
-            <button
-              key={q.value}
-              onClick={() => setSelectedQuantity(q.value)}
-              className={`p-3 rounded-lg border text-center transition-colors ${
-                selectedQuantity === q.value
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-primary/40'
-              }`}
-            >
-              <p className="text-sm font-medium text-foreground">{q.label}</p>
-              <p className="text-[10px] text-muted-foreground">
-                {q.credits} crédito{q.credits > 1 ? 's' : ''}
-              </p>
-            </button>
           ))}
         </div>
-      </div>
 
-      <Button onClick={handleGenerate} disabled={!selectedScenario || isGenerating} className="w-full">
-        Gerar Fotos ({QUANTITIES.find(q => q.value === selectedQuantity)?.credits} créditos)
-      </Button>
-    </div>
-  );
+        <div className="space-y-3">
+          <p className="text-xs font-mono text-muted-foreground">Quantas fotos?</p>
+          <div className="grid grid-cols-3 gap-2">
+            {QUANTITIES.map(q => (
+              <button
+                key={q.value}
+                onClick={() => setSelectedQuantity(q.value)}
+                className={`p-3 rounded-lg border text-center transition-colors ${
+                  selectedQuantity === q.value
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/40'
+                }`}
+              >
+                <p className="text-sm font-medium text-foreground">{q.label}</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {q.credits} crédito{q.credits > 1 ? 's' : ''}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <Button onClick={handleGenerate} disabled={!selectedScenario || isGenerating} className="w-full">
+          Gerar Fotos ({QUANTITIES.find(q => q.value === selectedQuantity)?.credits} créditos)
+        </Button>
+      </div>
+    );
+  }
 
   // ── STEP: GENERATING ──
   if (step === 'generating') return (
