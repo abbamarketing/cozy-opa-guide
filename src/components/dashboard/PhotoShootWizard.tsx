@@ -3,14 +3,14 @@ import { useDropzone } from 'react-dropzone';
 import { usePhotoShoot } from '@/hooks/usePhotoShoot';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, Download } from 'lucide-react';
+import { ChevronLeft, Download, Building2, Lightbulb, BarChart3, Armchair, Sunset, Upload, Brain, CheckCircle2, Camera, Loader2 } from 'lucide-react';
 
 const SCENARIOS = [
-  { id: 'executive_office', label: 'Executivo', desc: 'Escritório com vista para a cidade', icon: '🏙️' },
-  { id: 'startup_workspace', label: 'Startup', desc: 'Ambiente moderno e descontraído', icon: '💡' },
-  { id: 'boardroom', label: 'Sala de Reunião', desc: 'Corporativo e autoritativo', icon: '📊' },
-  { id: 'consulting_office', label: 'Consultório/Consultoria', desc: 'Premium e acolhedor', icon: '🪑' },
-  { id: 'outdoor_business', label: 'Externo Corporativo', desc: 'Terraço ou ambiente externo', icon: '🌆' },
+  { id: 'executive_office', label: 'Executivo', desc: 'Escritório com vista para a cidade', Icon: Building2 },
+  { id: 'startup_workspace', label: 'Startup', desc: 'Ambiente moderno e descontraído', Icon: Lightbulb },
+  { id: 'boardroom', label: 'Sala de Reunião', desc: 'Corporativo e autoritativo', Icon: BarChart3 },
+  { id: 'consulting_office', label: 'Consultório/Consultoria', desc: 'Premium e acolhedor', Icon: Armchair },
+  { id: 'outdoor_business', label: 'Externo Corporativo', desc: 'Terraço ou ambiente externo', Icon: Sunset },
 ];
 
 const QUANTITIES = [
