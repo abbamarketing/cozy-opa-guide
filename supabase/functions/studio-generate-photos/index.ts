@@ -162,6 +162,7 @@ serve(async (req) => {
         .from('studio-generated-photos')
         .createSignedUrl(filePath, 60 * 60 * 24 * 7)
 
+      generatedPaths.push(filePath)
       if (signedData?.signedUrl) generatedUrls.push(signedData.signedUrl)
     }
 
@@ -170,11 +171,11 @@ serve(async (req) => {
       .from('photo_shoots')
       .insert({
         user_id: user.id,
-        profile_id,
         scenario,
         quantity,
-        generated_photo_urls: generatedUrls,
+        generated_photo_paths: generatedPaths,
         reference_image_url: profile.reference_image_url,
+        lora_url: profile.lora_url,
         credits_used: creditCost,
       })
       .select()
