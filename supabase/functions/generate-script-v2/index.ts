@@ -204,17 +204,14 @@ DURAÇÃO ESTIMADA: [Xmin Ys]`;
       .from("user_projects")
       .update({ script_credits: (userProject.script_credits ?? 1) - 1 })
       .eq("id", userProject.id);
-  } else {
-    const credits = (globalThis as any).__studioCredits;
-    if (credits) {
-      await supabaseAdmin
-        .from("studio_credits")
-        .update({
-          credits_remaining: (credits.credits_remaining ?? 1) - 1,
-          credits_used_month: (credits.credits_used_month ?? 0) + 1,
-        })
-        .eq("user_id", userId);
-    }
+  } else if (studioCredits) {
+    await supabaseAdmin
+      .from("studio_credits")
+      .update({
+        credits_remaining: (studioCredits.credits_remaining ?? 1) - 1,
+        credits_used_month: (studioCredits.credits_used_month ?? 0) + 1,
+      })
+      .eq("user_id", userId);
   }
 
   // Salvar roteiro no histórico
