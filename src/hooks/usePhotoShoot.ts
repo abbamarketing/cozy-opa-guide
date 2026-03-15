@@ -1,206 +1,155 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
+import { toast } from 'sonner';
 
-const ANALYZE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/studio-analyze-photos`;
-const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/studio-generate-photos`;
+type TrainingStatus = 'idle' | 'uploading' | 'training' | 'generating_reference' | 'completed' | 'failed';
 
-export type Scenario = 'studio' | 'clinic' | 'office' | 'outdoor';
-export type Quantity = 1 | 3 | 5;
-
-export interface PhotoShootResult {
-  shoot_id: string;
-  photos: string[];
-  credits_used: number;
-  credits_remaining: number;
-}
-
-export interface ClientProfile {
+interface PhotoProfile {
   id: string;
-  person_summary: string;
-  overall_confidence: number;
-  photos_used: number;
+  training_status: TrainingStatus;
+  reference_image_url: string | null;
+  lora_url: string | null;
 }
 
-export function usePhotoShoot() {
-  const { user } = useAuth();
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [analyzeProgress, setAnalyzeProgress] = useState('');
-  const [existingProfile, setExistingProfile] = useState<ClientProfile | null>(null);
-  const [result, setResult] = useState<PhotoShootResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+interface UsePhotoShootReturn {
+  profile: PhotoProfile | null;
+  isLoading: boolean;
+  trainingStatus: TrainingStatus;
+  generatedPhotos: string[];
+  isGenerating: boolean;
+  uploadAndTrain: (files: File[]) => Promise<void>;
+  generatePhotos: (scenario: string, quantity: 1 | 3 | 5) => Promise<void>;
+  resetGenerated: () => void;
+}
 
-  const checkExistingProfile = useCallback(async () => {
+export const usePhotoShoot = (): UsePhotoShootReturn => {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<PhotoProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [trainingStatus, setTrainingStatus] = useState<TrainingStatus>('idle');
+  const [generatedPhotos, setGeneratedPhotos] = useState<string[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Busca perfil existente do usuário
+  const fetchProfile = useCallback(async () => {
     if (!user) return;
     const { data } = await supabase
       .from('client_photo_profiles')
-      .select('id, profile_document, photos_analyzed')
+      .select('id, training_status, reference_image_url, lora_url')
       .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
       .maybeSingle();
 
     if (data) {
-      const doc = data.profile_document as Record<string, unknown> | null;
-      setExistingProfile({
-        id: data.id,
-        person_summary: (doc?.person_summary as string) || 'Perfil salvo',
-        overall_confidence: (doc?.overall_confidence as number) || 0,
-        photos_used: data.photos_analyzed,
-      });
+      setProfile(data as PhotoProfile);
+      setTrainingStatus(data.training_status as TrainingStatus);
     }
   }, [user]);
 
-  const uploadReferencePhotos = useCallback(async (files: File[]): Promise<string[]> => {
-    if (!user) throw new Error('Usuário não autenticado');
-    const paths: string[] = [];
-    for (const file of files) {
-      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const filePath = `${user.id}/references/${fileName}`;
-      const { error } = await supabase.storage
-        .from('studio-reference-photos')
-        .upload(filePath, file, { upsert: false });
+  // Upload das fotos + dispara treinamento
+  const uploadAndTrain = useCallback(async (files: File[]) => {
+    if (!user) return;
+    if (files.length < 5 || files.length > 15) {
+      toast.error('Envie entre 5 e 15 fotos para melhores resultados');
+      return;
+    }
+
+    setIsLoading(true);
+    setTrainingStatus('uploading');
+
+    try {
+      // 1. Cria registro do perfil
+      const { data: newProfile, error: profileError } = await supabase
+        .from('client_photo_profiles')
+        .insert({ user_id: user.id, training_status: 'uploading' })
+        .select()
+        .single();
+
+      if (profileError) throw profileError;
+
+      // 2. Faz upload de cada foto e coleta URLs temporárias
+      const photoUrls: string[] = [];
+      for (const file of files) {
+        const path = `${user.id}/${newProfile.id}/${Date.now()}_${file.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('studio-reference-photos')
+          .upload(path, file);
+        if (uploadError) throw uploadError;
+
+        const { data: signedData } = await supabase.storage
+          .from('studio-reference-photos')
+          .createSignedUrl(path, 60 * 60);
+
+        if (signedData?.signedUrl) photoUrls.push(signedData.signedUrl);
+      }
+
+      setTrainingStatus('training');
+      setProfile({ ...newProfile, training_status: 'training' } as PhotoProfile);
+
+      // 3. Chama Edge Function de treinamento
+      const { data, error } = await supabase.functions.invoke('studio-train-lora', {
+        body: { photo_urls: photoUrls, profile_id: newProfile.id },
+      });
+
       if (error) throw error;
-      paths.push(filePath);
+
+      // 4. Atualiza estado local
+      const updatedProfile: PhotoProfile = {
+        id: newProfile.id,
+        training_status: 'completed',
+        reference_image_url: data.reference_image_url,
+        lora_url: data.lora_url,
+      };
+      setProfile(updatedProfile);
+      setTrainingStatus('completed');
+      toast.success('Perfil criado! Agora você pode gerar fotos profissionais.');
+
+    } catch (err: any) {
+      setTrainingStatus('failed');
+      toast.error(`Erro no treinamento: ${err.message}`);
+    } finally {
+      setIsLoading(false);
     }
-    return paths;
   }, [user]);
 
-  const analyzePhotos = useCallback(async (files: File[]) => {
-    if (!user) return;
-    setIsAnalyzing(true);
-    setError(null);
-
-    try {
-      setAnalyzeProgress('Enviando fotos...');
-      const paths = await uploadReferencePhotos(files);
-
-      setAnalyzeProgress('Identificando características...');
-
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Sessão expirada');
-
-      const resp = await fetch(ANALYZE_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ photo_paths: paths }),
-      });
-
-      if (!resp.ok) {
-        const err = await resp.json().catch(() => ({ error: 'Erro desconhecido' }));
-        if (resp.status === 429) throw new Error('Limite de requisições. Tente novamente em breve.');
-        if (resp.status === 402) throw new Error('Créditos da plataforma esgotados.');
-        throw new Error(err.error || 'Erro na análise');
-      }
-
-      const data = await resp.json();
-      setExistingProfile({
-        id: data.profile_id,
-        person_summary: data.summary,
-        overall_confidence: data.overall_confidence,
-        photos_used: data.photos_used,
-      });
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Erro ao analisar fotos');
-    } finally {
-      setIsAnalyzing(false);
-      setAnalyzeProgress('');
+  // Gera fotos para um cenário
+  const generatePhotos = useCallback(async (scenario: string, quantity: 1 | 3 | 5) => {
+    if (!profile?.id || profile.training_status !== 'completed') {
+      toast.error('Complete o treinamento do perfil primeiro');
+      return;
     }
-  }, [user, uploadReferencePhotos]);
 
-  const generatePhotos = useCallback(async (scenario: Scenario, quantity: Quantity) => {
-    if (!user) return;
     setIsGenerating(true);
-    setError(null);
-    setResult(null);
+    setGeneratedPhotos([]);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Sessão expirada');
-
-      const resp = await fetch(GENERATE_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ scenario, quantity }),
+      const { data, error } = await supabase.functions.invoke('studio-generate-photos', {
+        body: { scenario, quantity, profile_id: profile.id },
       });
 
-      if (!resp.ok) {
-        const err = await resp.json().catch(() => ({ error: 'Erro desconhecido' }));
-        if (resp.status === 402) throw new Error('Créditos insuficientes');
-        if (resp.status === 404) throw new Error('Perfil não encontrado. Analise suas fotos primeiro.');
-        if (resp.status === 429) throw new Error('Limite de requisições. Tente novamente em breve.');
-        throw new Error(err.error || 'Erro na geração');
-      }
+      if (error) throw error;
 
-      const { shoot_id } = await resp.json() as { shoot_id: string };
-
-      // Poll for completion
-      const maxAttempts = 60; // 5 minutes max
-      for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        await new Promise(r => setTimeout(r, 5000)); // poll every 5s
-
-        const { data: shoot } = await supabase
-          .from('photo_shoots')
-          .select('status, generated_photo_paths, error_message')
-          .eq('id', shoot_id)
-          .single();
-
-        if (!shoot) continue;
-
-        if (shoot.status === 'completed') {
-          // Get signed URLs for the generated photos
-          const paths = (shoot.generated_photo_paths as string[]) || [];
-          const signedUrls: string[] = [];
-          for (const path of paths) {
-            const { data } = await supabase.storage
-              .from('studio-generated-photos')
-              .createSignedUrl(path, 60 * 60 * 24 * 7);
-            if (data?.signedUrl) signedUrls.push(data.signedUrl);
-          }
-
-          setResult({
-            shoot_id,
-            photos: signedUrls,
-            credits_used: quantity === 1 ? 1 : quantity === 3 ? 2 : 3,
-            credits_remaining: 0,
-          });
-          return;
-        }
-
-        if (shoot.status === 'failed') {
-          throw new Error(shoot.error_message || 'Falha na geração das fotos');
-        }
-      }
-
-      throw new Error('Tempo limite excedido. Tente novamente.');
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Erro ao gerar fotos');
+      setGeneratedPhotos(data.photos);
+      toast.success(`${quantity} foto${quantity > 1 ? 's' : ''} gerada${quantity > 1 ? 's' : ''} com sucesso!`);
+    } catch (err: any) {
+      toast.error(`Erro na geração: ${err.message}`);
     } finally {
       setIsGenerating(false);
     }
-  }, [user]);
+  }, [profile]);
 
-  const reset = useCallback(() => {
-    setResult(null);
-    setError(null);
-  }, []);
+  const resetGenerated = useCallback(() => setGeneratedPhotos([]), []);
 
   return {
-    isAnalyzing,
+    profile,
+    isLoading,
+    trainingStatus,
+    generatedPhotos,
     isGenerating,
-    analyzeProgress,
-    existingProfile,
-    result,
-    error,
-    checkExistingProfile,
-    analyzePhotos,
+    uploadAndTrain,
     generatePhotos,
-    reset,
+    resetGenerated,
   };
-}
+};
