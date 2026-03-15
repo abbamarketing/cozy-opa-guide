@@ -183,7 +183,7 @@ const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
                 SEU PLANO
               </p>
               <p className="text-sm font-mono font-semibold text-primary mt-0.5">
-                {userProject.custom_project?.project_name ?? userProject.subscription_tier ?? 'Assinatura'}
+                {userProject.custom_project?.project_name ?? getTierLabel(userProject.subscription_tier)}
               </p>
             </div>
             <div className="flex items-center gap-2">
