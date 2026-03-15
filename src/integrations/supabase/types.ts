@@ -116,6 +116,36 @@ export type Database = {
           },
         ]
       }
+      client_photo_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          photos_analyzed: number
+          profile_document: Json
+          reference_photo_paths: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          photos_analyzed?: number
+          profile_document?: Json
+          reference_photo_paths?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          photos_analyzed?: number
+          profile_document?: Json
+          reference_photo_paths?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       custom_projects: {
         Row: {
           active: boolean
@@ -670,6 +700,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      photo_shoots: {
+        Row: {
+          created_at: string
+          credits_used: number
+          error_message: string | null
+          generated_photo_paths: string[] | null
+          id: string
+          quantity: number
+          scenario: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_used: number
+          error_message?: string | null
+          generated_photo_paths?: string[] | null
+          id?: string
+          quantity: number
+          scenario: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_used?: number
+          error_message?: string | null
+          generated_photo_paths?: string[] | null
+          id?: string
+          quantity?: number
+          scenario?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
