@@ -939,6 +939,7 @@ export type Database = {
           monthly_quota: number | null
           payment_confirmed_at: string | null
           priority_level: number | null
+          script_credits: number | null
           sla_hours: number | null
           status: Database["public"]["Enums"]["user_project_status"]
           stripe_subscription_id: string | null
@@ -973,6 +974,7 @@ export type Database = {
           monthly_quota?: number | null
           payment_confirmed_at?: string | null
           priority_level?: number | null
+          script_credits?: number | null
           sla_hours?: number | null
           status?: Database["public"]["Enums"]["user_project_status"]
           stripe_subscription_id?: string | null
@@ -1007,6 +1009,7 @@ export type Database = {
           monthly_quota?: number | null
           payment_confirmed_at?: string | null
           priority_level?: number | null
+          script_credits?: number | null
           sla_hours?: number | null
           status?: Database["public"]["Enums"]["user_project_status"]
           stripe_subscription_id?: string | null

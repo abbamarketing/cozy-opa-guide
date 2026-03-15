@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Crown, Zap, Clock, Film, Sparkles } from 'lucide-react';
+import { Crown, Zap, Clock, Film, Sparkles, FileText } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
@@ -140,6 +140,14 @@ const SubscriptionStatusCard = ({ userProject }: Props) => {
           <div className="text-[10px] font-mono text-muted-foreground">
             Fila: {queueCount} vídeo(s) aguardando
           </div>
+
+          {/* Script credits */}
+          {['subscription', 'custom'].includes(userProject.client_type || '') && (
+            <div className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
+              <FileText className="h-3 w-3" />
+              <span>Roteiros: <strong className="text-foreground">{(userProject as any).script_credits ?? 0}</strong> créditos</span>
+            </div>
+          )}
 
           {/* Studio link */}
           {userProject.studio_access && studioCredits !== null && (

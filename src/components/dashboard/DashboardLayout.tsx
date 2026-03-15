@@ -257,7 +257,7 @@ const DashboardLayout = () => {
     { id: 'deliveries', label: 'Minhas Entregas', shortLabel: 'ENTREGAS', icon: Video },
     { id: 'calendar', label: 'Calendário', shortLabel: 'AGENDA', icon: Calendar },
     { id: 'history', label: 'Histórico', shortLabel: 'HIST.', icon: CheckCircle2 },
-    ...(userProject?.custom_project?.include_script
+    ...((userProject?.custom_project?.include_script || ['subscription', 'custom'].includes(userProject?.client_type || ''))
       ? [{ id: 'scripts' as DashboardTab, label: 'Roteiros', shortLabel: 'ROTEIRO', icon: FileText }]
       : []),
     { id: 'brand', label: 'Minha Marca', shortLabel: 'MARCA', icon: Palette },

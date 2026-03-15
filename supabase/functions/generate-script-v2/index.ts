@@ -64,21 +64,38 @@ serve(async (req) => {
     briefing,
   } = body;
 
-  // REMOVIDO em PRD v5 — todos os usuários precisam de créditos, incluindo admin
-  const { data: credits } = await supabaseAdmin
-    .from("studio_credits")
-    .select("credits_remaining, credits_used_month")
+  // Determine credit source based on client type
+  const { data: userProject } = await supabaseAdmin
+    .from("user_projects")
+    .select("id, client_type, script_credits")
     .eq("user_id", userId)
-    .single();
+    .eq("status", "active")
+    .maybeSingle();
 
-  if (!credits || (credits.credits_remaining ?? 0) <= 0) {
-    return new Response(
-      JSON.stringify({ error: "Sem créditos disponíveis" }),
-      {
-        status: 402,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+  const isScriptCreditsClient = userProject && ['subscription', 'custom'].includes(userProject.client_type || '');
+  let studioCredits: { credits_remaining: number; credits_used_month: number } | null = null;
+
+  if (isScriptCreditsClient) {
+    if ((userProject.script_credits ?? 0) <= 0) {
+      return new Response(
+        JSON.stringify({ error: "Créditos de roteiro esgotados" }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+  } else {
+    const { data: credits } = await supabaseAdmin
+      .from("studio_credits")
+      .select("credits_remaining, credits_used_month")
+      .eq("user_id", userId)
+      .single();
+
+    if (!credits || (credits.credits_remaining ?? 0) <= 0) {
+      return new Response(
+        JSON.stringify({ error: "Sem créditos disponíveis" }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    studioCredits = credits;
   }
 
   // Contexto do briefing de marca
@@ -181,14 +198,21 @@ DURAÇÃO ESTIMADA: [Xmin Ys]`;
   const generatedScript =
     aiData.choices?.[0]?.message?.content || "";
 
-  // REMOVIDO em PRD v5 — admin não bypassa débito de créditos
-  await supabaseAdmin
-    .from("studio_credits")
-    .update({
-      credits_remaining: (credits.credits_remaining ?? 1) - 1,
-      credits_used_month: (credits.credits_used_month ?? 0) + 1,
-    })
-    .eq("user_id", userId);
+  // Debit credits based on client type
+  if (isScriptCreditsClient) {
+    await supabaseAdmin
+      .from("user_projects")
+      .update({ script_credits: (userProject.script_credits ?? 1) - 1 })
+      .eq("id", userProject.id);
+  } else if (studioCredits) {
+    await supabaseAdmin
+      .from("studio_credits")
+      .update({
+        credits_remaining: (studioCredits.credits_remaining ?? 1) - 1,
+        credits_used_month: (studioCredits.credits_used_month ?? 0) + 1,
+      })
+      .eq("user_id", userId);
+  }
 
   // Salvar roteiro no histórico
   await supabaseAdmin.from("studio_scripts").insert({

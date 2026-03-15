@@ -211,6 +211,7 @@ Deno.serve(async (req) => {
                 stripe_subscription_id: session.subscription,
                 current_period_start: now,
                 current_period_end: periodEnd,
+                script_credits: 12,
               })
               .eq("id", existingUp.id);
           } else {
@@ -230,6 +231,7 @@ Deno.serve(async (req) => {
               current_period_start: now,
               current_period_end: periodEnd,
               payment_confirmed_at: now,
+              script_credits: 12,
             });
           }
 
