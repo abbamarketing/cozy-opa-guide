@@ -138,8 +138,47 @@ export function usePhotoShoot() {
         throw new Error(err.error || 'Erro na geração');
       }
 
-      const data: PhotoShootResult = await resp.json();
-      setResult(data);
+      const { shoot_id } = await resp.json() as { shoot_id: string };
+
+      // Poll for completion
+      const maxAttempts = 60; // 5 minutes max
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        await new Promise(r => setTimeout(r, 5000)); // poll every 5s
+
+        const { data: shoot } = await supabase
+          .from('photo_shoots')
+          .select('status, generated_photo_paths, error_message')
+          .eq('id', shoot_id)
+          .single();
+
+        if (!shoot) continue;
+
+        if (shoot.status === 'completed') {
+          // Get signed URLs for the generated photos
+          const paths = (shoot.generated_photo_paths as string[]) || [];
+          const signedUrls: string[] = [];
+          for (const path of paths) {
+            const { data } = await supabase.storage
+              .from('studio-generated-photos')
+              .createSignedUrl(path, 60 * 60 * 24 * 7);
+            if (data?.signedUrl) signedUrls.push(data.signedUrl);
+          }
+
+          setResult({
+            shoot_id,
+            photos: signedUrls,
+            credits_used: quantity === 1 ? 1 : quantity === 3 ? 2 : 3,
+            credits_remaining: 0,
+          });
+          return;
+        }
+
+        if (shoot.status === 'failed') {
+          throw new Error(shoot.error_message || 'Falha na geração das fotos');
+        }
+      }
+
+      throw new Error('Tempo limite excedido. Tente novamente.');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erro ao gerar fotos');
     } finally {
