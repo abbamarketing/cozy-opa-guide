@@ -8,6 +8,7 @@ import DeliveryHistory from '@/components/dashboard/DeliveryHistory';
 import ScriptGenerator from '@/components/dashboard/ScriptGenerator';
 import BrandProfile from '@/components/dashboard/BrandProfile';
 import SettingsComponent from '@/components/dashboard/Settings';
+import StudioTab from '@/components/studio/StudioTab';
 import NotificationBell from '@/components/shared/NotificationBell';
 import ContextualTour, { restartTour } from '@/components/dashboard/ContextualTour';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -21,6 +22,8 @@ import {
   Palette,
   LogOut,
   ChevronDown,
+  Sparkles,
+  Lock,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { useProfile } from '@/hooks/useProfile';
@@ -50,13 +53,14 @@ import QuotaCard from '@/components/dashboard/QuotaCard';
 import SubscriptionStatusCard from '@/components/dashboard/SubscriptionStatusCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-type DashboardTab = 'deliveries' | 'calendar' | 'history' | 'scripts' | 'brand' | 'settings';
+type DashboardTab = 'studio' | 'deliveries' | 'calendar' | 'history' | 'scripts' | 'brand' | 'settings';
 
 interface NavItem {
   id: DashboardTab;
   label: string;
   shortLabel: string;
   icon: React.ComponentType<{ className?: string }>;
+  locked?: boolean;
 }
 
 /* ───── Header (compact on mobile) ───── */
@@ -138,12 +142,12 @@ const DashboardHeader = () => {
 /* ───── Desktop Sidebar ───── */
 const DashboardSidebar = ({
   activeTab,
-  setActiveTab,
+  onTabChange,
   navItems,
   userProject,
 }: {
   activeTab: DashboardTab;
-  setActiveTab: (t: DashboardTab) => void;
+  onTabChange: (t: DashboardTab, locked?: boolean) => void;
   navItems: NavItem[];
   userProject: import('@/hooks/useUserProject').UserProjectData | null;
 }) => {
@@ -159,15 +163,22 @@ const DashboardSidebar = ({
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
-                    onClick={() => setActiveTab(item.id)}
-                    className={`cursor-pointer rounded-xl ${
+                    onClick={() => onTabChange(item.id, item.locked)}
+                    className={`cursor-pointer relative rounded-xl ${
                       activeTab === item.id
                         ? 'bg-abba-surface text-abba-lime font-semibold'
-                        : 'text-white/60 hover:bg-abba-surface/60 rounded-xl'
+                        : item.locked
+                        ? 'text-white/30 hover:text-white/50 cursor-default'
+                        : 'text-white/60 hover:bg-abba-surface/60'
                     }`}
                   >
                     <item.icon className="h-4 w-4" />
-                    {!collapsed && <span className="font-sans">{item.label}</span>}
+                    {!collapsed && (
+                      <span className="flex-1 font-sans">{item.label}</span>
+                    )}
+                    {!collapsed && item.locked && (
+                      <Lock className="h-3 w-3 text-white/30 shrink-0" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -175,7 +186,6 @@ const DashboardSidebar = ({
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      {/* QuotaCard at sidebar bottom (desktop only) */}
       {!collapsed && userProject && userProject.client_type === 'custom' && (
         <div className="mt-auto p-2 border-t border-abba-surface">
           <QuotaCard userProject={userProject} />
@@ -194,14 +204,14 @@ const DashboardSidebar = ({
   );
 };
 
-/* ───── Mobile Bottom Nav (fixed, always visible labels) ───── */
+/* ───── Mobile Bottom Nav ───── */
 const MobileBottomNav = ({
   activeTab,
-  setActiveTab,
+  onTabChange,
   navItems,
 }: {
   activeTab: DashboardTab;
-  setActiveTab: (t: DashboardTab) => void;
+  onTabChange: (t: DashboardTab, locked?: boolean) => void;
   navItems: NavItem[];
 }) => (
   <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-abba-surface bg-abba-dark/95 backdrop-blur-lg safe-area-bottom">
@@ -211,17 +221,22 @@ const MobileBottomNav = ({
         return (
           <button
             key={item.id}
-            onClick={() => setActiveTab(item.id)}
+            onClick={() => onTabChange(item.id, item.locked)}
             className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors min-h-[56px] ${
               isActive
                 ? 'text-abba-lime'
+                : item.locked
+                ? 'text-white/20'
                 : 'text-muted-foreground active:text-foreground'
             }`}
           >
-            <item.icon className={`h-5 w-5 ${isActive ? 'text-abba-lime' : ''}`} />
-            <span className={`text-[10px] font-sans font-semibold tracking-wider leading-none ${
-              isActive ? '' : ''
-            }`}>
+            <div className="relative">
+              <item.icon className="h-5 w-5" />
+              {item.locked && (
+                <Lock className="h-2.5 w-2.5 absolute -top-1 -right-1 text-white/40" />
+              )}
+            </div>
+            <span className="text-[10px] font-sans font-semibold tracking-wider leading-none">
               {item.shortLabel}
             </span>
             {isActive && (
@@ -238,36 +253,64 @@ const MobileBottomNav = ({
 const DashboardLayout = () => {
   const [searchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab') as DashboardTab | null;
-  const [activeTab, setActiveTab] = useState<DashboardTab>(tabFromUrl || 'deliveries');
   const { userProject, isLoading } = useUserProject();
   const { isGod } = useRole();
   const isMobile = useIsMobile();
 
+  const isStudio = userProject?.client_type === 'studio';
+  const defaultTab: DashboardTab = isStudio ? 'studio' : 'deliveries';
+
+  const [activeTab, setActiveTab] = useState<DashboardTab>(tabFromUrl || defaultTab);
+  const [lockedTabAttempt, setLockedTabAttempt] = useState<DashboardTab | null>(null);
+
+  // Update default tab when userProject loads
+  useEffect(() => {
+    if (!tabFromUrl && userProject) {
+      setActiveTab(userProject.client_type === 'studio' ? 'studio' : 'deliveries');
+    }
+  }, [userProject?.client_type]);
+
   // Sync tab from URL
   useEffect(() => {
-    if (tabFromUrl && ['deliveries', 'calendar', 'history', 'scripts', 'settings'].includes(tabFromUrl)) {
+    if (tabFromUrl && ['studio', 'deliveries', 'calendar', 'history', 'scripts', 'brand', 'settings'].includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl]);
 
-  // Redirect to root if no project (root handles WaitingForProject) — god bypasses
+  // Redirect to waiting if no project — god bypasses
   if (!isLoading && !userProject && !isGod()) {
     return <Navigate to="/waiting" replace />;
   }
 
+  const handleTabChange = (tab: DashboardTab, locked?: boolean) => {
+    if (locked) {
+      setLockedTabAttempt(tab);
+      return;
+    }
+    setActiveTab(tab);
+    setLockedTabAttempt(null);
+  };
+
   const navItems: NavItem[] = [
-    { id: 'deliveries', label: 'Minhas Entregas', shortLabel: 'ENTREGAS', icon: Video },
-    { id: 'calendar', label: 'Calendário', shortLabel: 'AGENDA', icon: Calendar },
-    { id: 'history', label: 'Histórico', shortLabel: 'HIST.', icon: CheckCircle2 },
-    ...((userProject?.custom_project?.include_script || ['subscription', 'custom'].includes(userProject?.client_type || ''))
-      ? [{ id: 'scripts' as DashboardTab, label: 'Roteiros', shortLabel: 'ROTEIRO', icon: FileText }]
+    ...(isStudio
+      ? [{ id: 'studio' as DashboardTab, label: 'Studio', shortLabel: 'STUDIO', icon: Sparkles, locked: false }]
       : []),
-    { id: 'brand', label: 'Minha Marca', shortLabel: 'MARCA', icon: Palette },
-    { id: 'settings', label: 'Configurações', shortLabel: 'CONFIG', icon: Settings },
+    { id: 'deliveries', label: 'Minhas Entregas', shortLabel: 'ENTREGAS', icon: Video, locked: isStudio },
+    { id: 'calendar', label: 'Calendário', shortLabel: 'AGENDA', icon: Calendar, locked: isStudio },
+    { id: 'history', label: 'Histórico', shortLabel: 'HIST.', icon: CheckCircle2, locked: isStudio },
+    ...((userProject?.custom_project?.include_script || ['subscription', 'custom'].includes(userProject?.client_type || ''))
+      ? [{ id: 'scripts' as DashboardTab, label: 'Roteiros', shortLabel: 'ROTEIRO', icon: FileText, locked: isStudio }]
+      : isStudio
+      ? [{ id: 'scripts' as DashboardTab, label: 'Roteiros', shortLabel: 'ROTEIRO', icon: FileText, locked: true }]
+      : []),
+    { id: 'brand', label: 'Minha Marca', shortLabel: 'MARCA', icon: Palette, locked: isStudio },
+    { id: 'settings', label: 'Configurações', shortLabel: 'CONFIG', icon: Settings, locked: false },
   ];
 
   const renderContent = () => {
     switch (activeTab) {
+      case 'studio':
+        return <StudioTab />;
       case 'deliveries':
         return userProject ? (
           <Kanban userProject={userProject} />
@@ -305,21 +348,19 @@ const DashboardLayout = () => {
     <>
       <ContextualTour ready={tourReady} />
 
-      {/* Desktop: sidebar + content side-by-side */}
       {!isMobile && (
-        <DashboardSidebar activeTab={activeTab} setActiveTab={setActiveTab} navItems={navItems} userProject={userProject} />
+        <DashboardSidebar activeTab={activeTab} onTabChange={handleTabChange} navItems={navItems} userProject={userProject} />
       )}
 
       <div className="flex-1 flex flex-col min-h-screen">
         <DashboardHeader />
 
         <main className={`flex-1 overflow-y-auto p-3 md:p-6 space-y-4 ${isMobile ? 'pb-20' : ''}`}>
-          {/* Quota Card - mobile only (desktop shows in sidebar) */}
           {isMobile && (
             isLoading ? (
               <Skeleton className="h-12 w-full rounded-[20px]" />
             ) : userProject ? (
-              activeTab !== 'settings' && (
+              activeTab !== 'settings' && activeTab !== 'studio' && (
                 <>
                   {['custom', 'studio'].includes(userProject.client_type || '') && <QuotaCard userProject={userProject} />}
                   {userProject.client_type === 'subscription' && <SubscriptionStatusCard userProject={userProject} />}
@@ -334,14 +375,59 @@ const DashboardLayout = () => {
             )
           )}
 
-          {/* Dynamic content */}
           {renderContent()}
         </main>
       </div>
 
-      {/* Mobile bottom nav */}
       {isMobile && (
-        <MobileBottomNav activeTab={activeTab} setActiveTab={setActiveTab} navItems={navItems} />
+        <MobileBottomNav activeTab={activeTab} onTabChange={handleTabChange} navItems={navItems} />
+      )}
+
+      {/* Upsell overlay for locked tabs */}
+      {lockedTabAttempt && (
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={() => setLockedTabAttempt(null)}
+        >
+          <div
+            className="w-full max-w-sm rounded-[24px] bg-abba-surface p-6 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative overflow-hidden rounded-[16px] bg-abba-lime p-5 text-abba-dark">
+              <div
+                className="absolute right-[-20px] top-[-20px] w-24 h-24 rounded-full border-[16px] border-black/10"
+                style={{ boxShadow: '0 0 0 14px rgba(0,0,0,0.06), 0 0 0 30px rgba(0,0,0,0.03)' }}
+              />
+              <Lock className="h-6 w-6 mb-3 opacity-60" />
+              <p className="text-[13px] font-semibold uppercase tracking-widest opacity-60 mb-1">
+                Funcionalidade bloqueada
+              </p>
+              <p className="text-[22px] font-extrabold leading-tight tracking-tight">
+                Isso faz parte<br />
+                <span className="italic font-light">da assinatura</span>
+              </p>
+            </div>
+
+            <p className="text-[13px] text-white/60 leading-relaxed">
+              Com um plano de assinatura você envia o bruto, a gente edita e entrega seus Reels, Shorts e TikToks toda semana — com SLA garantido.
+            </p>
+
+            <div className="space-y-2">
+              <button
+                onClick={() => window.open('/', '_blank')}
+                className="w-full bg-abba-lime text-abba-dark font-bold rounded-full py-3 text-sm hover:opacity-90 transition-colors"
+              >
+                Ver planos de assinatura →
+              </button>
+              <button
+                onClick={() => setLockedTabAttempt(null)}
+                className="w-full text-white/40 text-sm py-2 hover:text-white/60 transition-colors"
+              >
+                Agora não
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

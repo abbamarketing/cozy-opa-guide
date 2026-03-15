@@ -170,7 +170,7 @@ function handleSingleRoleRedirect(
         if (!profile?.onboarding_complete) {
           return <Navigate to="/onboarding" replace />;
         }
-        return <Navigate to="/studio" replace />;
+        return <Navigate to="/dashboard" replace />;
       }
       if (clientType === 'subscription') {
         if (!profile?.onboarding_complete) {
