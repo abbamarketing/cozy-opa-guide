@@ -729,26 +729,32 @@ export type Database = {
       studio_credits: {
         Row: {
           created_at: string | null
-          credits_remaining: number | null
-          credits_used_month: number | null
+          credits_available: number
+          credits_used: number
           id: string
-          last_reset_at: string | null
+          period_end: string
+          period_start: string
+          updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
-          credits_remaining?: number | null
-          credits_used_month?: number | null
+          credits_available?: number
+          credits_used?: number
           id?: string
-          last_reset_at?: string | null
+          period_end?: string
+          period_start?: string
+          updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
-          credits_remaining?: number | null
-          credits_used_month?: number | null
+          credits_available?: number
+          credits_used?: number
           id?: string
-          last_reset_at?: string | null
+          period_end?: string
+          period_start?: string
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
