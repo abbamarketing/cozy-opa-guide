@@ -31,6 +31,7 @@ const TABS = [
 
 const Admin = () => {
   const { signOut } = useAuth();
+  const { isGod } = useRole();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'overview';
   const isMobile = useIsMobile();
