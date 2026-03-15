@@ -117,9 +117,15 @@ const StudioScriptPipeline = ({ onCreditsChanged }: StudioScriptPipelineProps) =
   const [confirmNewOpen, setConfirmNewOpen] = useState(false);
   const [history, setHistory] = useState<HistoryScript[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
+  const [briefingPrefilled, setBriefingPrefilled] = useState<{ tone: boolean; audience: boolean }>({ tone: false, audience: false });
 
-  const update = (field: keyof ScriptFormData, value: string) =>
+  const update = (field: keyof ScriptFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    // Clear prefilled indicator when user manually changes
+    if (field === 'tone' || field === 'audience') {
+      setBriefingPrefilled((prev) => ({ ...prev, [field]: false }));
+    }
+  };
 
   // Fetch credits
   // REMOVIDO em PRD v5 — admin não tem créditos de Studio gratuitos
