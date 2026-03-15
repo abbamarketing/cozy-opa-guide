@@ -138,9 +138,9 @@ const DeliveryCalendar = ({ userProject }: DeliveryCalendarProps) => {
         }
       }
 
-      // Download expiry (90 days after approval)
+      // Download expiry (365 days after approval — matches signed URL expiration)
       if (d.status === 'approved' && d.approved_at && d.file_url && showExpiry) {
-        const expiryDate = addDays(new Date(d.approved_at), 90);
+        const expiryDate = addDays(new Date(d.approved_at), 365);
         result.push({
           id: `expiry-${d.id}`,
           title: `⚠️ Download expira: ${d.title}`,
