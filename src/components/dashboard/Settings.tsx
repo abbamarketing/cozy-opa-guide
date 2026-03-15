@@ -154,7 +154,7 @@ export default function Settings() {
       {activeSection === 'profile' && (
         <Card className="border-border bg-card shadow-sm">
           <CardHeader className="p-4">
-            <CardTitle className="text-sm font-mono">Informacoes Pessoais</CardTitle>
+            <CardTitle className="text-sm font-mono">Informações Pessoais</CardTitle>
             <CardDescription className="text-xs">Atualize seus dados cadastrais</CardDescription>
           </CardHeader>
           <CardContent className="p-4 pt-0 space-y-4">
