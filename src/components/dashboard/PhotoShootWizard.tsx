@@ -209,7 +209,7 @@ export default function PhotoShootWizard({ onBack }: PhotoShootWizardProps) {
                 : 'border-border hover:border-primary/40'
             }`}
           >
-            <span className="text-2xl">{s.icon}</span>
+            <s.Icon className="h-6 w-6 text-muted-foreground" />
             <div>
               <p className="text-sm font-medium text-foreground">{s.label}</p>
               <p className="text-xs text-muted-foreground">{s.desc}</p>
