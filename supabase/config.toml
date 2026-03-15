@@ -31,3 +31,5 @@ project_id = "iqrypgqdhpanqjqnxtap"
     verify_jwt = false
   [functions.admin-manage-subscription]
     verify_jwt = false
+  [functions.studio-generate]
+    verify_jwt = false
