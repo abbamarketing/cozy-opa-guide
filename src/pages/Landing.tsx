@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Upload, Scissors, CheckCircle, Play, Clock, ArrowRight } from 'lucide-react';
+import { Upload, Scissors, CheckCircle, Clock, ArrowRight } from 'lucide-react';
+import abbaLogo from '@/assets/abba-logo.png';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
