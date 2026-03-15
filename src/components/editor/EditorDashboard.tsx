@@ -201,8 +201,6 @@ const EditorDeliveryCard = ({
   const nextCol = currentColIndex < COLUMNS.length - 1 ? COLUMNS[currentColIndex + 1] : null;
   const canGoPrev = prevCol?.editorCanDrop;
   const canGoNext = nextCol?.editorCanDrop;
-  const Icon = typeIcons[delivery.delivery_type] || Video;
-  const deadline = getDeadlineInfo(delivery.due_date);
 
   return (
     <Card
