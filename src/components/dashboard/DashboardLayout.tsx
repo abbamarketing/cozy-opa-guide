@@ -331,8 +331,7 @@ const DashboardLayout = () => {
         );
       case 'history':
         return <DeliveryHistory />;
-      case 'scripts':
-        return <ScriptGenerator />;
+      case 'brand':
       case 'brand':
         return <BrandProfile />;
       case 'settings':
