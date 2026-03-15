@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { format, subMonths, startOfMonth, endOfMonth, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, BarChart, Bar,
 } from 'recharts';
-import { DollarSign, Users, Video, Clock, TrendingUp, TrendingDown, Download, AlertTriangle, ShieldAlert, CheckCircle, Trophy } from 'lucide-react';
+import { DollarSign, Users, Video, Clock, TrendingUp, TrendingDown, Download, AlertTriangle, ShieldAlert, CheckCircle, Trophy, Cpu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { downloadCSV } from '@/lib/csv';
 
