@@ -78,7 +78,7 @@ const CaptureScheduleModal = ({
         .from('capture_sessions')
         .select('scheduled_date')
         .eq('user_project_id', userProject.id)
-        .in('status', ['scheduled', 'confirmed', 'completed'])
+        .in('status', ['confirmed', 'completed'])
         .order('scheduled_date', { ascending: false })
         .limit(1);
 
