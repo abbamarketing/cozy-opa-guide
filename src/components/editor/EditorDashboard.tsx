@@ -184,12 +184,23 @@ const EditorDeliveryCard = ({
   onClick,
   onDragStart,
   isDragging,
+  onMoveStatus,
 }: {
   delivery: EditorDelivery;
   onClick: () => void;
   onDragStart?: (e: React.DragEvent) => void;
   isDragging?: boolean;
+  onMoveStatus?: (deliveryId: string, targetColumn: Column) => void;
 }) => {
+  const Icon = typeIcons[delivery.delivery_type] || Video;
+  const deadline = getDeadlineInfo(delivery.due_date);
+
+  // Compute prev/next columns for mobile status buttons
+  const currentColIndex = COLUMNS.findIndex((c) => c.statuses.includes(delivery.status));
+  const prevCol = currentColIndex > 0 ? COLUMNS[currentColIndex - 1] : null;
+  const nextCol = currentColIndex < COLUMNS.length - 1 ? COLUMNS[currentColIndex + 1] : null;
+  const canGoPrev = prevCol?.editorCanDrop;
+  const canGoNext = nextCol?.editorCanDrop;
   const Icon = typeIcons[delivery.delivery_type] || Video;
   const deadline = getDeadlineInfo(delivery.due_date);
 
