@@ -532,8 +532,8 @@ const AdminClients = () => {
         </Card>
       )}
 
-      {/* Pagination */}
-      {totalCount > PAGE_SIZE && (
+      {/* Pagination — hidden when filtering */}
+      {!isFiltering && totalCount > PAGE_SIZE && (
         <div className="flex items-center justify-center gap-3 pt-2">
           <Button
             variant="outline"
