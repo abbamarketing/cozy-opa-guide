@@ -172,7 +172,7 @@ export default function Settings() {
               <Label className="text-xs font-mono">Email</Label>
               <Input value={email} disabled className="opacity-60" />
               <p className="text-[10px] text-muted-foreground font-mono">
-                Email nao pode ser alterado.
+                Email não pode ser alterado.
               </p>
             </div>
 
