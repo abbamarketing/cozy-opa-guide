@@ -235,20 +235,58 @@ const AdminClients = () => {
       }
     } else {
       const newStatus = confirmAction.type === 'suspend' ? 'suspended' : 'active';
+      const action = confirmAction.type === 'suspend' ? 'suspend' : 'activate';
 
-      const { error } = await supabase
-        .from('user_projects')
-        .update({ status: newStatus } as any)
-        .eq('user_id', confirmAction.userId);
+      if (confirmAction.clientType === 'subscription') {
+        // Route through edge function to pause/resume Stripe subscription
+        try {
+          const { data: sessionData } = await supabase.auth.getSession();
+          const accessToken = sessionData?.session?.access_token;
+          if (!accessToken) throw new Error('Sessão expirada');
 
-      if (error) {
-        toast.error('Erro ao atualizar status');
+          const response = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-manage-subscription`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+                apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              },
+              body: JSON.stringify({ userId: confirmAction.userId, action }),
+            },
+          );
+
+          if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err?.error || `Erro ${response.status}`);
+          }
+
+          toast.success(
+            confirmAction.type === 'suspend' ? 'Cliente Suspendido' : 'Cliente Reativado',
+            { description: 'Status e assinatura Stripe atualizados com sucesso' }
+          );
+          refetch();
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : 'Erro desconhecido';
+          toast.error('Erro ao atualizar status', { description: message });
+        }
       } else {
-        toast.success(
-          confirmAction.type === 'suspend' ? 'Cliente Suspendido' : 'Cliente Reativado',
-          { description: 'Status atualizado com sucesso' }
-        );
-        refetch();
+        // Custom/studio — local update only
+        const { error } = await supabase
+          .from('user_projects')
+          .update({ status: newStatus } as any)
+          .eq('user_id', confirmAction.userId);
+
+        if (error) {
+          toast.error('Erro ao atualizar status');
+        } else {
+          toast.success(
+            confirmAction.type === 'suspend' ? 'Cliente Suspendido' : 'Cliente Reativado',
+            { description: 'Status atualizado com sucesso' }
+          );
+          refetch();
+        }
       }
     }
 
