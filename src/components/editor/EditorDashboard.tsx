@@ -679,11 +679,14 @@ const EditorDashboard = () => {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-1 px-2">
+                  <Button variant="ghost" size="sm" className="gap-1.5 px-2">
                     <Avatar className="h-6 w-6">
                       <AvatarImage src={profile?.avatar_url || undefined} />
                       <AvatarFallback className="bg-primary/20 text-[10px] text-primary">{initials}</AvatarFallback>
                     </Avatar>
+                    <span className="text-sm font-medium truncate max-w-[120px]">
+                      {profile?.full_name || editor?.display_name || 'Editor'}
+                    </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40">
