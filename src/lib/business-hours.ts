@@ -194,13 +194,13 @@ export function countWeekdayHours(startDate: Date, slaHours: number): Date {
       : (24 * (5 - dayOfWeek)) + (24 - currentHourFrac); // horas até sexta meia-noite
 
     if (remaining <= hoursUntilWeekend) {
-      current.setHours(current.getHours() + remaining);
+      current.setTime(current.getTime() + remaining * 3600000);
       remaining = 0;
     } else {
       // Consumir até o fim da sexta e pular o fim de semana
       remaining -= hoursUntilWeekend;
       const hoursToMonday = hoursUntilWeekend + 48; // sexta->sab->dom->seg
-      current.setHours(current.getHours() + hoursToMonday);
+      current.setTime(current.getTime() + hoursToMonday * 3600000);
     }
   }
 
