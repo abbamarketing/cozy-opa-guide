@@ -279,6 +279,33 @@ const EditorDeliveryCard = ({
           </span>
         </div>
       )}
+
+      {/* Mobile status navigation buttons */}
+      {onMoveStatus && (canGoPrev || canGoNext) && (
+        <div className="mt-2 flex items-center gap-2 md:hidden" onClick={(e) => e.stopPropagation()}>
+          {canGoPrev && prevCol && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2 text-[10px] text-muted-foreground"
+              onClick={(e) => { e.stopPropagation(); onMoveStatus(delivery.id, prevCol); }}
+            >
+              ← {prevCol.title}
+            </Button>
+          )}
+          <div className="flex-1" />
+          {canGoNext && nextCol && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2 text-[10px] text-muted-foreground"
+              onClick={(e) => { e.stopPropagation(); onMoveStatus(delivery.id, nextCol); }}
+            >
+              {nextCol.title} →
+            </Button>
+          )}
+        </div>
+      )}
     </Card>
   );
 };
