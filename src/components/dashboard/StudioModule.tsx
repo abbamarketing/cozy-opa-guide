@@ -9,6 +9,7 @@ import {
   Clapperboard, Camera, Sparkles, Copy, Check, StopCircle,
   Loader2, ChevronRight, ChevronLeft, Zap, MapPin
 } from 'lucide-react';
+import PhotoShootWizard from './PhotoShootWizard';
 import { toast } from 'sonner';
 import { useStudioCredits } from '@/hooks/useStudioCredits';
 import { supabase } from '@/integrations/supabase/client';
