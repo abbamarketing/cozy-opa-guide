@@ -134,10 +134,11 @@ Deno.serve(async (req) => {
 
           await supabase.from("studio_credits").upsert({
             user_id: userId,
-            credits_remaining: 10,
-            credits_used_month: 0,
-            last_reset_at: new Date().toISOString().split("T")[0],
-          }, { onConflict: "user_id" });
+            credits_available: 10,
+            credits_used: 0,
+            period_start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
+            period_end: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString(),
+          }, { onConflict: "user_id,period_start" });
 
           const { data: existingUp } = await supabase
             .from("user_projects")
