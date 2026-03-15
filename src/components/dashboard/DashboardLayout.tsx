@@ -356,26 +356,23 @@ const DashboardLayout = () => {
         <DashboardHeader />
 
         <main className={`flex-1 overflow-y-auto p-3 md:p-6 space-y-4 ${isMobile ? 'pb-20' : ''}`}>
-          {isMobile && (
-            isLoading ? (
+          {isLoading ? (
+            <div className="space-y-3">
               <Skeleton className="h-12 w-full rounded-[20px]" />
-            ) : userProject ? (
-              activeTab !== 'settings' && activeTab !== 'studio' && (
+              <Skeleton className="h-48 w-full rounded-[20px]" />
+              <Skeleton className="h-48 w-full rounded-[20px]" />
+            </div>
+          ) : (
+            <>
+              {isMobile && userProject && activeTab !== 'settings' && activeTab !== 'studio' && (
                 <>
                   {['custom', 'studio'].includes(userProject.client_type || '') && <QuotaCard userProject={userProject} />}
                   {userProject.client_type === 'subscription' && <SubscriptionStatusCard userProject={userProject} />}
                 </>
-              )
-            ) : (
-              activeTab === 'deliveries' && (
-                <div className="rounded-[20px] bg-abba-surface p-4 text-center text-sm text-muted-foreground">
-                  Nenhum projeto ativo encontrado.
-                </div>
-              )
-            )
+              )}
+              {renderContent()}
+            </>
           )}
-
-          {renderContent()}
         </main>
       </div>
 
