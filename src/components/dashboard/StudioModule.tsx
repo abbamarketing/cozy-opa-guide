@@ -285,7 +285,7 @@ export default function StudioModule() {
                         : 'border-border text-muted-foreground hover:border-border/80'
                     }`}
                   >
-                    <span className="text-base">{loc.emoji}</span>
+                    <MapPin className="h-4 w-4" />
                     <span>{loc.label}</span>
                   </button>
                 ))}
