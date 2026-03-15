@@ -205,6 +205,7 @@ export default function StudioModule() {
             </CardContent>
           </Card>
         </div>
+        <ScriptHistory />
       </div>
     );
   }
