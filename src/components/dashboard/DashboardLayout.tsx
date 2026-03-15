@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import abbaLogo from '@/assets/abba-logo.png';
 import { Navigate } from 'react-router-dom';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
