@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
+import { useRole } from '@/hooks/useRole';
 
 export interface UserProjectData {
   id: string;
@@ -40,11 +41,44 @@ export interface UserProjectData {
     max_revisions: number;
     deadline: string;
     capture_lead_days: number;
-  };
+  } | null;
+  subscription_slug?: string | null;
+  custom_slug?: string | null;
+  monthly_quota?: number | null;
+  script_credits?: number | null;
 }
+
+const GOD_MOCK_PROJECT: Omit<UserProjectData, 'user_id'> = {
+  id: 'god-mode',
+  status: 'active',
+  client_type: 'god',
+  subscription_tier: null,
+  sla_hours: null,
+  studio_access: true,
+  youtube_reserved: 0,
+  youtube_approved: 0,
+  instagram_reserved: 0,
+  instagram_approved: 0,
+  thumbnails_reserved: 0,
+  thumbnails_approved: 0,
+  covers_reserved: 0,
+  covers_approved: 0,
+  captures_reserved: 0,
+  captures_approved: 0,
+  current_period_start: new Date().toISOString(),
+  current_period_end: new Date(Date.now() + 30 * 86400000).toISOString(),
+  stripe_subscription_id: null,
+  tour_completed: true,
+  custom_project: null,
+  subscription_slug: null,
+  custom_slug: null,
+  monthly_quota: 999,
+  script_credits: 999,
+};
 
 export const useUserProject = () => {
   const { user } = useAuth();
+  const { isGod } = useRole();
 
   const { data: userProject = null, isLoading, error } = useQuery({
     queryKey: ['user-project', user?.id],
@@ -57,7 +91,15 @@ export const useUserProject = () => {
         .maybeSingle();
 
       if (err) throw new Error(err.message);
-      return (data as unknown as UserProjectData) ?? null;
+
+      if (data) return data as unknown as UserProjectData;
+
+      // GOD: return mock project that unlocks everything
+      if (isGod()) {
+        return { ...GOD_MOCK_PROJECT, user_id: user!.id } as UserProjectData;
+      }
+
+      return null;
     },
     enabled: !!user?.id,
     staleTime: 5 * 60 * 1000,

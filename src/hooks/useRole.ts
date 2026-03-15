@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 
-type AppRole = 'admin' | 'editor' | 'client';
+type AppRole = 'admin' | 'editor' | 'client' | 'god';
 
 export function useRole() {
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -34,10 +34,11 @@ export function useRole() {
     fetchRoles();
   }, [user?.id, isAuthLoading]);
 
-  const hasRole = (role: AppRole) => roles.includes(role);
+  const isGod = () => roles.includes('god');
+  const hasRole = (role: AppRole) => roles.includes(role) || roles.includes('god');
   const isAdmin = () => hasRole('admin');
   const isEditor = () => hasRole('editor');
   const isClient = () => hasRole('client');
 
-  return { roles, loading, hasRole, isAdmin, isEditor, isClient };
+  return { roles, loading, hasRole, isAdmin, isEditor, isClient, isGod };
 }
