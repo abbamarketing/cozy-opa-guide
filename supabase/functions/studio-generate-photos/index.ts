@@ -94,6 +94,7 @@ serve(async (req) => {
     const imagenEndpoint = `https://us-central1-aiplatform.googleapis.com/v1/projects/${Deno.env.get('GCLOUD_PROJECT_ID')}/locations/us-central1/publishers/google/models/imagegeneration@006:predict`
 
     const generatedUrls: string[] = []
+    const generatedPaths: string[] = []
 
     for (let i = 0; i < quantity; i++) {
       // Variação de seed para fotos diferentes mas mesma pessoa
