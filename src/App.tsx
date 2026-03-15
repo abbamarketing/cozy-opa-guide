@@ -24,8 +24,6 @@ const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const Waiting = lazy(() => import("./pages/Waiting"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const Studio = lazy(() => import("./pages/Studio"));
-// Studio now redirects to /dashboard
 
 const queryClient = new QueryClient({
   defaultOptions: {
