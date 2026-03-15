@@ -39,7 +39,19 @@ interface ClientRow {
   project_name: string | null;
   plan_value: number | null;
   status: string;
+  client_type: string | null;
+  subscription_tier: string | null;
 }
+
+const SUBSCRIPTION_VALUES: Record<string, number> = {
+  standard: 490, pro: 660, business: 1100, premium: 2970, agency: 5590,
+};
+
+const CLIENT_TYPE_BADGE: Record<string, { label: string; className: string }> = {
+  custom: { label: 'Custom', className: 'bg-blue-500/15 text-blue-500 border-blue-500/30' },
+  subscription: { label: 'Assinatura', className: 'bg-green-500/15 text-green-500 border-green-500/30' },
+  studio: { label: 'Studio', className: 'bg-purple-500/15 text-purple-500 border-purple-500/30' },
+};
 
 const STATUS_MAP: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
   active: { label: 'Ativo', variant: 'default' },
@@ -56,6 +68,7 @@ const AdminClients = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
@@ -97,10 +110,10 @@ const AdminClients = () => {
 
     const { data: userProjects } = await supabase
       .from('user_projects')
-      .select('user_id, status, custom_project_id')
+      .select('user_id, status, custom_project_id, client_type, subscription_tier')
       .in('user_id', userIds);
 
-    const projectIds = [...new Set((userProjects || []).map((up: any) => up.custom_project_id))];
+    const projectIds = [...new Set((userProjects || []).filter((up: any) => up.custom_project_id).map((up: any) => up.custom_project_id))];
     const { data: projects } = await supabase
       .from('custom_projects')
       .select('id, project_name, monthly_value')
@@ -111,15 +124,31 @@ const AdminClients = () => {
 
     const rows: ClientRow[] = (profiles || []).map((p: any) => {
       const up = upMap.get(p.user_id);
-      const proj = up ? projectMap.get(up.custom_project_id) : null;
+      const proj = up?.custom_project_id ? projectMap.get(up.custom_project_id) : null;
+
+      const planValue = proj
+        ? Number(proj.monthly_value)
+        : (up?.client_type === 'subscription' && up?.subscription_tier)
+          ? (SUBSCRIPTION_VALUES[up.subscription_tier] ?? null)
+          : null;
+
+      const displayName = proj?.project_name
+        || (up?.client_type === 'subscription'
+            ? `Assinatura ${up?.subscription_tier ? up.subscription_tier.charAt(0).toUpperCase() + up.subscription_tier.slice(1) : ''}`.trim()
+            : null)
+        || (up?.client_type === 'studio' ? 'Studio' : null)
+        || 'Sem projeto';
+
       return {
         user_id: p.user_id,
         full_name: p.full_name,
         avatar_url: p.avatar_url,
         created_at: p.created_at,
-        project_name: proj?.project_name || null,
-        plan_value: proj ? Number(proj.monthly_value) : null,
+        project_name: displayName,
+        plan_value: planValue,
         status: up?.status || 'no_project',
+        client_type: up?.client_type || null,
+        subscription_tier: up?.subscription_tier || null,
       };
     });
 
@@ -136,12 +165,15 @@ const AdminClients = () => {
     if (statusFilter !== 'all') {
       result = result.filter((c) => c.status === statusFilter);
     }
+    if (typeFilter !== 'all') {
+      result = result.filter((c) => c.client_type === typeFilter);
+    }
     if (debouncedSearch.trim()) {
       const q = debouncedSearch.toLowerCase();
       result = result.filter((c) => c.full_name?.toLowerCase().includes(q));
     }
     return result;
-  }, [clients, statusFilter, debouncedSearch]);
+  }, [clients, statusFilter, typeFilter, debouncedSearch]);
 
   const handleStatusChange = async () => {
     if (!confirmAction.userId || !confirmAction.type) return;
@@ -279,6 +311,17 @@ const AdminClients = () => {
               <SelectItem value="cancelled">Cancelado</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <SelectTrigger className="w-full sm:w-[140px]">
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos tipos</SelectItem>
+              <SelectItem value="custom">Custom</SelectItem>
+              <SelectItem value="subscription">Assinatura</SelectItem>
+              <SelectItem value="studio">Studio</SelectItem>
+            </SelectContent>
+          </Select>
           <Button
             variant="outline"
             size="sm"
@@ -309,7 +352,14 @@ const AdminClients = () => {
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium truncate">{c.full_name || 'Sem nome'}</p>
-                      <p className="text-[11px] text-muted-foreground truncate">{c.project_name || 'Sem projeto'}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-[11px] text-muted-foreground truncate">{c.project_name || 'Sem projeto'}</p>
+                        {c.client_type && CLIENT_TYPE_BADGE[c.client_type] && (
+                          <Badge variant="outline" className={`text-[9px] px-1.5 py-0 h-4 shrink-0 ${CLIENT_TYPE_BADGE[c.client_type].className}`}>
+                            {CLIENT_TYPE_BADGE[c.client_type].label}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     <Badge variant={st.variant} className="shrink-0 text-[10px]">{st.label}</Badge>
                   </div>
@@ -388,7 +438,16 @@ const AdminClients = () => {
                   return (
                     <TableRow key={c.user_id} className="border-border/30">
                       <TableCell className="font-medium">{c.full_name || 'Sem nome'}</TableCell>
-                      <TableCell className="text-sm">{c.project_name || '—'}</TableCell>
+                      <TableCell className="text-sm">
+                        <div className="flex items-center gap-1.5">
+                          <span>{c.project_name || '—'}</span>
+                          {c.client_type && CLIENT_TYPE_BADGE[c.client_type] && (
+                            <Badge variant="outline" className={`text-[9px] px-1.5 py-0 h-4 shrink-0 ${CLIENT_TYPE_BADGE[c.client_type].className}`}>
+                              {CLIENT_TYPE_BADGE[c.client_type].label}
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell className="text-sm font-mono">
                         {c.plan_value ? `R$ ${c.plan_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '—'}
                       </TableCell>
