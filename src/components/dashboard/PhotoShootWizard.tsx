@@ -3,14 +3,43 @@ import { useDropzone } from 'react-dropzone';
 import { usePhotoShoot } from '@/hooks/usePhotoShoot';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, Download, Building2, Lightbulb, BarChart3, Armchair, Sunset, Upload, Brain, CheckCircle2, Camera, Loader2 } from 'lucide-react';
+import { ChevronLeft, Download, Upload, Brain, CheckCircle2, Loader2 } from 'lucide-react';
 
-const SCENARIOS = [
-  { id: 'executive_office', label: 'Executivo', desc: 'Escritório com vista para a cidade', Icon: Building2 },
-  { id: 'startup_workspace', label: 'Startup', desc: 'Ambiente moderno e descontraído', Icon: Lightbulb },
-  { id: 'boardroom', label: 'Sala de Reunião', desc: 'Corporativo e autoritativo', Icon: BarChart3 },
-  { id: 'consulting_office', label: 'Consultório/Consultoria', desc: 'Premium e acolhedor', Icon: Armchair },
-  { id: 'outdoor_business', label: 'Externo Corporativo', desc: 'Terraço ou ambiente externo', Icon: Sunset },
+interface ScenarioItem {
+  id: string;
+  category: string;
+  label: string;
+  desc: string;
+  icon: string;
+}
+
+const SCENARIOS: ScenarioItem[] = [
+  // Corporativo
+  { id: 'executive_office',       category: 'Corporativo',  label: 'Executivo',             desc: 'Escritório com vista panorâmica',            icon: '🏙️' },
+  { id: 'boardroom',              category: 'Corporativo',  label: 'Sala de Reunião',       desc: 'Boardroom Fortune 500 — formal',              icon: '📊' },
+  { id: 'startup_workspace',      category: 'Corporativo',  label: 'Startup',               desc: 'Loft criativo com tijolos à vista',           icon: '💡' },
+  { id: 'consulting_office',      category: 'Corporativo',  label: 'Escritório Consultivo', desc: 'Estante de livros, luz âmbar — premium',      icon: '📚' },
+  { id: 'outdoor_business',       category: 'Corporativo',  label: 'Externo Corporativo',   desc: 'Rooftop com skyline ao fundo',                icon: '🌆' },
+  { id: 'outdoor_rooftop',        category: 'Corporativo',  label: 'Terraço ao Entardecer', desc: 'Terraço com skyline iluminado ao dusk',       icon: '🌇' },
+  // Editorial
+  { id: 'studio_editorial',       category: 'Editorial',    label: 'Estúdio Editorial',     desc: 'Fundo infinito branco — Vogue',               icon: '🤍' },
+  { id: 'fashion_dark_editorial', category: 'Editorial',    label: 'Editorial Dark',        desc: 'Loft industrial, sombras dramáticas',         icon: '🖤' },
+  { id: 'luxury_hotel_lobby',     category: 'Editorial',    label: 'Lobby de Luxo',         desc: 'Mármore, lustre e floral — LVMH',             icon: '🏛️' },
+  { id: 'fashion_street',         category: 'Editorial',    label: 'Rua Parisiense',        desc: 'Paralelepípedo e luz matinal dourada',        icon: '🇫🇷' },
+  // Lifestyle
+  { id: 'golden_hour_outdoor',    category: 'Lifestyle',    label: 'Golden Hour',           desc: 'Luz dourada do entardecer, bokeh natural',    icon: '🌅' },
+  { id: 'cafe_lifestyle',         category: 'Lifestyle',    label: 'Café',                  desc: 'Coffee shop aconchegante — Kinfolk',          icon: '☕' },
+  { id: 'beach_sunset',           category: 'Lifestyle',    label: 'Praia ao Pôr do Sol',   desc: 'Oceano, areia e luz rosa-laranja',            icon: '🌊' },
+  { id: 'forest_nature',          category: 'Lifestyle',    label: 'Floresta',              desc: 'Luz dappled, vegetação exuberante',           icon: '🌿' },
+  // Artístico
+  { id: 'neon_cyberpunk',         category: 'Artístico',    label: 'Neon Cyberpunk',        desc: 'Beco molhado, neon rosa e azul',              icon: '🌃' },
+  { id: 'vintage_film',           category: 'Artístico',    label: 'Filme Vintage',         desc: 'Grão de película, tons pastéis',              icon: '🎞️' },
+  { id: 'moody_warehouse',        category: 'Artístico',    label: 'Galpão Moody',          desc: 'Névoa industrial, feixe dramático',           icon: '🏭' },
+  { id: 'studio_bw',              category: 'Artístico',    label: 'P&B Clássico',          desc: 'Irving Penn / Yousuf Karsh',                  icon: '⬛' },
+  // Creator
+  { id: 'home_office_creator',    category: 'Creator',      label: 'Home Office',           desc: 'Estante de livros, plantas, luz natural',     icon: '🖥️' },
+  { id: 'wellness_spa',           category: 'Creator',      label: 'Wellness / Spa',        desc: 'Interior japonês sereno — Goop vibe',         icon: '🪷' },
+  { id: 'urban_lifestyle',        category: 'Creator',      label: 'Lifestyle Urbano',      desc: 'Rua limpa, arquitetura modernista',            icon: '🏃' },
 ];
 
 const QUANTITIES = [
