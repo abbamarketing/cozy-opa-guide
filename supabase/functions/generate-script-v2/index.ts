@@ -64,21 +64,40 @@ serve(async (req) => {
     briefing,
   } = body;
 
-  // REMOVIDO em PRD v5 — todos os usuários precisam de créditos, incluindo admin
-  const { data: credits } = await supabaseAdmin
-    .from("studio_credits")
-    .select("credits_remaining, credits_used_month")
+  // Determine credit source based on client type
+  const { data: userProject } = await supabaseAdmin
+    .from("user_projects")
+    .select("id, client_type, script_credits")
     .eq("user_id", userId)
-    .single();
+    .eq("status", "active")
+    .maybeSingle();
 
-  if (!credits || (credits.credits_remaining ?? 0) <= 0) {
-    return new Response(
-      JSON.stringify({ error: "Sem créditos disponíveis" }),
-      {
-        status: 402,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+  const isScriptCreditsClient = userProject && ['subscription', 'custom'].includes(userProject.client_type || '');
+
+  if (isScriptCreditsClient) {
+    // Use script_credits from user_projects
+    if ((userProject.script_credits ?? 0) <= 0) {
+      return new Response(
+        JSON.stringify({ error: "Créditos de roteiro esgotados" }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+  } else {
+    // Studio client — use studio_credits
+    const { data: credits } = await supabaseAdmin
+      .from("studio_credits")
+      .select("credits_remaining, credits_used_month")
+      .eq("user_id", userId)
+      .single();
+
+    if (!credits || (credits.credits_remaining ?? 0) <= 0) {
+      return new Response(
+        JSON.stringify({ error: "Sem créditos disponíveis" }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    // Store credits ref for later debit
+    (globalThis as any).__studioCredits = credits;
   }
 
   // Contexto do briefing de marca
