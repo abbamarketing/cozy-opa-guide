@@ -76,7 +76,8 @@ const AdminClients = () => {
     type: 'suspend' | 'activate' | 'delete' | null;
     userId: string | null;
     clientName: string | null;
-  }>({ type: null, userId: null, clientName: null });
+    clientType: string | null;
+  }>({ type: null, userId: null, clientName: null, clientType: null });
 
   const hasActiveFilter = (s: string, st: string, t: string) =>
     s.trim() !== '' || st !== 'all' || t !== 'all';
@@ -234,25 +235,63 @@ const AdminClients = () => {
       }
     } else {
       const newStatus = confirmAction.type === 'suspend' ? 'suspended' : 'active';
+      const action = confirmAction.type === 'suspend' ? 'suspend' : 'activate';
 
-      const { error } = await supabase
-        .from('user_projects')
-        .update({ status: newStatus } as any)
-        .eq('user_id', confirmAction.userId);
+      if (confirmAction.clientType === 'subscription') {
+        // Route through edge function to pause/resume Stripe subscription
+        try {
+          const { data: sessionData } = await supabase.auth.getSession();
+          const accessToken = sessionData?.session?.access_token;
+          if (!accessToken) throw new Error('Sessão expirada');
 
-      if (error) {
-        toast.error('Erro ao atualizar status');
+          const response = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-manage-subscription`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+                apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              },
+              body: JSON.stringify({ userId: confirmAction.userId, action }),
+            },
+          );
+
+          if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err?.error || `Erro ${response.status}`);
+          }
+
+          toast.success(
+            confirmAction.type === 'suspend' ? 'Cliente Suspendido' : 'Cliente Reativado',
+            { description: 'Status e assinatura Stripe atualizados com sucesso' }
+          );
+          refetch();
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : 'Erro desconhecido';
+          toast.error('Erro ao atualizar status', { description: message });
+        }
       } else {
-        toast.success(
-          confirmAction.type === 'suspend' ? 'Cliente Suspendido' : 'Cliente Reativado',
-          { description: 'Status atualizado com sucesso' }
-        );
-        refetch();
+        // Custom/studio — local update only
+        const { error } = await supabase
+          .from('user_projects')
+          .update({ status: newStatus } as any)
+          .eq('user_id', confirmAction.userId);
+
+        if (error) {
+          toast.error('Erro ao atualizar status');
+        } else {
+          toast.success(
+            confirmAction.type === 'suspend' ? 'Cliente Suspendido' : 'Cliente Reativado',
+            { description: 'Status atualizado com sucesso' }
+          );
+          refetch();
+        }
       }
     }
 
     setActionLoading(null);
-    setConfirmAction({ type: null, userId: null, clientName: null });
+    setConfirmAction({ type: null, userId: null, clientName: null, clientType: null });
   };
 
   const exportCSV = () => {
@@ -273,7 +312,7 @@ const AdminClients = () => {
       {/* Confirmation Dialog */}
       <AlertDialog
         open={confirmAction.type !== null}
-        onOpenChange={(open) => !open && setConfirmAction({ type: null, userId: null, clientName: null })}
+        onOpenChange={(open) => !open && setConfirmAction({ type: null, userId: null, clientName: null, clientType: null })}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -404,7 +443,7 @@ const AdminClients = () => {
                         size="sm"
                         className="h-7 text-xs gap-1"
                         disabled={actionLoading === c.user_id}
-                        onClick={() => setConfirmAction({ type: 'activate', userId: c.user_id, clientName: c.full_name })}
+                        onClick={() => setConfirmAction({ type: 'activate', userId: c.user_id, clientName: c.full_name, clientType: c.client_type })}
                       >
                         <Play className="h-3 w-3" /> Ativar
                       </Button>
@@ -415,7 +454,7 @@ const AdminClients = () => {
                         size="sm"
                         className="h-7 text-xs gap-1 text-destructive"
                         disabled={actionLoading === c.user_id}
-                        onClick={() => setConfirmAction({ type: 'suspend', userId: c.user_id, clientName: c.full_name })}
+                        onClick={() => setConfirmAction({ type: 'suspend', userId: c.user_id, clientName: c.full_name, clientType: c.client_type })}
                       >
                         <Pause className="h-3 w-3" /> Suspender
                       </Button>
@@ -425,7 +464,7 @@ const AdminClients = () => {
                       size="sm"
                       className="h-7 text-xs gap-1 text-destructive"
                       disabled={actionLoading === c.user_id}
-                      onClick={() => setConfirmAction({ type: 'delete', userId: c.user_id, clientName: c.full_name })}
+                      onClick={() => setConfirmAction({ type: 'delete', userId: c.user_id, clientName: c.full_name, clientType: c.client_type })}
                     >
                       <Trash2 className="h-3 w-3" /> Excluir
                     </Button>
@@ -501,21 +540,21 @@ const AdminClients = () => {
                           <DropdownMenuContent align="end">
                             {c.status !== 'active' && c.status !== 'no_project' && (
                               <DropdownMenuItem
-                                onClick={() => setConfirmAction({ type: 'activate', userId: c.user_id, clientName: c.full_name })}
+                                onClick={() => setConfirmAction({ type: 'activate', userId: c.user_id, clientName: c.full_name, clientType: c.client_type })}
                               >
                                 <Play className="mr-2 h-4 w-4" /> Ativar
                               </DropdownMenuItem>
                             )}
                             {c.status === 'active' && (
                               <DropdownMenuItem
-                                onClick={() => setConfirmAction({ type: 'suspend', userId: c.user_id, clientName: c.full_name })}
+                                onClick={() => setConfirmAction({ type: 'suspend', userId: c.user_id, clientName: c.full_name, clientType: c.client_type })}
                                 className="text-destructive"
                               >
                                 <Pause className="mr-2 h-4 w-4" /> Suspender
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuItem
-                              onClick={() => setConfirmAction({ type: 'delete', userId: c.user_id, clientName: c.full_name })}
+                              onClick={() => setConfirmAction({ type: 'delete', userId: c.user_id, clientName: c.full_name, clientType: c.client_type })}
                               className="text-destructive"
                             >
                               <Trash2 className="mr-2 h-4 w-4" /> Excluir
