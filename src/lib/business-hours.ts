@@ -177,30 +177,30 @@ export function countWeekdayHours(startDate: Date, slaHours: number): Date {
     // Pular fim de semana: avançar para segunda-feira meia-noite
     if (dayOfWeek === 0) {
       // Domingo: avançar 24h (para segunda)
-      current.setHours(current.getHours() + 24);
+      current.setTime(current.getTime() + 24 * 3600000);
       continue;
     }
     if (dayOfWeek === 6) {
       // Sábado: calcular horas até meia-noite e avançar para segunda
-      const hoursUntilMidnight = 24 - current.getHours();
-      current.setHours(current.getHours() + hoursUntilMidnight + 24); // sab->dom->seg meia-noite
+      const hoursUntilMidnight = 24 - current.getHours() - (current.getMinutes() / 60);
+      current.setTime(current.getTime() + (hoursUntilMidnight + 24) * 3600000);
       continue;
     }
 
     // É dia útil (seg-sex): verificar se chegamos no sábado antes de esgotar o SLA
-    const currentHour = current.getHours();
+    const currentHourFrac = current.getHours() + current.getMinutes() / 60;
     const hoursUntilWeekend = dayOfWeek === 5
-      ? (24 - currentHour) // sexta: horas até meia-noite
-      : (24 * (5 - dayOfWeek)) + (24 - currentHour); // horas até sexta meia-noite
+      ? (24 - currentHourFrac) // sexta: horas até meia-noite
+      : (24 * (5 - dayOfWeek)) + (24 - currentHourFrac); // horas até sexta meia-noite
 
     if (remaining <= hoursUntilWeekend) {
-      current.setHours(current.getHours() + remaining);
+      current.setTime(current.getTime() + remaining * 3600000);
       remaining = 0;
     } else {
       // Consumir até o fim da sexta e pular o fim de semana
       remaining -= hoursUntilWeekend;
       const hoursToMonday = hoursUntilWeekend + 48; // sexta->sab->dom->seg
-      current.setHours(current.getHours() + hoursToMonday);
+      current.setTime(current.getTime() + hoursToMonday * 3600000);
     }
   }
 
