@@ -76,6 +76,6 @@ export const logger = {
 // Flush on page unload
 if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', () => {
-    flushLogs();
+    if (logBuffer.length > 0) void flushLogs();
   });
 }
