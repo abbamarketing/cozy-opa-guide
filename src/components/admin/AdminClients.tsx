@@ -184,6 +184,8 @@ const AdminClients = () => {
 
   const debouncedSearch = useDebouncedValue(search, 300);
 
+  const refetch = () => fetchClients(debouncedSearch, statusFilter, typeFilter, page);
+
   const isFiltering = hasActiveFilter(debouncedSearch, statusFilter, typeFilter);
 
   useEffect(() => {
