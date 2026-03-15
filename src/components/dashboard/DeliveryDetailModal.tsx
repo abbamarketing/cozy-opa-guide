@@ -76,6 +76,17 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
     setShowCelebration(false);
   }, []);
 
+  const openSafeUrl = (url: string | null | undefined) => {
+    if (!url) return;
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch {
+      // URL inválida — não abrir
+    }
+  };
+
   if (!delivery) return null;
 
   const config = typeConfig[delivery.delivery_type] || typeConfig.youtube_video;
@@ -256,7 +267,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
                         variant="outline"
                         size="sm"
                         className="w-full gap-2"
-                        onClick={() => window.open(delivery.file_url!, '_blank')}
+                        onClick={() => openSafeUrl(delivery.file_url)}
                       >
                         <Download className="h-3.5 w-3.5" /> Baixar Arquivo
                       </Button>
@@ -346,7 +357,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
                         variant="outline"
                         size="sm"
                         className="gap-1.5"
-                        onClick={() => window.open(delivery.file_url!, '_blank')}
+                        onClick={() => openSafeUrl(delivery.file_url)}
                       >
                         <Download className="h-3.5 w-3.5" /> Baixar
                       </Button>
@@ -382,7 +393,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
                     variant="outline"
                     size="sm"
                     className="w-full gap-1.5"
-                    onClick={() => window.open(delivery.file_url!, '_blank')}
+                    onClick={() => openSafeUrl(delivery.file_url)}
                   >
                     <Download className="h-3.5 w-3.5" /> Baixar Vídeo
                   </Button>
