@@ -359,7 +359,7 @@ const EditorDashboard = () => {
         )
       `)
       .eq('editor_id', editor.id)
-      .in('status', ['queue', 'in_progress'])
+      .in('status', ['queue'])
       .order('priority_level', { ascending: false })
       .order('created_at', { ascending: true });
 
