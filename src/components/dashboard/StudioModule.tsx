@@ -190,19 +190,20 @@ export default function StudioModule() {
               <Button size="sm" className="w-full gap-1.5"><Sparkles className="h-3.5 w-3.5" />Criar</Button>
             </CardContent>
           </Card>
-          <Card className="border-border/40 bg-card opacity-60 cursor-not-allowed">
+          <Card
+            className="cursor-pointer border-border/40 bg-card transition-all hover:border-primary/40 hover:shadow-[0_0_16px_hsl(var(--primary)/0.08)]"
+            onClick={() => credits && credits.available > 0 ? setView('photoShoot') : toast.error('Créditos esgotados')}
+          >
             <CardHeader className="p-4">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                  <Camera className="h-5 w-5 text-muted-foreground" />
-                </div>
-                <Badge variant="outline" className="text-[10px] font-mono">Em breve</Badge>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 mb-2">
+                <Camera className="h-5 w-5 text-primary" />
               </div>
-              <CardTitle className="text-sm font-mono text-muted-foreground">Ensaio Fotográfico</CardTitle>
-              <CardDescription className="text-xs">Geração de fotos profissionais com IA. Disponível em breve.</CardDescription>
+              <CardTitle className="text-sm font-mono">Ensaio Fotográfico</CardTitle>
+              <CardDescription className="text-xs">Gere fotos profissionais com IA a partir das suas fotos.</CardDescription>
             </CardHeader>
             <CardContent className="p-4 pt-0">
-              <Button size="sm" variant="outline" className="w-full" disabled>Em breve</Button>
+              <p className="text-[10px] text-muted-foreground font-mono mb-2">A partir de 1 crédito</p>
+              <Button size="sm" className="w-full gap-1.5"><Sparkles className="h-3.5 w-3.5" />Criar</Button>
             </CardContent>
           </Card>
         </div>
