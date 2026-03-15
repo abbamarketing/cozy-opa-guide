@@ -1,0 +1,2 @@
+ALTER TABLE public.photo_shoots DROP CONSTRAINT photo_shoots_scenario_check;
+ALTER TABLE public.photo_shoots ADD CONSTRAINT photo_shoots_scenario_check CHECK (scenario = ANY (ARRAY['executive_office','startup_workspace','boardroom','consulting_office','outdoor_business','studio','clinic','office','outdoor']::text[]));
