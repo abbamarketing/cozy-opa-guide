@@ -3,14 +3,43 @@ import { useDropzone } from 'react-dropzone';
 import { usePhotoShoot } from '@/hooks/usePhotoShoot';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, Download, Building2, Lightbulb, BarChart3, Armchair, Sunset, Upload, Brain, CheckCircle2, Camera, Loader2 } from 'lucide-react';
+import { ChevronLeft, Download, Upload, Brain, CheckCircle2, Loader2 } from 'lucide-react';
 
-const SCENARIOS = [
-  { id: 'executive_office', label: 'Executivo', desc: 'Escritório com vista para a cidade', Icon: Building2 },
-  { id: 'startup_workspace', label: 'Startup', desc: 'Ambiente moderno e descontraído', Icon: Lightbulb },
-  { id: 'boardroom', label: 'Sala de Reunião', desc: 'Corporativo e autoritativo', Icon: BarChart3 },
-  { id: 'consulting_office', label: 'Consultório/Consultoria', desc: 'Premium e acolhedor', Icon: Armchair },
-  { id: 'outdoor_business', label: 'Externo Corporativo', desc: 'Terraço ou ambiente externo', Icon: Sunset },
+interface ScenarioItem {
+  id: string;
+  category: string;
+  label: string;
+  desc: string;
+  icon: string;
+}
+
+const SCENARIOS: ScenarioItem[] = [
+  // Corporativo
+  { id: 'executive_office',       category: 'Corporativo',  label: 'Executivo',             desc: 'Escritório com vista panorâmica',            icon: '🏙️' },
+  { id: 'boardroom',              category: 'Corporativo',  label: 'Sala de Reunião',       desc: 'Boardroom Fortune 500 — formal',              icon: '📊' },
+  { id: 'startup_workspace',      category: 'Corporativo',  label: 'Startup',               desc: 'Loft criativo com tijolos à vista',           icon: '💡' },
+  { id: 'consulting_office',      category: 'Corporativo',  label: 'Escritório Consultivo', desc: 'Estante de livros, luz âmbar — premium',      icon: '📚' },
+  { id: 'outdoor_business',       category: 'Corporativo',  label: 'Externo Corporativo',   desc: 'Rooftop com skyline ao fundo',                icon: '🌆' },
+  { id: 'outdoor_rooftop',        category: 'Corporativo',  label: 'Terraço ao Entardecer', desc: 'Terraço com skyline iluminado ao dusk',       icon: '🌇' },
+  // Editorial
+  { id: 'studio_editorial',       category: 'Editorial',    label: 'Estúdio Editorial',     desc: 'Fundo infinito branco — Vogue',               icon: '🤍' },
+  { id: 'fashion_dark_editorial', category: 'Editorial',    label: 'Editorial Dark',        desc: 'Loft industrial, sombras dramáticas',         icon: '🖤' },
+  { id: 'luxury_hotel_lobby',     category: 'Editorial',    label: 'Lobby de Luxo',         desc: 'Mármore, lustre e floral — LVMH',             icon: '🏛️' },
+  { id: 'fashion_street',         category: 'Editorial',    label: 'Rua Parisiense',        desc: 'Paralelepípedo e luz matinal dourada',        icon: '🇫🇷' },
+  // Lifestyle
+  { id: 'golden_hour_outdoor',    category: 'Lifestyle',    label: 'Golden Hour',           desc: 'Luz dourada do entardecer, bokeh natural',    icon: '🌅' },
+  { id: 'cafe_lifestyle',         category: 'Lifestyle',    label: 'Café',                  desc: 'Coffee shop aconchegante — Kinfolk',          icon: '☕' },
+  { id: 'beach_sunset',           category: 'Lifestyle',    label: 'Praia ao Pôr do Sol',   desc: 'Oceano, areia e luz rosa-laranja',            icon: '🌊' },
+  { id: 'forest_nature',          category: 'Lifestyle',    label: 'Floresta',              desc: 'Luz dappled, vegetação exuberante',           icon: '🌿' },
+  // Artístico
+  { id: 'neon_cyberpunk',         category: 'Artístico',    label: 'Neon Cyberpunk',        desc: 'Beco molhado, neon rosa e azul',              icon: '🌃' },
+  { id: 'vintage_film',           category: 'Artístico',    label: 'Filme Vintage',         desc: 'Grão de película, tons pastéis',              icon: '🎞️' },
+  { id: 'moody_warehouse',        category: 'Artístico',    label: 'Galpão Moody',          desc: 'Névoa industrial, feixe dramático',           icon: '🏭' },
+  { id: 'studio_bw',              category: 'Artístico',    label: 'P&B Clássico',          desc: 'Irving Penn / Yousuf Karsh',                  icon: '⬛' },
+  // Creator
+  { id: 'home_office_creator',    category: 'Creator',      label: 'Home Office',           desc: 'Estante de livros, plantas, luz natural',     icon: '🖥️' },
+  { id: 'wellness_spa',           category: 'Creator',      label: 'Wellness / Spa',        desc: 'Interior japonês sereno — Goop vibe',         icon: '🪷' },
+  { id: 'urban_lifestyle',        category: 'Creator',      label: 'Lifestyle Urbano',      desc: 'Rua limpa, arquitetura modernista',            icon: '🏃' },
 ];
 
 const QUANTITIES = [
@@ -188,63 +217,71 @@ export default function PhotoShootWizard({ onBack }: PhotoShootWizardProps) {
   );
 
   // ── STEP: SCENARIO ──
-  if (step === 'scenario') return (
-    <div className="space-y-6 p-4">
-      {onBack && (
+  if (step === 'scenario') {
+    const categories = Array.from(new Set(SCENARIOS.map(s => s.category)));
+    return (
+      <div className="space-y-6 p-4">
         <Button variant="ghost" size="sm" onClick={() => setStep('ready')} className="gap-1.5 -ml-2">
           <ChevronLeft className="h-4 w-4" /> Voltar
         </Button>
-      )}
 
-      <h3 className="text-sm font-mono font-semibold text-foreground">Escolha o ambiente</h3>
+        <h3 className="text-sm font-mono font-semibold text-foreground">Escolha o cenário</h3>
 
-      <div className="space-y-2">
-        {SCENARIOS.map(s => (
-          <button
-            key={s.id}
-            onClick={() => setSelectedScenario(s.id)}
-            className={`flex items-center gap-4 p-4 rounded-lg border text-left transition-colors w-full ${
-              selectedScenario === s.id
-                ? 'border-primary bg-primary/5'
-                : 'border-border hover:border-primary/40'
-            }`}
-          >
-            <s.Icon className="h-6 w-6 text-muted-foreground" />
-            <div>
-              <p className="text-sm font-medium text-foreground">{s.label}</p>
-              <p className="text-xs text-muted-foreground">{s.desc}</p>
+        <div className="space-y-4">
+          {categories.map(cat => (
+            <div key={cat} className="space-y-2">
+              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{cat}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {SCENARIOS.filter(s => s.category === cat).map(s => (
+                  <button
+                    key={s.id}
+                    onClick={() => setSelectedScenario(s.id)}
+                    className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-colors w-full ${
+                      selectedScenario === s.id
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/40'
+                    }`}
+                  >
+                    <span className="text-lg">{s.icon}</span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground">{s.label}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{s.desc}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
-          </button>
-        ))}
-      </div>
-
-      <div className="space-y-3">
-        <p className="text-xs font-mono text-muted-foreground">Quantas fotos?</p>
-        <div className="grid grid-cols-3 gap-2">
-          {QUANTITIES.map(q => (
-            <button
-              key={q.value}
-              onClick={() => setSelectedQuantity(q.value)}
-              className={`p-3 rounded-lg border text-center transition-colors ${
-                selectedQuantity === q.value
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-primary/40'
-              }`}
-            >
-              <p className="text-sm font-medium text-foreground">{q.label}</p>
-              <p className="text-[10px] text-muted-foreground">
-                {q.credits} crédito{q.credits > 1 ? 's' : ''}
-              </p>
-            </button>
           ))}
         </div>
-      </div>
 
-      <Button onClick={handleGenerate} disabled={!selectedScenario || isGenerating} className="w-full">
-        Gerar Fotos ({QUANTITIES.find(q => q.value === selectedQuantity)?.credits} créditos)
-      </Button>
-    </div>
-  );
+        <div className="space-y-3">
+          <p className="text-xs font-mono text-muted-foreground">Quantas fotos?</p>
+          <div className="grid grid-cols-3 gap-2">
+            {QUANTITIES.map(q => (
+              <button
+                key={q.value}
+                onClick={() => setSelectedQuantity(q.value)}
+                className={`p-3 rounded-lg border text-center transition-colors ${
+                  selectedQuantity === q.value
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/40'
+                }`}
+              >
+                <p className="text-sm font-medium text-foreground">{q.label}</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {q.credits} crédito{q.credits > 1 ? 's' : ''}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <Button onClick={handleGenerate} disabled={!selectedScenario || isGenerating} className="w-full">
+          Gerar Fotos ({QUANTITIES.find(q => q.value === selectedQuantity)?.credits} créditos)
+        </Button>
+      </div>
+    );
+  }
 
   // ── STEP: GENERATING ──
   if (step === 'generating') return (

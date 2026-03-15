@@ -3,13 +3,77 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { logAiUsage } from '../_shared/log-ai-usage.ts'
 
+const PHOTO_VARIATIONS = [
+  {
+    angle: 'slight 3/4 angle toward camera, subject looking directly at lens with steady gaze',
+    expression: 'neutral confident expression, composed and authoritative, jaw slightly set',
+    lighting: 'classic Rembrandt 45° key light from upper left, soft fill on right, warm golden tones',
+    framing: 'upper body portrait, head and chest prominent, negative space on one side',
+    pose: 'standing upright, shoulders squared, one hand resting at side, relaxed power stance',
+  },
+  {
+    angle: 'tight headshot, face nearly frontal, eyes looking directly into lens',
+    expression: 'genuine warm smile, natural and approachable energy',
+    lighting: 'soft butterfly lighting from directly above and in front, clean even shadows',
+    framing: 'extreme close crop: face fills 80% of frame, shallow depth of field',
+    pose: 'relaxed neck, chin slightly forward and down, natural shoulder drop',
+  },
+  {
+    angle: 'strong 45° profile body angle, face turns back toward camera',
+    expression: 'intense contemplative look, eyes slightly narrowed, editorial',
+    lighting: 'dramatic hard side light creating deep shadow across half the face, thin silver rim light from behind',
+    framing: 'mid-body showing torso and arms, subject taking up left third of frame',
+    pose: 'one hand in jacket pocket, other arm relaxed, weight shifted — editorial stance',
+  },
+  {
+    angle: 'subtle low angle (camera at chest level looking up) — empowering',
+    expression: 'open genuine laugh, eyes squinting slightly, caught in a real moment of joy',
+    lighting: 'bright high-key ambient with crisp directional window key from above',
+    framing: 'full upper body visible including hands, open body language',
+    pose: 'walking mid-stride toward camera, jacket open, relaxed energy — dynamic movement',
+  },
+  {
+    angle: 'eye-level, perfectly symmetrical frontal',
+    expression: 'calm decisive look: steady unwavering direct gaze, mouth closed, quiet power',
+    lighting: 'cinematic split lighting: warm amber key from left, cool blue-silver fill from right',
+    framing: 'classic bust crop just below collarbones, background falls to deep bokeh blur',
+    pose: 'hands clasped in front, slight forward lean, intentional stillness',
+  },
+];
+
 const SCENARIO_PROMPTS: Record<string, string> = {
-  executive_office: `Professional executive portrait of this exact person in a modern high-rise office, floor-to-ceiling windows with city skyline at golden hour, wearing a well-tailored dark navy suit with white dress shirt and silk tie. Standing confidently with hands clasped, slight 3/4 angle toward camera. Shot on Canon EOS R5, 85mm f/1.4, shallow depth of field, warm directional window light creating soft shadows. Cinematic editorial quality, photorealistic.`,
-  startup_workspace: `Professional portrait of this exact person in a contemporary startup office, exposed brick walls, Edison bulb pendant lights, whiteboard with sticky notes blurred in background, lush green plants. Wearing smart casual: charcoal blazer over black t-shirt. Leaning slightly against a wooden standing desk, relaxed confident posture, genuine expression. Shot on Sony A7R IV, 85mm f/1.8, natural window light from left, warm ambient fill. Editorial tech magazine quality.`,
-  boardroom: `Corporate portrait of this exact person standing at the head of a mahogany boardroom table, leather executive chairs receding in background, screen displaying business analytics. Wearing impeccably fitted navy blue suit, white shirt, silver tie. Poised, authoritative stance, direct eye contact with camera. Shot on Canon EOS R5, 70mm f/2.0, balanced fluorescent + window light, clean corporate aesthetic. Fortune 500 annual report quality.`,
-  consulting_office: `Professional consulting portrait of this exact person in a premium private office, warm wood bookshelf filled with books visible behind, elegant desk lamp creating warm accent light. Wearing business casual: navy chinos, white oxford shirt, cognac leather belt. Seated at a clean minimal desk, one hand resting naturally, engaged and approachable expression. Shot on Nikon Z9, 85mm f/1.4, warm key light + cool window fill. McKinsey-level professional imagery.`,
-  outdoor_business: `Environmental business portrait of this exact person on a rooftop terrace of a modern office building, glass facades of city buildings behind, overcast sky creating perfect diffused light. Wearing charcoal wool coat over dark turtleneck. Standing near a glass railing, looking slightly off-camera with a thoughtful expression. Shot on Leica SL2, 90mm Summicron, natural overcast diffused light, subtle architectural bokeh. Premium brand campaign quality.`,
-}
+  // ── CORPORATIVO ──
+  executive_office: `Professional executive portrait of this exact person in a modern high-rise corner office, floor-to-ceiling windows with panoramic city skyline behind, dark walnut desk visible. Wearing an impeccably tailored dark navy suit, white dress shirt, silk tie. {{VARIATION}} Shot on Canon EOS R5, 85mm f/1.4, shallow depth of field. Cinematic editorial quality, photorealistic, ultra-sharp face.`,
+  boardroom: `Corporate portrait of this exact person in a Fortune 500 executive boardroom, mahogany conference table receding in background, large display showing business analytics. Wearing a charcoal bespoke suit with subtle pinstripe, silver pocket square. {{VARIATION}} Shot on Canon EOS R5, 70mm f/2.0. Annual-report quality, photorealistic.`,
+  startup_workspace: `Portrait of this exact person in a vibrant modern startup loft: exposed brick walls, Edison pendant bulb clusters, whiteboards with colorful sticky notes, trailing green plants. Wearing smart casual — slim charcoal blazer over a crisp black t-shirt. {{VARIATION}} Shot on Sony A7R IV, 85mm f/1.8. Tech magazine editorial quality, photorealistic.`,
+  consulting_office: `Professional portrait of this exact person in a premium private consulting office: floor-to-ceiling walnut bookshelves, warm brass desk lamp creating amber glow, minimal desk. Wearing a navy blazer, white Oxford shirt — polished but approachable. {{VARIATION}} Shot on Nikon Z9, 85mm f/1.4. McKinsey-level professional imagery, photorealistic.`,
+  outdoor_business: `Environmental business portrait of this exact person on a rooftop terrace of a glass tower, city skyline behind, overcast sky providing perfect diffused light. Wearing a charcoal wool overcoat over dark turtleneck. {{VARIATION}} Shot on Leica SL2, 90mm f/2.0. Premium brand campaign quality, photorealistic.`,
+  outdoor_rooftop: `Environmental business portrait of this exact person on a rooftop terrace at dusk, city skyline glittering behind, steel and glass architectural forms. Wearing a charcoal wool overcoat over dark turtleneck. {{VARIATION}} Shot on Leica SL2, 90mm f/2.0. Premium brand campaign quality, photorealistic.`,
+  // ── EDITORIAL ──
+  studio_editorial: `High-fashion editorial portrait of this exact person in a minimal studio against seamless pure-white backdrop. Wearing architectural fashion: structured black blazer. Three-light studio setup: hard key from upper left, soft fill from right, white background light. {{VARIATION}} Shot on Phase One XF, 80mm f/2.8. Vogue editorial quality, photorealistic.`,
+  fashion_dark_editorial: `Edgy dark fashion editorial portrait of this exact person in a raw concrete industrial loft: peeling paint walls, dramatic shadows. Wearing avant-garde fashion: oversized black leather trench coat. Strong side key light from a single window, deep shadow on opposite side, thin silver rim light. {{VARIATION}} Shot on Hasselblad X2D, 90mm f/2.2. i-D editorial quality, photorealistic.`,
+  luxury_hotel_lobby: `Luxury brand campaign portrait of this exact person in a grand five-star hotel lobby: soaring marble columns, gold-leafed ceiling, enormous fresh floral arrangements. Wearing elegant cream linen blazer, tapered trousers. Soft ambient lobby lighting with warm chandelier glow. {{VARIATION}} Shot on Mamiya RB67, 90mm f/2.8. LVMH campaign quality, photorealistic.`,
+  fashion_street: `Fashion campaign street portrait of this exact person on a quiet Parisian-style cobblestone street: Haussmann-era facades with wrought-iron balconies blurred behind, morning golden sidelight. Wearing contemporary tailored trench coat, white tee, slim trousers. {{VARIATION}} Shot on Leica M11, 50mm f/1.4. Acne Studios campaign quality, photorealistic.`,
+  // ── LIFESTYLE ──
+  golden_hour_outdoor: `Warm lifestyle portrait of this exact person outdoors at golden hour, late afternoon sun creating glowing backlight in hair, soft warm reflected fill on face. Background: lush bokeh green trees and golden meadow. Wearing casual premium cream linen shirt, beige trousers. {{VARIATION}} Shot on Sony A7R V, 50mm f/1.4. Fine-art portrait quality, photorealistic.`,
+  cafe_lifestyle: `Warm lifestyle portrait of this exact person in a cozy specialty coffee shop: exposed wood beams, hanging plants, warm amber pendant lights, large street-facing windows with diffused morning light. Wearing casual smart denim jacket over white Breton stripe shirt. {{VARIATION}} Shot on Fujifilm GFX 50R, 63mm f/2.8. Kinfolk magazine aesthetic, photorealistic.`,
+  beach_sunset: `Cinematic lifestyle portrait of this exact person on a near-empty beach at golden sunset: turquoise ocean blurred behind, wet sand reflecting warm pink-orange sky. Wearing linen resort wear — open white shirt, rolled trousers, barefoot. Rim lighting from low sun, warm reflective fill from sand. {{VARIATION}} Shot on Canon EOS R5, 85mm f/1.8. Luxury travel campaign, photorealistic.`,
+  forest_nature: `Atmospheric nature portrait of this exact person in a lush green forest: shafts of dappled sunlight through dense canopy, moss-covered ground, ferns in foreground bokeh. Wearing outdoorsy navy wool sweater, earth-tone field jacket. Natural soft directional light through canopy. {{VARIATION}} Shot on Nikon Z8, 85mm f/1.4. National Geographic portrait quality, photorealistic.`,
+  // ── ARTÍSTICO ──
+  neon_cyberpunk: `Cinematic cyberpunk neon portrait of this exact person in a rain-slicked urban alley at midnight: vivid pink and electric blue neon signs reflecting off wet pavement, steam rising. Wearing a dark leather jacket. Hard neon rim lighting in magenta from left, cyan fill from right, deep shadows. {{VARIATION}} Shot on Sony A7 III, 50mm f/1.8. Blade Runner 2049 cinematography, photorealistic.`,
+  vintage_film: `Intimate vintage-film-aesthetic portrait of this exact person in a sun-drenched interior with sheer curtain diffusing light: worn parquet floor, antique mirror, muted color palette. Wearing soft vintage oversized linen button-up shirt. Soft diffused window light, warm color cast, visible film grain. {{VARIATION}} Shot on Contax 645, Kodak Portra 400, 80mm f/2.0. Photorealistic.`,
+  moody_warehouse: `Dramatic industrial portrait of this exact person in a raw warehouse: steel beams and skylights, light fog creating volumetric light beams from high windows. Wearing dark structured overcoat. Single narrow spotlight beam illuminates face and shoulders from above, deep shadows. {{VARIATION}} Shot on Fujifilm GFX 100S, 110mm f/2.0. Craig McDean editorial quality, photorealistic.`,
+  studio_bw: `Timeless black-and-white studio portrait of this exact person: pure white background, classic chiaroscuro contrast. Wearing simple dark crew-neck sweater. Classic Rembrandt lighting: single key from 45° above-left, small catchlight reflector. Converted to black and white with rich tonal range. {{VARIATION}} Shot on Hasselblad 500C/M, 80mm f/2.8. Irving Penn quality, photorealistic.`,
+  // ── CREATOR / SOCIAL ──
+  home_office_creator: `Authentic creator lifestyle portrait of this exact person in a beautifully curated home studio: floor-to-ceiling bookshelves, trailing Monstera plants, large monitor in background, warm wood tones. Wearing casual untucked Oxford shirt, sleeves rolled. Natural daylight from large side window. {{VARIATION}} Shot on Sony FX3, 50mm f/1.8. YouTube creator aesthetic, photorealistic.`,
+  wellness_spa: `Serene wellness lifestyle portrait of this exact person in a minimalist Japanese spa interior: smooth natural stone, single orchid, shallow water pool reflecting diffused light, neutral sand and cream palette. Wearing soft spa-white robe. Soft overhead diffused natural light, completely even. {{VARIATION}} Shot on Leica SL2, 75mm f/2.0. Aman Resorts campaign quality, photorealistic.`,
+  urban_lifestyle: `Candid urban lifestyle portrait of this exact person on a quiet downtown street on a crisp clear morning: modernist glass architecture reflecting blue sky, autumn leaves on pavement. Wearing contemporary grey crewneck, dark trousers, white sneakers. Available natural morning light, slightly cool and clean. {{VARIATION}} Shot on Ricoh GR IIIx, 40mm f/2.8. COS campaign quality, photorealistic.`,
+  // ── LEGACY (kept for backward compatibility) ──
+  studio: `Professional studio portrait of this exact person against a clean backdrop with three-point lighting. Wearing smart business attire. {{VARIATION}} Shot on Canon EOS R5, 85mm f/1.4. Photorealistic.`,
+  clinic: `Professional portrait of this exact person in a modern medical office, clean white interior with subtle warm accents. Wearing a professional white coat. {{VARIATION}} Shot on Nikon Z9, 85mm f/1.4. Photorealistic.`,
+  office: `Executive portrait of this exact person in a modern corporate office with clean lines and warm wood accents. Wearing business attire. {{VARIATION}} Shot on Canon EOS R5, 85mm f/1.4. Photorealistic.`,
+  outdoor: `Environmental portrait of this exact person in a beautiful outdoor setting with natural light. Wearing smart casual attire. {{VARIATION}} Shot on Sony A7R V, 85mm f/1.8. Photorealistic.`,
+};
 
 const CREDIT_COSTS: Record<number, number> = { 1: 1, 3: 2, 5: 3 }
 const AI_GATEWAY = 'https://ai.gateway.lovable.dev/v1/chat/completions'
@@ -141,6 +205,10 @@ serve(async (req) => {
           : 'Generate a professional portrait of this exact person shown in the reference image.'
 
         const scenarioPrompt = SCENARIO_PROMPTS[scenario] ?? SCENARIO_PROMPTS.executive_office
+        // Inject unique variation per photo
+        const variation = PHOTO_VARIATIONS[i % PHOTO_VARIATIONS.length]
+        const variationText = `${variation.angle}. ${variation.expression}. ${variation.lighting}. ${variation.framing}. ${variation.pose}.`
+        const finalPrompt = scenarioPrompt.replace('{{VARIATION}}', variationText)
         const generatedPaths: string[] = []
 
         for (let i = 0; i < quantity; i++) {
@@ -156,7 +224,7 @@ serve(async (req) => {
                 role: 'user',
                 content: [
                   { type: 'image_url', image_url: { url: `data:${mimeType};base64,${refImageBase64}` } },
-                  { type: 'text', text: `${personDescription}\n\n${scenarioPrompt}\n\nGenerate a single photorealistic image. The person in the generated image MUST look identical to the person in the reference photo — same facial features, skin tone, hair, and overall appearance. Only change the clothing, pose, and background as described in the scenario.` },
+                  { type: 'text', text: `${personDescription}\n\n${finalPrompt}\n\nGenerate a single photorealistic image. The person in the generated image MUST look identical to the person in the reference photo — same facial features, skin tone, hair, and overall appearance. Only change the clothing, pose, and background as described in the scenario.` },
                 ],
               }],
               modalities: ['image', 'text'],
