@@ -348,7 +348,7 @@ const AdminClients = () => {
             variant="outline"
             size="sm"
             className="gap-1.5 shrink-0"
-            disabled={filtered.length === 0}
+            disabled={clients.length === 0}
             onClick={exportCSV}
           >
             <Download className="h-3.5 w-3.5" />
