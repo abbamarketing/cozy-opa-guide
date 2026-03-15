@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 
 
 const ROLE_CONFIG: Record<string, { label: string; description: string; icon: React.ComponentType<{ className?: string }>; path: string }> = {
+  god: { label: 'God Mode', description: 'Acesso total a todas as áreas', icon: Shield, path: '/admin' },
   admin: { label: 'Administrador', description: 'Gerencie projetos, clientes e editores', icon: Shield, path: '/admin' },
   editor: { label: 'Editor', description: 'Veja e gerencie suas entregas', icon: Film, path: '/editor' },
   client: { label: 'Cliente', description: 'Acompanhe suas entregas e projetos', icon: User, path: '/dashboard' },
