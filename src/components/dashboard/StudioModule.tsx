@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Clapperboard, Camera, Sparkles, Copy, Check, StopCircle,
-  Loader2, ChevronRight, ChevronLeft, Zap, MapPin
+  Loader2, ChevronRight, ChevronLeft, Zap, MapPin, FolderOpen
 } from 'lucide-react';
 import PhotoShootWizard from './PhotoShootWizard';
 import { PhotoShootGallery } from '@/components/studio/PhotoShootGallery';
@@ -223,8 +223,8 @@ export default function StudioModule() {
         </Button>
         <Tabs defaultValue="new" className="w-full">
           <TabsList className="w-full grid grid-cols-2">
-            <TabsTrigger value="new" className="gap-1.5 text-xs">📷 Novo Ensaio</TabsTrigger>
-            <TabsTrigger value="gallery" className="gap-1.5 text-xs">🗂 Meus Ensaios</TabsTrigger>
+            <TabsTrigger value="new" className="gap-1.5 text-xs"><Camera className="h-3.5 w-3.5" /> Novo Ensaio</TabsTrigger>
+            <TabsTrigger value="gallery" className="gap-1.5 text-xs"><FolderOpen className="h-3.5 w-3.5" /> Meus Ensaios</TabsTrigger>
           </TabsList>
           <TabsContent value="new">
             <PhotoShootWizard />

@@ -1,17 +1,18 @@
 import { usePhotoShootGallery, PhotoShoot } from '@/hooks/usePhotoShootGallery';
 import { Button } from '@/components/ui/button';
-import { Download, Loader2, RefreshCw } from 'lucide-react';
+import { Download, Loader2, RefreshCw, Building2, Lightbulb, BarChart3, Armchair, Sunset, Camera, Image, AlertTriangle } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
-const SCENARIO_ICONS: Record<string, string> = {
-  executive_office: '🏙️',
-  startup_workspace: '💡',
-  boardroom: '📊',
-  consulting_office: '🪑',
-  outdoor_business: '🌆',
-  studio: '📸',
-  clinic: '🏥',
-  office: '🏢',
-  outdoor: '🌳',
+const SCENARIO_ICONS: Record<string, LucideIcon> = {
+  executive_office: Building2,
+  startup_workspace: Lightbulb,
+  boardroom: BarChart3,
+  consulting_office: Armchair,
+  outdoor_business: Sunset,
+  studio: Camera,
+  clinic: Building2,
+  office: Building2,
+  outdoor: Sunset,
 };
 
 function ExpiryBadge({ hoursRemaining }: { hoursRemaining: number }) {
@@ -57,7 +58,7 @@ function ShootCard({ shoot }: { shoot: PhotoShoot }) {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">{SCENARIO_ICONS[shoot.scenario] ?? '📷'}</span>
+          {(() => { const Icon = SCENARIO_ICONS[shoot.scenario] ?? Image; return <Icon className="h-6 w-6 text-muted-foreground" />; })()}
           <div>
             <p className="text-sm font-mono font-semibold text-foreground">{shoot.scenario_label}</p>
             <p className="text-[10px] text-muted-foreground">
@@ -126,7 +127,7 @@ export const PhotoShootGallery = () => {
 
   if (shoots.length === 0) return (
     <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
-      <span className="text-4xl">📷</span>
+      <Camera className="h-10 w-10 text-muted-foreground" />
       <div className="text-center">
         <p className="text-sm font-mono font-semibold text-foreground">Nenhum ensaio ainda</p>
         <p className="text-xs text-muted-foreground mt-1">Suas fotos geradas aparecerão aqui por 7 dias.</p>
@@ -148,8 +149,8 @@ export const PhotoShootGallery = () => {
           <p className="text-[10px] text-muted-foreground">{totalPhotos} fotos disponíveis</p>
         </div>
         {expiringToday > 0 && (
-          <span className="text-[10px] text-destructive font-mono">
-            ⚠️ {expiringToday} ensaio{expiringToday > 1 ? 's' : ''} expira{expiringToday > 1 ? 'm' : ''} hoje
+          <span className="text-[10px] text-destructive font-mono flex items-center gap-1">
+            <AlertTriangle className="h-3 w-3" /> {expiringToday} ensaio{expiringToday > 1 ? 's' : ''} expira{expiringToday > 1 ? 'm' : ''} hoje
           </span>
         )}
       </div>

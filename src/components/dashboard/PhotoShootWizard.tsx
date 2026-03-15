@@ -3,14 +3,14 @@ import { useDropzone } from 'react-dropzone';
 import { usePhotoShoot } from '@/hooks/usePhotoShoot';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, Download } from 'lucide-react';
+import { ChevronLeft, Download, Building2, Lightbulb, BarChart3, Armchair, Sunset, Upload, Brain, CheckCircle2, Camera, Loader2 } from 'lucide-react';
 
 const SCENARIOS = [
-  { id: 'executive_office', label: 'Executivo', desc: 'Escritório com vista para a cidade', icon: '🏙️' },
-  { id: 'startup_workspace', label: 'Startup', desc: 'Ambiente moderno e descontraído', icon: '💡' },
-  { id: 'boardroom', label: 'Sala de Reunião', desc: 'Corporativo e autoritativo', icon: '📊' },
-  { id: 'consulting_office', label: 'Consultório/Consultoria', desc: 'Premium e acolhedor', icon: '🪑' },
-  { id: 'outdoor_business', label: 'Externo Corporativo', desc: 'Terraço ou ambiente externo', icon: '🌆' },
+  { id: 'executive_office', label: 'Executivo', desc: 'Escritório com vista para a cidade', Icon: Building2 },
+  { id: 'startup_workspace', label: 'Startup', desc: 'Ambiente moderno e descontraído', Icon: Lightbulb },
+  { id: 'boardroom', label: 'Sala de Reunião', desc: 'Corporativo e autoritativo', Icon: BarChart3 },
+  { id: 'consulting_office', label: 'Consultório/Consultoria', desc: 'Premium e acolhedor', Icon: Armchair },
+  { id: 'outdoor_business', label: 'Externo Corporativo', desc: 'Terraço ou ambiente externo', Icon: Sunset },
 ];
 
 const QUANTITIES = [
@@ -93,7 +93,7 @@ export default function PhotoShootWizard({ onBack }: PhotoShootWizardProps) {
         }`}
       >
         <input {...getInputProps()} />
-        <div className="text-4xl mb-3">📸</div>
+        <Upload className="h-10 w-10 text-muted-foreground mb-3" />
         <p className="text-sm font-medium text-foreground">Arraste suas fotos aqui</p>
         <p className="text-xs text-muted-foreground mt-1">
           ou clique para selecionar · JPG, PNG, WebP · máx. 15 fotos
@@ -150,7 +150,7 @@ export default function PhotoShootWizard({ onBack }: PhotoShootWizardProps) {
 
     return (
       <div className="flex flex-col items-center justify-center py-16 space-y-6">
-        <div className="text-5xl">🧠</div>
+        <Brain className="h-12 w-12 text-primary" />
         <div className="text-center space-y-3 max-w-xs">
           <p className="text-sm font-mono font-semibold text-foreground">{current.label}</p>
           <Progress value={current.progress} className="h-2" />
@@ -165,7 +165,7 @@ export default function PhotoShootWizard({ onBack }: PhotoShootWizardProps) {
   // ── STEP: READY ──
   if (step === 'ready') return (
     <div className="flex flex-col items-center justify-center py-16 space-y-6">
-      <div className="text-5xl">✅</div>
+      <CheckCircle2 className="h-12 w-12 text-primary" />
       <div className="text-center space-y-2">
         <h3 className="text-lg font-mono font-semibold text-foreground">Perfil criado!</h3>
         <p className="text-sm text-muted-foreground">
@@ -209,7 +209,7 @@ export default function PhotoShootWizard({ onBack }: PhotoShootWizardProps) {
                 : 'border-border hover:border-primary/40'
             }`}
           >
-            <span className="text-2xl">{s.icon}</span>
+            <s.Icon className="h-6 w-6 text-muted-foreground" />
             <div>
               <p className="text-sm font-medium text-foreground">{s.label}</p>
               <p className="text-xs text-muted-foreground">{s.desc}</p>
@@ -249,7 +249,7 @@ export default function PhotoShootWizard({ onBack }: PhotoShootWizardProps) {
   // ── STEP: GENERATING ──
   if (step === 'generating') return (
     <div className="flex flex-col items-center justify-center py-16 space-y-6">
-      <div className="text-5xl">📷</div>
+      <Loader2 className="h-12 w-12 text-primary animate-spin" />
       <div className="text-center space-y-3 max-w-xs">
         <p className="text-sm font-mono font-semibold text-foreground">
           Gerando suas fotos profissionais...
