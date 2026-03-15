@@ -39,7 +39,19 @@ interface ClientRow {
   project_name: string | null;
   plan_value: number | null;
   status: string;
+  client_type: string | null;
+  subscription_tier: string | null;
 }
+
+const SUBSCRIPTION_VALUES: Record<string, number> = {
+  standard: 490, pro: 660, business: 1100, premium: 2970, agency: 5590,
+};
+
+const CLIENT_TYPE_BADGE: Record<string, { label: string; className: string }> = {
+  custom: { label: 'Custom', className: 'bg-blue-500/15 text-blue-500 border-blue-500/30' },
+  subscription: { label: 'Assinatura', className: 'bg-green-500/15 text-green-500 border-green-500/30' },
+  studio: { label: 'Studio', className: 'bg-purple-500/15 text-purple-500 border-purple-500/30' },
+};
 
 const STATUS_MAP: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
   active: { label: 'Ativo', variant: 'default' },
