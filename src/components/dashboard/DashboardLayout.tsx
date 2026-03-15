@@ -5,7 +5,7 @@ import { Navigate } from 'react-router-dom';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
 import DeliveryHistory from '@/components/dashboard/DeliveryHistory';
-import ScriptGenerator from '@/components/dashboard/ScriptGenerator';
+import StudioModule from '@/components/dashboard/StudioModule';
 import BrandProfile from '@/components/dashboard/BrandProfile';
 import SettingsComponent from '@/components/dashboard/Settings';
 import StudioTab from '@/components/studio/StudioTab';
