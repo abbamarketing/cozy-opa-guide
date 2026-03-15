@@ -166,6 +166,9 @@ function handleSingleRoleRedirect(
       }
       // Route based on client_type
       if (clientType === 'studio') {
+        if (!profile?.onboarding_complete) {
+          return <Navigate to="/onboarding" replace />;
+        }
         return <Navigate to="/studio" replace />;
       }
       if (clientType === 'subscription') {
