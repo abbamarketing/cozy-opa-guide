@@ -60,7 +60,7 @@ serve(async (req) => {
     // 2. Fetch profile
     const { data: profile } = await supabase
       .from('client_photo_profiles')
-      .select('reference_image_url, lora_url, training_status, profile_document')
+      .select('reference_image_url, lora_url, training_status, profile_document, reference_photo_paths')
       .eq('id', profile_id)
       .eq('user_id', user.id)
       .single()
@@ -100,39 +100,29 @@ serve(async (req) => {
     // 5. Process in background using EdgeRuntime.waitUntil
     const backgroundTask = (async () => {
       try {
-        // Generate reference image on-demand if missing
-        let referenceImageUrl = profile.reference_image_url
-        if (!referenceImageUrl && profile.lora_url) {
-          const FAL_KEY = Deno.env.get('FAL_AI_KEY')
-          if (FAL_KEY) {
-            const refResponse = await fetch('https://fal.run/fal-ai/flux-lora', {
-              method: 'POST',
-              headers: { 'Authorization': `Key ${FAL_KEY}`, 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                prompt: 'professional portrait photo of SUBJECTPERSON, neutral expression, looking directly at camera, plain white background, studio lighting, sharp focus, high resolution headshot',
-                negative_prompt: 'blurry, distorted, cartoon, painting, illustration, bad anatomy, multiple people',
-                loras: [{ path: profile.lora_url, scale: 1.0 }],
-                num_images: 1, image_size: 'portrait_4_3', num_inference_steps: 28, guidance_scale: 3.5, enable_safety_checker: true,
-              }),
-            })
-            if (refResponse.ok) {
-              const refResult = await refResponse.json()
-              const refUrl = refResult?.images?.[0]?.url
-              if (refUrl) {
-                const imgResp = await fetch(refUrl)
-                const imgBuf = await imgResp.arrayBuffer()
-                const storagePath = `${user.id}/${profile_id}/canonical_reference.jpg`
-                await supabase.storage.from('studio-lora-references').upload(storagePath, imgBuf, { contentType: 'image/jpeg', upsert: true })
-                const { data: signedRef } = await supabase.storage.from('studio-lora-references').createSignedUrl(storagePath, 60 * 60 * 24 * 365)
-                referenceImageUrl = signedRef?.signedUrl ?? refUrl
-                await supabase.from('client_photo_profiles').update({ reference_image_url: referenceImageUrl }).eq('id', profile_id)
-              }
-            }
+        // Use one of the user's REAL uploaded photos as reference (not LoRA-generated)
+        // This avoids distortions like wrong eye color from the AI-generated reference
+        let referenceImageUrl: string | null = null
+
+        // Try to get a real photo from reference_photo_paths
+        const realPhotoPaths = (profile as any).reference_photo_paths as string[] | null
+        if (realPhotoPaths && realPhotoPaths.length > 0) {
+          // Pick the first real photo
+          const { data: signedReal } = await supabase.storage
+            .from('studio-reference-photos')
+            .createSignedUrl(realPhotoPaths[0], 60 * 60)
+          if (signedReal?.signedUrl) {
+            referenceImageUrl = signedReal.signedUrl
           }
         }
 
+        // Fallback to the LoRA-generated reference if no real photos available
         if (!referenceImageUrl) {
-          throw new Error('Imagem de referência não encontrada.')
+          referenceImageUrl = profile.reference_image_url
+        }
+
+        if (!referenceImageUrl) {
+          throw new Error('Nenhuma foto de referência disponível.')
         }
 
         // Download reference and convert to base64
