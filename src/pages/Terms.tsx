@@ -1,4 +1,4 @@
-import { Play } from 'lucide-react';
+import abbaLogo from '@/assets/abba-logo.png';
 import { Link } from 'react-router-dom';
 
 const TERMS_SECTIONS = [
