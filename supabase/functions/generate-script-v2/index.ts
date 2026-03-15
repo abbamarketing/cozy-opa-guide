@@ -73,7 +73,7 @@ serve(async (req) => {
     .maybeSingle();
 
   const isScriptCreditsClient = userProject && ['subscription', 'custom'].includes(userProject.client_type || '');
-  let studioCredits: { credits_remaining: number; credits_used_month: number } | null = null;
+  let studioCredits: { credits_available: number; credits_used: number } | null = null;
 
   if (isScriptCreditsClient) {
     if ((userProject.script_credits ?? 0) <= 0) {
@@ -85,11 +85,13 @@ serve(async (req) => {
   } else {
     const { data: credits } = await supabaseAdmin
       .from("studio_credits")
-      .select("credits_remaining, credits_used_month")
+      .select("credits_available, credits_used")
       .eq("user_id", userId)
+      .order("period_start", { ascending: false })
+      .limit(1)
       .single();
 
-    if (!credits || (credits.credits_remaining ?? 0) <= 0) {
+    if (!credits || (credits.credits_available ?? 0) <= 0) {
       return new Response(
         JSON.stringify({ error: "Sem créditos disponíveis" }),
         { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
