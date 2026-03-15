@@ -139,7 +139,6 @@ Deno.serve(async (req) => {
             last_reset_at: new Date().toISOString().split("T")[0],
           }, { onConflict: "user_id" });
 
-          // If user already has a user_project, just enable studio_access
           const { data: existingUp } = await supabase
             .from("user_projects")
             .select("id")
@@ -147,10 +146,32 @@ Deno.serve(async (req) => {
             .maybeSingle();
 
           if (existingUp) {
+            // Usuário já tem projeto (assinatura) — apenas habilita studio_access
             await supabase
               .from("user_projects")
               .update({ studio_access: true })
               .eq("id", existingUp.id);
+          } else {
+            // Usuário comprou SOMENTE o Studio — criar user_project com client_type studio
+            await supabase.from("user_projects").insert({
+              user_id: userId,
+              client_type: "studio",
+              status: "active",
+              studio_access: true,
+              current_period_start: new Date().toISOString(),
+              current_period_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+              youtube_reserved: 0,
+              youtube_approved: 0,
+              instagram_reserved: 0,
+              instagram_approved: 0,
+              thumbnails_reserved: 0,
+              thumbnails_approved: 0,
+              covers_reserved: 0,
+              covers_approved: 0,
+              captures_reserved: 0,
+              captures_approved: 0,
+              tour_completed: false,
+            });
           }
 
           await supabase.from("system_logs").insert({
