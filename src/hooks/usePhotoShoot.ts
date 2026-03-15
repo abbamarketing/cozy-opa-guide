@@ -75,7 +75,8 @@ export const usePhotoShoot = (): UsePhotoShootReturn => {
       // 2. Faz upload de cada foto e coleta URLs temporárias
       const photoUrls: string[] = [];
       for (const file of files) {
-        const path = `${user.id}/${newProfile.id}/${Date.now()}_${file.name}`;
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const path = `${user.id}/${newProfile.id}/${Date.now()}_${safeName}`;
         const { error: uploadError } = await supabase.storage
           .from('studio-reference-photos')
           .upload(path, file);
