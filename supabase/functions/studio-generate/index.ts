@@ -257,13 +257,10 @@ REGRAS IMPORTANTES:
     .then();
 
   // ─── Log AI usage (fire-and-forget) ───
-  const authHeader = req.headers.get('Authorization') ?? '';
-  const jwt = authHeader.replace('Bearer ', '');
-  const { data: { user: authUser } } = await supabase.auth.getUser(jwt);
   logAiUsage({
-    userId: authUser?.id,
+    userId: user.id,
     functionName: 'studio-generate',
-    model: 'google/gemini-3-flash-preview',
+    model: 'google/gemini-2.5-flash',
     isStreaming: true,
   });
 
