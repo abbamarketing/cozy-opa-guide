@@ -78,10 +78,12 @@ const GOD_MOCK_PROJECT: Omit<UserProjectData, 'user_id'> = {
 
 export const useUserProject = () => {
   const { user } = useAuth();
-  const { isGod } = useRole();
+  const { isGod, loading: roleLoading } = useRole();
+
+  const isGodUser = isGod();
 
   const { data: userProject = null, isLoading, error } = useQuery({
-    queryKey: ['user-project', user?.id],
+    queryKey: ['user-project', user?.id, isGodUser],
     queryFn: async () => {
       const { data, error: err } = await supabase
         .from('user_projects')
@@ -94,16 +96,15 @@ export const useUserProject = () => {
 
       if (data) return data as unknown as UserProjectData;
 
-      // GOD: return mock project that unlocks everything
-      if (isGod()) {
+      if (isGodUser) {
         return { ...GOD_MOCK_PROJECT, user_id: user!.id } as UserProjectData;
       }
 
       return null;
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id && !roleLoading,
     staleTime: 5 * 60 * 1000,
   });
 
-  return { userProject, isLoading, error: error?.message ?? null };
+  return { userProject, isLoading: isLoading || roleLoading, error: error?.message ?? null };
 };

@@ -45,7 +45,9 @@ export const useProfile = () => {
   const profile = data?.profile ?? null;
   const roles = data?.roles ?? [];
 
-  const primaryRole = roles.includes('admin')
+  const primaryRole = roles.includes('god')
+    ? 'god'
+    : roles.includes('admin')
     ? 'admin'
     : roles.includes('editor')
     ? 'editor'

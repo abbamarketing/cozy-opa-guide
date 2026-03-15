@@ -254,7 +254,7 @@ const DashboardLayout = () => {
   const [searchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab') as DashboardTab | null;
   const { userProject, isLoading } = useUserProject();
-  const { isGod } = useRole();
+  const { isGod, loading: roleLoading } = useRole();
   const isMobile = useIsMobile();
 
   const isStudio = userProject?.client_type === 'studio';
@@ -278,7 +278,7 @@ const DashboardLayout = () => {
   }, [tabFromUrl]);
 
   // Redirect to waiting if no project — god bypasses
-  if (!isLoading && !userProject && !isGod()) {
+  if (!isLoading && !roleLoading && !userProject && !isGod()) {
     return <Navigate to="/waiting" replace />;
   }
 
