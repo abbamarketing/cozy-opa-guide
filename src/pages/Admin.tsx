@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
-import { Play, LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, BookOpen, Menu } from 'lucide-react';
+import { LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, BookOpen, Menu } from 'lucide-react';
+import abbaLogo from '@/assets/abba-logo.png';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
