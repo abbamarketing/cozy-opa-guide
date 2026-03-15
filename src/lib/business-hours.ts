@@ -177,7 +177,7 @@ export function countWeekdayHours(startDate: Date, slaHours: number): Date {
     // Pular fim de semana: avançar para segunda-feira meia-noite
     if (dayOfWeek === 0) {
       // Domingo: avançar 24h (para segunda)
-      current.setHours(current.getHours() + 24);
+      current.setTime(current.getTime() + 24 * 3600000);
       continue;
     }
     if (dayOfWeek === 6) {
