@@ -1,0 +1,1 @@
+ALTER TABLE public.user_projects ADD COLUMN IF NOT EXISTS script_credits integer DEFAULT 0;
