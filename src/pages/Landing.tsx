@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Upload, Scissors, CheckCircle, Clock, ArrowRight } from 'lucide-react';
+import { CheckCircle, Clock, ArrowRight, ArrowDown, Sparkles, MessageSquare, Send, FileText, Zap } from 'lucide-react';
 import abbaLogo from '@/assets/abba-logo.png';
+import screenshotDashboard from '@/assets/screenshot-dashboard-desktop.jpg';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -20,57 +21,57 @@ const fadeUp = {
   }),
 } as const;
 
-const PLANS = [
-  { name: 'Standard', price: 490, videos: 4, sla: '72h úteis', popular: false },
-  { name: 'Pro', price: 660, videos: 8, sla: '48h úteis', popular: true },
-  { name: 'Business', price: 1100, videos: 16, sla: '48h úteis', popular: false },
-  { name: 'Premium', price: 2970, videos: 30, sla: '24h úteis', popular: false },
-  { name: 'Agency', price: 5590, videos: 60, sla: '24h úteis', popular: false },
-];
-
-const STEPS = [
-  { icon: Upload, title: 'Você envia', desc: 'Arquivos brutos, briefing de marca e pauta do vídeo' },
-  { icon: Scissors, title: 'A gente edita', desc: 'Equipe de editores profissionais com SLA por plano' },
-  { icon: CheckCircle, title: 'Você recebe', desc: 'Vídeo aprovado na plataforma, pronto para publicar' },
-];
-
 const FAQ = [
   {
-    q: 'Posso pedir qualquer tipo de vídeo?',
-    a: 'O plano cobre short videos até 90 segundos para Reels, Shorts e TikTok. Para outros formatos, temos projetos customizados.',
+    q: 'O que é fila ilimitada?',
+    a: 'Você envia quantos vídeos quiser, quando quiser. Não existe cota mensal de quantidade. Processamos um por vez, na ordem de envio, dentro do prazo garantido do seu plano.',
   },
   {
-    q: 'Qual o prazo de entrega?',
-    a: 'Depende do seu plano. Standard: 72h úteis. Pro/Business: 48h úteis. Premium/Agency: 24h úteis.',
+    q: 'Como funciona o SLA?',
+    a: 'Cada vídeo tem um prazo contado em horas úteis a partir do envio. O countdown fica visível no seu dashboard em tempo real. No plano mais avançado, seu vídeo sai em até 4 horas.',
   },
   {
-    q: 'Como envio os arquivos brutos?',
-    a: 'Diretamente pela plataforma, via upload ou link do Google Drive.',
+    q: 'O que a edição inclui?',
+    a: 'Short videos de até 90 segundos: Reels, Shorts e TikTok. Corte, legenda, ritmo e identidade visual. Não inclui vídeos longos, thumbnails ou capas.',
   },
   {
-    q: 'Posso pedir revisões?',
-    a: 'Sim. Cada entrega inclui 2 rodadas de revisão gratuitas.',
+    q: 'E se eu não gostar da edição?',
+    a: 'Pede revisão no app, marca o segundo exato se precisar, e o vídeo volta para produção — com o mesmo prazo garantido. Sem limite de revisões, sem custo adicional.',
+  },
+  {
+    q: 'O que é o Studio?',
+    a: 'Ferramenta de roteiro com IA inclusa em todos os planos. Também disponível separado — paga uma vez e usa para sempre.',
+  },
+  {
+    q: 'Posso cancelar?',
+    a: 'Sim. A qualquer momento pelo portal do cliente. Sem multa, sem burocracia.',
   },
 ];
 
 const KANBAN_COLS = [
   {
-    title: 'Aguardando edição',
+    title: 'Fila',
     cards: [
-      { type: 'Reel', title: 'Rotina de manhã', sla: '71h restantes', slaColor: 'bg-yellow-500/20 text-yellow-400' },
+      { type: 'Reel', title: 'Rotina de manhã', sla: 'Na fila', slaColor: 'bg-white/10 text-white/50' },
+      { type: 'Short', title: 'Review produto X', sla: 'Na fila', slaColor: 'bg-white/10 text-white/50' },
     ],
   },
   {
     title: 'Em produção',
     cards: [
-      { type: 'Short', title: 'Dica rápida #12', sla: '23h restantes', slaColor: 'bg-abba-lime/20 text-abba-lime' },
-      { type: 'TikTok', title: 'Trend challenge', sla: '46h restantes', slaColor: 'bg-abba-lime/20 text-abba-lime' },
+      { type: 'TikTok', title: 'Trend challenge', sla: '3h 42min restantes', slaColor: 'bg-abba-lime/20 text-abba-lime' },
+    ],
+  },
+  {
+    title: 'Revisar',
+    cards: [
+      { type: 'Reel', title: 'Dica rápida #12', sla: 'Pronto', slaColor: 'bg-abba-lime/20 text-abba-lime' },
     ],
   },
   {
     title: 'Aprovado',
     cards: [
-      { type: 'Reel', title: 'Unboxing produto X', sla: 'Entregue', slaColor: 'bg-abba-lime/20 text-abba-lime' },
+      { type: 'Short', title: 'Unboxing novo setup', sla: 'Entregue', slaColor: 'bg-abba-lime/20 text-abba-lime' },
     ],
   },
 ];
@@ -78,6 +79,26 @@ const KANBAN_COLS = [
 const Landing = () => {
   return (
     <div className="min-h-screen bg-abba-dark text-foreground">
+      {/* ─── NAV ─── */}
+      <nav className="sticky top-0 z-50 bg-abba-dark/90 backdrop-blur-lg border-b border-abba-surface">
+        <div className="mx-auto max-w-6xl flex items-center justify-between px-6 py-3">
+          <div className="flex items-center gap-2">
+            <img src={abbaLogo} alt="AbbaVideo" className="h-8 w-8 rounded-lg" />
+            <span className="text-lg font-sans font-bold">
+              Abba<span className="text-abba-lime">Video</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" asChild className="text-white/60 hover:text-white hidden sm:inline-flex">
+              <a href="#planos">Planos</a>
+            </Button>
+            <Button size="sm" asChild className="bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light">
+              <Link to="/auth">Entrar</Link>
+            </Button>
+          </div>
+        </div>
+      </nav>
+
       {/* ─── HERO ─── */}
       <section className="relative flex min-h-[85vh] flex-col items-center justify-center px-6 text-center">
         <motion.div
@@ -85,203 +106,178 @@ const Landing = () => {
           animate="visible"
           className="mx-auto max-w-3xl space-y-6"
         >
-          <motion.div variants={fadeUp} custom={0} className="mx-auto flex items-center gap-2">
-            <img src={abbaLogo} alt="AbbaVideo" className="h-10 w-10 rounded-xl" />
-            <span className="text-xl font-sans font-bold">
-              Abba<span className="text-abba-lime">Video</span>
-            </span>
-          </motion.div>
+          <motion.p
+            variants={fadeUp}
+            custom={0}
+            className="text-sm font-sans text-white/50 tracking-wide"
+          >
+            Edição profissional de vídeo sempre foi cara, lenta e imprevisível.
+          </motion.p>
 
           <motion.h1
             variants={fadeUp}
             custom={1}
-            className="text-3xl font-sans font-extrabold leading-tight tracking-[-0.04em] sm:text-5xl"
+            className="text-3xl font-sans font-extrabold leading-tight tracking-[-0.04em] sm:text-5xl lg:text-6xl"
           >
-            Seus Reels, Shorts e TikToks.{' '}
-            <span className="text-abba-lime">Editados por <em className="font-light">profissionais.</em></span>{' '}
-            Entregues toda semana.
+            A tecnologia{' '}
+            <span className="text-abba-lime"><em className="font-light">mudou</em></span>{' '}
+            isso.
           </motion.h1>
 
           <motion.p
             variants={fadeUp}
             custom={2}
-            className="mx-auto max-w-xl text-base text-muted-foreground sm:text-lg font-sans"
+            className="mx-auto max-w-2xl text-base text-white/70 sm:text-lg font-sans leading-relaxed"
           >
-            Assine um plano, envie seus arquivos brutos, e receba seus vídeos
-            prontos para publicar — com SLA garantido.
+            AbbaVideo entrega short videos editados com sua identidade visual em até 4 horas
+            — fila ilimitada, sem cota, sem surpresa.
           </motion.p>
 
-          <motion.div variants={fadeUp} custom={3} className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <motion.p
+            variants={fadeUp}
+            custom={3}
+            className="text-sm font-sans text-abba-lime font-semibold"
+          >
+            7 dias grátis. Cancela quando quiser.
+          </motion.p>
+
+          <motion.div variants={fadeUp} custom={4} className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <Button size="lg" asChild className="bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light">
-              <a href="#planos">Ver Planos</a>
+              <Link to="/auth">Começar agora</Link>
             </Button>
             <Button variant="outline" size="lg" asChild className="border border-white/20 text-white rounded-full hover:bg-abba-surface">
-              <Link to="/auth">
-                Entrar na plataforma <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
+              <a href="#o-que-mudou">
+                Ver como funciona <ArrowDown className="ml-2 h-4 w-4" />
+              </a>
             </Button>
           </motion.div>
         </motion.div>
       </section>
 
-      {/* ─── COMO FUNCIONA ─── */}
-      <section className="border-t border-abba-surface bg-abba-dark py-20 px-6">
-        <div className="mx-auto max-w-5xl">
-          <motion.h2
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12 text-center text-2xl font-sans font-bold sm:text-3xl"
-          >
-            Como funciona
-          </motion.h2>
-
-          <div className="grid gap-6 sm:grid-cols-3">
-            {STEPS.map((step, i) => {
-              const Icon = step.icon;
-              return (
-                <motion.div
-                  key={step.title}
-                  variants={fadeUp}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  custom={i}
-                >
-                  <div className="flex flex-col items-center gap-4 rounded-[20px] bg-abba-surface border border-white/8 p-8 text-center">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-abba-lime">
-                      <Icon className="h-7 w-7 text-[#111]" />
-                    </div>
-                    <h3 className="text-lg font-sans font-semibold">{step.title}</h3>
-                    <p className="text-sm font-sans text-muted-foreground">{step.desc}</p>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── O QUE É ENTREGUE ─── */}
-      <section className="py-20 px-6">
+      {/* ─── O QUE MUDOU ─── */}
+      <section id="o-que-mudou" className="border-t border-abba-surface py-20 px-6">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mx-auto max-w-2xl text-center space-y-4"
+          className="mx-auto max-w-2xl space-y-6 text-center"
         >
-          <Badge variant="secondary" className="text-xs font-sans rounded-full">
-            Plano de Assinatura — Short Videos até 90s
-          </Badge>
-          <h2 className="text-2xl font-sans font-bold sm:text-3xl">O que está incluso</h2>
-          <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground font-sans">
-            <span className="rounded-full border border-white/20 px-3 py-1">Instagram Reels</span>
-            <span className="rounded-full border border-white/20 px-3 py-1">YouTube Shorts</span>
-            <span className="rounded-full border border-white/20 px-3 py-1">TikTok</span>
+          <h2 className="text-2xl font-sans font-bold sm:text-3xl">O que mudou</h2>
+          <div className="space-y-4 text-sm sm:text-base font-sans text-white/70 leading-relaxed text-left">
+            <p>
+              Durante anos, ter uma equipe de edição profissional era privilégio de quem tinha orçamento de agência.
+            </p>
+            <p>
+              Freelancer era a alternativa. E quem usou sabe o que significa: prazo que "depende da demanda",
+              qualidade inconsistente, nenhuma memória de marca entre um vídeo e outro.
+            </p>
+            <p className="text-white font-medium">
+              AbbaVideo existe porque bom serviço não deveria funcionar assim.
+            </p>
+            <p>
+              Tecnologia aplicada com inteligência muda a equação.{' '}
+              <span className="text-abba-lime font-semibold">Fila ilimitada. Prazo garantido. Identidade visual aplicada em todo vídeo — sempre.</span>
+            </p>
           </div>
-          <p className="text-sm font-sans text-muted-foreground pt-2">
-            Precisa de outros formatos?{' '}
-            <Link to="/auth" className="text-abba-lime font-medium hover:underline">
-              Fale com a gente sobre projetos customizados.
-            </Link>
-          </p>
         </motion.div>
       </section>
 
-      {/* ─── PLANOS ─── */}
-      <section id="planos" className="border-t border-abba-surface bg-abba-dark py-20 px-6">
-        <div className="mx-auto max-w-6xl">
-          <motion.h2
+      {/* ─── CRIE O ROTEIRO (STUDIO) ─── */}
+      <section className="border-t border-abba-surface bg-abba-surface/30 py-20 px-6">
+        <div className="mx-auto max-w-4xl">
+          <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-4 text-center text-2xl font-sans font-bold sm:text-3xl"
+            className="text-center space-y-4 mb-12"
           >
-            Planos e Preços
-          </motion.h2>
-          <p className="mx-auto mb-12 max-w-lg text-center text-sm font-sans text-muted-foreground">
-            Todos os planos incluem edição profissional de short videos até 90s,
-            2 rodadas de revisão por entrega e acesso à plataforma.
-          </p>
+            <Badge variant="secondary" className="text-xs font-sans rounded-full">
+              <Sparkles className="h-3 w-3 mr-1" /> Studio — IA para Roteiros
+            </Badge>
+            <h2 className="text-2xl font-sans font-bold sm:text-3xl">Crie o roteiro</h2>
+            <p className="text-white/50 font-sans text-sm">Antes de gravar, tenha o roteiro certo.</p>
+          </motion.div>
 
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
-            {PLANS.map((plan, i) => (
-              <motion.div
-                key={plan.name}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={i}
-              >
-                <div
-                  className={`relative flex flex-col rounded-[20px] p-6 ${
-                    plan.popular ? 'kpi-dark border-2 border-abba-lime' : 'bg-abba-surface border border-white/8 rounded-[20px]'
-                  }`}
-                  style={plan.popular ? { minHeight: 'auto' } : undefined}
-                >
-                  {plan.popular && (
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-abba-lime text-[#111] font-bold rounded-full px-3 py-0.5 text-[11px] uppercase tracking-widest">
-                      Mais Popular
-                    </span>
-                  )}
-                  <h3 className="text-lg font-sans font-bold text-white">{plan.name}</h3>
-                  <p className="mt-2 text-3xl font-sans font-extrabold text-abba-lime">
-                    R$ {plan.price.toLocaleString('pt-BR')}
-                    <span className="text-sm font-normal text-white/60">/mês</span>
-                  </p>
-                  <ul className="mt-5 space-y-2 text-sm font-sans text-white/60 flex-1">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-abba-lime shrink-0" />
-                      {plan.videos} vídeos/mês
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-abba-lime shrink-0" />
-                      SLA: {plan.sla}
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-abba-lime shrink-0" />
-                      2 revisões/entrega
-                    </li>
-                  </ul>
-                  <Button
-                    className={`mt-6 w-full rounded-full font-bold ${
-                      plan.popular
-                        ? 'bg-abba-lime text-[#111] hover:bg-abba-light'
-                        : 'border border-white/20 text-white hover:bg-abba-surface bg-transparent'
+          {/* Studio mock */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-[20px] bg-abba-surface border border-white/8 p-6 sm:p-8 space-y-6"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex gap-1">
+                {['Tema', 'Público', 'Tom', 'Referência', 'Gerar'].map((step, i) => (
+                  <span
+                    key={step}
+                    className={`px-3 py-1 rounded-full text-[11px] font-sans font-semibold ${
+                      i === 4
+                        ? 'bg-abba-lime text-[#111]'
+                        : i < 4
+                        ? 'bg-abba-lime/20 text-abba-lime'
+                        : 'bg-white/10 text-white/40'
                     }`}
-                    asChild
                   >
-                    <Link to="/auth">Assinar</Link>
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                    {step}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="rounded-xl bg-abba-dark/60 border border-white/6 p-4 space-y-2">
+                <p className="text-[11px] font-sans font-semibold text-white/40 uppercase tracking-wider">Tema</p>
+                <p className="text-sm font-sans text-white/80">5 hábitos que mudaram minha produtividade</p>
+              </div>
+              <div className="rounded-xl bg-abba-dark/60 border border-white/6 p-4 space-y-2">
+                <p className="text-[11px] font-sans font-semibold text-white/40 uppercase tracking-wider">Tom</p>
+                <p className="text-sm font-sans text-white/80">Direto, confiante, sem enrolação</p>
+              </div>
+            </div>
+            <Button className="bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light w-full sm:w-auto">
+              <Sparkles className="h-4 w-4 mr-2" /> Gerar Roteiro
+            </Button>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="mt-8 text-center space-y-3"
+          >
+            <p className="text-sm font-sans text-white/70">
+              O Studio é a ferramenta de roteiro com IA do AbbaVideo. Em 5 passos, você transforma um tema em roteiro estruturado
+              — com hook, desenvolvimento, CTA e palavras-chave prontas para gravar.
+            </p>
+            <p className="text-sm font-sans text-white font-medium">
+              Hook que para o scroll. Estrutura que segura até o fim. Tom que é o seu.
+            </p>
+            <p className="text-xs font-sans text-abba-lime font-semibold">
+              10 roteiros por mês. Todo mês. Incluso em todos os planos.
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      {/* ─── PLATAFORMA (MOCK) ─── */}
-      <section className="py-20 px-6">
+      {/* ─── ENVIE E ACOMPANHE ─── */}
+      <section className="border-t border-abba-surface py-20 px-6">
         <div className="mx-auto max-w-5xl">
-          <motion.h2
+          <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-4 text-center text-2xl font-sans font-bold sm:text-3xl"
+            className="text-center space-y-4 mb-12"
           >
-            Acompanhe tudo pela plataforma
-          </motion.h2>
-          <p className="mx-auto mb-10 max-w-lg text-center text-sm font-sans text-muted-foreground">
-            Kanban em tempo real com status de cada entrega e contagem regressiva do SLA.
-          </p>
+            <h2 className="text-2xl font-sans font-bold sm:text-3xl">Envie e acompanhe</h2>
+            <p className="text-white/50 font-sans text-sm">Sem email. Sem WhatsApp. Sem ruído.</p>
+          </motion.div>
 
+          {/* Kanban mock */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="grid gap-4 sm:grid-cols-3"
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
           >
             {KANBAN_COLS.map((col) => (
               <div key={col.title} className="rounded-[20px] bg-abba-surface/60 border border-white/8 p-4">
@@ -309,11 +305,312 @@ const Landing = () => {
               </div>
             ))}
           </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="mt-8 text-center space-y-3 max-w-2xl mx-auto"
+          >
+            <p className="text-sm font-sans text-white/70">
+              Cada vídeo tem um status em tempo real. Você sabe exatamente onde está, quando chega e quanto tempo falta
+              — sem precisar perguntar para ninguém.
+            </p>
+            <p className="text-sm font-sans text-white/70">
+              Envia o arquivo bruto ou um link. O briefing de marca já está salvo. Sua equipe sabe o que fazer.
+            </p>
+            <p className="text-sm font-sans text-abba-lime font-semibold">
+              Fila ilimitada. Sem cota mensal. Envia quantos quiser.
+            </p>
+          </motion.div>
         </div>
       </section>
 
+      {/* ─── VÍDEO PRONTO EM HORAS ─── */}
+      <section className="border-t border-abba-surface bg-abba-surface/30 py-20 px-6">
+        <div className="mx-auto max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center space-y-4 mb-12"
+          >
+            <h2 className="text-2xl font-sans font-bold sm:text-3xl">Vídeo pronto em horas</h2>
+            <p className="text-white/50 font-sans text-sm">Não em dias. Em horas.</p>
+          </motion.div>
+
+          {/* SLA card mock */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-[20px] bg-abba-surface border border-white/8 p-6 sm:p-8 max-w-md mx-auto"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <Badge variant="secondary" className="text-[10px] font-sans rounded-full">TikTok</Badge>
+              <Badge className="bg-abba-lime/20 text-abba-lime text-[10px] rounded-full border-0">Standard</Badge>
+            </div>
+            <p className="text-sm font-sans font-semibold text-white mb-3">Trend challenge — edição rápida</p>
+            <div className="progress-track" style={{ height: '36px' }}>
+              <div className="progress-fill text-[12px]" style={{ width: '62%' }}>
+                3h 42min restantes
+              </div>
+            </div>
+            <p className="text-[11px] font-sans text-white/40 mt-2">SLA: 72h úteis · Enviado há 44h</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="mt-8 text-center space-y-3 max-w-2xl mx-auto"
+          >
+            <p className="text-sm font-sans text-white/70">
+              Dependendo do plano, seu vídeo sai editado em até 4 horas.
+            </p>
+            <p className="text-sm font-sans text-white/70">
+              Cada entrega tem um prazo garantido contado em horas úteis a partir do momento do envio.
+              Você acompanha o countdown em tempo real. Quando o vídeo chega, você recebe uma notificação
+              — e aprova com um clique.
+            </p>
+            <p className="text-sm font-sans text-white font-medium">
+              Isso não existia antes. Agora existe.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── REVISE COM PRECISÃO ─── */}
+      <section className="border-t border-abba-surface py-20 px-6">
+        <div className="mx-auto max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center space-y-4 mb-12"
+          >
+            <h2 className="text-2xl font-sans font-bold sm:text-3xl">Revise com precisão</h2>
+            <p className="text-white/50 font-sans text-sm">Pediu ajuste, foi ajustado.</p>
+          </motion.div>
+
+          {/* Revision mock */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-[20px] bg-abba-surface border border-white/8 p-6 sm:p-8 max-w-md mx-auto space-y-4"
+          >
+            <div className="rounded-xl bg-abba-dark/60 border border-white/6 p-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4 text-abba-lime" />
+                <p className="text-[11px] font-sans font-semibold text-white/40 uppercase tracking-wider">Revisão</p>
+              </div>
+              <div className="rounded-lg bg-abba-dark border border-white/6 p-3">
+                <p className="text-xs font-sans text-white/60 mb-1">
+                  <span className="text-abba-lime font-mono">00:14</span> — cortar pausa
+                </p>
+                <p className="text-xs font-sans text-white/60">
+                  <span className="text-abba-lime font-mono">00:32</span> — legenda cortou o texto
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-[11px] font-sans text-white/40">
+              <Clock className="h-3 w-3" />
+              Revisão anterior: 2h atrás · Entregue com sucesso
+            </div>
+            <Button className="bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light w-full">
+              <Send className="h-4 w-4 mr-2" /> Enviar revisão
+            </Button>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="mt-8 text-center space-y-3 max-w-2xl mx-auto"
+          >
+            <p className="text-sm font-sans text-white/70">
+              Cada entrega tem um canal próprio. Você indica o ajuste, marca o segundo exato se precisar,
+              e o vídeo volta para produção — com o mesmo prazo garantido.
+            </p>
+            <p className="text-sm font-sans text-abba-lime font-semibold">
+              Sem limite de revisões. Sem cobranças extras. Sem atrito.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── PLANOS ─── */}
+      <section id="planos" className="border-t border-abba-surface bg-abba-surface/30 py-20 px-6">
+        <div className="mx-auto max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center space-y-4 mb-12"
+          >
+            <h2 className="text-2xl font-sans font-bold sm:text-3xl">Planos</h2>
+            <p className="text-white/50 font-sans text-sm">Escolha pela velocidade que o seu ritmo exige.</p>
+          </motion.div>
+
+          <div className="grid gap-6 sm:grid-cols-2 max-w-3xl mx-auto">
+            {/* Studio Plan */}
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              custom={0}
+            >
+              <div className="flex flex-col rounded-[20px] bg-abba-surface border border-white/8 p-6 h-full">
+                <div className="flex items-center gap-2 mb-1">
+                  <FileText className="h-4 w-4 text-abba-lime" />
+                  <h3 className="text-lg font-sans font-bold text-white">Studio</h3>
+                </div>
+                <p className="text-xs font-sans text-white/50 mb-4">Comece aqui</p>
+                <p className="text-sm font-sans text-white/70 mb-4">
+                  Para quem quer gravar com mais clareza e consistência.
+                </p>
+                <ul className="space-y-2 text-sm font-sans text-white/60 flex-1">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
+                    10 roteiros por mês com IA — para sempre
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
+                    Pipeline guiado em 5 passos
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
+                    Hook, desenvolvimento, CTA e palavras-chave
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
+                    Histórico completo de roteiros gerados
+                  </li>
+                </ul>
+                <p className="text-xs font-sans text-white/40 mt-4 mb-4">
+                  Paga uma vez. Usa para sempre.
+                </p>
+                <Button
+                  className="w-full rounded-full font-bold border border-white/20 text-white hover:bg-abba-surface bg-transparent"
+                  asChild
+                >
+                  <Link to="/auth">Criar meu primeiro roteiro</Link>
+                </Button>
+              </div>
+            </motion.div>
+
+            {/* Standard Plan */}
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              custom={1}
+            >
+              <div className="relative flex flex-col rounded-[20px] kpi-dark border-2 border-abba-lime p-6 h-full" style={{ minHeight: 'auto' }}>
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-abba-lime text-[#111] font-bold rounded-full px-3 py-0.5 text-[11px] uppercase tracking-widest flex items-center gap-1">
+                  <Zap className="h-3 w-3" /> 7 dias grátis
+                </span>
+                <div className="flex items-center gap-2 mb-1 mt-2">
+                  <h3 className="text-lg font-sans font-bold text-white">Standard</h3>
+                  <span className="text-abba-lime text-lg">★</span>
+                </div>
+                <p className="text-sm font-sans text-white/70 mb-4">
+                  Para quem quer escalar sem depender de ninguém.
+                </p>
+                <ul className="space-y-2 text-sm font-sans text-white/60 flex-1">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
+                    Reels, Shorts e TikTok de até 90 segundos
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
+                    Fila ilimitada — sem cota mensal
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Clock className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
+                    Vídeo pronto em até 72 horas
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
+                    Identidade visual aplicada em todo vídeo
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
+                    Briefing de marca salvo — sem explicar de novo
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Sparkles className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
+                    Studio incluso
+                  </li>
+                </ul>
+                <p className="text-xs font-sans text-white/40 mt-4 mb-4">
+                  Cancele quando quiser, sem multa.
+                </p>
+                <Button
+                  className="w-full rounded-full font-bold bg-abba-lime text-[#111] hover:bg-abba-light"
+                  asChild
+                >
+                  <Link to="/auth">Começar 7 dias grátis</Link>
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* More speed CTA */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="mt-10 text-center rounded-[20px] bg-abba-surface border border-white/8 p-6 max-w-xl mx-auto"
+          >
+            <p className="text-sm font-sans text-white font-medium mb-2">
+              Precisa de mais velocidade?
+            </p>
+            <p className="text-xs font-sans text-white/50 mb-4">
+              Temos planos com entrega em 48h, 24h, 8h e até 4 horas — para criadores e times que
+              produzem em alto volume e não podem esperar.
+            </p>
+            <Button
+              variant="outline"
+              className="rounded-full border border-white/20 text-white hover:bg-abba-surface"
+              asChild
+            >
+              <Link to="/auth">Falar com a equipe <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── MANIFESTO ─── */}
+      <section className="border-t border-abba-surface py-20 px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto max-w-2xl text-center space-y-6"
+        >
+          <h2 className="text-2xl font-sans font-bold sm:text-3xl">Manifesto</h2>
+          <div className="space-y-4 text-sm sm:text-base font-sans text-white/70 leading-relaxed">
+            <p>Acreditamos que produção profissional deveria ser acessível.</p>
+            <p>
+              Não como desconto. Não como versão inferior.
+              <br />
+              Como serviço real, com prazo real, para criadores reais.
+            </p>
+            <p className="text-white font-medium">
+              É isso que a tecnologia permite quando usada do jeito certo.
+              <br />
+              É isso que o AbbaVideo entrega.
+            </p>
+          </div>
+        </motion.div>
+      </section>
+
       {/* ─── FAQ ─── */}
-      <section className="border-t border-abba-surface bg-abba-dark py-20 px-6">
+      <section className="border-t border-abba-surface bg-abba-surface/30 py-20 px-6">
         <div className="mx-auto max-w-2xl">
           <motion.h2
             initial={{ opacity: 0, y: 16 }}
@@ -321,7 +618,7 @@ const Landing = () => {
             viewport={{ once: true }}
             className="mb-10 text-center text-2xl font-sans font-bold sm:text-3xl"
           >
-            Perguntas Frequentes
+            FAQ
           </motion.h2>
 
           <Accordion type="single" collapsible className="space-y-2">
@@ -339,17 +636,53 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* ─── CTA FINAL ─── */}
+      <section className="border-t border-abba-surface py-20 px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto max-w-2xl text-center space-y-6"
+        >
+          <h2 className="text-2xl font-sans font-bold sm:text-3xl">
+            O próximo vídeo do seu canal poderia estar em produção agora.
+          </h2>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button size="lg" asChild className="bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light">
+              <Link to="/auth">Começar 7 dias grátis</Link>
+            </Button>
+            <Button variant="outline" size="lg" asChild className="border border-white/20 text-white rounded-full hover:bg-abba-surface">
+              <Link to="/auth">
+                Criar roteiro com IA <Sparkles className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+          <p className="text-xs font-sans text-white/40">
+            Fila ilimitada. Prazo garantido. Identidade visual em todo vídeo.
+          </p>
+        </motion.div>
+      </section>
+
       {/* ─── FOOTER ─── */}
       <footer className="border-t border-abba-surface py-10 px-6">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 text-center text-sm font-sans text-muted-foreground sm:flex-row sm:justify-between sm:text-left">
-          <p>© {new Date().getFullYear()} AbbaVideo. Edição profissional de short videos.</p>
+          <div className="flex items-center gap-2">
+            <img src={abbaLogo} alt="AbbaVideo" className="h-6 w-6 rounded-md" />
+            <p>© {new Date().getFullYear()} AbbaVideo</p>
+          </div>
           <div className="flex gap-4">
             <Link to="/auth" className="hover:text-foreground transition-colors">
               Entrar
             </Link>
             <a href="#planos" className="hover:text-foreground transition-colors">
-              Ver Planos
+              Planos
             </a>
+            <Link to="/termos" className="hover:text-foreground transition-colors">
+              Termos
+            </Link>
+            <Link to="/privacidade" className="hover:text-foreground transition-colors">
+              Privacidade
+            </Link>
           </div>
         </div>
       </footer>
