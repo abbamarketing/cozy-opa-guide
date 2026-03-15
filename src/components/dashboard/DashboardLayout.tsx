@@ -17,7 +17,7 @@ import {
   Video,
   Calendar,
   CheckCircle2,
-  FileText,
+  Clapperboard,
   Settings,
   Palette,
   LogOut,
