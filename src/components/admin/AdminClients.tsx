@@ -443,7 +443,7 @@ const AdminClients = () => {
                         size="sm"
                         className="h-7 text-xs gap-1"
                         disabled={actionLoading === c.user_id}
-                        onClick={() => setConfirmAction({ type: 'activate', userId: c.user_id, clientName: c.full_name })}
+                        onClick={() => setConfirmAction({ type: 'activate', userId: c.user_id, clientName: c.full_name, clientType: c.client_type })}
                       >
                         <Play className="h-3 w-3" /> Ativar
                       </Button>
