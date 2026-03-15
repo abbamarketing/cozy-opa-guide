@@ -205,6 +205,10 @@ serve(async (req) => {
           : 'Generate a professional portrait of this exact person shown in the reference image.'
 
         const scenarioPrompt = SCENARIO_PROMPTS[scenario] ?? SCENARIO_PROMPTS.executive_office
+        // Inject unique variation per photo
+        const variation = PHOTO_VARIATIONS[i % PHOTO_VARIATIONS.length]
+        const variationText = `${variation.angle}. ${variation.expression}. ${variation.lighting}. ${variation.framing}. ${variation.pose}.`
+        const finalPrompt = scenarioPrompt.replace('{{VARIATION}}', variationText)
         const generatedPaths: string[] = []
 
         for (let i = 0; i < quantity; i++) {
