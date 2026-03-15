@@ -364,10 +364,10 @@ const AdminClients = () => {
             <div className="py-12 text-center text-muted-foreground">
               <Loader2 className="h-6 w-6 animate-spin mx-auto" />
             </div>
-          ) : filtered.length === 0 ? (
+          ) : clients.length === 0 ? (
             <p className="py-12 text-center text-sm text-muted-foreground">Nenhum cliente encontrado.</p>
           ) : (
-            filtered.map((c) => {
+            clients.map((c) => {
               const st = STATUS_MAP[c.status] || { label: 'Sem projeto', variant: 'secondary' as const };
               return (
                 <Card key={c.user_id} className="p-3 space-y-2">
