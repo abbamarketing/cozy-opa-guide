@@ -247,7 +247,7 @@ const AdminClients = () => {
           confirmAction.type === 'suspend' ? 'Cliente Suspendido' : 'Cliente Reativado',
           { description: 'Status atualizado com sucesso' }
         );
-        fetchClients();
+        refetch();
       }
     }
 
