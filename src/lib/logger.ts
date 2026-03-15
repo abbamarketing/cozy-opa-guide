@@ -44,14 +44,14 @@ function scheduleFlush() {
   if (flushTimer) return;
   flushTimer = setTimeout(() => {
     flushTimer = null;
-    flushLogs();
+    void flushLogs();
   }, FLUSH_INTERVAL);
 }
 
 function addLog(entry: LogEntry) {
   logBuffer.push(entry);
   if (logBuffer.length >= LOG_BATCH_SIZE) {
-    flushLogs();
+    void flushLogs();
   } else {
     scheduleFlush();
   }
@@ -76,6 +76,6 @@ export const logger = {
 // Flush on page unload
 if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', () => {
-    flushLogs();
+    if (logBuffer.length > 0) void flushLogs();
   });
 }
