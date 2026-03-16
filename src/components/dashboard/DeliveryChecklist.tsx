@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ClipboardCheck } from 'lucide-react';
+import { useDebouncedCallback } from '@/hooks/useDebounce';
 
 interface ChecklistItem {
   id: string;
@@ -12,23 +13,46 @@ interface ChecklistItem {
 
 interface DeliveryChecklistProps {
   userProjectId: string;
+  deliveryId: string;
 }
 
-const DeliveryChecklist = ({ userProjectId }: DeliveryChecklistProps) => {
+const DeliveryChecklist = ({ userProjectId, deliveryId }: DeliveryChecklistProps) => {
   const { user } = useAuth();
   const [items, setItems] = useState<ChecklistItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  // Debounced save to Supabase
+  const persistState = useDebouncedCallback(async (currentItems: ChecklistItem[]) => {
+    const state: Record<string, boolean> = {};
+    currentItems.forEach((i) => { state[i.id] = i.checked; });
+    await supabase
+      .from('deliveries')
+      .update({ checklist_state: state } as any)
+      .eq('id', deliveryId);
+  }, 500);
 
   useEffect(() => {
     if (!user) return;
 
-    const fetchBriefing = async () => {
-      const { data: briefing } = await supabase
-        .from('onboarding_briefings')
-        .select('brand_name, brand_fonts, brand_colors, content_style, primary_color, secondary_color, legend_style, jump_cuts, remove_silences, use_emojis, use_icons')
-        .eq('user_id', user.id)
-        .maybeSingle();
+    const fetchData = async () => {
+      // Fetch briefing + saved state in parallel
+      const [briefingRes, deliveryRes] = await Promise.all([
+        supabase
+          .from('onboarding_briefings')
+          .select('brand_name, brand_fonts, brand_colors, content_style, primary_color, secondary_color, legend_style, jump_cuts, remove_silences, use_emojis, use_icons')
+          .eq('user_id', user.id)
+          .maybeSingle(),
+        supabase
+          .from('deliveries')
+          .select('checklist_state')
+          .eq('id', deliveryId)
+          .maybeSingle(),
+      ]);
 
+      const briefing = briefingRes.data;
       if (!briefing) return;
+
+      const savedState = (deliveryRes.data as any)?.checklist_state as Record<string, boolean> | null;
 
       // Build dynamic checklist from briefing
       const checklist: ChecklistItem[] = [];
@@ -71,17 +95,29 @@ const DeliveryChecklist = ({ userProjectId }: DeliveryChecklistProps) => {
       checklist.push({ id: `c${idx++}`, label: 'Duração do vídeo está correta', checked: false });
       checklist.push({ id: `c${idx++}`, label: 'Qualidade de áudio e vídeo verificada', checked: false });
 
+      // Restore saved state
+      if (savedState) {
+        checklist.forEach((item) => {
+          if (savedState[item.id] !== undefined) {
+            item.checked = savedState[item.id];
+          }
+        });
+      }
+
       setItems(checklist);
+      setLoaded(true);
     };
 
-    fetchBriefing();
-  }, [user, userProjectId]);
+    fetchData();
+  }, [user, userProjectId, deliveryId]);
 
-  const toggleItem = (id: string) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, checked: !item.checked } : item))
-    );
-  };
+  const toggleItem = useCallback((id: string) => {
+    setItems((prev) => {
+      const next = prev.map((item) => (item.id === id ? { ...item, checked: !item.checked } : item));
+      persistState(next);
+      return next;
+    });
+  }, [persistState]);
 
   if (items.length === 0) return null;
 
