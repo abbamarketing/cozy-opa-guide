@@ -57,6 +57,7 @@ import DeliveryListView from '@/components/shared/DeliveryListView';
 import DeliveryCalendarView from '@/components/shared/DeliveryCalendarView';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 import EditorTour, { restartEditorTour } from '@/components/editor/EditorTour';
+import KanbanBoard from '@/components/shared/KanbanBoard';
 
 /* ─── Types ─── */
 interface EditorDelivery extends DeliveryData {
@@ -1092,62 +1093,43 @@ const EditorDashboard = () => {
             onSelect={setSelectedDelivery}
           />
         ) : (
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-3" data-tour="editor-kanban">
-            {COLUMNS.map((col) => {
-              const items = filtered.filter((d) => col.statuses.includes(d.status));
-              return (
-                <div
-                  key={col.id}
-                  className={`flex flex-col rounded-xl border p-2 transition-colors ${
-                    draggedId && col.editorCanDrop
-                      ? 'border-primary/50 bg-primary/5'
-                      : 'border-border/40 bg-muted/30'
-                  }`}
-                  onDragOver={handleDragOver(col)}
-                  onDrop={() => handleDrop(col)}
-                >
-                  <div className="mb-2 px-1">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        {col.title}
-                      </h3>
-                      <Badge variant="secondary" className="h-5 min-w-[20px] justify-center px-1.5 text-[10px]">
-                        {items.length}
-                      </Badge>
-                    </div>
-                    <p className="text-[10px] text-muted-foreground/70">{col.description}</p>
-                  </div>
-
-                  <ScrollArea className="flex-1">
-                    <div className="space-y-2 p-0.5">
-                      {items.length === 0 ? (
-                        <div className="py-8 text-center space-y-2">
-                          <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
-                          <p className="text-xs text-muted-foreground/50">
-                            {deliveries.length === 0
-                              ? 'Nenhuma entrega atribuída no momento. Aguarde o admin atribuir novas demandas.'
-                              : 'Nenhuma entrega aqui'}
-                          </p>
-                        </div>
-                      ) : (
-                        items.map((d, idx) => (
-                          <div key={d.id} {...(idx === 0 && col.statuses.includes('in_progress') ? { 'data-tour': 'editor-card-production' } : {})}>
-                            <EditorDeliveryCard
-                              delivery={d}
-                              isDragging={draggedId === d.id}
-                              onClick={() => setSelectedDelivery(d)}
-                              onDragStart={handleDragStart(d.id)}
-                              onSubmitDelivery={(del) => setSubmitTarget(del)}
-                            />
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </ScrollArea>
-                </div>
-              );
-            })}
-          </div>
+          <KanbanBoard<EditorDelivery>
+            columns={COLUMNS.map((c) => ({ id: c.id, title: c.title, statuses: c.statuses, description: c.description }))}
+            items={filtered as EditorDelivery[]}
+            canDragBetweenColumns={true}
+            dataTour="editor-kanban"
+            onStatusChange={async (itemId, newStatus) => {
+              const col = COLUMNS.find((c) => c.statuses.includes(newStatus));
+              if (!col?.editorCanDrop) throw new Error('Cannot drop here');
+              const updateData: Record<string, any> = { status: newStatus };
+              if (newStatus === 'review') updateData.delivered_at = new Date().toISOString();
+              const { error } = await supabase.from('deliveries').update(updateData).eq('id', itemId);
+              if (error) { toast.error('Erro ao mover entrega'); throw error; }
+              logger.info('Editor moveu entrega', { delivery_id: itemId, to: col.title }, 'editor');
+              toast.success(`Movido para ${col.title}`);
+              fetchDeliveries();
+            }}
+            renderCard={(d) => (
+              <div {...(d.status === 'in_progress' ? { 'data-tour': 'editor-card-production' } : {})}>
+                <EditorDeliveryCard
+                  delivery={d}
+                  isDragging={false}
+                  onClick={() => setSelectedDelivery(d)}
+                  onSubmitDelivery={(del) => setSubmitTarget(del)}
+                />
+              </div>
+            )}
+            renderEmpty={(_col, hasAnyItems) => (
+              <div className="py-8 text-center space-y-2">
+                <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
+                <p className="text-xs text-muted-foreground/50">
+                  {!hasAnyItems
+                    ? 'Nenhuma entrega atribuída no momento. Aguarde o admin atribuir novas demandas.'
+                    : 'Nenhuma entrega aqui'}
+                </p>
+              </div>
+            )}
+          />
         )}
       </main>
 

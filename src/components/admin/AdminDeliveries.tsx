@@ -25,6 +25,7 @@ import { remainingBusinessMinutes, formatBusinessCountdown } from '@/lib/busines
 import DeliveryListView from '@/components/shared/DeliveryListView';
 import DeliveryCalendarView from '@/components/shared/DeliveryCalendarView';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
+import KanbanBoard from '@/components/shared/KanbanBoard';
 
 interface AdminDelivery {
   id: string;
@@ -436,35 +437,23 @@ const AdminDeliveries = () => {
         </div>
       ) : (
         /* Desktop: 4-column Kanban */
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3" data-tour="admin-kanban">
-          {COLUMNS.map((col) => {
-            const items = filtered.filter((d) => col.statuses.includes(d.status));
-            return (
-              <div
-                key={col.id}
-                className={`flex flex-col rounded-xl border p-2.5 min-h-[300px] transition-colors ${
-                  draggedId ? 'border-primary/30 bg-primary/5' : 'border-border/30 bg-muted/15'
-                }`}
-                onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
-                onDrop={() => handleDrop(col.statuses)}
-              >
-                <div className="mb-2.5 px-1 flex items-center justify-between">
-                  <h3 className="text-[10px] font-mono font-semibold uppercase tracking-widest text-muted-foreground">{col.title}</h3>
-                  <Badge variant="secondary" className="h-5 min-w-[20px] justify-center px-1.5 text-[10px] font-mono">{items.length}</Badge>
-                </div>
-                <ScrollArea className="flex-1">
-                  <div className="space-y-2 p-0.5">
-                    {items.length === 0 ? (
-                      <p className="py-8 text-center text-[11px] text-muted-foreground/40 font-mono">Nenhuma</p>
-                    ) : (
-                      items.map((d) => <DeliveryItem key={d.id} d={d} />)
-                    )}
-                  </div>
-                </ScrollArea>
-              </div>
-            );
-          })}
-        </div>
+        <KanbanBoard<AdminDelivery>
+          columns={COLUMNS.map((c) => ({ id: c.id, title: c.title, statuses: c.statuses }))}
+          items={filtered}
+          canDragBetweenColumns={true}
+          dataTour="admin-kanban"
+          onStatusChange={async (itemId, newStatus) => {
+            const { error } = await supabase
+              .from('deliveries')
+              .update({ status: newStatus } as any)
+              .eq('id', itemId);
+            if (error) { toast.error('Erro ao mover'); throw error; }
+            toast.success('Status atualizado');
+            fetchData();
+          }}
+          renderCard={(d) => <DeliveryItem d={d} />}
+          emptyLabel="Nenhuma"
+        />
       )}
 
       {/* Pagination */}
