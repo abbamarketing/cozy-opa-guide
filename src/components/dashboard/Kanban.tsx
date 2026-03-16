@@ -222,6 +222,12 @@ const Kanban = ({ userProject }: KanbanProps) => {
               </div>
             ))}
           </div>
+        ) : viewMode === 'list' ? (
+          <DeliveryListView
+            deliveries={deliveries}
+            onSelect={setSelectedDelivery}
+            role="client"
+          />
         ) : (
           <>
             <div className="flex gap-2 p-1" data-tour="kanban-board">
