@@ -390,7 +390,7 @@ const AdminCalendar = () => {
         {[
           { color: deliveryColor, label: 'Entregas', icon: Package },
           { color: captureColor, label: 'Captações', icon: Camera },
-          { color: manualColor, label: 'Eventos', icon: Pin },
+          ...EVENT_TYPES.map(t => ({ color: MANUAL_TYPE_COLORS[t.value], label: t.label, icon: Pin })),
         ].map(({ color, label, icon: Icon }) => (
           <div key={label} className="flex items-center gap-1.5">
             <span className={cn('h-2.5 w-2.5 rounded-full border', color)} />
