@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Crown, Zap, Clock, Film, Sparkles, FileText } from 'lucide-react';
+import { Crown, Zap, Clock, Film, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { SlaCountdown } from '@/components/editor/SlaCountdown';
