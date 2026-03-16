@@ -185,7 +185,9 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames }: DeliveryL
                         <span className="text-[10px] text-muted-foreground block">
                           {format(new Date(d.due_date), "dd/MM HH'h'", { locale: ptBR })}
                         </span>
-                        <Badge variant="outline" className={`text-[9px] px-1.5 py-0 ${slaBadgeClass[sla.level]}`}>
+                        <Badge variant="outline" className={`text-[9px] px-1.5 py-0 inline-flex items-center gap-0.5 ${slaBadgeClass[sla.level]}`}>
+                          {sla.icon === 'shield' && <ShieldAlert className="h-2.5 w-2.5" />}
+                          {sla.icon === 'alert' && <AlertTriangle className="h-2.5 w-2.5" />}
                           {sla.label}
                         </Badge>
                       </div>
