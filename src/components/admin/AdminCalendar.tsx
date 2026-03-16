@@ -344,22 +344,29 @@ const AdminCalendar = () => {
                   </div>
 
                   <div className="space-y-0.5">
-                    {dayEvents.slice(0, maxVisible).map((ev) => (
-                      <button
-                        key={ev.id}
-                        onClick={() => handleEventClick(ev)}
-                        className={cn(
-                          'w-full text-left rounded px-1.5 py-0.5 text-[9px] font-medium truncate border cursor-pointer transition-opacity hover:opacity-80 flex items-center gap-1',
-                          ev.color,
-                        )}
-                        title={ev.title}
-                      >
-                        {ev.type === 'delivery' && <Package className="h-2.5 w-2.5 shrink-0" />}
-                        {ev.type === 'capture' && <Camera className="h-2.5 w-2.5 shrink-0" />}
-                        {ev.type === 'manual' && <Pin className="h-2.5 w-2.5 shrink-0" />}
-                        <span className="truncate">{ev.title}</span>
-                      </button>
-                    ))}
+                    {dayEvents.length === 0 && mode === 'day' ? (
+                      <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <CalendarIcon className="h-8 w-8 text-muted-foreground/20 mb-2" />
+                        <p className="text-xs text-muted-foreground/60">Nenhum evento neste período.</p>
+                      </div>
+                    ) : (
+                      dayEvents.slice(0, maxVisible).map((ev) => (
+                        <button
+                          key={ev.id}
+                          onClick={() => handleEventClick(ev)}
+                          className={cn(
+                            'w-full text-left rounded px-1.5 py-0.5 text-[9px] font-medium truncate border cursor-pointer transition-opacity hover:opacity-80 flex items-center gap-1',
+                            ev.color,
+                          )}
+                          title={ev.title}
+                        >
+                          {ev.type === 'delivery' && <Package className="h-2.5 w-2.5 shrink-0" />}
+                          {ev.type === 'capture' && <Camera className="h-2.5 w-2.5 shrink-0" />}
+                          {ev.type === 'manual' && <Pin className="h-2.5 w-2.5 shrink-0" />}
+                          <span className="truncate">{ev.title}</span>
+                        </button>
+                      ))
+                    )}
                   </div>
                 </div>
               );

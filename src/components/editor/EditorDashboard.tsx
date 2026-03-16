@@ -1050,7 +1050,21 @@ const EditorDashboard = () => {
       <main className="flex-1 overflow-x-auto p-4">
         {isLoading ? (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-            {COLUMNS.map((c) => <Skeleton key={c.id} className="h-64 rounded-xl" />)}
+            {COLUMNS.map((c) => (
+              <div key={c.id} className="flex flex-col rounded-xl border border-border/40 bg-muted/30 p-2 space-y-2">
+                <div className="flex items-center justify-between px-1 mb-1">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-5 w-5 rounded-md" />
+                </div>
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="rounded-xl border border-border/30 bg-card p-3 space-y-2">
+                    <Skeleton className="h-3.5 w-3/4" />
+                    <Skeleton className="h-2.5 w-1/2" />
+                    <Skeleton className="h-2.5 w-1/3" />
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
         ) : viewMode === 'list' ? (
           <DeliveryListView
@@ -1094,9 +1108,14 @@ const EditorDashboard = () => {
                   <ScrollArea className="flex-1">
                     <div className="space-y-2 p-0.5">
                       {items.length === 0 ? (
-                        <p className="py-8 text-center text-xs text-muted-foreground/50">
-                          Nenhuma entrega
-                        </p>
+                        <div className="py-8 text-center space-y-2">
+                          <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
+                          <p className="text-xs text-muted-foreground/50">
+                            {deliveries.length === 0
+                              ? 'Nenhuma entrega atribuída no momento. Aguarde o admin atribuir novas demandas.'
+                              : 'Nenhuma entrega aqui'}
+                          </p>
+                        </div>
                       ) : (
                         items.map((d, idx) => (
                           <div key={d.id} {...(idx === 0 && col.statuses.includes('in_progress') ? { 'data-tour': 'editor-card-production' } : {})}>

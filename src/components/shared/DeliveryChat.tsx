@@ -186,7 +186,7 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
           <div className="flex flex-col items-center justify-center h-full py-6 text-center">
             <MessageSquare className="h-8 w-8 text-muted-foreground/20 mb-2" />
             <p className="text-xs text-muted-foreground/60">
-              Nenhuma mensagem ainda. Inicie a conversa!
+              Nenhuma mensagem ainda. Seja o primeiro a enviar!
             </p>
           </div>
         ) : (

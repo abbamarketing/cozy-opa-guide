@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Video, Camera, Image, Layers, Clock, AlertTriangle, ShieldAlert, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
@@ -33,6 +34,8 @@ interface DeliveryListViewProps {
   role: 'client' | 'editor' | 'admin';
   /** For editor/admin: client name mapped by delivery id */
   clientNames?: Record<string, string | null>;
+  /** Show skeleton loading state */
+  isLoading?: boolean;
 }
 
 function getSlaLevel(dueDate: string | null): { label: string; level: 'ok' | 'warning' | 'danger' | 'overdue' | 'none'; icon?: 'alert' | 'shield' } {
@@ -62,7 +65,7 @@ const SortIcon = ({ field, sortField, sortDir }: { field: SortField; sortField: 
     : <ChevronDown className="h-3 w-3 text-primary" />;
 };
 
-const DeliveryListView = ({ deliveries, onSelect, role, clientNames }: DeliveryListViewProps) => {
+const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoading }: DeliveryListViewProps) => {
   const [sortField, setSortField] = useState<SortField>('due_date');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [page, setPage] = useState(0);
@@ -107,6 +110,33 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames }: DeliveryL
 
   const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
   const paged = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  if (isLoading) {
+    return (
+      <div className="rounded-[20px] bg-abba-surface/40 border border-white/6 overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-white/6 hover:bg-transparent">
+              {['Título', 'Tipo', 'Status', personLabel, 'Prazo SLA'].map((h) => (
+                <TableHead key={h}><span className="text-[10px] uppercase tracking-widest font-semibold">{h}</span></TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <TableRow key={i} className="border-white/6">
+                <TableCell><Skeleton className="h-4 w-3/4" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
+  }
 
   if (deliveries.length === 0) {
     return (
