@@ -1053,6 +1053,11 @@ const EditorDashboard = () => {
             role="editor"
             clientNames={editorClientNames}
           />
+        ) : viewMode === 'calendar' ? (
+          <DeliveryCalendarView
+            deliveries={filtered}
+            onSelect={setSelectedDelivery}
+          />
         ) : (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
             {COLUMNS.map((col) => {

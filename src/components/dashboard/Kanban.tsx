@@ -392,6 +392,11 @@ const Kanban = ({ userProject }: KanbanProps) => {
           onSelect={setSelectedDelivery}
           role="client"
         />
+      ) : viewMode === 'calendar' ? (
+        <DeliveryCalendarView
+          deliveries={deliveries}
+          onSelect={setSelectedDelivery}
+        />
       ) : (
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3" data-tour="kanban-board">
           {COLUMNS.map((col) => {

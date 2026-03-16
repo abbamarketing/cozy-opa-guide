@@ -345,6 +345,31 @@ const AdminDeliveries = () => {
           role="admin"
           clientNames={Object.fromEntries(filtered.map((d) => [d.id, d.client_name]))}
         />
+      ) : viewMode === 'calendar' ? (
+        <DeliveryCalendarView
+          deliveries={filtered.map((d) => ({
+            ...d,
+            description: null,
+            revision_count: 0,
+            max_revisions: 2,
+            file_url: null,
+            thumbnail_url: null,
+            editor_name: d.editor_name || undefined,
+            editor_id: d.editor_id,
+            created_at: '',
+            delivered_at: null,
+            approved_at: null,
+            revision_notes: null,
+            user_project_id: d.user_project_id,
+            raw_file_url: null,
+            raw_drive_link: null,
+            client_notes: null,
+            is_exception: null,
+            exception_notes: null,
+            delivery_type: d.delivery_type as DeliveryData['delivery_type'],
+          }))}
+          onSelect={() => {}}
+        />
       ) : isMobile ? (
         <div className="space-y-3">
           <div className="flex gap-1 bg-secondary/50 rounded-lg p-1 border border-border/20">
