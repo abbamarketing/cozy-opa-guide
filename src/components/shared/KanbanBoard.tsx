@@ -1,9 +1,10 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import {
   DndContext,
   DragOverlay,
   closestCorners,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   type DragStartEvent,
@@ -20,6 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Video } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 /* ─── Types ─── */
 export interface KanbanColumn {
@@ -32,17 +34,11 @@ export interface KanbanColumn {
 export interface KanbanBoardProps<T extends { id: string; status: string }> {
   columns: KanbanColumn[];
   items: T[];
-  /** Render a single card */
   renderCard: (item: T, isDragging?: boolean) => React.ReactNode;
-  /** Called when an item is moved to a new column status. Return false/throw to revert. */
   onStatusChange?: (itemId: string, newStatus: string) => Promise<void>;
-  /** Whether drag between columns is allowed */
   canDragBetweenColumns?: boolean;
-  /** Empty state label */
   emptyLabel?: string;
-  /** Custom empty state for specific column */
   renderEmpty?: (column: KanbanColumn, hasAnyItems: boolean) => React.ReactNode;
-  /** data-tour attribute for the board */
   dataTour?: string;
 }
 
@@ -51,10 +47,12 @@ function SortableCard<T extends { id: string }>({
   item,
   renderCard,
   canDrag,
+  index,
 }: {
   item: T;
   renderCard: (item: T, isDragging?: boolean) => React.ReactNode;
   canDrag: boolean;
+  index: number;
 }) {
   const {
     attributes,
@@ -73,10 +71,17 @@ function SortableCard<T extends { id: string }>({
     transition,
     opacity: isDragging ? 0.4 : 1,
     cursor: canDrag ? 'grab' : 'default',
+    animationDelay: `${index * 50}ms`,
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="animate-fade-in"
+      {...attributes}
+      {...listeners}
+    >
       {renderCard(item, isDragging)}
     </div>
   );
@@ -92,6 +97,7 @@ function KanbanColumnComponent<T extends { id: string; status: string }>({
   emptyLabel,
   renderEmpty,
   hasAnyItems,
+  isMobile,
 }: {
   column: KanbanColumn;
   items: T[];
@@ -101,13 +107,17 @@ function KanbanColumnComponent<T extends { id: string; status: string }>({
   emptyLabel?: string;
   renderEmpty?: (column: KanbanColumn, hasAnyItems: boolean) => React.ReactNode;
   hasAnyItems: boolean;
+  isMobile: boolean;
 }) {
   const itemIds = useMemo(() => items.map((i) => i.id), [items]);
 
   return (
     <div
       className={cn(
-        'flex flex-col rounded-[20px] bg-abba-surface/40 border p-2 min-w-[280px] max-w-[320px] shrink-0 transition-colors',
+        'flex flex-col rounded-[20px] bg-abba-surface/40 border p-2 shrink-0 transition-colors',
+        isMobile
+          ? 'w-[85vw] min-w-[85vw] snap-start'
+          : 'min-w-[280px] max-w-[320px]',
         isOver
           ? 'border-primary/50 bg-primary/5'
           : 'border-white/6'
@@ -145,18 +155,38 @@ function KanbanColumnComponent<T extends { id: string; status: string }>({
                 </div>
               )
             ) : (
-              items.map((item) => (
+              items.map((item, idx) => (
                 <SortableCard
                   key={item.id}
                   item={item}
                   renderCard={renderCard}
                   canDrag={canDrag}
+                  index={idx}
                 />
               ))
             )}
           </div>
         </SortableContext>
       </ScrollArea>
+    </div>
+  );
+}
+
+/* ─── Scroll Indicator Dots ─── */
+function ScrollDots({ count, activeIndex }: { count: number; activeIndex: number }) {
+  return (
+    <div className="flex justify-center gap-1.5 pt-2 pb-1 md:hidden">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className={cn(
+            'h-1.5 rounded-full transition-all duration-200',
+            i === activeIndex
+              ? 'w-4 bg-primary'
+              : 'w-1.5 bg-muted-foreground/30'
+          )}
+        />
+      ))}
     </div>
   );
 }
@@ -174,10 +204,29 @@ function KanbanBoard<T extends { id: string; status: string }>({
 }: KanbanBoardProps<T>) {
   const [activeItem, setActiveItem] = useState<T | null>(null);
   const [overColumnId, setOverColumnId] = useState<string | null>(null);
+  const [activeScrollIndex, setActiveScrollIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
   );
+
+  // Track scroll position for dot indicator
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !isMobile) return;
+
+    const handleScroll = () => {
+      const colWidth = el.scrollWidth / columns.length;
+      const idx = Math.round(el.scrollLeft / colWidth);
+      setActiveScrollIndex(Math.min(idx, columns.length - 1));
+    };
+
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, [isMobile, columns.length]);
 
   const getColumnForStatus = useCallback(
     (status: string) => columns.find((c) => c.statuses.includes(status)),
@@ -212,7 +261,6 @@ function KanbanBoard<T extends { id: string; status: string }>({
     const { over } = event;
     if (!over) { setOverColumnId(null); return; }
 
-    // over could be a column ID or an item ID
     const overCol = columns.find((c) => c.id === over.id);
     if (overCol) {
       setOverColumnId(overCol.id);
@@ -231,7 +279,6 @@ function KanbanBoard<T extends { id: string; status: string }>({
 
     const activeCol = getColumnForItemId(active.id as string);
 
-    // Determine the target column
     let targetCol = columns.find((c) => c.id === over.id);
     if (!targetCol) {
       targetCol = getColumnForItemId(over.id as string) || undefined;
@@ -249,6 +296,10 @@ function KanbanBoard<T extends { id: string; status: string }>({
 
   const hasAnyItems = items.length > 0;
 
+  // Mobile header showing current column
+  const activeCol = columns[activeScrollIndex];
+  const activeColItems = activeCol ? (itemsByColumn.get(activeCol.id) || []) : [];
+
   return (
     <DndContext
       sensors={sensors}
@@ -257,8 +308,26 @@ function KanbanBoard<T extends { id: string; status: string }>({
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
+      {/* Mobile column indicator */}
+      {isMobile && activeCol && (
+        <div className="flex items-center justify-between px-1 mb-2 md:hidden">
+          <span className="text-xs font-sans font-semibold text-foreground">
+            {activeCol.title}
+          </span>
+          <span className="text-[10px] text-muted-foreground font-sans">
+            {activeColItems.length} · {activeScrollIndex + 1}/{columns.length}
+          </span>
+        </div>
+      )}
+
       <div
-        className="flex gap-3 overflow-x-auto pb-2 scrollbar-none scroll-smooth"
+        ref={scrollRef}
+        className={cn(
+          'flex gap-3 overflow-x-auto pb-2 scroll-smooth',
+          isMobile
+            ? 'snap-x snap-mandatory -mx-1 px-1 scrollbar-none'
+            : 'scrollbar-none'
+        )}
         data-tour={dataTour}
       >
         {columns.map((col) => (
@@ -272,9 +341,13 @@ function KanbanBoard<T extends { id: string; status: string }>({
             emptyLabel={emptyLabel}
             renderEmpty={renderEmpty}
             hasAnyItems={hasAnyItems}
+            isMobile={isMobile}
           />
         ))}
       </div>
+
+      {/* Scroll dots for mobile */}
+      {isMobile && <ScrollDots count={columns.length} activeIndex={activeScrollIndex} />}
 
       <DragOverlay>
         {activeItem ? (

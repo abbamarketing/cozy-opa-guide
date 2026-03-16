@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import DeliveryCard, { type DeliveryData } from './DeliveryCard';
 import { useDeliveries } from '@/hooks/useDeliveries';
 import type { UserProjectData } from '@/hooks/useUserProject';
-import { useIsMobile } from '@/hooks/use-mobile';
+
 import ViewToggle, { type ViewMode } from '@/components/shared/ViewToggle';
 import DeliveryListView from '@/components/shared/DeliveryListView';
 import DeliveryCalendarView from '@/components/shared/DeliveryCalendarView';
@@ -46,14 +46,9 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [showCaptureModal, setShowCaptureModal] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [activeColumn, setActiveColumn] = useState(() =>
-    userProject.client_type === 'subscription' ? 'queue' : 'todo'
-  );
   const [hasScheduledCapture, setHasScheduledCapture] = useState(false);
   const [captureLeadDays, setCaptureLeadDays] = useState(30);
   const [captureCheckDone, setCaptureCheckDone] = useState(false);
-  const isMobile = useIsMobile();
   const [viewMode, setViewMode] = useState<ViewMode>(() =>
     (localStorage.getItem('preferred_view_client') as ViewMode) || 'kanban'
   );
@@ -127,12 +122,6 @@ const Kanban = ({ userProject }: KanbanProps) => {
     }
   };
 
-  const getDeliveriesForColumn = (col: Column) =>
-    deliveries.filter((d) => col.statuses.includes(d.status));
-
-  const handleLoadMore = () => {
-    setVisibleCount((prev) => prev + PAGE_SIZE);
-  };
 
   // Capture banner component
   const CaptureBanner = () => {
@@ -163,183 +152,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
     );
   };
 
-  // Mobile: segmented control with single column view
-  if (isMobile) {
-    const currentCol = COLUMNS.find(c => c.id === activeColumn) || COLUMNS[0];
-    const items = getDeliveriesForColumn(currentCol);
-
-    return (
-      <div className="space-y-3">
-        {/* Capture Banner */}
-        <CaptureBanner />
-
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-sans font-semibold text-foreground">Entregas</h2>
-          <div className="flex items-center gap-2">
-            <ViewToggle value={viewMode} onChange={handleViewChange} />
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span>
-                  <Button
-                    size="sm"
-                    disabled={!canCreateDelivery}
-                    className="gap-1.5 h-9 bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light"
-                    onClick={handleNewClick}
-                    data-tour="new-delivery-btn"
-                  >
-                    {needsCaptureFirst ? <Camera className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                    {needsCaptureFirst ? 'Agendar' : 'Nova'}
-                  </Button>
-                </span>
-              </TooltipTrigger>
-              {!canCreateDelivery && !needsCaptureFirst && (
-                <TooltipContent>
-                  <p>Você atingiu o limite de entregas do seu plano. Faça upgrade para continuar.</p>
-                </TooltipContent>
-              )}
-              {needsCaptureFirst && (
-                <TooltipContent>
-                  <p>Agende uma captação para liberar entregas</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          </div>
-        </div>
-
-        {/* Column Tabs */}
-        {isLoading ? (
-          <div className="space-y-3">
-            <div className="flex gap-2 p-1">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="flex-1 h-8 rounded-full" />
-              ))}
-            </div>
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded-[20px] bg-abba-surface border border-white/8 p-3 space-y-2">
-                <Skeleton className="h-3.5 w-3/4" />
-                <Skeleton className="h-2.5 w-1/2" />
-                <Skeleton className="h-2.5 w-1/3" />
-              </div>
-            ))}
-          </div>
-        ) : viewMode === 'list' ? (
-          <DeliveryListView
-            deliveries={deliveries}
-            onSelect={setSelectedDelivery}
-            role="client"
-          />
-        ) : viewMode === 'calendar' ? (
-          <DeliveryCalendarView
-            deliveries={deliveries}
-            onSelect={setSelectedDelivery}
-          />
-        ) : (
-          <>
-            <div className="flex gap-2 p-1" data-tour="kanban-board">
-              {COLUMNS.map((col) => {
-                const count = getDeliveriesForColumn(col).length;
-                const isActive = activeColumn === col.id;
-                return (
-                  <button
-                    key={col.id}
-                    onClick={() => setActiveColumn(col.id)}
-                    className={`flex-1 flex items-center justify-center gap-1 py-2 px-3 rounded-full text-[11px] font-sans font-semibold tracking-wide transition-colors ${
-                      isActive
-                        ? 'bg-abba-surface text-white shadow-sm'
-                        : 'text-white/50 hover:text-white/80'
-                    }`}
-                  >
-                    {col.title}
-                    {count > 0 && (
-                      <span className={`text-[9px] ${isActive ? 'text-abba-lime' : 'text-white/50'}`}>
-                        {count}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Cards */}
-            <div className="space-y-2">
-              {items.length === 0 && deliveries.length === 0 ? (
-                <div className="rounded-[20px] bg-abba-surface/40 border border-white/6 p-8 text-center space-y-3">
-                  <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
-                  <p className="text-sm font-sans font-medium text-muted-foreground">
-                    Você ainda não tem entregas
-                  </p>
-                  <p className="text-xs text-muted-foreground/60">
-                    Clique em "+ Nova Entrega" para começar!
-                  </p>
-                  {canCreateDelivery && (
-                    <Button size="sm" variant="outline" onClick={handleNewClick} className="text-xs rounded-full">
-                      <Plus className="h-3 w-3 mr-1" />
-                      Nova Entrega
-                    </Button>
-                  )}
-                </div>
-              ) : items.length === 0 ? (
-                <div className="rounded-[20px] bg-abba-surface/40 border border-white/6 p-8 text-center space-y-3">
-                  <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
-                  <p className="text-xs font-sans text-muted-foreground">
-                    Nenhuma entrega aqui
-                  </p>
-                </div>
-              ) : (
-                items.map((d, idx) => (
-                  <div key={d.id} className="relative" {...(idx === 0 ? { 'data-tour': 'delivery-card' } : {})}>
-                    {activeColumn === 'queue' && (
-                      <div className="absolute top-2 right-2 z-10">
-                        <Badge variant="secondary" className="text-[9px] font-sans gap-1">
-                          <Clock className="h-2.5 w-2.5" />
-                          Aguardando editor
-                        </Badge>
-                      </div>
-                    )}
-                    <DeliveryCard
-                      delivery={d}
-                      onClick={() => setSelectedDelivery(d)}
-                    />
-                  </div>
-                ))
-              )}
-            </div>
-          </>
-        )}
-
-        {/* Modals */}
-        <Suspense fallback={null}>
-          <DeliveryDetailModal
-            open={!!selectedDelivery}
-            onOpenChange={() => setSelectedDelivery(null)}
-            delivery={selectedDelivery}
-            onUpdated={refetch}
-            userProject={userProject}
-          />
-          {showNewModal && (
-            <NewDeliveryModal
-              open={showNewModal}
-              onOpenChange={setShowNewModal}
-              userProject={userProject}
-              onCreated={refetch}
-            />
-          )}
-          {showCaptureModal && (
-            <CaptureScheduleModal
-              open={showCaptureModal}
-              onOpenChange={setShowCaptureModal}
-              userProject={userProject}
-              onScheduled={checkCapture}
-              captureLeadDays={captureLeadDays}
-            />
-          )}
-        </Suspense>
-      </div>
-    );
-  }
-
-  // Desktop: original 4-column grid
+  // Unified layout (mobile uses KanbanBoard with scroll-snap, desktop uses grid)
   return (
     <div className="space-y-4">
       {/* Capture Banner */}
