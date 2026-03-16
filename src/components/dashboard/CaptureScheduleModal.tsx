@@ -178,7 +178,9 @@ const CaptureScheduleModal = ({
                 <p className="text-xs text-muted-foreground">
                   Você já possui um agendamento recente (último em{' '}
                   <strong>{format(lastSessionDate!, "dd/MM/yyyy", { locale: ptBR })}</strong>).
-                  Aguarde <strong>{cooldownRemainingDays} dia(s)</strong> para agendar novamente.
+                  Próxima sessão disponível em{' '}
+                  <strong>{format(addDays(lastSessionDate!, COOLDOWN_DAYS), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</strong>{' '}
+                  ({cooldownRemainingDays} dia{cooldownRemainingDays !== 1 ? 's' : ''}).
                 </p>
               </div>
             </div>
