@@ -218,39 +218,6 @@ const AdminMetrics = () => {
         },
       ]);
 
-      // ─── AI Usage ───
-      const thirtyDaysAgo = subDays(new Date(), 30).toISOString();
-      const { data: aiLogs } = await supabase
-        .from('ai_usage_logs')
-        .select('function_name, total_tokens, created_at')
-        .gte('created_at', thirtyDaysAgo)
-        .order('created_at', { ascending: true });
-
-      if (aiLogs && aiLogs.length > 0) {
-        const byFunc: Record<string, { calls: number; tokens: number }> = {};
-        const byDay: Record<string, number> = {};
-        let totalTokens = 0;
-
-        aiLogs.forEach((log: any) => {
-          const fn = log.function_name;
-          if (!byFunc[fn]) byFunc[fn] = { calls: 0, tokens: 0 };
-          byFunc[fn].calls++;
-          byFunc[fn].tokens += log.total_tokens || 0;
-          totalTokens += log.total_tokens || 0;
-
-          const day = format(new Date(log.created_at), 'dd/MM');
-          byDay[day] = (byDay[day] || 0) + 1;
-        });
-
-        setAiUsage({
-          totalCalls: aiLogs.length,
-          totalTokens,
-          byFunction: Object.entries(byFunc).map(([name, data]) => ({ name, ...data })).sort((a, b) => b.calls - a.calls),
-          dailyData: Object.entries(byDay).map(([day, calls]) => ({ day, calls })),
-        });
-      }
-
-      setLoading(false);
     };
 
     fetchMetrics();
