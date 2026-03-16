@@ -395,6 +395,15 @@ const EditorDashboard = () => {
   const [startingProduction, setStartingProduction] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [submitTarget, setSubmitTarget] = useState<EditorDelivery | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>(() =>
+    (localStorage.getItem('preferred_view_editor') as ViewMode) || 'kanban'
+  );
+
+  const handleViewChange = (v: ViewMode) => {
+    setViewMode(v);
+    localStorage.setItem('preferred_view_editor', v);
+  };
+
   // Filters
   const [clientFilter, setClientFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
