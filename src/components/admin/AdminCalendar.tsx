@@ -100,7 +100,7 @@ const AdminCalendar = () => {
     setLoading(true);
     const [delRes, capRes, manRes] = await Promise.all([
       supabase.from('deliveries').select('id, title, due_date, status, delivery_type'),
-      supabase.from('capture_sessions').select('id, scheduled_date, location_name, status, user_project_id'),
+      supabase.from('capture_sessions').select('id, scheduled_date, location_name, status, user_project_id, user_projects!inner(user_id)'),
       supabase.from('calendar_events').select('*'),
     ]);
 
@@ -118,14 +118,25 @@ const AdminCalendar = () => {
       });
     });
 
+    // Build a map of user_id -> full_name from profiles for capture sessions
+    const capUserIds = [...new Set((capRes.data || []).map((c: any) => c.user_projects?.user_id).filter(Boolean))];
+    let profileMap: Record<string, string> = {};
+    if (capUserIds.length > 0) {
+      const { data: profs } = await supabase.from('profiles').select('user_id, full_name').in('user_id', capUserIds);
+      (profs || []).forEach((p: any) => { profileMap[p.user_id] = p.full_name || ''; });
+    }
+
     (capRes.data || []).forEach((c: any) => {
+      const clientName = profileMap[c.user_projects?.user_id] || '';
+      const locationLabel = c.location_name || 'Captação';
+      const title = clientName ? `🎬 ${clientName} — ${locationLabel}` : locationLabel;
       mapped.push({
         id: `cap-${c.id}`,
-        title: c.location_name || 'Captação',
+        title,
         date: c.scheduled_date,
         type: 'capture',
         color: captureColor,
-        raw: c,
+        raw: { ...c, client_name: clientName },
       });
     });
 
@@ -427,8 +438,10 @@ const AdminCalendar = () => {
           )}
           {detailEvent?.type === 'capture' && (
             <div className="text-xs space-y-1 text-muted-foreground">
+              {detailEvent.raw.client_name && <p>Cliente: {detailEvent.raw.client_name}</p>}
               <p>Status: <Badge variant="outline" className="text-[10px] ml-1">{detailEvent.raw.status}</Badge></p>
               {detailEvent.raw.location_name && <p>Local: {detailEvent.raw.location_name}</p>}
+              <p>Data: {format(new Date(detailEvent.date), "dd/MM/yyyy", { locale: ptBR })}</p>
             </div>
           )}
           {detailEvent?.type === 'manual' && (
