@@ -25,6 +25,7 @@ import { remainingBusinessMinutes, formatBusinessCountdown } from '@/lib/busines
 import DeliveryListView from '@/components/shared/DeliveryListView';
 import DeliveryCalendarView from '@/components/shared/DeliveryCalendarView';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
+import KanbanBoard from '@/components/shared/KanbanBoard';
 
 interface AdminDelivery {
   id: string;
