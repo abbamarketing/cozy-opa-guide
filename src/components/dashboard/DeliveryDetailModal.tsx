@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { format, differenceInHours, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
@@ -34,7 +34,7 @@ import RevisionModal from './RevisionModal';
 import DeliveryChat from '@/components/shared/DeliveryChat';
 import SubtaskList from '@/components/shared/SubtaskList';
 import DeliveryChecklist from './DeliveryChecklist';
-import ApprovalCelebration from './ApprovalCelebration';
+
 
 interface DeliveryDetailModalProps {
   open: boolean;
@@ -57,7 +57,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
   const [revisions, setRevisions] = useState<RevisionRecord[]>([]);
   const [showRevisionModal, setShowRevisionModal] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
+  
 
   useEffect(() => {
     if (!delivery || !open) return;
@@ -72,9 +72,6 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
     fetchRevisions();
   }, [delivery, open]);
 
-  const handleCelebrationComplete = useCallback(() => {
-    setShowCelebration(false);
-  }, []);
 
   const openSafeUrl = (url: string | null | undefined) => {
     if (!url) return;
@@ -126,7 +123,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
       }
 
       logger.info('Entrega aprovada', { delivery_id: delivery.id, title: delivery.title }, 'delivery');
-      setShowCelebration(true);
+      
       toast.success('Entrega aprovada com sucesso! 🎉');
       setTimeout(() => {
         onOpenChange(false);
@@ -147,7 +144,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
 
   return (
     <>
-      <ApprovalCelebration show={showCelebration} onComplete={handleCelebrationComplete} />
+      
 
       <Dialog open={open && !showRevisionModal} onOpenChange={onOpenChange}>
         <DialogContent className="max-h-[90vh] max-w-lg overflow-hidden p-0">

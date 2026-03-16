@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, BookOpen, Menu } from 'lucide-react';
+import { LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, Menu } from 'lucide-react';
 import abbaLogo from '@/assets/abba-logo.png';
 import { useRole } from '@/hooks/useRole';
 import { useAuth } from '@/lib/auth';
@@ -15,7 +15,7 @@ import EditorManagement from '@/components/admin/EditorManagement';
 import AdminMetrics from '@/components/admin/AdminMetrics';
 import ProjectManager from '@/components/admin/ProjectManager';
 import LogViewer from '@/components/admin/LogViewer';
-import AdminDocs from '@/components/admin/AdminDocs';
+
 import NotificationBell from '@/components/shared/NotificationBell';
 
 const TABS = [
@@ -26,7 +26,7 @@ const TABS = [
   { id: 'metricas', label: 'Métricas', icon: BarChart3 },
   { id: 'projetos', label: 'Projetos', icon: FolderKanban },
   { id: 'logs', label: 'Logs', icon: ScrollText },
-  { id: 'docs', label: 'Docs', icon: BookOpen },
+  
 ];
 
 const Admin = () => {
@@ -54,7 +54,7 @@ const Admin = () => {
       case 'metricas': return <AdminMetrics />;
       case 'projetos': return <ProjectManager />;
       case 'logs': return <LogViewer />;
-      case 'docs': return <AdminDocs />;
+      
       default: return <AdminOverview />;
     }
   };
