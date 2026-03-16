@@ -125,6 +125,7 @@ const AdminNewDemandModal = ({ open, onOpenChange, onCreated }: AdminNewDemandMo
       editor_id: editorId,
       status: 'in_progress' as any,
       due_date: dueDate.toISOString(),
+      sla_deadline: dueDate.toISOString(),
       description: description.trim(),
       client_notes: internalNotes.trim() || null,
       is_exception: true,
