@@ -28,6 +28,7 @@ import {
   Loader2,
   Wrench,
   MessageSquare,
+  Volume2, Palette, Scissors, FileText, Timer, Pin,
 } from 'lucide-react';
 import type { DeliveryData } from './DeliveryCard';
 import { typeConfig, statusConfig } from './DeliveryCard';
