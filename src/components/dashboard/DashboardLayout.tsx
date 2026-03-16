@@ -5,7 +5,7 @@ import { Navigate } from 'react-router-dom';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
 import DeliveryHistory from '@/components/dashboard/DeliveryHistory';
-import StudioModule from '@/components/dashboard/StudioModule';
+
 import BrandProfile from '@/components/dashboard/BrandProfile';
 import SettingsComponent from '@/components/dashboard/Settings';
 
@@ -17,12 +17,11 @@ import {
   Video,
   Calendar,
   CheckCircle2,
-  Clapperboard,
   Settings,
   Palette,
   LogOut,
   ChevronDown,
-  Sparkles,
+  
   Lock,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
@@ -53,7 +52,7 @@ import QuotaCard from '@/components/dashboard/QuotaCard';
 import SubscriptionStatusCard from '@/components/dashboard/SubscriptionStatusCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-type DashboardTab = 'studio' | 'deliveries' | 'calendar' | 'history' | 'brand' | 'settings';
+type DashboardTab = 'deliveries' | 'calendar' | 'history' | 'brand' | 'settings';
 
 interface NavItem {
   id: DashboardTab;
@@ -191,13 +190,9 @@ const DashboardSidebar = ({
           <QuotaCard userProject={userProject} />
         </div>
       )}
-      {!collapsed && userProject && ['subscription', 'studio'].includes(userProject.client_type || '') && (
+      {!collapsed && userProject && userProject.client_type === 'subscription' && (
         <div className="mt-auto p-2 border-t border-abba-surface">
-          {userProject.client_type === 'subscription' ? (
-            <SubscriptionStatusCard userProject={userProject} />
-          ) : (
-            <QuotaCard userProject={userProject} />
-          )}
+          <SubscriptionStatusCard userProject={userProject} />
         </div>
       )}
     </Sidebar>
@@ -257,21 +252,12 @@ const DashboardLayout = () => {
   const { isGod, loading: roleLoading } = useRole();
   const isMobile = useIsMobile();
 
-  const isStudio = userProject?.client_type === 'studio';
-
   const [activeTab, setActiveTab] = useState<DashboardTab>(tabFromUrl || 'deliveries');
   const [lockedTabAttempt, setLockedTabAttempt] = useState<DashboardTab | null>(null);
 
-  // Defina a aba correta assim que o projeto carregar
-  useEffect(() => {
-    if (isLoading) return;
-    if (tabFromUrl) return;
-    setActiveTab(isStudio ? 'studio' : 'deliveries');
-  }, [isLoading, isStudio, tabFromUrl]);
-
   // Sync tab da URL
   useEffect(() => {
-    const valid: DashboardTab[] = ['studio', 'deliveries', 'calendar', 'history', 'brand', 'settings'];
+    const valid: DashboardTab[] = ['deliveries', 'calendar', 'history', 'brand', 'settings'];
     if (tabFromUrl && valid.includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
     }
@@ -292,18 +278,15 @@ const DashboardLayout = () => {
   };
 
   const navItems: NavItem[] = [
-    { id: 'deliveries', label: 'Minhas Entregas', shortLabel: 'ENTREGAS', icon: Video, locked: isStudio },
-    { id: 'calendar', label: 'Calendário', shortLabel: 'AGENDA', icon: Calendar, locked: isStudio },
-    { id: 'history', label: 'Histórico', shortLabel: 'HIST.', icon: CheckCircle2, locked: isStudio },
-    { id: 'studio' as DashboardTab, label: 'Studio', shortLabel: 'STUDIO', icon: Clapperboard, locked: false },
-    { id: 'brand', label: 'Minha Marca', shortLabel: 'MARCA', icon: Palette, locked: isStudio },
-    { id: 'settings', label: 'Configurações', shortLabel: 'CONFIG', icon: Settings, locked: false },
+    { id: 'deliveries', label: 'Minhas Entregas', shortLabel: 'ENTREGAS', icon: Video },
+    { id: 'calendar', label: 'Calendário', shortLabel: 'AGENDA', icon: Calendar },
+    { id: 'history', label: 'Histórico', shortLabel: 'HIST.', icon: CheckCircle2 },
+    { id: 'brand', label: 'Minha Marca', shortLabel: 'MARCA', icon: Palette },
+    { id: 'settings', label: 'Configurações', shortLabel: 'CONFIG', icon: Settings },
   ];
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'studio':
-        return <StudioModule />;
       case 'deliveries':
         return userProject ? (
           <Kanban userProject={userProject} />
@@ -356,7 +339,7 @@ const DashboardLayout = () => {
             </div>
           ) : (
             <>
-              {isMobile && userProject && activeTab !== 'settings' && activeTab !== 'studio' && (
+              {isMobile && userProject && activeTab !== 'settings' && (
                 <>
                   {['custom', 'studio'].includes(userProject.client_type || '') && <QuotaCard userProject={userProject} />}
                   {userProject.client_type === 'subscription' && <SubscriptionStatusCard userProject={userProject} />}
@@ -369,11 +352,7 @@ const DashboardLayout = () => {
       </div>
 
       {isMobile && (
-        <MobileBottomNav activeTab={activeTab} onTabChange={handleTabChange} navItems={
-          isStudio
-            ? navItems.filter(item => ['studio', 'deliveries', 'brand', 'settings'].includes(item.id))
-            : navItems
-        } />
+        <MobileBottomNav activeTab={activeTab} onTabChange={handleTabChange} navItems={navItems} />
       )}
 
       {/* Upsell overlay for locked tabs */}
