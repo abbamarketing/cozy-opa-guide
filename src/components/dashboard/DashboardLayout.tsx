@@ -52,7 +52,7 @@ import QuotaCard from '@/components/dashboard/QuotaCard';
 import SubscriptionStatusCard from '@/components/dashboard/SubscriptionStatusCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-type DashboardTab = 'studio' | 'deliveries' | 'calendar' | 'history' | 'brand' | 'settings';
+type DashboardTab = 'deliveries' | 'calendar' | 'history' | 'brand' | 'settings';
 
 interface NavItem {
   id: DashboardTab;
