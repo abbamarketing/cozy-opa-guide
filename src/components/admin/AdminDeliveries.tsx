@@ -278,7 +278,7 @@ const AdminDeliveries = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 min-w-0">
       {/* Filters */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 sm:flex-wrap">
         <Select value={clientFilter} onValueChange={setClientFilter}>

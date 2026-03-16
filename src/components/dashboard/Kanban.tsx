@@ -154,11 +154,11 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
   // Unified layout (mobile uses KanbanBoard with scroll-snap, desktop uses grid)
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col min-w-0 gap-4">
       {/* Capture Banner */}
       <CaptureBanner />
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between shrink-0">
         <h2 className="text-lg font-sans font-semibold text-foreground">Minhas Entregas</h2>
         <div className="flex items-center gap-3">
           <ViewToggle value={viewMode} onChange={handleViewChange} />

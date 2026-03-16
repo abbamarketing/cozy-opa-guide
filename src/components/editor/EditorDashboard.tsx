@@ -1061,7 +1061,7 @@ const EditorDashboard = () => {
         </div>
       )}
 
-      <main className="flex-1 overflow-x-auto p-4">
+      <main className="flex-1 min-w-0 p-4">
         {isLoading ? (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
             {COLUMNS.map((c) => (
