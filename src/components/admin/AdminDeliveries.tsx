@@ -316,8 +316,22 @@ const AdminDeliveries = () => {
             <span className="hidden sm:inline">CSV</span>
           </Button>
           <ViewToggle value={viewMode} onChange={handleViewChange} />
+          <Button
+            size="sm"
+            className="gap-1.5 h-8 text-xs shrink-0"
+            onClick={() => setDemandModalOpen(true)}
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Nova Demanda</span>
+          </Button>
         </div>
       </div>
+
+      <AdminNewDemandModal
+        open={demandModalOpen}
+        onOpenChange={setDemandModalOpen}
+        onCreated={fetchData}
+      />
 
       {/* Mobile: Tab + single column */}
       {viewMode === 'list' ? (
