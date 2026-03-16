@@ -158,7 +158,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
       toast.error('Erro ao entregar: ' + error.message);
     } else {
       logger.info('Editor entregou', { delivery_id: delivery.id, title: delivery.title }, 'editor');
-      toast.success('Entrega marcada como concluída! 🎉');
+      toast.success('Entrega marcada como concluída!');
       onOpenChange(false);
       onUpdated();
     }
