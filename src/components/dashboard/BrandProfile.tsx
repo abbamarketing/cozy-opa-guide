@@ -523,7 +523,6 @@ export default function BrandProfile() {
     </div>
   );
 }
-  const { user } = useAuth();
   const { userProject } = useUserProject();
   const [brand, setBrand] = useState<BrandData>(defaultBrand);
   const [loading, setLoading] = useState(true);
