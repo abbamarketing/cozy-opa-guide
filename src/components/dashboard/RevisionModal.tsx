@@ -164,20 +164,23 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProje
                 <FormItem>
                   <FormLabel>Categoria do ajuste *</FormLabel>
                   <div className="flex flex-wrap gap-1.5">
-                    {FEEDBACK_CATEGORIES.map((cat) => (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        onClick={() => field.onChange(cat.id)}
-                        className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${
-                          field.value === cat.id
-                            ? 'bg-primary text-primary-foreground ring-1 ring-primary/30'
-                            : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                        }`}
-                      >
-                        {cat.label}
-                      </button>
-                    ))}
+                    {FEEDBACK_CATEGORIES.map((cat) => {
+                      const CatIcon = cat.icon;
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => field.onChange(cat.id)}
+                          className={`rounded-full px-3 py-1 text-xs font-medium transition-all inline-flex items-center gap-1.5 ${
+                            field.value === cat.id
+                              ? 'bg-primary text-primary-foreground ring-1 ring-primary/30'
+                              : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                          }`}
+                        >
+                          <CatIcon className="h-3 w-3" /> {cat.label}
+                        </button>
+                      );
+                    })}
                   </div>
                   <FormMessage />
                 </FormItem>
