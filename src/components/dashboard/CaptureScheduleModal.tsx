@@ -62,7 +62,7 @@ const CaptureScheduleModal = ({
 
   // Minimum 72h lead time (3 days)
   const MIN_LEAD_DAYS = 3;
-  const COOLDOWN_DAYS = 30;
+  const COOLDOWN_DAYS = 28;
 
   // Use the greater of captureLeadDays or 3 days (72h)
   const effectiveLeadDays = Math.max(captureLeadDays, MIN_LEAD_DAYS);
@@ -178,7 +178,9 @@ const CaptureScheduleModal = ({
                 <p className="text-xs text-muted-foreground">
                   Você já possui um agendamento recente (último em{' '}
                   <strong>{format(lastSessionDate!, "dd/MM/yyyy", { locale: ptBR })}</strong>).
-                  Aguarde <strong>{cooldownRemainingDays} dia(s)</strong> para agendar novamente.
+                  Próxima sessão disponível em{' '}
+                  <strong>{format(addDays(lastSessionDate!, COOLDOWN_DAYS), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</strong>{' '}
+                  ({cooldownRemainingDays} dia{cooldownRemainingDays !== 1 ? 's' : ''}).
                 </p>
               </div>
             </div>
@@ -188,11 +190,17 @@ const CaptureScheduleModal = ({
           </div>
         ) : (
           <div className="space-y-4 pt-2">
+            {/* Status */}
+            <div className="p-3 rounded-lg bg-primary/10 border border-primary/20 flex items-center gap-2">
+              <Camera className="h-4 w-4 text-primary shrink-0" />
+              <p className="text-xs font-medium text-primary">Você pode agendar agora!</p>
+            </div>
+
             {/* Rules info */}
             <div className="p-3 rounded-lg bg-muted/50 border border-border/50 space-y-1">
               <p className="text-[11px] text-muted-foreground">• Seg–Sex, 08h às 18h</p>
               <p className="text-[11px] text-muted-foreground">• Mínimo 72h de antecedência</p>
-              <p className="text-[11px] text-muted-foreground">• 1 agendamento a cada 30 dias</p>
+              <p className="text-[11px] text-muted-foreground">• 1 agendamento a cada 28 dias</p>
             </div>
 
             {/* Date picker */}
