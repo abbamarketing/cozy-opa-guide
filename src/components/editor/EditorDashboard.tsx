@@ -873,6 +873,13 @@ const EditorDashboard = () => {
               <Skeleton className="h-24 rounded-lg" />
               <Skeleton className="h-24 rounded-lg" />
             </div>
+          ) : viewMode === 'list' ? (
+            <DeliveryListView
+              deliveries={filtered}
+              onSelect={setSelectedDelivery}
+              role="editor"
+              clientNames={editorClientNames}
+            />
           ) : items.length === 0 ? (
             <div className="rounded-lg border border-border bg-card p-8 text-center">
               <p className="text-xs font-mono text-muted-foreground">Nenhuma entrega</p>
