@@ -1062,8 +1062,8 @@ const EditorDashboard = () => {
       )}
 
       <main className="flex-1 min-w-0 p-4 flex flex-col">
-        {/* ÁREA DE SCROLL — só o conteúdo scrolla aqui */}
-        <div className="flex-1 min-h-0">
+        {/* WRAPPER DE SCROLL — cria contexto isolado para as colunas */}
+        <div className="flex-1 min-h-0 w-full overflow-x-hidden">
           {isLoading ? (
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
               {COLUMNS.map((c) => (
