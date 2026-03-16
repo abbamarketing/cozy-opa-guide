@@ -160,7 +160,7 @@ const DashboardSidebar = ({
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => (
-                <SidebarMenuItem key={item.id}>
+                <SidebarMenuItem key={item.id} {...(item.id === 'calendar' ? { 'data-tour': 'nav-calendar' } : {})}>
                   <SidebarMenuButton
                     onClick={() => onTabChange(item.id, item.locked)}
                     className={`cursor-pointer relative rounded-xl ${
@@ -217,6 +217,7 @@ const MobileBottomNav = ({
           <button
             key={item.id}
             onClick={() => onTabChange(item.id, item.locked)}
+            {...(item.id === 'calendar' ? { 'data-tour': 'nav-calendar' } : {})}
             className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors min-h-[56px] ${
               isActive
                 ? 'text-abba-lime'

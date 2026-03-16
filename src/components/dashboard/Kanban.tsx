@@ -277,8 +277,8 @@ const Kanban = ({ userProject }: KanbanProps) => {
                   )}
                 </div>
               ) : (
-                items.map((d) => (
-                  <div key={d.id} className="relative">
+                items.map((d, idx) => (
+                  <div key={d.id} className="relative" {...(idx === 0 ? { 'data-tour': 'delivery-card' } : {})}>
                     {activeColumn === 'queue' && (
                       <div className="absolute top-2 right-2 z-10">
                         <Badge variant="secondary" className="text-[9px] font-sans gap-1">
@@ -407,6 +407,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
               <div
                 key={col.id}
                 className="flex flex-col rounded-[20px] bg-abba-surface/40 border border-white/6 p-2"
+                {...(col.id === 'review' ? { 'data-tour': 'kanban-review' } : {})}
               >
                 <div className="mb-2 px-1">
                   <div className="flex items-center justify-between">
@@ -437,8 +438,8 @@ const Kanban = ({ userProject }: KanbanProps) => {
                         )}
                       </div>
                     ) : (
-                      items.map((d) => (
-                        <div key={d.id} className="relative">
+                      items.map((d, idx) => (
+                        <div key={d.id} className="relative" {...(idx === 0 && col.id === 'todo' ? { 'data-tour': 'delivery-card' } : {})}>
                           {col.id === 'queue' && (
                             <div className="absolute top-2 right-2 z-10">
                               <Badge variant="secondary" className="text-[9px] font-sans gap-1">
