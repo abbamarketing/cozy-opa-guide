@@ -423,7 +423,7 @@ const AdminDeliveries = () => {
         </div>
       ) : (
         /* Desktop: 4-column Kanban */
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3" data-tour="admin-kanban">
           {COLUMNS.map((col) => {
             const items = filtered.filter((d) => col.statuses.includes(d.status));
             return (
