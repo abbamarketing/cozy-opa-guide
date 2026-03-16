@@ -77,6 +77,7 @@ const AdminDeliveries = () => {
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [activeColumn, setActiveColumn] = useState('todo');
+  const [demandModalOpen, setDemandModalOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>(() =>
