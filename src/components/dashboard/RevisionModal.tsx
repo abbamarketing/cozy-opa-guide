@@ -26,7 +26,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, RotateCcw } from 'lucide-react';
+import { Loader2, RotateCcw, Volume2, Palette, Scissors, FileText, Timer, Pin } from 'lucide-react';
 import type { DeliveryData } from './DeliveryCard';
 
 interface RevisionModalProps {
