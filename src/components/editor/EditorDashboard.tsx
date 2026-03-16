@@ -881,6 +881,11 @@ const EditorDashboard = () => {
               role="editor"
               clientNames={editorClientNames}
             />
+          ) : viewMode === 'calendar' ? (
+            <DeliveryCalendarView
+              deliveries={filtered}
+              onSelect={setSelectedDelivery}
+            />
           ) : items.length === 0 ? (
             <div className="rounded-lg border border-border bg-card p-8 text-center">
               <p className="text-xs font-mono text-muted-foreground">Nenhuma entrega</p>
