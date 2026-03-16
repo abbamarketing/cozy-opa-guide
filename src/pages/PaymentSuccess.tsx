@@ -33,7 +33,7 @@ const PaymentSuccess = () => {
 
       const ct = (up as any)?.client_type;
       if (ct === 'studio') {
-        navigate('/studio', { replace: true });
+        navigate('/dashboard', { replace: true });
       } else if (ct === 'subscription') {
         navigate('/onboarding', { replace: true });
       } else {
