@@ -309,6 +309,7 @@ export type Database = {
       deliveries: {
         Row: {
           approved_at: string | null
+          checklist_state: Json | null
           client_notes: string | null
           created_at: string
           delivered_at: string | null
@@ -336,6 +337,7 @@ export type Database = {
         }
         Insert: {
           approved_at?: string | null
+          checklist_state?: Json | null
           client_notes?: string | null
           created_at?: string
           delivered_at?: string | null
@@ -363,6 +365,7 @@ export type Database = {
         }
         Update: {
           approved_at?: string | null
+          checklist_state?: Json | null
           client_notes?: string | null
           created_at?: string
           delivered_at?: string | null
