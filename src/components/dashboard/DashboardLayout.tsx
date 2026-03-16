@@ -21,7 +21,7 @@ import {
   Palette,
   LogOut,
   ChevronDown,
-  Sparkles,
+  
   Lock,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
