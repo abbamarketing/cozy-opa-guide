@@ -991,6 +991,9 @@ const EditorDashboard = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem onClick={restartEditorTour}>
+                  Reiniciar Tour
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={signOut} className="text-destructive">
                   <LogOut className="mr-2 h-4 w-4" /> Sair
                 </DropdownMenuItem>
