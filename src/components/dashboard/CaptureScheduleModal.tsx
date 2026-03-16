@@ -59,6 +59,7 @@ const CaptureScheduleModal = ({
   const [saving, setSaving] = useState(false);
   const [lastSessionDate, setLastSessionDate] = useState<Date | null>(null);
   const [checkingCooldown, setCheckingCooldown] = useState(true);
+  const [quotaExceeded, setQuotaExceeded] = useState(false);
 
   // Minimum 72h lead time (3 days)
   const MIN_LEAD_DAYS = 3;
@@ -68,7 +69,7 @@ const CaptureScheduleModal = ({
   const effectiveLeadDays = Math.max(captureLeadDays, MIN_LEAD_DAYS);
   const minDate = addDays(new Date(), effectiveLeadDays);
 
-  // Check for 30-day cooldown
+  // Check for 28-day cooldown and max_captures quota
   useEffect(() => {
     if (!open || !userProject) return;
 
