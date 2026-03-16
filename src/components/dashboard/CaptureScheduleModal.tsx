@@ -92,13 +92,9 @@ const CaptureScheduleModal = ({
 
       // Check max_captures quota
       const capturesUsed = (userProject.captures_approved ?? 0) + (userProject.captures_reserved ?? 0);
-      const { data: cpData } = await supabase
-        .from('custom_projects')
-        .select('max_captures')
-        .eq('id', userProject.custom_project_id)
-        .maybeSingle();
+      const maxCaptures = userProject.custom_project?.max_captures ?? 1;
 
-      if (cpData && capturesUsed >= cpData.max_captures) {
+      if (capturesUsed >= maxCaptures) {
         setQuotaExceeded(true);
       } else {
         setQuotaExceeded(false);
