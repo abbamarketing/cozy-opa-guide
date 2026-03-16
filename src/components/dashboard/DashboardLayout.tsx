@@ -160,7 +160,7 @@ const DashboardSidebar = ({
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => (
-                <SidebarMenuItem key={item.id}>
+                <SidebarMenuItem key={item.id} {...(item.id === 'calendar' ? { 'data-tour': 'nav-calendar' } : {})}>
                   <SidebarMenuButton
                     onClick={() => onTabChange(item.id, item.locked)}
                     className={`cursor-pointer relative rounded-xl ${
