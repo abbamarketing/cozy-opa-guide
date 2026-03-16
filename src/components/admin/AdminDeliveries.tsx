@@ -315,11 +315,12 @@ const AdminDeliveries = () => {
             <Download className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">CSV</span>
           </Button>
-          <ViewToggle value={viewMode} onChange={handleViewChange} />
+          <div data-tour="admin-view-toggle"><ViewToggle value={viewMode} onChange={handleViewChange} /></div>
           <Button
             size="sm"
             className="gap-1.5 h-8 text-xs shrink-0"
             onClick={() => setDemandModalOpen(true)}
+            data-tour="admin-new-demand"
           >
             <Plus className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Nova Demanda</span>
