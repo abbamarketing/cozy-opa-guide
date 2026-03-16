@@ -941,7 +941,7 @@ const EditorDashboard = () => {
 
   /* ─── Desktop Layout ─── */
   return (
-    <div className="flex min-h-screen flex-col bg-background overflow-x-hidden">
+    <div className="flex min-h-screen flex-col bg-background">
       <EditorTour ready={!isLoading && !!editor} />
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-border/50 bg-background/80 backdrop-blur-md">
@@ -1061,7 +1061,7 @@ const EditorDashboard = () => {
         </div>
       )}
 
-      <main className="flex-1 min-w-0 p-4 overflow-x-hidden">
+      <main className="flex-1 min-w-0 p-4">
         {isLoading ? (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
             {COLUMNS.map((c) => (
