@@ -16,6 +16,7 @@ import {
   ChevronDown,
   AlertTriangle,
   X,
+  Send,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
