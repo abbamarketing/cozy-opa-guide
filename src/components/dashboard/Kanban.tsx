@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import DeliveryCard, { type DeliveryData } from './DeliveryCard';
 import { useDeliveries } from '@/hooks/useDeliveries';
 import type { UserProjectData } from '@/hooks/useUserProject';
-import { useIsMobile } from '@/hooks/use-mobile';
+
 import ViewToggle, { type ViewMode } from '@/components/shared/ViewToggle';
 import DeliveryListView from '@/components/shared/DeliveryListView';
 import DeliveryCalendarView from '@/components/shared/DeliveryCalendarView';
