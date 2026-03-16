@@ -122,12 +122,6 @@ const Kanban = ({ userProject }: KanbanProps) => {
     }
   };
 
-  const getDeliveriesForColumn = (col: Column) =>
-    deliveries.filter((d) => col.statuses.includes(d.status));
-
-  const handleLoadMore = () => {
-    setVisibleCount((prev) => prev + PAGE_SIZE);
-  };
 
   // Capture banner component
   const CaptureBanner = () => {
