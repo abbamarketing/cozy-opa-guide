@@ -45,16 +45,26 @@ type ViewMode = 'month' | 'week' | 'day';
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 const EVENT_TYPES = [
-  { value: 'reuniao', label: 'Reunião' },
-  { value: 'marco', label: 'Marco' },
-  { value: 'lembrete', label: 'Lembrete' },
-  { value: 'outro', label: 'Outro' },
+  { value: 'gravacao', label: '🎬 Gravação' },
+  { value: 'captacao_externa', label: '📍 Captação Externa' },
+  { value: 'sessao_cliente', label: '👤 Sessão com Cliente' },
+  { value: 'revisao_ao_vivo', label: '🔄 Revisão ao Vivo' },
 ];
 
 /* colour classes */
 const deliveryColor = 'bg-primary/15 border-primary/30 text-primary';
 const captureColor  = 'bg-[hsl(var(--queue-green))]/20 border-[hsl(var(--queue-green))]/40 text-[hsl(var(--queue-green))]';
-const manualColor   = 'bg-[hsl(var(--energy-leve))]/20 border-[hsl(var(--energy-leve))]/40 text-[hsl(var(--energy-leve))]';
+
+const MANUAL_TYPE_COLORS: Record<string, string> = {
+  gravacao: 'bg-purple-500/20 border-purple-500/40 text-purple-400',
+  captacao_externa: 'bg-orange-500/20 border-orange-500/40 text-orange-400',
+  sessao_cliente: 'bg-blue-500/20 border-blue-500/40 text-blue-400',
+  revisao_ao_vivo: 'bg-yellow-500/20 border-yellow-500/40 text-yellow-400',
+};
+const manualColorFallback = 'bg-muted/20 border-muted/40 text-muted-foreground';
+
+const getManualColor = (type?: string) => (type && MANUAL_TYPE_COLORS[type]) || manualColorFallback;
+const getManualLabel = (type?: string) => EVENT_TYPES.find(t => t.value === type)?.label || type || 'Evento';
 
 /* ───── Component ───── */
 const AdminCalendar = () => {
@@ -70,7 +80,7 @@ const AdminCalendar = () => {
 
   // Create form
   const [formTitle, setFormTitle] = useState('');
-  const [formType, setFormType] = useState('outro');
+  const [formType, setFormType] = useState('gravacao');
   const [formStartDate, setFormStartDate] = useState<Date | undefined>(undefined);
   const [formStartTime, setFormStartTime] = useState('09:00');
   const [formEndTime, setFormEndTime] = useState('10:00');
@@ -125,7 +135,7 @@ const AdminCalendar = () => {
         title: m.title,
         date: format(startOfDay(new Date(m.starts_at)), 'yyyy-MM-dd'),
         type: 'manual',
-        color: manualColor,
+        color: getManualColor(m.type),
         raw: m,
       });
     });
@@ -184,7 +194,7 @@ const AdminCalendar = () => {
 
   /* ───── Create / Edit event ───── */
   const resetForm = () => {
-    setFormTitle(''); setFormType('outro'); setFormStartDate(undefined);
+    setFormTitle(''); setFormType('gravacao'); setFormStartDate(undefined);
     setFormStartTime('09:00'); setFormEndTime('10:00');
     setFormNotes(''); setFormEditorId(''); setFormClientId('');
     setEditingEvent(null);
@@ -196,7 +206,7 @@ const AdminCalendar = () => {
     if (ev.type !== 'manual') return;
     const r = ev.raw;
     setFormTitle(r.title);
-    setFormType(r.type || 'outro');
+    setFormType(r.type || 'gravacao');
     setFormStartDate(new Date(r.starts_at));
     setFormStartTime(format(new Date(r.starts_at), 'HH:mm'));
     setFormEndTime(format(new Date(r.ends_at), 'HH:mm'));
@@ -380,7 +390,7 @@ const AdminCalendar = () => {
         {[
           { color: deliveryColor, label: 'Entregas', icon: Package },
           { color: captureColor, label: 'Captações', icon: Camera },
-          { color: manualColor, label: 'Eventos', icon: Pin },
+          ...EVENT_TYPES.map(t => ({ color: MANUAL_TYPE_COLORS[t.value], label: t.label, icon: Pin })),
         ].map(({ color, label, icon: Icon }) => (
           <div key={label} className="flex items-center gap-1.5">
             <span className={cn('h-2.5 w-2.5 rounded-full border', color)} />
@@ -423,7 +433,7 @@ const AdminCalendar = () => {
           )}
           {detailEvent?.type === 'manual' && (
             <div className="text-xs space-y-2 text-muted-foreground">
-              <p>Tipo: {detailEvent.raw.type}</p>
+              <p>Tipo: {getManualLabel(detailEvent.raw.type)}</p>
               <p>Início: {format(new Date(detailEvent.raw.starts_at), "HH:mm", { locale: ptBR })}</p>
               <p>Fim: {format(new Date(detailEvent.raw.ends_at), "HH:mm", { locale: ptBR })}</p>
               {detailEvent.raw.notes && <p className="pt-1 border-t border-border/50">{detailEvent.raw.notes}</p>}
