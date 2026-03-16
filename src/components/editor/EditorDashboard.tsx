@@ -188,12 +188,14 @@ const EditorDeliveryCard = ({
   onDragStart,
   isDragging,
   onMoveStatus,
+  onSubmitDelivery,
 }: {
   delivery: EditorDelivery;
   onClick: () => void;
   onDragStart?: (e: React.DragEvent) => void;
   isDragging?: boolean;
   onMoveStatus?: (deliveryId: string, targetColumn: Column) => void;
+  onSubmitDelivery?: (delivery: EditorDelivery) => void;
 }) => {
   const Icon = typeIcons[delivery.delivery_type] || Video;
   const deadline = getDeadlineInfo(delivery.due_date);
