@@ -1047,6 +1047,7 @@ const EditorDashboard = () => {
                             isDragging={draggedId === d.id}
                             onClick={() => setSelectedDelivery(d)}
                             onDragStart={handleDragStart(d.id)}
+                            onSubmitDelivery={(del) => setSubmitTarget(del)}
                           />
                         ))
                       )}
