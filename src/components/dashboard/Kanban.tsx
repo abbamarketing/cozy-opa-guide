@@ -380,6 +380,12 @@ const Kanban = ({ userProject }: KanbanProps) => {
             </div>
           ))}
         </div>
+      ) : viewMode === 'list' ? (
+        <DeliveryListView
+          deliveries={deliveries}
+          onSelect={setSelectedDelivery}
+          role="client"
+        />
       ) : (
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3" data-tour="kanban-board">
           {COLUMNS.map((col) => {
