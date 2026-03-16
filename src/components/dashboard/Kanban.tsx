@@ -408,85 +408,47 @@ const Kanban = ({ userProject }: KanbanProps) => {
           onSelect={setSelectedDelivery}
         />
       ) : (
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3" data-tour="kanban-board">
-          {COLUMNS.map((col) => {
-            const allItems = getDeliveriesForColumn(col);
-            const items = allItems.slice(0, visibleCount);
-            const hasMore = allItems.length > visibleCount;
-            return (
-              <div
-                key={col.id}
-                className="flex flex-col rounded-[20px] bg-abba-surface/40 border border-white/6 p-2"
-                {...(col.id === 'review' ? { 'data-tour': 'kanban-review' } : {})}
-              >
-                <div className="mb-2 px-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-[10px] font-sans font-semibold uppercase tracking-widest text-muted-foreground">
-                      {col.title}
-                    </h3>
-                    <Badge
-                      variant="secondary"
-                      className="h-5 min-w-[20px] justify-center px-1.5 text-[10px] font-sans"
-                    >
-                      {allItems.length}
-                    </Badge>
-                  </div>
-                  <p className="text-[10px] text-muted-foreground/70">{col.description}</p>
+        <KanbanBoard<DeliveryData>
+          columns={COLUMNS}
+          items={deliveries}
+          canDragBetweenColumns={false}
+          dataTour="kanban-board"
+          renderCard={(d) => (
+            <div className="relative" data-tour={d.status === 'pending' ? 'delivery-card' : undefined}>
+              {d.status === 'queue' && (
+                <div className="absolute top-2 right-2 z-10">
+                  <Badge variant="secondary" className="text-[9px] font-sans gap-1">
+                    <Clock className="h-2.5 w-2.5" />
+                    Aguardando editor
+                  </Badge>
                 </div>
-
-                <ScrollArea className="flex-1">
-                  <div className="space-y-2 p-0.5">
-                    {items.length === 0 && deliveries.length === 0 && col.id === 'todo' ? (
-                      <div className="py-8 text-center space-y-3">
-                        <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
-                        <p className="text-sm font-sans font-medium text-muted-foreground">Você ainda não tem entregas</p>
-                        <p className="text-[10px] text-muted-foreground/60">Clique em "+ Nova Solicitação" para começar!</p>
-                        {canCreateDelivery && (
-                          <Button size="sm" variant="outline" onClick={handleNewClick} className="text-xs rounded-full">
-                            <Plus className="h-3 w-3 mr-1" />
-                            Nova Entrega
-                          </Button>
-                        )}
-                      </div>
-                    ) : items.length === 0 ? (
-                      <div className="py-8 text-center space-y-3">
-                        <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
-                        <p className="text-[10px] font-sans text-muted-foreground/50">Nenhuma entrega aqui</p>
-                      </div>
-                    ) : (
-                      items.map((d, idx) => (
-                        <div key={d.id} className="relative" {...(idx === 0 && col.id === 'todo' ? { 'data-tour': 'delivery-card' } : {})}>
-                          {col.id === 'queue' && (
-                            <div className="absolute top-2 right-2 z-10">
-                              <Badge variant="secondary" className="text-[9px] font-sans gap-1">
-                                <Clock className="h-2.5 w-2.5" />
-                                Aguardando editor
-                              </Badge>
-                            </div>
-                          )}
-                          <DeliveryCard
-                            delivery={d}
-                            onClick={() => setSelectedDelivery(d)}
-                          />
-                        </div>
-                      ))
-                    )}
-                    {hasMore && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full text-xs text-muted-foreground"
-                        onClick={handleLoadMore}
-                      >
-                        Carregar mais ({allItems.length - visibleCount})
-                      </Button>
-                    )}
-                  </div>
-                </ScrollArea>
-              </div>
-            );
-          })}
-        </div>
+              )}
+              <DeliveryCard
+                delivery={d}
+                onClick={() => setSelectedDelivery(d)}
+              />
+            </div>
+          )}
+          renderEmpty={(col, hasAnyItems) => (
+            <div className="py-8 text-center space-y-3">
+              <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
+              {!hasAnyItems && col.statuses.includes('pending') ? (
+                <>
+                  <p className="text-sm font-sans font-medium text-muted-foreground">Você ainda não tem entregas</p>
+                  <p className="text-[10px] text-muted-foreground/60">Clique em "+ Nova Solicitação" para começar!</p>
+                  {canCreateDelivery && (
+                    <Button size="sm" variant="outline" onClick={handleNewClick} className="text-xs rounded-full">
+                      <Plus className="h-3 w-3 mr-1" />
+                      Nova Entrega
+                    </Button>
+                  )}
+                </>
+              ) : (
+                <p className="text-[10px] font-sans text-muted-foreground/50">Nenhuma entrega aqui</p>
+              )}
+            </div>
+          )}
+        />
       )}
 
       <Suspense fallback={null}>
