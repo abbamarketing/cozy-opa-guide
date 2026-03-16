@@ -65,7 +65,7 @@ const SortIcon = ({ field, sortField, sortDir }: { field: SortField; sortField: 
     : <ChevronDown className="h-3 w-3 text-primary" />;
 };
 
-const DeliveryListView = ({ deliveries, onSelect, role, clientNames }: DeliveryListViewProps) => {
+const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoading }: DeliveryListViewProps) => {
   const [sortField, setSortField] = useState<SortField>('due_date');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [page, setPage] = useState(0);
