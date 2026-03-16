@@ -35,13 +35,13 @@ interface DeliveryListViewProps {
   clientNames?: Record<string, string | null>;
 }
 
-function getSlaLevel(dueDate: string | null): { label: string; level: 'ok' | 'warning' | 'danger' | 'overdue' | 'none' } {
+function getSlaLevel(dueDate: string | null): { label: string; level: 'ok' | 'warning' | 'danger' | 'overdue' | 'none'; icon?: 'alert' | 'shield' } {
   if (!dueDate) return { label: '—', level: 'none' };
   const bizMin = remainingBusinessMinutes(new Date(dueDate));
   const countdown = formatBusinessCountdown(bizMin);
-  if (bizMin < 0) return { label: `⛔ ${countdown}`, level: 'overdue' };
-  if (bizMin <= 360) return { label: `⚠️ ${countdown}`, level: 'danger' };
-  if (bizMin <= 720) return { label: `⚠️ ${countdown}`, level: 'warning' };
+  if (bizMin < 0) return { label: countdown, level: 'overdue', icon: 'shield' };
+  if (bizMin <= 360) return { label: countdown, level: 'danger', icon: 'alert' };
+  if (bizMin <= 720) return { label: countdown, level: 'warning', icon: 'alert' };
   return { label: countdown, level: 'ok' };
 }
 
