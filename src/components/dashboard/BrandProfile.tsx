@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { useUserProject } from '@/hooks/useUserProject';
@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Save, Palette, Upload } from 'lucide-react';
+import { Loader2, Save, Palette, Upload, ImageIcon, Type, X } from 'lucide-react';
 
 interface BrandData {
   brand_name: string;
@@ -30,6 +30,7 @@ interface BrandData {
   logo_url: string;
   intro_url: string;
   outro_url: string;
+  brand_fonts: { primary: string; secondary: string };
 }
 
 const defaultBrand: BrandData = {
@@ -50,7 +51,11 @@ const defaultBrand: BrandData = {
   logo_url: '',
   intro_url: '',
   outro_url: '',
+  brand_fonts: { primary: '', secondary: '' },
 };
+
+const LOGO_ACCEPTED = '.png,.jpg,.jpeg,.svg';
+const LOGO_MAX_SIZE = 5 * 1024 * 1024;
 
 export default function BrandProfile() {
   const { user } = useAuth();
@@ -58,8 +63,10 @@ export default function BrandProfile() {
   const [brand, setBrand] = useState<BrandData>(defaultBrand);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [channelsInput, setChannelsInput] = useState('');
   const [briefingId, setBriefingId] = useState<string | null>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user) loadBrand();
@@ -76,6 +83,7 @@ export default function BrandProfile() {
       .maybeSingle();
 
     if (data) {
+      const fonts = (data.brand_fonts as any) || {};
       setBriefingId(data.id);
       setBrand({
         brand_name: data.brand_name || '',
@@ -95,10 +103,65 @@ export default function BrandProfile() {
         logo_url: data.logo_url || '',
         intro_url: data.intro_url || '',
         outro_url: data.outro_url || '',
+        brand_fonts: {
+          primary: Array.isArray(fonts) ? (fonts[0] || '') : (fonts.primary || ''),
+          secondary: Array.isArray(fonts) ? (fonts[1] || '') : (fonts.secondary || ''),
+        },
       });
       setChannelsInput((data.reference_channels || []).join(', '));
     }
     setLoading(false);
+  };
+
+  const update = (key: keyof BrandData, value: any) =>
+    setBrand((prev) => ({ ...prev, [key]: value }));
+
+  const updateFont = (key: 'primary' | 'secondary', value: string) =>
+    setBrand((prev) => ({
+      ...prev,
+      brand_fonts: { ...prev.brand_fonts, [key]: value },
+    }));
+
+  const handleLogoUpload = async (file: File) => {
+    if (!file) return;
+    if (file.size > LOGO_MAX_SIZE) {
+      toast.error('Logo muito grande. Máximo: 5MB');
+      return;
+    }
+    const validTypes = ['image/png', 'image/jpeg', 'image/svg+xml'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Formato inválido. Use .png, .jpg ou .svg');
+      return;
+    }
+
+    setUploadingLogo(true);
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const path = `${user!.id}/${Date.now()}-${safeName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('brand-logos')
+      .upload(path, file, { cacheControl: '3600', upsert: true });
+
+    if (uploadError) {
+      toast.error('Erro no upload do logo');
+      setUploadingLogo(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from('brand-logos').getPublicUrl(path);
+    const newUrl = urlData.publicUrl;
+
+    update('logo_url', newUrl);
+
+    if (briefingId) {
+      await supabase
+        .from('onboarding_briefings')
+        .update({ logo_url: newUrl })
+        .eq('id', briefingId);
+    }
+
+    toast.success('Logo atualizado!');
+    setUploadingLogo(false);
   };
 
   const handleSave = async () => {
@@ -130,6 +193,7 @@ export default function BrandProfile() {
       logo_url: brand.logo_url || null,
       intro_url: brand.intro_url || null,
       outro_url: brand.outro_url || null,
+      brand_fonts: brand.brand_fonts as any,
     };
 
     let error;
@@ -164,9 +228,6 @@ export default function BrandProfile() {
       </div>
     );
   }
-
-  const update = (key: keyof BrandData, value: any) =>
-    setBrand((prev) => ({ ...prev, [key]: value }));
 
   return (
     <div className="space-y-6">
@@ -212,6 +273,59 @@ export default function BrandProfile() {
             />
           </div>
 
+          {/* Logo Upload */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-1.5">
+              <ImageIcon className="h-3.5 w-3.5" />
+              Logo da Marca
+            </Label>
+            <div className="flex items-center gap-4">
+              {brand.logo_url && (
+                <div className="relative group">
+                  <div className="glass rounded-lg p-3 w-fit">
+                    <img src={brand.logo_url} alt="Logo" className="h-16 object-contain max-w-[200px]" />
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive/90 text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => update('logo_url', '')}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+              <div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  disabled={uploadingLogo}
+                  onClick={() => logoInputRef.current?.click()}
+                >
+                  {uploadingLogo ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Upload className="h-3.5 w-3.5" />
+                  )}
+                  {brand.logo_url ? 'Trocar logo' : 'Enviar logo'}
+                </Button>
+                <p className="text-[10px] text-muted-foreground mt-1">.png, .jpg, .svg — máx 5MB</p>
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept={LOGO_ACCEPTED}
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleLogoUpload(file);
+                    e.target.value = '';
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>Cor Principal</Label>
@@ -251,14 +365,33 @@ export default function BrandProfile() {
             </div>
           </div>
 
-          {brand.logo_url && (
-            <div className="space-y-2">
-              <Label>Logo Atual</Label>
-              <div className="glass rounded-lg p-3 w-fit">
-                <img src={brand.logo_url} alt="Logo" className="h-16 object-contain" />
+          {/* Brand Fonts */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-1.5">
+              <Type className="h-3.5 w-3.5" />
+              Fontes da Marca
+            </Label>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Fonte Principal</Label>
+                <Input
+                  value={brand.brand_fonts.primary}
+                  onChange={(e) => updateFont('primary', e.target.value)}
+                  placeholder="Ex: Montserrat, Inter, Roboto"
+                  maxLength={100}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Fonte Secundária (opcional)</Label>
+                <Input
+                  value={brand.brand_fonts.secondary}
+                  onChange={(e) => updateFont('secondary', e.target.value)}
+                  placeholder="Ex: Open Sans, Lato"
+                  maxLength={100}
+                />
               </div>
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
 
