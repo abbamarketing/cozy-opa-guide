@@ -941,7 +941,7 @@ const EditorDashboard = () => {
 
   /* ─── Desktop Layout ─── */
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-background overflow-x-hidden">
       <EditorTour ready={!isLoading && !!editor} />
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-border/50 bg-background/80 backdrop-blur-md">
