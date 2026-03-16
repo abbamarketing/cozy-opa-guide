@@ -1,0 +1,1 @@
+ALTER TABLE public.delivery_revisions ADD COLUMN IF NOT EXISTS category text DEFAULT NULL;

@@ -91,7 +91,8 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProje
         requested_by: user.id,
         notes: formattedNotes,
         timestamp_marker: values.timestamp_marker || null,
-      });
+        category: values.category,
+      } as any);
       if (revError) throw revError;
 
       const updateData: Record<string, any> = {
