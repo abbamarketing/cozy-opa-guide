@@ -38,12 +38,12 @@ interface RevisionModalProps {
 }
 
 const FEEDBACK_CATEGORIES = [
-  { id: 'audio', label: '🔊 Áudio', placeholder: 'Ex: Volume da música muito alto nos primeiros 30s' },
-  { id: 'visual', label: '🎨 Visual', placeholder: 'Ex: Cor do texto no minuto 1:20 está diferente da identidade' },
-  { id: 'cortes', label: '✂️ Cortes', placeholder: 'Ex: Transição brusca em 2:15, suavizar' },
-  { id: 'texto', label: '📝 Texto/Legenda', placeholder: 'Ex: Erro de digitação na legenda em 0:45' },
-  { id: 'ritmo', label: '⏱ Ritmo', placeholder: 'Ex: Parte entre 3:00-4:00 está lenta, acelerar' },
-  { id: 'outro', label: '📌 Outro', placeholder: 'Descreva o ajuste necessário em detalhe...' },
+  { id: 'audio', label: 'Áudio', icon: Volume2, placeholder: 'Ex: Volume da música muito alto nos primeiros 30s' },
+  { id: 'visual', label: 'Visual', icon: Palette, placeholder: 'Ex: Cor do texto no minuto 1:20 está diferente da identidade' },
+  { id: 'cortes', label: 'Cortes', icon: Scissors, placeholder: 'Ex: Transição brusca em 2:15, suavizar' },
+  { id: 'texto', label: 'Texto/Legenda', icon: FileText, placeholder: 'Ex: Erro de digitação na legenda em 0:45' },
+  { id: 'ritmo', label: 'Ritmo', icon: Timer, placeholder: 'Ex: Parte entre 3:00-4:00 está lenta, acelerar' },
+  { id: 'outro', label: 'Outro', icon: Pin, placeholder: 'Descreva o ajuste necessário em detalhe...' },
 ];
 
 const revisionSchema = z.object({

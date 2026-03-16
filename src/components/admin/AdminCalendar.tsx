@@ -129,7 +129,7 @@ const AdminCalendar = () => {
     (capRes.data || []).forEach((c: any) => {
       const clientName = profileMap[c.user_projects?.user_id] || '';
       const locationLabel = c.location_name || 'Captação';
-      const title = clientName ? `🎬 ${clientName} — ${locationLabel}` : locationLabel;
+      const title = clientName ? `${clientName} — ${locationLabel}` : locationLabel;
       mapped.push({
         id: `cap-${c.id}`,
         title,

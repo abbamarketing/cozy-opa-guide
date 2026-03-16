@@ -143,7 +143,7 @@ const DeliveryCalendar = ({ userProject }: DeliveryCalendarProps) => {
         const expiryDate = addDays(new Date(d.approved_at), 365);
         result.push({
           id: `expiry-${d.id}`,
-          title: `⚠️ Download expira: ${d.title}`,
+          title: `Download expira: ${d.title}`,
           date: expiryDate,
           type: 'expiry',
           delivery: d,
