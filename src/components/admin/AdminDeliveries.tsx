@@ -22,6 +22,7 @@ import { downloadCSV } from '@/lib/csv';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { remainingBusinessMinutes, formatBusinessCountdown } from '@/lib/business-hours';
 import DeliveryListView from '@/components/shared/DeliveryListView';
+import DeliveryCalendarView from '@/components/shared/DeliveryCalendarView';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 
 interface AdminDelivery {
