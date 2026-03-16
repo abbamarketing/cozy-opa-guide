@@ -48,16 +48,31 @@ const GuidedTour = ({ steps, completedKey, stepKey, ready, onComplete }: GuidedT
 
   useEffect(() => {
     if (!active) return;
-    measureTarget();
+
+    const currentStep = steps[step];
+    let cancelled = false;
+
+    const run = async () => {
+      if (currentStep?.onBeforeStep) {
+        await currentStep.onBeforeStep();
+        // Wait for DOM to settle after tab change etc.
+        await new Promise((r) => setTimeout(r, 350));
+      }
+      if (!cancelled) measureTarget();
+    };
+
+    run();
+
     const interval = setInterval(measureTarget, 300);
     window.addEventListener('resize', measureTarget);
     window.addEventListener('scroll', measureTarget, true);
     return () => {
+      cancelled = true;
       clearInterval(interval);
       window.removeEventListener('resize', measureTarget);
       window.removeEventListener('scroll', measureTarget, true);
     };
-  }, [active, step, measureTarget]);
+  }, [active, step, measureTarget, steps]);
 
   useEffect(() => {
     if (active) localStorage.setItem(stepKey, String(step));
