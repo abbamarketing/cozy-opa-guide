@@ -131,16 +131,6 @@ const SubscriptionStatusCard = ({ userProject }: Props) => {
             </div>
           )}
 
-          {/* Studio link */}
-          {userProject.studio_access && studioCredits !== null && (
-            <Link
-              to="/studio"
-              className="flex items-center gap-1.5 text-xs font-sans text-abba-lime hover:underline mt-1"
-            >
-              <Sparkles className="h-3 w-3" />
-              Acessar Studio · {studioCredits} créditos
-            </Link>
-          )}
         </div>
       </div>
     </div>
