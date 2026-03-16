@@ -407,7 +407,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
 
                 {/* Subtasks */}
                 <Separator className="bg-border/50" />
-                <SubtaskList deliveryId={delivery.id} role="editor" />
+                <div data-tour="editor-subtasks"><SubtaskList deliveryId={delivery.id} role="editor" /></div>
               </TabsContent>
 
               {/* TAB 2: Marca */}
