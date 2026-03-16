@@ -1061,76 +1061,79 @@ const EditorDashboard = () => {
         </div>
       )}
 
-      <main className="flex-1 min-w-0 p-4">
-        {isLoading ? (
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-            {COLUMNS.map((c) => (
-              <div key={c.id} className="flex flex-col rounded-xl border border-border/40 bg-muted/30 p-2 space-y-2">
-                <div className="flex items-center justify-between px-1 mb-1">
-                  <Skeleton className="h-3 w-20" />
-                  <Skeleton className="h-5 w-5 rounded-md" />
-                </div>
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="rounded-xl border border-border/30 bg-card p-3 space-y-2">
-                    <Skeleton className="h-3.5 w-3/4" />
-                    <Skeleton className="h-2.5 w-1/2" />
-                    <Skeleton className="h-2.5 w-1/3" />
+      <main className="flex-1 min-w-0 p-4 flex flex-col">
+        {/* ÁREA DE SCROLL — só o conteúdo scrolla aqui */}
+        <div className="flex-1 min-h-0">
+          {isLoading ? (
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+              {COLUMNS.map((c) => (
+                <div key={c.id} className="flex flex-col rounded-xl border border-border/40 bg-muted/30 p-2 space-y-2">
+                  <div className="flex items-center justify-between px-1 mb-1">
+                    <Skeleton className="h-3 w-20" />
+                    <Skeleton className="h-5 w-5 rounded-md" />
                   </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        ) : viewMode === 'list' ? (
-          <DeliveryListView
-            deliveries={filtered}
-            onSelect={setSelectedDelivery}
-            role="editor"
-            clientNames={editorClientNames}
-          />
-        ) : viewMode === 'calendar' ? (
-          <DeliveryCalendarView
-            deliveries={filtered}
-            onSelect={setSelectedDelivery}
-          />
-        ) : (
-          <KanbanBoard<EditorDelivery>
-            columns={COLUMNS.map((c) => ({ id: c.id, title: c.title, statuses: c.statuses, description: c.description }))}
-            items={filtered as EditorDelivery[]}
-            canDragBetweenColumns={true}
-            dataTour="editor-kanban"
-            onStatusChange={async (itemId, newStatus) => {
-              const col = COLUMNS.find((c) => c.statuses.includes(newStatus));
-              if (!col?.editorCanDrop) throw new Error('Cannot drop here');
-              const updateData: Record<string, any> = { status: newStatus };
-              if (newStatus === 'review') updateData.delivered_at = new Date().toISOString();
-              const { error } = await supabase.from('deliveries').update(updateData).eq('id', itemId);
-              if (error) { toast.error('Erro ao mover entrega'); throw error; }
-              logger.info('Editor moveu entrega', { delivery_id: itemId, to: col.title }, 'editor');
-              toast.success(`Movido para ${col.title}`);
-              fetchDeliveries();
-            }}
-            renderCard={(d) => (
-              <div {...(d.status === 'in_progress' ? { 'data-tour': 'editor-card-production' } : {})}>
-                <EditorDeliveryCard
-                  delivery={d}
-                  isDragging={false}
-                  onClick={() => setSelectedDelivery(d)}
-                  onSubmitDelivery={(del) => setSubmitTarget(del)}
-                />
-              </div>
-            )}
-            renderEmpty={(_col, hasAnyItems) => (
-              <div className="py-8 text-center space-y-2">
-                <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
-                <p className="text-xs text-muted-foreground/50">
-                  {!hasAnyItems
-                    ? 'Nenhuma entrega atribuída no momento. Aguarde o admin atribuir novas demandas.'
-                    : 'Nenhuma entrega aqui'}
-                </p>
-              </div>
-            )}
-          />
-        )}
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="rounded-xl border border-border/30 bg-card p-3 space-y-2">
+                      <Skeleton className="h-3.5 w-3/4" />
+                      <Skeleton className="h-2.5 w-1/2" />
+                      <Skeleton className="h-2.5 w-1/3" />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : viewMode === 'list' ? (
+            <DeliveryListView
+              deliveries={filtered}
+              onSelect={setSelectedDelivery}
+              role="editor"
+              clientNames={editorClientNames}
+            />
+          ) : viewMode === 'calendar' ? (
+            <DeliveryCalendarView
+              deliveries={filtered}
+              onSelect={setSelectedDelivery}
+            />
+          ) : (
+            <KanbanBoard<EditorDelivery>
+              columns={COLUMNS.map((c) => ({ id: c.id, title: c.title, statuses: c.statuses, description: c.description }))}
+              items={filtered as EditorDelivery[]}
+              canDragBetweenColumns={true}
+              dataTour="editor-kanban"
+              onStatusChange={async (itemId, newStatus) => {
+                const col = COLUMNS.find((c) => c.statuses.includes(newStatus));
+                if (!col?.editorCanDrop) throw new Error('Cannot drop here');
+                const updateData: Record<string, any> = { status: newStatus };
+                if (newStatus === 'review') updateData.delivered_at = new Date().toISOString();
+                const { error } = await supabase.from('deliveries').update(updateData).eq('id', itemId);
+                if (error) { toast.error('Erro ao mover entrega'); throw error; }
+                logger.info('Editor moveu entrega', { delivery_id: itemId, to: col.title }, 'editor');
+                toast.success(`Movido para ${col.title}`);
+                fetchDeliveries();
+              }}
+              renderCard={(d) => (
+                <div {...(d.status === 'in_progress' ? { 'data-tour': 'editor-card-production' } : {})}>
+                  <EditorDeliveryCard
+                    delivery={d}
+                    isDragging={false}
+                    onClick={() => setSelectedDelivery(d)}
+                    onSubmitDelivery={(del) => setSubmitTarget(del)}
+                  />
+                </div>
+              )}
+              renderEmpty={(_col, hasAnyItems) => (
+                <div className="py-8 text-center space-y-2">
+                  <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
+                  <p className="text-xs text-muted-foreground/50">
+                    {!hasAnyItems
+                      ? 'Nenhuma entrega atribuída no momento. Aguarde o admin atribuir novas demandas.'
+                      : 'Nenhuma entrega aqui'}
+                  </p>
+                </div>
+              )}
+            />
+          )}
+        </div>
       </main>
 
       <EditorBriefingModal

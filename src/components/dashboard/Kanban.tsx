@@ -154,115 +154,120 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
   // Unified layout (mobile uses KanbanBoard with scroll-snap, desktop uses grid)
   return (
-    <div className="flex flex-col min-w-0 gap-4">
-      {/* Capture Banner */}
-      <CaptureBanner />
+    <div className="flex flex-col min-w-0 flex-1">
+      {/* HEADER — fora do scroll, nunca se move */}
+      <div className="shrink-0 space-y-4 px-0 pb-4">
+        <CaptureBanner />
 
-      <div className="flex items-center justify-between shrink-0">
-        <h2 className="text-lg font-sans font-semibold text-foreground">Minhas Entregas</h2>
-        <div className="flex items-center gap-3">
-          <ViewToggle value={viewMode} onChange={handleViewChange} />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span>
-                <Button
-                  size="sm"
-                  disabled={!canCreateDelivery}
-                  className="gap-1.5 bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light"
-                  onClick={handleNewClick}
-                  data-tour="new-delivery-btn"
-                >
-                  {needsCaptureFirst ? <Camera className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                  {needsCaptureFirst ? 'Agendar Captação' : 'Nova Solicitação'}
-                </Button>
-              </span>
-            </TooltipTrigger>
-            {!canCreateDelivery && !needsCaptureFirst && (
-              <TooltipContent>
-                <p>Você atingiu o limite de entregas do seu plano. Faça upgrade para continuar.</p>
-              </TooltipContent>
-            )}
-            {needsCaptureFirst && (
-              <TooltipContent>
-                <p>Agende uma captação para liberar entregas</p>
-              </TooltipContent>
-            )}
-          </Tooltip>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-sans font-semibold text-foreground">Minhas Entregas</h2>
+          <div className="flex items-center gap-3">
+            <ViewToggle value={viewMode} onChange={handleViewChange} />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button
+                    size="sm"
+                    disabled={!canCreateDelivery}
+                    className="gap-1.5 bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light"
+                    onClick={handleNewClick}
+                    data-tour="new-delivery-btn"
+                  >
+                    {needsCaptureFirst ? <Camera className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                    {needsCaptureFirst ? 'Agendar Captação' : 'Nova Solicitação'}
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              {!canCreateDelivery && !needsCaptureFirst && (
+                <TooltipContent>
+                  <p>Você atingiu o limite de entregas do seu plano. Faça upgrade para continuar.</p>
+                </TooltipContent>
+              )}
+              {needsCaptureFirst && (
+                <TooltipContent>
+                  <p>Agende uma captação para liberar entregas</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </div>
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-          {ALL_COLUMNS.filter(c => c.id !== 'queue' || isSubscription).map((c) => (
-            <div key={c.id} className="rounded-[20px] bg-abba-surface/40 border border-white/6 p-2.5 min-w-[240px] space-y-2">
-              <div className="flex items-center justify-between px-1 mb-1">
-                <Skeleton className="h-3 w-20" />
-                <Skeleton className="h-5 w-5 rounded-md" />
+      {/* ÁREA DE SCROLL — só o conteúdo scrolla aqui */}
+      <div className="flex-1 min-h-0">
+        {isLoading ? (
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+            {ALL_COLUMNS.filter(c => c.id !== 'queue' || isSubscription).map((c) => (
+              <div key={c.id} className="rounded-[20px] bg-abba-surface/40 border border-white/6 p-2.5 min-w-[240px] space-y-2">
+                <div className="flex items-center justify-between px-1 mb-1">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-5 w-5 rounded-md" />
+                </div>
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="rounded-[20px] bg-abba-surface border border-white/8 p-3 space-y-2">
+                    <Skeleton className="h-3.5 w-3/4" />
+                    <Skeleton className="h-2.5 w-1/2" />
+                    <Skeleton className="h-2.5 w-1/3" />
+                  </div>
+                ))}
               </div>
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="rounded-[20px] bg-abba-surface border border-white/8 p-3 space-y-2">
-                  <Skeleton className="h-3.5 w-3/4" />
-                  <Skeleton className="h-2.5 w-1/2" />
-                  <Skeleton className="h-2.5 w-1/3" />
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      ) : viewMode === 'list' ? (
-        <DeliveryListView
-          deliveries={deliveries}
-          onSelect={setSelectedDelivery}
-          role="client"
-        />
-      ) : viewMode === 'calendar' ? (
-        <DeliveryCalendarView
-          deliveries={deliveries}
-          onSelect={setSelectedDelivery}
-        />
-      ) : (
-        <KanbanBoard<DeliveryData>
-          columns={COLUMNS}
-          items={deliveries}
-          canDragBetweenColumns={false}
-          dataTour="kanban-board"
-          renderCard={(d) => (
-            <div className="relative" data-tour={d.status === 'pending' ? 'delivery-card' : undefined}>
-              {d.status === 'queue' && (
-                <div className="absolute top-2 right-2 z-10">
-                  <Badge variant="secondary" className="text-[9px] font-sans gap-1">
-                    <Clock className="h-2.5 w-2.5" />
-                    Aguardando editor
-                  </Badge>
-                </div>
-              )}
-              <DeliveryCard
-                delivery={d}
-                onClick={() => setSelectedDelivery(d)}
-              />
-            </div>
-          )}
-          renderEmpty={(col, hasAnyItems) => (
-            <div className="py-8 text-center space-y-3">
-              <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
-              {!hasAnyItems && col.statuses.includes('pending') ? (
-                <>
-                  <p className="text-sm font-sans font-medium text-muted-foreground">Você ainda não tem entregas</p>
-                  <p className="text-[10px] text-muted-foreground/60">Clique em "+ Nova Solicitação" para começar!</p>
-                  {canCreateDelivery && (
-                    <Button size="sm" variant="outline" onClick={handleNewClick} className="text-xs rounded-full">
-                      <Plus className="h-3 w-3 mr-1" />
-                      Nova Entrega
-                    </Button>
-                  )}
-                </>
-              ) : (
-                <p className="text-[10px] font-sans text-muted-foreground/50">Nenhuma entrega aqui</p>
-              )}
-            </div>
-          )}
-        />
-      )}
+            ))}
+          </div>
+        ) : viewMode === 'list' ? (
+          <DeliveryListView
+            deliveries={deliveries}
+            onSelect={setSelectedDelivery}
+            role="client"
+          />
+        ) : viewMode === 'calendar' ? (
+          <DeliveryCalendarView
+            deliveries={deliveries}
+            onSelect={setSelectedDelivery}
+          />
+        ) : (
+          <KanbanBoard<DeliveryData>
+            columns={COLUMNS}
+            items={deliveries}
+            canDragBetweenColumns={false}
+            dataTour="kanban-board"
+            renderCard={(d) => (
+              <div className="relative" data-tour={d.status === 'pending' ? 'delivery-card' : undefined}>
+                {d.status === 'queue' && (
+                  <div className="absolute top-2 right-2 z-10">
+                    <Badge variant="secondary" className="text-[9px] font-sans gap-1">
+                      <Clock className="h-2.5 w-2.5" />
+                      Aguardando editor
+                    </Badge>
+                  </div>
+                )}
+                <DeliveryCard
+                  delivery={d}
+                  onClick={() => setSelectedDelivery(d)}
+                />
+              </div>
+            )}
+            renderEmpty={(col, hasAnyItems) => (
+              <div className="py-8 text-center space-y-3">
+                <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
+                {!hasAnyItems && col.statuses.includes('pending') ? (
+                  <>
+                    <p className="text-sm font-sans font-medium text-muted-foreground">Você ainda não tem entregas</p>
+                    <p className="text-[10px] text-muted-foreground/60">Clique em "+ Nova Solicitação" para começar!</p>
+                    {canCreateDelivery && (
+                      <Button size="sm" variant="outline" onClick={handleNewClick} className="text-xs rounded-full">
+                        <Plus className="h-3 w-3 mr-1" />
+                        Nova Entrega
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-[10px] font-sans text-muted-foreground/50">Nenhuma entrega aqui</p>
+                )}
+              </div>
+            )}
+          />
+        )}
+      </div>
 
       <Suspense fallback={null}>
         <DeliveryDetailModal
