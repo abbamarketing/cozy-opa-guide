@@ -51,6 +51,7 @@ import NotificationBell from '@/components/shared/NotificationBell';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { SlaCountdown } from '@/components/editor/SlaCountdown';
 import { logger } from '@/lib/logger';
+import DeliverySubmitModal from '@/components/editor/DeliverySubmitModal';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 
 /* ─── Types ─── */
