@@ -54,6 +54,7 @@ import { logger } from '@/lib/logger';
 import DeliverySubmitModal from '@/components/editor/DeliverySubmitModal';
 import ViewToggle, { type ViewMode } from '@/components/shared/ViewToggle';
 import DeliveryListView from '@/components/shared/DeliveryListView';
+import DeliveryCalendarView from '@/components/shared/DeliveryCalendarView';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 
 /* ─── Types ─── */
@@ -880,6 +881,11 @@ const EditorDashboard = () => {
               role="editor"
               clientNames={editorClientNames}
             />
+          ) : viewMode === 'calendar' ? (
+            <DeliveryCalendarView
+              deliveries={filtered}
+              onSelect={setSelectedDelivery}
+            />
           ) : items.length === 0 ? (
             <div className="rounded-lg border border-border bg-card p-8 text-center">
               <p className="text-xs font-mono text-muted-foreground">Nenhuma entrega</p>
@@ -1046,6 +1052,11 @@ const EditorDashboard = () => {
             onSelect={setSelectedDelivery}
             role="editor"
             clientNames={editorClientNames}
+          />
+        ) : viewMode === 'calendar' ? (
+          <DeliveryCalendarView
+            deliveries={filtered}
+            onSelect={setSelectedDelivery}
           />
         ) : (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">

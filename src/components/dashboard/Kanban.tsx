@@ -12,6 +12,7 @@ import type { UserProjectData } from '@/hooks/useUserProject';
 import { useIsMobile } from '@/hooks/use-mobile';
 import ViewToggle, { type ViewMode } from '@/components/shared/ViewToggle';
 import DeliveryListView from '@/components/shared/DeliveryListView';
+import DeliveryCalendarView from '@/components/shared/DeliveryCalendarView';
 
 const NewDeliveryModal = lazy(() => import('./NewDeliveryModal'));
 const DeliveryDetailModal = lazy(() => import('./DeliveryDetailModal'));
@@ -228,6 +229,11 @@ const Kanban = ({ userProject }: KanbanProps) => {
             onSelect={setSelectedDelivery}
             role="client"
           />
+        ) : viewMode === 'calendar' ? (
+          <DeliveryCalendarView
+            deliveries={deliveries}
+            onSelect={setSelectedDelivery}
+          />
         ) : (
           <>
             <div className="flex gap-2 p-1" data-tour="kanban-board">
@@ -385,6 +391,11 @@ const Kanban = ({ userProject }: KanbanProps) => {
           deliveries={deliveries}
           onSelect={setSelectedDelivery}
           role="client"
+        />
+      ) : viewMode === 'calendar' ? (
+        <DeliveryCalendarView
+          deliveries={deliveries}
+          onSelect={setSelectedDelivery}
         />
       ) : (
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3" data-tour="kanban-board">
