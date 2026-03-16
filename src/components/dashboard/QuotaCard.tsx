@@ -51,46 +51,6 @@ const QuotaRow = ({ label, icon, used, total }: QuotaLine) => {
   );
 };
 
-// ─── Studio view: shows script credits ───
-const StudioQuotaCard = () => {
-  const { user } = useAuth();
-  const [credits, setCredits] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (!user) return;
-    const fetch = async () => {
-      const { data } = await supabase
-        .from('studio_credits')
-        .select('credits_available')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      setCredits(data?.credits_available ?? 0);
-    };
-    fetch();
-  }, [user]);
-
-  const total = 10;
-  const used = total - (credits ?? 0);
-
-  return (
-    <div data-tour="quota-card">
-      <div className="kpi-dark" style={{ minHeight: 'auto' }}>
-        <p className="text-[10px] font-sans uppercase tracking-widest text-white/60 mb-2">
-          CRÉDITOS DE ROTEIRO
-        </p>
-        <QuotaRow
-          label="Roteiros"
-          icon={<FileText className="h-3.5 w-3.5 text-abba-lime" />}
-          used={used}
-          total={total}
-        />
-        <p className="text-[10px] font-sans text-white/60 mt-2">
-          {credits ?? 0} créditos de roteiro restantes
-        </p>
-      </div>
-    </div>
-  );
-};
 
 // ─── Subscription view: shows only short video quota ───
 const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
