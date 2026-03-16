@@ -8,7 +8,7 @@ import {
 import { ptBR } from 'date-fns/locale';
 import {
   ChevronLeft, ChevronRight, Plus, Package, Camera, Pin,
-  Loader2, CalendarIcon, Trash2, Pencil,
+  Loader2, CalendarIcon, Trash2, Pencil, Clapperboard, MapPin, Users, RefreshCw,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
@@ -45,10 +45,10 @@ type ViewMode = 'month' | 'week' | 'day';
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 const EVENT_TYPES = [
-  { value: 'gravacao', label: '🎬 Gravação' },
-  { value: 'captacao_externa', label: '📍 Captação Externa' },
-  { value: 'sessao_cliente', label: '👤 Sessão com Cliente' },
-  { value: 'revisao_ao_vivo', label: '🔄 Revisão ao Vivo' },
+  { value: 'gravacao', label: 'Gravação', icon: Clapperboard },
+  { value: 'captacao_externa', label: 'Captação Externa', icon: MapPin },
+  { value: 'sessao_cliente', label: 'Sessão com Cliente', icon: Users },
+  { value: 'revisao_ao_vivo', label: 'Revisão ao Vivo', icon: RefreshCw },
 ];
 
 /* colour classes */
@@ -129,7 +129,7 @@ const AdminCalendar = () => {
     (capRes.data || []).forEach((c: any) => {
       const clientName = profileMap[c.user_projects?.user_id] || '';
       const locationLabel = c.location_name || 'Captação';
-      const title = clientName ? `🎬 ${clientName} — ${locationLabel}` : locationLabel;
+      const title = clientName ? `${clientName} — ${locationLabel}` : locationLabel;
       mapped.push({
         id: `cap-${c.id}`,
         title,
@@ -401,7 +401,7 @@ const AdminCalendar = () => {
         {[
           { color: deliveryColor, label: 'Entregas', icon: Package },
           { color: captureColor, label: 'Captações', icon: Camera },
-          ...EVENT_TYPES.map(t => ({ color: MANUAL_TYPE_COLORS[t.value], label: t.label, icon: Pin })),
+          ...EVENT_TYPES.map(t => ({ color: MANUAL_TYPE_COLORS[t.value], label: t.label, icon: t.icon })),
         ].map(({ color, label, icon: Icon }) => (
           <div key={label} className="flex items-center gap-1.5">
             <span className={cn('h-2.5 w-2.5 rounded-full border', color)} />
@@ -511,7 +511,7 @@ const AdminCalendar = () => {
               <Select value={formType} onValueChange={setFormType}>
                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {EVENT_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                  {EVENT_TYPES.map((t) => { const TIcon = t.icon; return <SelectItem key={t.value} value={t.value}><span className="inline-flex items-center gap-1.5"><TIcon className="h-3.5 w-3.5" /> {t.label}</span></SelectItem>; })}
                 </SelectContent>
               </Select>
             </div>

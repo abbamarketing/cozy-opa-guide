@@ -42,6 +42,7 @@ import {
   Type,
   CheckSquare,
   History,
+  Timer,
 } from 'lucide-react';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 import { typeConfig, statusConfig } from '@/components/dashboard/DeliveryCard';
@@ -158,7 +159,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
       toast.error('Erro ao entregar: ' + error.message);
     } else {
       logger.info('Editor entregou', { delivery_id: delivery.id, title: delivery.title }, 'editor');
-      toast.success('Entrega marcada como concluída! 🎉');
+      toast.success('Entrega marcada como concluída!');
       onOpenChange(false);
       onUpdated();
     }
@@ -283,7 +284,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
                     {delivery.is_exception && (
                       <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-3 space-y-1">
                         <div className="flex items-center gap-1.5">
-                          <Badge className="bg-amber-500 text-white text-[10px]">⚠️ Exceção ao briefing</Badge>
+                          <Badge className="bg-amber-500 text-white text-[10px]">Exceção ao briefing</Badge>
                         </div>
                         {delivery.exception_notes && (
                           <p className="text-sm text-amber-700 dark:text-amber-300 whitespace-pre-wrap">{delivery.exception_notes}</p>
@@ -638,8 +639,8 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
                               {format(new Date(rev.created_at), "dd/MM 'às' HH:mm", { locale: ptBR })}
                             </span>
                             {rev.timestamp_marker && (
-                              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                                ⏱ {rev.timestamp_marker}
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 inline-flex items-center gap-1">
+                                <Timer className="h-3 w-3" /> {rev.timestamp_marker}
                               </Badge>
                             )}
                           </div>

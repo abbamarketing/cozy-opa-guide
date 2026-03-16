@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Send, Clock, MessageSquare } from 'lucide-react';
+import { Send, Clock, MessageSquare, Timer } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -42,10 +42,10 @@ const renderMessageWithTimestamps = (text: string) => {
           return (
             <button
               key={i}
-              onClick={() => toast.info(`Ponto crítico no vídeo: ⏱ ${part}`, { duration: 3000 })}
+              onClick={() => toast.info(`Ponto crítico no vídeo: ${part}`, { duration: 3000 })}
               className="inline-flex items-center gap-0.5 px-1 py-0 rounded bg-primary/15 text-primary font-mono text-[11px] font-semibold hover:bg-primary/25 transition-colors cursor-pointer border border-primary/20"
             >
-              ⏱ {part}
+              <Timer className="h-2.5 w-2.5 inline" /> {part}
             </button>
           );
         }
@@ -221,9 +221,9 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
                       <Badge
                         variant="outline"
                         className="text-[9px] px-1 py-0 border-0 bg-primary/10 text-primary cursor-pointer"
-                        onClick={() => toast.info(`Ponto crítico: ⏱ ${msg.timestamp_marker}`, { duration: 3000 })}
+                        onClick={() => toast.info(`Ponto crítico: ${msg.timestamp_marker}`, { duration: 3000 })}
                       >
-                        ⏱ {msg.timestamp_marker}
+                        <Timer className="h-2.5 w-2.5 inline" /> {msg.timestamp_marker}
                       </Badge>
                     )}
                   </div>

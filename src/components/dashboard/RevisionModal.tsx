@@ -26,7 +26,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, RotateCcw } from 'lucide-react';
+import { Loader2, RotateCcw, Volume2, Palette, Scissors, FileText, Timer, Pin } from 'lucide-react';
 import type { DeliveryData } from './DeliveryCard';
 
 interface RevisionModalProps {
@@ -38,12 +38,12 @@ interface RevisionModalProps {
 }
 
 const FEEDBACK_CATEGORIES = [
-  { id: 'audio', label: '🔊 Áudio', placeholder: 'Ex: Volume da música muito alto nos primeiros 30s' },
-  { id: 'visual', label: '🎨 Visual', placeholder: 'Ex: Cor do texto no minuto 1:20 está diferente da identidade' },
-  { id: 'cortes', label: '✂️ Cortes', placeholder: 'Ex: Transição brusca em 2:15, suavizar' },
-  { id: 'texto', label: '📝 Texto/Legenda', placeholder: 'Ex: Erro de digitação na legenda em 0:45' },
-  { id: 'ritmo', label: '⏱ Ritmo', placeholder: 'Ex: Parte entre 3:00-4:00 está lenta, acelerar' },
-  { id: 'outro', label: '📌 Outro', placeholder: 'Descreva o ajuste necessário em detalhe...' },
+  { id: 'audio', label: 'Áudio', icon: Volume2, placeholder: 'Ex: Volume da música muito alto nos primeiros 30s' },
+  { id: 'visual', label: 'Visual', icon: Palette, placeholder: 'Ex: Cor do texto no minuto 1:20 está diferente da identidade' },
+  { id: 'cortes', label: 'Cortes', icon: Scissors, placeholder: 'Ex: Transição brusca em 2:15, suavizar' },
+  { id: 'texto', label: 'Texto/Legenda', icon: FileText, placeholder: 'Ex: Erro de digitação na legenda em 0:45' },
+  { id: 'ritmo', label: 'Ritmo', icon: Timer, placeholder: 'Ex: Parte entre 3:00-4:00 está lenta, acelerar' },
+  { id: 'outro', label: 'Outro', icon: Pin, placeholder: 'Descreva o ajuste necessário em detalhe...' },
 ];
 
 const revisionSchema = z.object({
@@ -164,20 +164,23 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProje
                 <FormItem>
                   <FormLabel>Categoria do ajuste *</FormLabel>
                   <div className="flex flex-wrap gap-1.5">
-                    {FEEDBACK_CATEGORIES.map((cat) => (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        onClick={() => field.onChange(cat.id)}
-                        className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${
-                          field.value === cat.id
-                            ? 'bg-primary text-primary-foreground ring-1 ring-primary/30'
-                            : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                        }`}
-                      >
-                        {cat.label}
-                      </button>
-                    ))}
+                    {FEEDBACK_CATEGORIES.map((cat) => {
+                      const CatIcon = cat.icon;
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => field.onChange(cat.id)}
+                          className={`rounded-full px-3 py-1 text-xs font-medium transition-all inline-flex items-center gap-1.5 ${
+                            field.value === cat.id
+                              ? 'bg-primary text-primary-foreground ring-1 ring-primary/30'
+                              : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                          }`}
+                        >
+                          <CatIcon className="h-3 w-3" /> {cat.label}
+                        </button>
+                      );
+                    })}
                   </div>
                   <FormMessage />
                 </FormItem>
