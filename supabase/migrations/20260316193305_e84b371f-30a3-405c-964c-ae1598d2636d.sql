@@ -1,0 +1,1 @@
+DROP POLICY "Users can insert own studio credits" ON studio_credits;
