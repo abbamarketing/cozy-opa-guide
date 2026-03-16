@@ -135,7 +135,7 @@ const AdminCalendar = () => {
         title: m.title,
         date: format(startOfDay(new Date(m.starts_at)), 'yyyy-MM-dd'),
         type: 'manual',
-        color: manualColor,
+        color: getManualColor(m.type),
         raw: m,
       });
     });
