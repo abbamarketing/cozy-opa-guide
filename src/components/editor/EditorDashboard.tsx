@@ -873,8 +873,13 @@ const EditorDashboard = () => {
         <main className="flex-1 px-4 py-3">
           {isLoading ? (
             <div className="space-y-2">
-              <Skeleton className="h-24 rounded-lg" />
-              <Skeleton className="h-24 rounded-lg" />
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="rounded-xl border border-border/30 bg-card p-3 space-y-2">
+                  <Skeleton className="h-3.5 w-3/4" />
+                  <Skeleton className="h-2.5 w-1/2" />
+                  <Skeleton className="h-2.5 w-1/3" />
+                </div>
+              ))}
             </div>
           ) : viewMode === 'list' ? (
             <DeliveryListView
