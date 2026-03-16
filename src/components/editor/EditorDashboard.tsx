@@ -293,6 +293,7 @@ const EditorDeliveryCard = ({
       {delivery.status === 'in_progress' && onSubmitDelivery && (
         <div className={`mt-2 ${onDragStart ? 'pl-[42px]' : 'pl-8'}`} onClick={(e) => e.stopPropagation()}>
           <Button
+            data-tour="editor-submit-btn"
             size="sm"
             className="h-7 gap-1.5 text-xs w-full"
             onClick={(e) => { e.stopPropagation(); onSubmitDelivery(delivery); }}
