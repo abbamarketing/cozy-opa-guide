@@ -91,14 +91,14 @@ Deno.serve(async (req) => {
     // Call Stripe API
     let body: string;
     if (action === "suspend") {
-      body = new URLSearchParams({
-        "pause_collection[behavior]": "void",
-      }).toString();
+      body = "pause_collection[behavior]=void";
     } else {
-      body = new URLSearchParams({
-        "pause_collection": "",
-      }).toString();
+      // To clear pause_collection, send empty string parameter directly
+      // URLSearchParams encodes it incorrectly; raw form-encoded is needed
+      body = "pause_collection=";
     }
+
+    console.log(`Stripe ${action} for subscription ${subscriptionId}, body: ${body}`);
 
     const stripeRes = await fetch(`${STRIPE_API}/subscriptions/${subscriptionId}`, {
       method: "POST",
@@ -108,6 +108,19 @@ Deno.serve(async (req) => {
       },
       body,
     });
+
+    const stripeData = await stripeRes.json();
+
+    if (!stripeRes.ok) {
+      console.error("Stripe API error:", stripeData);
+      return new Response(
+        JSON.stringify({ error: `Erro Stripe: ${stripeData?.error?.message || stripeRes.status}` }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    // Log result for debugging
+    console.log(`Stripe ${action} result: pause_collection=${JSON.stringify(stripeData.pause_collection)}, status=${stripeData.status}`);
 
     if (!stripeRes.ok) {
       const stripeError = await stripeRes.json();
