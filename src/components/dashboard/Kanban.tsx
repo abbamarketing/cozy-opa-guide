@@ -329,7 +329,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
           </TooltipTrigger>
           {!canCreateDelivery && !needsCaptureFirst && (
             <TooltipContent>
-              <p>Quota esgotada</p>
+              <p>Você atingiu o limite de entregas do seu plano. Faça upgrade para continuar.</p>
             </TooltipContent>
           )}
           {needsCaptureFirst && (

@@ -27,6 +27,7 @@ import {
   Circle,
   Loader2,
   Wrench,
+  MessageSquare,
 } from 'lucide-react';
 import type { DeliveryData } from './DeliveryCard';
 import { typeConfig, statusConfig } from './DeliveryCard';
