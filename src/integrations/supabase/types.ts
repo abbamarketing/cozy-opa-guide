@@ -50,6 +50,73 @@ export type Database = {
         }
         Relationships: []
       }
+      calendar_events: {
+        Row: {
+          created_at: string
+          created_by: string
+          ends_at: string
+          id: string
+          notes: string | null
+          related_client_id: string | null
+          related_delivery_id: string | null
+          related_editor_id: string | null
+          related_session_id: string | null
+          starts_at: string
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          ends_at: string
+          id?: string
+          notes?: string | null
+          related_client_id?: string | null
+          related_delivery_id?: string | null
+          related_editor_id?: string | null
+          related_session_id?: string | null
+          starts_at: string
+          title: string
+          type?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          ends_at?: string
+          id?: string
+          notes?: string | null
+          related_client_id?: string | null
+          related_delivery_id?: string | null
+          related_editor_id?: string | null
+          related_session_id?: string | null
+          starts_at?: string
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_events_related_delivery_id_fkey"
+            columns: ["related_delivery_id"]
+            isOneToOne: false
+            referencedRelation: "deliveries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "calendar_events_related_editor_id_fkey"
+            columns: ["related_editor_id"]
+            isOneToOne: false
+            referencedRelation: "editors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "calendar_events_related_session_id_fkey"
+            columns: ["related_session_id"]
+            isOneToOne: false
+            referencedRelation: "capture_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       capture_sessions: {
         Row: {
           address: string | null
