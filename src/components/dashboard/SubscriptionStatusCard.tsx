@@ -57,16 +57,6 @@ const SubscriptionStatusCard = ({ userProject }: Props) => {
 
       setQueueCount(count ?? 0);
 
-      if (userProject.studio_access) {
-        const { data: creditsData } = await supabase
-          .from('studio_credits')
-          .select('credits_available')
-          .eq('user_id', userProject.user_id)
-          .limit(1)
-          .maybeSingle();
-
-        setStudioCredits(creditsData?.credits_available ?? 0);
-      }
 
       setLoading(false);
     };
