@@ -206,7 +206,7 @@ const AdminCalendar = () => {
     if (ev.type !== 'manual') return;
     const r = ev.raw;
     setFormTitle(r.title);
-    setFormType(r.type || 'outro');
+    setFormType(r.type || 'gravacao');
     setFormStartDate(new Date(r.starts_at));
     setFormStartTime(format(new Date(r.starts_at), 'HH:mm'));
     setFormEndTime(format(new Date(r.ends_at), 'HH:mm'));
