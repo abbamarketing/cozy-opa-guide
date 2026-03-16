@@ -27,6 +27,7 @@ import {
   Circle,
   Loader2,
   Wrench,
+  MessageSquare,
 } from 'lucide-react';
 import type { DeliveryData } from './DeliveryCard';
 import { typeConfig, statusConfig } from './DeliveryCard';
@@ -317,10 +318,19 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
 
               {/* Chat */}
               <div className="space-y-3">
-                <DeliveryChat
-                  deliveryId={delivery.id}
-                  showTimestampInput={isVideoType}
-                />
+                {delivery.editor_id ? (
+                  <DeliveryChat
+                    deliveryId={delivery.id}
+                    showTimestampInput={isVideoType}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-6 text-center rounded-lg border border-border/40 bg-muted/10">
+                    <MessageSquare className="h-8 w-8 text-muted-foreground/20 mb-2" />
+                    <p className="text-xs text-muted-foreground">
+                      O chat será habilitado quando um editor for atribuído à sua entrega.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <Separator className="bg-border/50" />
