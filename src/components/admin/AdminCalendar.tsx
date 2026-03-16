@@ -433,7 +433,7 @@ const AdminCalendar = () => {
           )}
           {detailEvent?.type === 'manual' && (
             <div className="text-xs space-y-2 text-muted-foreground">
-              <p>Tipo: {detailEvent.raw.type}</p>
+              <p>Tipo: {getManualLabel(detailEvent.raw.type)}</p>
               <p>Início: {format(new Date(detailEvent.raw.starts_at), "HH:mm", { locale: ptBR })}</p>
               <p>Fim: {format(new Date(detailEvent.raw.ends_at), "HH:mm", { locale: ptBR })}</p>
               {detailEvent.raw.notes && <p className="pt-1 border-t border-border/50">{detailEvent.raw.notes}</p>}
