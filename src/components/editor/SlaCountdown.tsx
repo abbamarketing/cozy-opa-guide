@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-
+import { Timer } from 'lucide-react';
 interface SlaCountdownProps {
   slaDeadline: string;
   slaHours: number;
