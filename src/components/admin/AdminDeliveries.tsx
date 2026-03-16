@@ -75,6 +75,13 @@ const AdminDeliveries = () => {
   const [activeColumn, setActiveColumn] = useState('todo');
   const [page, setPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
+  const [viewMode, setViewMode] = useState<ViewMode>(() =>
+    (localStorage.getItem('preferred_view_admin') as ViewMode) || 'kanban'
+  );
+  const handleViewChange = (v: ViewMode) => {
+    setViewMode(v);
+    localStorage.setItem('preferred_view_admin', v);
+  };
 
   const fetchData = useCallback(async () => {
     setLoading(true);
