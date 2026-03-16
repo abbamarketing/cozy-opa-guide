@@ -310,6 +310,7 @@ const AdminDeliveries = () => {
             <Download className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">CSV</span>
           </Button>
+          <ViewToggle value={viewMode} onChange={handleViewChange} />
         </div>
       </div>
 
