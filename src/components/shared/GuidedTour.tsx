@@ -9,6 +9,7 @@ export interface TourStep {
   title: string;
   content: string;
   placement?: 'top' | 'bottom' | 'left' | 'right';
+  onBeforeStep?: () => void | Promise<void>;
 }
 
 interface GuidedTourProps {
