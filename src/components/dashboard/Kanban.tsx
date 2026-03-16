@@ -407,6 +407,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
               <div
                 key={col.id}
                 className="flex flex-col rounded-[20px] bg-abba-surface/40 border border-white/6 p-2"
+                {...(col.id === 'review' ? { 'data-tour': 'kanban-review' } : {})}
               >
                 <div className="mb-2 px-1">
                   <div className="flex items-center justify-between">
