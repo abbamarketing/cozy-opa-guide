@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Crown, Zap, Clock, Film, Sparkles, FileText } from 'lucide-react';
+
+import { Crown, Zap, Clock, Film, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { SlaCountdown } from '@/components/editor/SlaCountdown';
@@ -26,7 +26,7 @@ interface InProgressDelivery {
 const SubscriptionStatusCard = ({ userProject }: Props) => {
   const [inProgress, setInProgress] = useState<InProgressDelivery | null>(null);
   const [queueCount, setQueueCount] = useState(0);
-  const [studioCredits, setStudioCredits] = useState<number | null>(null);
+  
   const [loading, setLoading] = useState(true);
 
   const tierLabel =
@@ -57,22 +57,12 @@ const SubscriptionStatusCard = ({ userProject }: Props) => {
 
       setQueueCount(count ?? 0);
 
-      if (userProject.studio_access) {
-        const { data: creditsData } = await supabase
-          .from('studio_credits')
-          .select('credits_available')
-          .eq('user_id', userProject.user_id)
-          .limit(1)
-          .maybeSingle();
-
-        setStudioCredits(creditsData?.credits_available ?? 0);
-      }
 
       setLoading(false);
     };
 
     fetchData();
-  }, [userProject.id, userProject.user_id, userProject.studio_access]);
+  }, [userProject.id]);
 
   const formatDeadlineBRT = (iso: string) => {
     const d = new Date(iso);
@@ -141,16 +131,6 @@ const SubscriptionStatusCard = ({ userProject }: Props) => {
             </div>
           )}
 
-          {/* Studio link */}
-          {userProject.studio_access && studioCredits !== null && (
-            <Link
-              to="/studio"
-              className="flex items-center gap-1.5 text-xs font-sans text-abba-lime hover:underline mt-1"
-            >
-              <Sparkles className="h-3 w-3" />
-              Acessar Studio · {studioCredits} créditos
-            </Link>
-          )}
         </div>
       </div>
     </div>

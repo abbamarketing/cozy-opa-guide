@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/lib/auth";
 import ProtectedRoute from "@/components/layout/ProtectedRoute";
-import AIChatWidget from "@/components/shared/AIChatWidget";
+
 import { Loader2 } from "lucide-react";
 
 // Lazy-loaded pages
@@ -115,7 +115,7 @@ const App = () => (
             </Routes>
           </Suspense>
         </BrowserRouter>
-        <AIChatWidget />
+        
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
