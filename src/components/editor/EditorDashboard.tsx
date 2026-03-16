@@ -57,6 +57,7 @@ import DeliveryListView from '@/components/shared/DeliveryListView';
 import DeliveryCalendarView from '@/components/shared/DeliveryCalendarView';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 import EditorTour, { restartEditorTour } from '@/components/editor/EditorTour';
+import KanbanBoard from '@/components/shared/KanbanBoard';
 
 /* ─── Types ─── */
 interface EditorDelivery extends DeliveryData {
