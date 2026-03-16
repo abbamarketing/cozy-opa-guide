@@ -138,6 +138,7 @@ const Admin = () => {
               <button
                 key={tab.id}
                 onClick={() => setTab(tab.id)}
+                data-tour={`admin-tab-${tab.id}`}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-primary text-primary-foreground neon-glow'
