@@ -42,10 +42,10 @@ const renderMessageWithTimestamps = (text: string) => {
           return (
             <button
               key={i}
-              onClick={() => toast.info(`Ponto crítico no vídeo: ⏱ ${part}`, { duration: 3000 })}
+              onClick={() => toast.info(`Ponto crítico no vídeo: ${part}`, { duration: 3000 })}
               className="inline-flex items-center gap-0.5 px-1 py-0 rounded bg-primary/15 text-primary font-mono text-[11px] font-semibold hover:bg-primary/25 transition-colors cursor-pointer border border-primary/20"
             >
-              ⏱ {part}
+              <Timer className="h-2.5 w-2.5 inline" /> {part}
             </button>
           );
         }
