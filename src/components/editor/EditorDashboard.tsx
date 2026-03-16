@@ -559,7 +559,7 @@ const EditorDashboard = () => {
     if (!editor) return;
     const channel = supabase
       .channel(`editor-deliveries-${editor.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'deliveries' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'deliveries', filter: `editor_id=eq.${editor.id}` }, () => {
         fetchDeliveries();
       })
       .subscribe();
