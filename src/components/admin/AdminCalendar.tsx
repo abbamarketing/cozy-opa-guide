@@ -8,7 +8,7 @@ import {
 import { ptBR } from 'date-fns/locale';
 import {
   ChevronLeft, ChevronRight, Plus, Package, Camera, Pin,
-  Loader2, CalendarIcon, Trash2, Pencil,
+  Loader2, CalendarIcon, Trash2, Pencil, Clapperboard, MapPin, Users, RefreshCw,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
