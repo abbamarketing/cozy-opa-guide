@@ -511,7 +511,7 @@ const AdminCalendar = () => {
               <Select value={formType} onValueChange={setFormType}>
                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {EVENT_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                  {EVENT_TYPES.map((t) => { const TIcon = t.icon; return <SelectItem key={t.value} value={t.value}><span className="inline-flex items-center gap-1.5"><TIcon className="h-3.5 w-3.5" /> {t.label}</span></SelectItem>; })}
                 </SelectContent>
               </Select>
             </div>
