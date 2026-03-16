@@ -445,6 +445,7 @@ export type Database = {
       }
       delivery_revisions: {
         Row: {
+          category: string | null
           created_at: string
           delivery_id: string
           id: string
@@ -453,6 +454,7 @@ export type Database = {
           timestamp_marker: string | null
         }
         Insert: {
+          category?: string | null
           created_at?: string
           delivery_id: string
           id?: string
@@ -461,6 +463,7 @@ export type Database = {
           timestamp_marker?: string | null
         }
         Update: {
+          category?: string | null
           created_at?: string
           delivery_id?: string
           id?: string
