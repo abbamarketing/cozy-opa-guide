@@ -3,7 +3,12 @@ import GuidedTour, { type TourStep } from '@/components/shared/GuidedTour';
 const COMPLETED_KEY = 'tour_completed_admin';
 const STEP_KEY = 'tour_step_admin';
 
-const STEPS: TourStep[] = [
+interface AdminTourProps {
+  ready: boolean;
+  onTabChange?: (tab: string) => void;
+}
+
+const buildSteps = (onTabChange?: (tab: string) => void): TourStep[] => [
   {
     title: 'Bem-vindo ao painel Admin!',
     content: 'Aqui você gerencia toda a operação: clientes, editores, entregas e métricas. Vamos dar uma volta rápida.',
@@ -31,6 +36,7 @@ const STEPS: TourStep[] = [
     title: 'Nova Demanda',
     content: 'Crie entregas diretamente, insira roteiros e atribua a editores sem depender do cliente.',
     placement: 'bottom',
+    onBeforeStep: () => onTabChange?.('entregas'),
   },
   {
     target: '[data-tour="admin-tab-calendario"]',
@@ -56,13 +62,9 @@ const STEPS: TourStep[] = [
   },
 ];
 
-interface AdminTourProps {
-  ready: boolean;
-}
-
-const AdminTour = ({ ready }: AdminTourProps) => (
+const AdminTour = ({ ready, onTabChange }: AdminTourProps) => (
   <GuidedTour
-    steps={STEPS}
+    steps={buildSteps(onTabChange)}
     completedKey={COMPLETED_KEY}
     stepKey={STEP_KEY}
     ready={ready}
