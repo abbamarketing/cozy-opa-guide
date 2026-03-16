@@ -30,10 +30,12 @@ type SortDir = 'asc' | 'desc';
 interface DeliveryListViewProps {
   deliveries: DeliveryData[];
   onSelect: (delivery: DeliveryData) => void;
-  /** 'client' shows editor_name, 'editor' shows client_name */
+  /** 'client' shows editor_name, 'editor'/'admin' shows client_name */
   role: 'client' | 'editor' | 'admin';
-  /** For editor/admin: client name mapped by delivery id */
+  /** For editor/admin: client name mapped by delivery id. Required when role !== 'client'. */
   clientNames?: Record<string, string | null>;
+  /** Whether clientNames is still loading */
+  isLoadingClientNames?: boolean;
   /** Show skeleton loading state */
   isLoading?: boolean;
 }
@@ -65,7 +67,7 @@ const SortIcon = ({ field, sortField, sortDir }: { field: SortField; sortField: 
     : <ChevronDown className="h-3 w-3 text-primary" />;
 };
 
-const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoading }: DeliveryListViewProps) => {
+const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoadingClientNames, isLoading }: DeliveryListViewProps) => {
   const [sortField, setSortField] = useState<SortField>('due_date');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [page, setPage] = useState(0);
@@ -82,8 +84,11 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoading }
 
   const personLabel = role === 'client' ? 'Editor' : 'Cliente';
 
+  const isClientNamesLoading = (role === 'editor' || role === 'admin') && (isLoadingClientNames || !clientNames);
+
   const getPersonName = (d: DeliveryData) => {
     if (role === 'client') return d.editor_name || '—';
+    if (isClientNamesLoading) return null; // signal to render skeleton
     return clientNames?.[d.id] || '—';
   };
 
@@ -95,7 +100,7 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoading }
         case 'title': cmp = a.title.localeCompare(b.title); break;
         case 'delivery_type': cmp = a.delivery_type.localeCompare(b.delivery_type); break;
         case 'status': cmp = a.status.localeCompare(b.status); break;
-        case 'person': cmp = (getPersonName(a)).localeCompare(getPersonName(b)); break;
+        case 'person': cmp = (getPersonName(a) || '').localeCompare(getPersonName(b) || ''); break;
         case 'due_date': {
           const da = a.due_date ? new Date(a.due_date).getTime() : Infinity;
           const db = b.due_date ? new Date(b.due_date).getTime() : Infinity;
@@ -207,7 +212,11 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoading }
                     <Badge variant={status.variant} className="text-[10px]">{status.label}</Badge>
                   </TableCell>
                   <TableCell>
-                    <span className="text-xs text-muted-foreground">{getPersonName(d)}</span>
+                    {getPersonName(d) === null ? (
+                      <Skeleton className="h-4 w-24" />
+                    ) : (
+                      <span className="text-xs text-muted-foreground">{getPersonName(d)}</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     {d.due_date && !isCompleted ? (
