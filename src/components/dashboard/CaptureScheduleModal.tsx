@@ -199,6 +199,21 @@ const CaptureScheduleModal = ({
               Fechar
             </Button>
           </div>
+        ) : quotaExceeded ? (
+          <div className="space-y-4 pt-2">
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
+              <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-destructive">Limite de sessões atingido</p>
+                <p className="text-xs text-muted-foreground">
+                  Você atingiu o limite de captações do seu plano neste período.
+                </p>
+              </div>
+            </div>
+            <Button variant="ghost" className="w-full" onClick={() => onOpenChange(false)}>
+              Fechar
+            </Button>
+          </div>
         ) : (
           <div className="space-y-4 pt-2">
             {/* Status */}
