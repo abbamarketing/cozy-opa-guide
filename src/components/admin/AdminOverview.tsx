@@ -139,7 +139,7 @@ const AdminOverview = () => {
   return (
     <div className="space-y-6">
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3" data-tour="admin-kpis">
         {kpiCards.map((kpi) => (
           <Card key={kpi.label} className="glass border-border/40 p-4 space-y-1">
             <div className="flex items-center justify-between">
