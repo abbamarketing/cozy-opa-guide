@@ -122,6 +122,7 @@ const ClientAssignment = () => {
       .insert({
         user_id: selectedClient.user_id,
         custom_project_id: selectedProject.id,
+        client_type: 'custom',
         status: 'pending_payment',
         youtube_reserved: 0,
         instagram_reserved: 0,
