@@ -12,6 +12,7 @@ import type { UserProjectData } from '@/hooks/useUserProject';
 import { useIsMobile } from '@/hooks/use-mobile';
 import ViewToggle, { type ViewMode } from '@/components/shared/ViewToggle';
 import DeliveryListView from '@/components/shared/DeliveryListView';
+import DeliveryCalendarView from '@/components/shared/DeliveryCalendarView';
 
 const NewDeliveryModal = lazy(() => import('./NewDeliveryModal'));
 const DeliveryDetailModal = lazy(() => import('./DeliveryDetailModal'));
