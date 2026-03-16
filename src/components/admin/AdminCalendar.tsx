@@ -118,14 +118,25 @@ const AdminCalendar = () => {
       });
     });
 
+    // Build a map of user_id -> full_name from profiles for capture sessions
+    const capUserIds = [...new Set((capRes.data || []).map((c: any) => c.user_projects?.user_id).filter(Boolean))];
+    let profileMap: Record<string, string> = {};
+    if (capUserIds.length > 0) {
+      const { data: profs } = await supabase.from('profiles').select('user_id, full_name').in('user_id', capUserIds);
+      (profs || []).forEach((p: any) => { profileMap[p.user_id] = p.full_name || ''; });
+    }
+
     (capRes.data || []).forEach((c: any) => {
+      const clientName = profileMap[c.user_projects?.user_id] || '';
+      const locationLabel = c.location_name || 'Captação';
+      const title = clientName ? `🎬 ${clientName} — ${locationLabel}` : locationLabel;
       mapped.push({
         id: `cap-${c.id}`,
-        title: c.location_name || 'Captação',
+        title,
         date: c.scheduled_date,
         type: 'capture',
         color: captureColor,
-        raw: c,
+        raw: { ...c, client_name: clientName },
       });
     });
 
