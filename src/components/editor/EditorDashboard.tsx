@@ -392,7 +392,7 @@ const EditorDashboard = () => {
   const [activeColumn, setActiveColumn] = useState('todo');
   const [startingProduction, setStartingProduction] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
-
+  const [submitTarget, setSubmitTarget] = useState<EditorDelivery | null>(null);
   // Filters
   const [clientFilter, setClientFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
