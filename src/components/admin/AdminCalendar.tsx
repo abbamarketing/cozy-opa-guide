@@ -45,10 +45,10 @@ type ViewMode = 'month' | 'week' | 'day';
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 const EVENT_TYPES = [
-  { value: 'gravacao', label: '🎬 Gravação' },
-  { value: 'captacao_externa', label: '📍 Captação Externa' },
-  { value: 'sessao_cliente', label: '👤 Sessão com Cliente' },
-  { value: 'revisao_ao_vivo', label: '🔄 Revisão ao Vivo' },
+  { value: 'gravacao', label: 'Gravação', icon: Clapperboard },
+  { value: 'captacao_externa', label: 'Captação Externa', icon: MapPin },
+  { value: 'sessao_cliente', label: 'Sessão com Cliente', icon: Users },
+  { value: 'revisao_ao_vivo', label: 'Revisão ao Vivo', icon: RefreshCw },
 ];
 
 /* colour classes */
