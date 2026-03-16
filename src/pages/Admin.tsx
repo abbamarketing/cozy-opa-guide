@@ -26,8 +26,8 @@ const TABS = [
   { id: 'editores', label: 'Editores', icon: Film },
   { id: 'metricas', label: 'Métricas', icon: BarChart3 },
   { id: 'projetos', label: 'Projetos', icon: FolderKanban },
+  { id: 'calendario', label: 'Calendário', icon: CalendarDays },
   { id: 'logs', label: 'Logs', icon: ScrollText },
-  
 ];
 
 const Admin = () => {
