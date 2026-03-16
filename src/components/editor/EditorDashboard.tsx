@@ -16,6 +16,7 @@ import {
   ChevronDown,
   AlertTriangle,
   X,
+  Send,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
@@ -50,6 +51,7 @@ import NotificationBell from '@/components/shared/NotificationBell';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { SlaCountdown } from '@/components/editor/SlaCountdown';
 import { logger } from '@/lib/logger';
+import DeliverySubmitModal from '@/components/editor/DeliverySubmitModal';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 
 /* ─── Types ─── */
@@ -186,12 +188,14 @@ const EditorDeliveryCard = ({
   onDragStart,
   isDragging,
   onMoveStatus,
+  onSubmitDelivery,
 }: {
   delivery: EditorDelivery;
   onClick: () => void;
   onDragStart?: (e: React.DragEvent) => void;
   isDragging?: boolean;
   onMoveStatus?: (deliveryId: string, targetColumn: Column) => void;
+  onSubmitDelivery?: (delivery: EditorDelivery) => void;
 }) => {
   const Icon = typeIcons[delivery.delivery_type] || Video;
   const deadline = getDeadlineInfo(delivery.due_date);
@@ -281,7 +285,20 @@ const EditorDeliveryCard = ({
         </div>
       )}
 
-      {/* Mobile status navigation buttons */}
+      {/* Deliver button for in_progress */}
+      {delivery.status === 'in_progress' && onSubmitDelivery && (
+        <div className={`mt-2 ${onDragStart ? 'pl-[42px]' : 'pl-8'}`} onClick={(e) => e.stopPropagation()}>
+          <Button
+            size="sm"
+            className="h-7 gap-1.5 text-xs w-full"
+            onClick={(e) => { e.stopPropagation(); onSubmitDelivery(delivery); }}
+          >
+            <Send className="h-3 w-3" />
+            Entregar
+          </Button>
+        </div>
+      )}
+
       {onMoveStatus && (canGoPrev || canGoNext) && (
         <div className="mt-2 flex items-center gap-2 md:hidden" onClick={(e) => e.stopPropagation()}>
           {canGoPrev && prevCol && (
@@ -375,7 +392,7 @@ const EditorDashboard = () => {
   const [activeColumn, setActiveColumn] = useState('todo');
   const [startingProduction, setStartingProduction] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
-
+  const [submitTarget, setSubmitTarget] = useState<EditorDelivery | null>(null);
   // Filters
   const [clientFilter, setClientFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -849,6 +866,7 @@ const EditorDashboard = () => {
                   delivery={d}
                   onClick={() => setSelectedDelivery(d)}
                   onMoveStatus={handleMoveStatus}
+                  onSubmitDelivery={(del) => setSubmitTarget(del)}
                 />
               ))}
             </div>
@@ -860,6 +878,14 @@ const EditorDashboard = () => {
           onOpenChange={() => setSelectedDelivery(null)}
           delivery={selectedDelivery}
           onUpdated={fetchDeliveries}
+        />
+
+        <DeliverySubmitModal
+          open={!!submitTarget}
+          onOpenChange={(open) => { if (!open) setSubmitTarget(null); }}
+          deliveryId={submitTarget?.id ?? ''}
+          deliveryTitle={submitTarget?.title ?? ''}
+          onSubmitted={fetchDeliveries}
         />
       </div>
     );
@@ -1029,6 +1055,7 @@ const EditorDashboard = () => {
                             isDragging={draggedId === d.id}
                             onClick={() => setSelectedDelivery(d)}
                             onDragStart={handleDragStart(d.id)}
+                            onSubmitDelivery={(del) => setSubmitTarget(del)}
                           />
                         ))
                       )}
@@ -1046,6 +1073,14 @@ const EditorDashboard = () => {
         onOpenChange={() => setSelectedDelivery(null)}
         delivery={selectedDelivery}
         onUpdated={fetchDeliveries}
+      />
+
+      <DeliverySubmitModal
+        open={!!submitTarget}
+        onOpenChange={(open) => { if (!open) setSubmitTarget(null); }}
+        deliveryId={submitTarget?.id ?? ''}
+        deliveryTitle={submitTarget?.title ?? ''}
+        onSubmitted={fetchDeliveries}
       />
     </div>
   );
