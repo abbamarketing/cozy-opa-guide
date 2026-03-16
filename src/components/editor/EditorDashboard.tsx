@@ -1108,9 +1108,14 @@ const EditorDashboard = () => {
                   <ScrollArea className="flex-1">
                     <div className="space-y-2 p-0.5">
                       {items.length === 0 ? (
-                        <p className="py-8 text-center text-xs text-muted-foreground/50">
-                          Nenhuma entrega
-                        </p>
+                        <div className="py-8 text-center space-y-2">
+                          <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
+                          <p className="text-xs text-muted-foreground/50">
+                            {deliveries.length === 0
+                              ? 'Nenhuma entrega atribuída no momento. Aguarde o admin atribuir novas demandas.'
+                              : 'Nenhuma entrega aqui'}
+                          </p>
+                        </div>
                       ) : (
                         items.map((d, idx) => (
                           <div key={d.id} {...(idx === 0 && col.statuses.includes('in_progress') ? { 'data-tour': 'editor-card-production' } : {})}>

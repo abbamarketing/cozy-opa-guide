@@ -111,6 +111,33 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoading }
   const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
   const paged = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
+  if (isLoading) {
+    return (
+      <div className="rounded-[20px] bg-abba-surface/40 border border-white/6 overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-white/6 hover:bg-transparent">
+              {['Título', 'Tipo', 'Status', personLabel, 'Prazo SLA'].map((h) => (
+                <TableHead key={h}><span className="text-[10px] uppercase tracking-widest font-semibold">{h}</span></TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <TableRow key={i} className="border-white/6">
+                <TableCell><Skeleton className="h-4 w-3/4" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
+  }
+
   if (deliveries.length === 0) {
     return (
       <div className="rounded-[20px] bg-abba-surface/40 border border-white/6 p-8 text-center">
