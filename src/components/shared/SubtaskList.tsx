@@ -174,7 +174,7 @@ const SubtaskList = ({ deliveryId, role }: SubtaskListProps) => {
                   size="sm"
                   className="h-6 text-[10px] px-2"
                   disabled={isUpdating}
-                  onClick={() => updateSubtask(subtask.id, subtask.requires_approval ? 'completed' : 'completed')}
+                  onClick={() => updateSubtask(subtask.id, 'completed')}
                 >
                   {isUpdating ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Concluir'}
                 </Button>
