@@ -586,6 +586,13 @@ const EditorDashboard = () => {
   const uniqueClients = useMemo(() => [...new Set(deliveries.map((d) => d.client_name).filter(Boolean))] as string[], [deliveries]);
   const uniqueTypes = useMemo(() => [...new Set(deliveries.map((d) => d.delivery_type))], [deliveries]);
 
+  // Build clientNames map for list view
+  const editorClientNames = useMemo(() => {
+    const map: Record<string, string | null> = {};
+    deliveries.forEach((d) => { map[d.id] = d.client_name; });
+    return map;
+  }, [deliveries]);
+
   // Subscription queue: count in-progress and start production
   const inProgressSubCount = subscriptionQueue.filter((d) => d.status === 'in_progress').length;
   const canStartProduction = inProgressSubCount < 2 && subscriptionQueue.some((d) => d.status === 'queue');
