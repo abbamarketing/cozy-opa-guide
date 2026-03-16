@@ -30,10 +30,12 @@ type SortDir = 'asc' | 'desc';
 interface DeliveryListViewProps {
   deliveries: DeliveryData[];
   onSelect: (delivery: DeliveryData) => void;
-  /** 'client' shows editor_name, 'editor' shows client_name */
+  /** 'client' shows editor_name, 'editor'/'admin' shows client_name */
   role: 'client' | 'editor' | 'admin';
-  /** For editor/admin: client name mapped by delivery id */
+  /** For editor/admin: client name mapped by delivery id. Required when role !== 'client'. */
   clientNames?: Record<string, string | null>;
+  /** Whether clientNames is still loading */
+  isLoadingClientNames?: boolean;
   /** Show skeleton loading state */
   isLoading?: boolean;
 }
