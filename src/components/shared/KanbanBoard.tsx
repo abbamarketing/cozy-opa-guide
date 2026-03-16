@@ -323,7 +323,7 @@ function KanbanBoard<T extends { id: string; status: string }>({
       <div
         ref={scrollRef}
         className={cn(
-          'flex gap-3 overflow-x-auto pb-2 scroll-smooth',
+          'flex gap-3 overflow-x-auto overflow-y-hidden pb-2 scroll-smooth min-w-0',
           isMobile
             ? 'snap-x snap-mandatory -mx-1 px-1 scrollbar-none'
             : 'scrollbar-none'
