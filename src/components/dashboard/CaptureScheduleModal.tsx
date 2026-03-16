@@ -59,6 +59,7 @@ const CaptureScheduleModal = ({
   const [saving, setSaving] = useState(false);
   const [lastSessionDate, setLastSessionDate] = useState<Date | null>(null);
   const [checkingCooldown, setCheckingCooldown] = useState(true);
+  const [quotaExceeded, setQuotaExceeded] = useState(false);
 
   // Minimum 72h lead time (3 days)
   const MIN_LEAD_DAYS = 3;
@@ -68,7 +69,7 @@ const CaptureScheduleModal = ({
   const effectiveLeadDays = Math.max(captureLeadDays, MIN_LEAD_DAYS);
   const minDate = addDays(new Date(), effectiveLeadDays);
 
-  // Check for 30-day cooldown
+  // Check for 28-day cooldown and max_captures quota
   useEffect(() => {
     if (!open || !userProject) return;
 
@@ -83,12 +84,22 @@ const CaptureScheduleModal = ({
         .limit(1);
 
       if (data && data.length > 0) {
-        // Parse YYYY-MM-DD as local date to avoid UTC shift
         const [y, m, d] = data[0].scheduled_date.split('-').map(Number);
         setLastSessionDate(new Date(y, m - 1, d));
       } else {
         setLastSessionDate(null);
       }
+
+      // Check max_captures quota
+      const capturesUsed = (userProject.captures_approved ?? 0) + (userProject.captures_reserved ?? 0);
+      const maxCaptures = userProject.custom_project?.max_captures ?? 1;
+
+      if (capturesUsed >= maxCaptures) {
+        setQuotaExceeded(true);
+      } else {
+        setQuotaExceeded(false);
+      }
+
       setCheckingCooldown(false);
     };
 
@@ -181,6 +192,21 @@ const CaptureScheduleModal = ({
                   Próxima sessão disponível em{' '}
                   <strong>{format(addDays(lastSessionDate!, COOLDOWN_DAYS), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</strong>{' '}
                   ({cooldownRemainingDays} dia{cooldownRemainingDays !== 1 ? 's' : ''}).
+                </p>
+              </div>
+            </div>
+            <Button variant="ghost" className="w-full" onClick={() => onOpenChange(false)}>
+              Fechar
+            </Button>
+          </div>
+        ) : quotaExceeded ? (
+          <div className="space-y-4 pt-2">
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
+              <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-destructive">Limite de sessões atingido</p>
+                <p className="text-xs text-muted-foreground">
+                  Você atingiu o limite de captações do seu plano neste período.
                 </p>
               </div>
             </div>
