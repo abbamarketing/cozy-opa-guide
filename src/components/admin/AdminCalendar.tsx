@@ -438,8 +438,10 @@ const AdminCalendar = () => {
           )}
           {detailEvent?.type === 'capture' && (
             <div className="text-xs space-y-1 text-muted-foreground">
+              {detailEvent.raw.client_name && <p>Cliente: {detailEvent.raw.client_name}</p>}
               <p>Status: <Badge variant="outline" className="text-[10px] ml-1">{detailEvent.raw.status}</Badge></p>
               {detailEvent.raw.location_name && <p>Local: {detailEvent.raw.location_name}</p>}
+              <p>Data: {format(new Date(detailEvent.date), "dd/MM/yyyy", { locale: ptBR })}</p>
             </div>
           )}
           {detailEvent?.type === 'manual' && (
