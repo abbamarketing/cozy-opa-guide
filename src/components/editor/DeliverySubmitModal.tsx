@@ -102,34 +102,45 @@ export default function DeliverySubmitModal({
     const safeName = sanitizeFileName(selectedFile.name);
     const path = `${deliveryId}/${Date.now()}-${safeName}`;
 
-    // Simulate progress since supabase-js doesn't expose upload progress
-    const progressInterval = setInterval(() => {
-      setUploadProgress((prev) => Math.min(prev + 8, 90));
-    }, 300);
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData?.session?.access_token;
+    if (!token) throw new Error('Não autenticado');
 
-    try {
-      const { error } = await supabase.storage
-        .from('delivery-files')
-        .upload(path, selectedFile, {
-          cacheControl: '3600',
-          upsert: false,
-        });
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const uploadUrl = `${supabaseUrl}/storage/v1/object/delivery-files/${path}`;
 
-      clearInterval(progressInterval);
+    await new Promise<void>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', uploadUrl);
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      xhr.setRequestHeader('Content-Type', selectedFile!.type);
 
-      if (error) throw error;
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          setUploadProgress(Math.round((e.loaded / e.total) * 100));
+        }
+      };
 
-      setUploadProgress(100);
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve();
+        } else {
+          reject(new Error(`Upload falhou: ${xhr.statusText || 'erro desconhecido'}`));
+        }
+      };
 
-      const { data: urlData } = supabase.storage
-        .from('delivery-files')
-        .getPublicUrl(path);
+      xhr.onerror = () => reject(new Error('Erro de rede durante upload'));
+      xhr.onabort = () => reject(new Error('Upload cancelado'));
+      xhr.send(selectedFile);
+    });
 
-      return urlData.publicUrl;
-    } catch (err) {
-      clearInterval(progressInterval);
-      throw err;
-    }
+    setUploadProgress(100);
+
+    const { data: urlData } = supabase.storage
+      .from('delivery-files')
+      .getPublicUrl(path);
+
+    return urlData.publicUrl;
   };
 
   const handleSubmit = async () => {
