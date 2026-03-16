@@ -894,8 +894,13 @@ const EditorDashboard = () => {
               onSelect={setSelectedDelivery}
             />
           ) : items.length === 0 ? (
-            <div className="rounded-lg border border-border bg-card p-8 text-center">
-              <p className="text-xs font-mono text-muted-foreground">Nenhuma entrega</p>
+            <div className="rounded-xl border border-border bg-card p-8 text-center space-y-2">
+              <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
+              <p className="text-xs text-muted-foreground">
+                {deliveries.length === 0
+                  ? 'Nenhuma entrega atribuída no momento. Aguarde o admin atribuir novas demandas.'
+                  : 'Nenhuma entrega nesta coluna'}
+              </p>
             </div>
           ) : (
             <div className="space-y-2">

@@ -257,8 +257,21 @@ const AdminDeliveries = () => {
 
   if (loading) {
     return (
-      <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 xl:grid-cols-4'} gap-3`}>
-        {(isMobile ? [1] : [1, 2, 3, 4]).map((_, i) => <Skeleton key={i} className="h-64 rounded-xl" />)}
+      <div className={`grid ${isMobile ? 'grid-cols-1 gap-2' : 'grid-cols-2 xl:grid-cols-4 gap-3'}`}>
+        {(isMobile ? [1, 2, 3] : [1, 2, 3, 4]).map((_, i) => (
+          <div key={i} className="rounded-xl border border-border/30 bg-muted/15 p-2.5 space-y-2">
+            <div className="flex items-center justify-between px-1 mb-1">
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-5 w-5 rounded-md" />
+            </div>
+            {[1, 2, 3].map((j) => (
+              <div key={j} className="rounded-lg border border-border/20 bg-card p-3 space-y-2">
+                <Skeleton className="h-3.5 w-3/4" />
+                <Skeleton className="h-2.5 w-1/2" />
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
     );
   }
