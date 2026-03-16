@@ -15,10 +15,11 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  Video, Camera, Image, Layers, Clock, GripVertical, MoreHorizontal, UserCheck, XCircle, Loader2, Download,
+  Video, Camera, Image, Layers, Clock, GripVertical, MoreHorizontal, UserCheck, XCircle, Loader2, Download, Plus,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { downloadCSV } from '@/lib/csv';
+import AdminNewDemandModal from './AdminNewDemandModal';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { remainingBusinessMinutes, formatBusinessCountdown } from '@/lib/business-hours';
 import DeliveryListView from '@/components/shared/DeliveryListView';
@@ -76,6 +77,7 @@ const AdminDeliveries = () => {
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [activeColumn, setActiveColumn] = useState('todo');
+  const [demandModalOpen, setDemandModalOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>(() =>
@@ -314,8 +316,22 @@ const AdminDeliveries = () => {
             <span className="hidden sm:inline">CSV</span>
           </Button>
           <ViewToggle value={viewMode} onChange={handleViewChange} />
+          <Button
+            size="sm"
+            className="gap-1.5 h-8 text-xs shrink-0"
+            onClick={() => setDemandModalOpen(true)}
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Nova Demanda</span>
+          </Button>
         </div>
       </div>
+
+      <AdminNewDemandModal
+        open={demandModalOpen}
+        onOpenChange={setDemandModalOpen}
+        onCreated={fetchData}
+      />
 
       {/* Mobile: Tab + single column */}
       {viewMode === 'list' ? (
