@@ -1035,12 +1035,18 @@ const EditorDashboard = () => {
         </div>
       )}
 
-      {/* Kanban desktop */}
       <main className="flex-1 overflow-x-auto p-4">
         {isLoading ? (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
             {COLUMNS.map((c) => <Skeleton key={c.id} className="h-64 rounded-xl" />)}
           </div>
+        ) : viewMode === 'list' ? (
+          <DeliveryListView
+            deliveries={filtered}
+            onSelect={setSelectedDelivery}
+            role="editor"
+            clientNames={editorClientNames}
+          />
         ) : (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
             {COLUMNS.map((col) => {
