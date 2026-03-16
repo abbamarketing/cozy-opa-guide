@@ -124,6 +124,7 @@ const Admin = () => {
           </div>
           <div className="flex items-center gap-2">
             <NotificationBell />
+            <Button variant="ghost" size="sm" onClick={restartAdminTour} className="hidden md:flex text-xs">Reiniciar Tour</Button>
             <Button variant="ghost" size="sm" onClick={signOut} className="hidden md:flex">Sair</Button>
           </div>
         </div>
