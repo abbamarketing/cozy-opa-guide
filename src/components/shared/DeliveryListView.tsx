@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Video, Camera, Image, Layers, Clock, AlertTriangle, ShieldAlert, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
