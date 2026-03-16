@@ -866,6 +866,7 @@ const EditorDashboard = () => {
                   delivery={d}
                   onClick={() => setSelectedDelivery(d)}
                   onMoveStatus={handleMoveStatus}
+                  onSubmitDelivery={(del) => setSubmitTarget(del)}
                 />
               ))}
             </div>
