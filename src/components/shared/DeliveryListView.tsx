@@ -34,6 +34,8 @@ interface DeliveryListViewProps {
   role: 'client' | 'editor' | 'admin';
   /** For editor/admin: client name mapped by delivery id */
   clientNames?: Record<string, string | null>;
+  /** Show skeleton loading state */
+  isLoading?: boolean;
 }
 
 function getSlaLevel(dueDate: string | null): { label: string; level: 'ok' | 'warning' | 'danger' | 'overdue' | 'none'; icon?: 'alert' | 'shield' } {
