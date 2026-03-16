@@ -72,9 +72,6 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
     fetchRevisions();
   }, [delivery, open]);
 
-  const handleCelebrationComplete = useCallback(() => {
-    setShowCelebration(false);
-  }, []);
 
   const openSafeUrl = (url: string | null | undefined) => {
     if (!url) return;
