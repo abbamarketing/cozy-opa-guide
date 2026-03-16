@@ -331,32 +331,35 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-sans font-semibold text-foreground">Minhas Entregas</h2>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span>
-              <Button
-                size="sm"
-                disabled={!canCreateDelivery}
-                className="gap-1.5 bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light"
-                onClick={handleNewClick}
-                data-tour="new-delivery-btn"
-              >
-                {needsCaptureFirst ? <Camera className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                {needsCaptureFirst ? 'Agendar Captação' : 'Nova Solicitação'}
-              </Button>
-            </span>
-          </TooltipTrigger>
-          {!canCreateDelivery && !needsCaptureFirst && (
-            <TooltipContent>
-              <p>Você atingiu o limite de entregas do seu plano. Faça upgrade para continuar.</p>
-            </TooltipContent>
-          )}
-          {needsCaptureFirst && (
-            <TooltipContent>
-              <p>Agende uma captação para liberar entregas</p>
-            </TooltipContent>
-          )}
-        </Tooltip>
+        <div className="flex items-center gap-3">
+          <ViewToggle value={viewMode} onChange={handleViewChange} />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span>
+                <Button
+                  size="sm"
+                  disabled={!canCreateDelivery}
+                  className="gap-1.5 bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light"
+                  onClick={handleNewClick}
+                  data-tour="new-delivery-btn"
+                >
+                  {needsCaptureFirst ? <Camera className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                  {needsCaptureFirst ? 'Agendar Captação' : 'Nova Solicitação'}
+                </Button>
+              </span>
+            </TooltipTrigger>
+            {!canCreateDelivery && !needsCaptureFirst && (
+              <TooltipContent>
+                <p>Você atingiu o limite de entregas do seu plano. Faça upgrade para continuar.</p>
+              </TooltipContent>
+            )}
+            {needsCaptureFirst && (
+              <TooltipContent>
+                <p>Agende uma captação para liberar entregas</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </div>
       </div>
 
       {isLoading ? (
