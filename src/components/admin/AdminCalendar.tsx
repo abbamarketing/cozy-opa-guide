@@ -194,7 +194,7 @@ const AdminCalendar = () => {
 
   /* ───── Create / Edit event ───── */
   const resetForm = () => {
-    setFormTitle(''); setFormType('outro'); setFormStartDate(undefined);
+    setFormTitle(''); setFormType('gravacao'); setFormStartDate(undefined);
     setFormStartTime('09:00'); setFormEndTime('10:00');
     setFormNotes(''); setFormEditorId(''); setFormClientId('');
     setEditingEvent(null);
