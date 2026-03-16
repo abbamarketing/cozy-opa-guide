@@ -407,7 +407,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
 
                 {/* Subtasks */}
                 <Separator className="bg-border/50" />
-                <SubtaskList deliveryId={delivery.id} role="editor" />
+                <div data-tour="editor-subtasks"><SubtaskList deliveryId={delivery.id} role="editor" /></div>
               </TabsContent>
 
               {/* TAB 2: Marca */}
@@ -547,7 +547,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
               </TabsContent>
 
               {/* TAB 4: Chat */}
-              <TabsContent value="chat" className="mt-4">
+              <TabsContent value="chat" className="mt-4" data-tour="editor-chat">
                 <DeliveryChat
                   deliveryId={delivery.id}
                   showTimestampInput={delivery.delivery_type === 'youtube_video' || delivery.delivery_type === 'instagram_video'}
@@ -555,7 +555,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
               </TabsContent>
 
               {/* TAB 5: Entregas */}
-              <TabsContent value="deliver" className="space-y-4 mt-4">
+              <TabsContent value="deliver" className="space-y-4 mt-4" data-tour="editor-submit-modal">
                 <FileUpload
                   userProjectId={delivery.user_project_id}
                   deliveryId={delivery.id}

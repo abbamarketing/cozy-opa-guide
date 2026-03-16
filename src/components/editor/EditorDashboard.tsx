@@ -56,6 +56,7 @@ import ViewToggle, { type ViewMode } from '@/components/shared/ViewToggle';
 import DeliveryListView from '@/components/shared/DeliveryListView';
 import DeliveryCalendarView from '@/components/shared/DeliveryCalendarView';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
+import EditorTour, { restartEditorTour } from '@/components/editor/EditorTour';
 
 /* ─── Types ─── */
 interface EditorDelivery extends DeliveryData {
@@ -292,6 +293,7 @@ const EditorDeliveryCard = ({
       {delivery.status === 'in_progress' && onSubmitDelivery && (
         <div className={`mt-2 ${onDragStart ? 'pl-[42px]' : 'pl-8'}`} onClick={(e) => e.stopPropagation()}>
           <Button
+            data-tour="editor-submit-btn"
             size="sm"
             className="h-7 gap-1.5 text-xs w-full"
             onClick={(e) => { e.stopPropagation(); onSubmitDelivery(delivery); }}
@@ -926,6 +928,7 @@ const EditorDashboard = () => {
   /* ─── Desktop Layout ─── */
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <EditorTour ready={!isLoading && !!editor} />
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-border/50 bg-background/80 backdrop-blur-md">
         <div className="flex h-14 items-center justify-between px-4">
@@ -989,6 +992,9 @@ const EditorDashboard = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem onClick={restartEditorTour}>
+                  Reiniciar Tour
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={signOut} className="text-destructive">
                   <LogOut className="mr-2 h-4 w-4" /> Sair
                 </DropdownMenuItem>
@@ -1059,7 +1065,7 @@ const EditorDashboard = () => {
             onSelect={setSelectedDelivery}
           />
         ) : (
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-3" data-tour="editor-kanban">
             {COLUMNS.map((col) => {
               const items = filtered.filter((d) => col.statuses.includes(d.status));
               return (
@@ -1092,15 +1098,16 @@ const EditorDashboard = () => {
                           Nenhuma entrega
                         </p>
                       ) : (
-                        items.map((d) => (
-                          <EditorDeliveryCard
-                            key={d.id}
-                            delivery={d}
-                            isDragging={draggedId === d.id}
-                            onClick={() => setSelectedDelivery(d)}
-                            onDragStart={handleDragStart(d.id)}
-                            onSubmitDelivery={(del) => setSubmitTarget(del)}
-                          />
+                        items.map((d, idx) => (
+                          <div key={d.id} {...(idx === 0 && col.statuses.includes('in_progress') ? { 'data-tour': 'editor-card-production' } : {})}>
+                            <EditorDeliveryCard
+                              delivery={d}
+                              isDragging={draggedId === d.id}
+                              onClick={() => setSelectedDelivery(d)}
+                              onDragStart={handleDragStart(d.id)}
+                              onSubmitDelivery={(del) => setSubmitTarget(del)}
+                            />
+                          </div>
                         ))
                       )}
                     </div>

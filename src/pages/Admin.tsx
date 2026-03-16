@@ -16,6 +16,7 @@ import AdminMetrics from '@/components/admin/AdminMetrics';
 import ProjectManager from '@/components/admin/ProjectManager';
 import LogViewer from '@/components/admin/LogViewer';
 import AdminCalendar from '@/components/admin/AdminCalendar';
+import AdminTour, { restartAdminTour } from '@/components/admin/AdminTour';
 
 import NotificationBell from '@/components/shared/NotificationBell';
 
@@ -62,6 +63,7 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <AdminTour ready={true} />
       <header className="sticky top-0 z-50 glass border-b border-border/50">
         <div className="flex h-14 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-2">
@@ -122,6 +124,7 @@ const Admin = () => {
           </div>
           <div className="flex items-center gap-2">
             <NotificationBell />
+            <Button variant="ghost" size="sm" onClick={restartAdminTour} className="hidden md:flex text-xs">Reiniciar Tour</Button>
             <Button variant="ghost" size="sm" onClick={signOut} className="hidden md:flex">Sair</Button>
           </div>
         </div>
@@ -135,6 +138,7 @@ const Admin = () => {
               <button
                 key={tab.id}
                 onClick={() => setTab(tab.id)}
+                data-tour={`admin-tab-${tab.id}`}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-primary text-primary-foreground neon-glow'
