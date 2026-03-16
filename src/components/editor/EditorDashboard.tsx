@@ -56,6 +56,7 @@ import ViewToggle, { type ViewMode } from '@/components/shared/ViewToggle';
 import DeliveryListView from '@/components/shared/DeliveryListView';
 import DeliveryCalendarView from '@/components/shared/DeliveryCalendarView';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
+import EditorTour, { restartEditorTour } from '@/components/editor/EditorTour';
 
 /* ─── Types ─── */
 interface EditorDelivery extends DeliveryData {
