@@ -42,6 +42,7 @@ import {
   Type,
   CheckSquare,
   History,
+  Timer,
 } from 'lucide-react';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 import { typeConfig, statusConfig } from '@/components/dashboard/DeliveryCard';
