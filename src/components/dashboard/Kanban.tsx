@@ -46,14 +46,9 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [showCaptureModal, setShowCaptureModal] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [activeColumn, setActiveColumn] = useState(() =>
-    userProject.client_type === 'subscription' ? 'queue' : 'todo'
-  );
   const [hasScheduledCapture, setHasScheduledCapture] = useState(false);
   const [captureLeadDays, setCaptureLeadDays] = useState(30);
   const [captureCheckDone, setCaptureCheckDone] = useState(false);
-  const isMobile = useIsMobile();
   const [viewMode, setViewMode] = useState<ViewMode>(() =>
     (localStorage.getItem('preferred_view_client') as ViewMode) || 'kanban'
   );
