@@ -547,7 +547,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
               </TabsContent>
 
               {/* TAB 4: Chat */}
-              <TabsContent value="chat" className="mt-4">
+              <TabsContent value="chat" className="mt-4" data-tour="editor-chat">
                 <DeliveryChat
                   deliveryId={delivery.id}
                   showTimestampInput={delivery.delivery_type === 'youtube_video' || delivery.delivery_type === 'instagram_video'}
