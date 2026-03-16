@@ -356,11 +356,7 @@ const DashboardLayout = () => {
       </div>
 
       {isMobile && (
-        <MobileBottomNav activeTab={activeTab} onTabChange={handleTabChange} navItems={
-          isStudio
-            ? navItems.filter(item => ['studio', 'deliveries', 'brand', 'settings'].includes(item.id))
-            : navItems
-        } />
+        <MobileBottomNav activeTab={activeTab} onTabChange={handleTabChange} navItems={navItems} />
       )}
 
       {/* Upsell overlay for locked tabs */}
