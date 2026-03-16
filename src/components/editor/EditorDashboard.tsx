@@ -285,7 +285,20 @@ const EditorDeliveryCard = ({
         </div>
       )}
 
-      {/* Mobile status navigation buttons */}
+      {/* Deliver button for in_progress */}
+      {delivery.status === 'in_progress' && onSubmitDelivery && (
+        <div className={`mt-2 ${onDragStart ? 'pl-[42px]' : 'pl-8'}`} onClick={(e) => e.stopPropagation()}>
+          <Button
+            size="sm"
+            className="h-7 gap-1.5 text-xs w-full"
+            onClick={(e) => { e.stopPropagation(); onSubmitDelivery(delivery); }}
+          >
+            <Send className="h-3 w-3" />
+            Entregar
+          </Button>
+        </div>
+      )}
+
       {onMoveStatus && (canGoPrev || canGoNext) && (
         <div className="mt-2 flex items-center gap-2 md:hidden" onClick={(e) => e.stopPropagation()}>
           {canGoPrev && prevCol && (
