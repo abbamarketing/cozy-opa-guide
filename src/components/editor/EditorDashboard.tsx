@@ -1066,6 +1066,14 @@ const EditorDashboard = () => {
         delivery={selectedDelivery}
         onUpdated={fetchDeliveries}
       />
+
+      <DeliverySubmitModal
+        open={!!submitTarget}
+        onOpenChange={(open) => { if (!open) setSubmitTarget(null); }}
+        deliveryId={submitTarget?.id ?? ''}
+        deliveryTitle={submitTarget?.title ?? ''}
+        onSubmitted={fetchDeliveries}
+      />
     </div>
   );
 };
