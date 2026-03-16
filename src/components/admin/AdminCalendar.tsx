@@ -45,16 +45,26 @@ type ViewMode = 'month' | 'week' | 'day';
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 const EVENT_TYPES = [
-  { value: 'reuniao', label: 'Reunião' },
-  { value: 'marco', label: 'Marco' },
-  { value: 'lembrete', label: 'Lembrete' },
-  { value: 'outro', label: 'Outro' },
+  { value: 'gravacao', label: '🎬 Gravação' },
+  { value: 'captacao_externa', label: '📍 Captação Externa' },
+  { value: 'sessao_cliente', label: '👤 Sessão com Cliente' },
+  { value: 'revisao_ao_vivo', label: '🔄 Revisão ao Vivo' },
 ];
 
 /* colour classes */
 const deliveryColor = 'bg-primary/15 border-primary/30 text-primary';
 const captureColor  = 'bg-[hsl(var(--queue-green))]/20 border-[hsl(var(--queue-green))]/40 text-[hsl(var(--queue-green))]';
-const manualColor   = 'bg-[hsl(var(--energy-leve))]/20 border-[hsl(var(--energy-leve))]/40 text-[hsl(var(--energy-leve))]';
+
+const MANUAL_TYPE_COLORS: Record<string, string> = {
+  gravacao: 'bg-purple-500/20 border-purple-500/40 text-purple-400',
+  captacao_externa: 'bg-orange-500/20 border-orange-500/40 text-orange-400',
+  sessao_cliente: 'bg-blue-500/20 border-blue-500/40 text-blue-400',
+  revisao_ao_vivo: 'bg-yellow-500/20 border-yellow-500/40 text-yellow-400',
+};
+const manualColorFallback = 'bg-muted/20 border-muted/40 text-muted-foreground';
+
+const getManualColor = (type?: string) => (type && MANUAL_TYPE_COLORS[type]) || manualColorFallback;
+const getManualLabel = (type?: string) => EVENT_TYPES.find(t => t.value === type)?.label || type || 'Evento';
 
 /* ───── Component ───── */
 const AdminCalendar = () => {
