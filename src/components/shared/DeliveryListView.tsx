@@ -100,7 +100,7 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoadingCl
         case 'title': cmp = a.title.localeCompare(b.title); break;
         case 'delivery_type': cmp = a.delivery_type.localeCompare(b.delivery_type); break;
         case 'status': cmp = a.status.localeCompare(b.status); break;
-        case 'person': cmp = (getPersonName(a)).localeCompare(getPersonName(b)); break;
+        case 'person': cmp = (getPersonName(a) || '').localeCompare(getPersonName(b) || ''); break;
         case 'due_date': {
           const da = a.due_date ? new Date(a.due_date).getTime() : Infinity;
           const db = b.due_date ? new Date(b.due_date).getTime() : Infinity;
