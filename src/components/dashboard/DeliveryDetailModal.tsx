@@ -57,7 +57,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
   const [revisions, setRevisions] = useState<RevisionRecord[]>([]);
   const [showRevisionModal, setShowRevisionModal] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
+  
 
   useEffect(() => {
     if (!delivery || !open) return;
