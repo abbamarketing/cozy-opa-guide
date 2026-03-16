@@ -123,7 +123,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
       }
 
       logger.info('Entrega aprovada', { delivery_id: delivery.id, title: delivery.title }, 'delivery');
-      setShowCelebration(true);
+      
       toast.success('Entrega aprovada com sucesso! 🎉');
       setTimeout(() => {
         onOpenChange(false);
