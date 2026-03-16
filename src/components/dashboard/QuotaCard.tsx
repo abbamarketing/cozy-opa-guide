@@ -309,10 +309,6 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
 const QuotaCard = ({ userProject }: QuotaCardProps) => {
   const clientType = userProject.client_type;
 
-  if (clientType === 'studio') {
-    return <StudioQuotaCard />;
-  }
-
   if (clientType === 'subscription') {
     return <SubscriptionQuotaCard userProject={userProject} />;
   }
