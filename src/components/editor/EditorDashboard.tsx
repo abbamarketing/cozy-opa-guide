@@ -873,8 +873,13 @@ const EditorDashboard = () => {
         <main className="flex-1 px-4 py-3">
           {isLoading ? (
             <div className="space-y-2">
-              <Skeleton className="h-24 rounded-lg" />
-              <Skeleton className="h-24 rounded-lg" />
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="rounded-xl border border-border/30 bg-card p-3 space-y-2">
+                  <Skeleton className="h-3.5 w-3/4" />
+                  <Skeleton className="h-2.5 w-1/2" />
+                  <Skeleton className="h-2.5 w-1/3" />
+                </div>
+              ))}
             </div>
           ) : viewMode === 'list' ? (
             <DeliveryListView
@@ -889,8 +894,13 @@ const EditorDashboard = () => {
               onSelect={setSelectedDelivery}
             />
           ) : items.length === 0 ? (
-            <div className="rounded-lg border border-border bg-card p-8 text-center">
-              <p className="text-xs font-mono text-muted-foreground">Nenhuma entrega</p>
+            <div className="rounded-xl border border-border bg-card p-8 text-center space-y-2">
+              <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
+              <p className="text-xs text-muted-foreground">
+                {deliveries.length === 0
+                  ? 'Nenhuma entrega atribuída no momento. Aguarde o admin atribuir novas demandas.'
+                  : 'Nenhuma entrega nesta coluna'}
+              </p>
             </div>
           ) : (
             <div className="space-y-2">
