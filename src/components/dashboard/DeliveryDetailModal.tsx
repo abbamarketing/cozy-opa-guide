@@ -298,9 +298,21 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
                         className="rounded-lg border border-border/40 bg-muted/20 p-3 space-y-1"
                       >
                         <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-                          <span>
-                            {format(new Date(rev.created_at), "dd/MM 'às' HH:mm", { locale: ptBR })}
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span>
+                              {format(new Date(rev.created_at), "dd/MM 'às' HH:mm", { locale: ptBR })}
+                            </span>
+                            {(rev as any).category && (
+                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                                {(rev as any).category === 'audio' && '🔊 Áudio'}
+                                {(rev as any).category === 'visual' && '🎨 Visual'}
+                                {(rev as any).category === 'cortes' && '✂️ Cortes'}
+                                {(rev as any).category === 'texto' && '📝 Texto'}
+                                {(rev as any).category === 'ritmo' && '⏱ Ritmo'}
+                                {(rev as any).category === 'outro' && '📌 Outro'}
+                              </Badge>
+                            )}
+                          </div>
                           {rev.timestamp_marker && (
                             <Badge variant="outline" className="text-[10px] px-1.5 py-0">
                               ⏱ {rev.timestamp_marker}
