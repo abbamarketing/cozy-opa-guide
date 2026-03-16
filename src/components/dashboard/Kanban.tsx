@@ -53,6 +53,14 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const [captureLeadDays, setCaptureLeadDays] = useState(30);
   const [captureCheckDone, setCaptureCheckDone] = useState(false);
   const isMobile = useIsMobile();
+  const [viewMode, setViewMode] = useState<ViewMode>(() =>
+    (localStorage.getItem('preferred_view_client') as ViewMode) || 'kanban'
+  );
+
+  const handleViewChange = (v: ViewMode) => {
+    setViewMode(v);
+    localStorage.setItem('preferred_view_client', v);
+  };
 
   const isSubscription = userProject.client_type === 'subscription';
 
