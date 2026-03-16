@@ -303,16 +303,24 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
                             <span>
                               {format(new Date(rev.created_at), "dd/MM 'às' HH:mm", { locale: ptBR })}
                             </span>
-                            {(rev as any).category && (
-                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                                {(rev as any).category === 'audio' && '🔊 Áudio'}
-                                {(rev as any).category === 'visual' && '🎨 Visual'}
-                                {(rev as any).category === 'cortes' && '✂️ Cortes'}
-                                {(rev as any).category === 'texto' && '📝 Texto'}
-                                {(rev as any).category === 'ritmo' && '⏱ Ritmo'}
-                                {(rev as any).category === 'outro' && '📌 Outro'}
-                              </Badge>
-                            )}
+                            {(rev as any).category && (() => {
+                              const catMap: Record<string, { icon: typeof Volume2; label: string }> = {
+                                audio: { icon: Volume2, label: 'Áudio' },
+                                visual: { icon: Palette, label: 'Visual' },
+                                cortes: { icon: Scissors, label: 'Cortes' },
+                                texto: { icon: FileText, label: 'Texto' },
+                                ritmo: { icon: Timer, label: 'Ritmo' },
+                                outro: { icon: Pin, label: 'Outro' },
+                              };
+                              const cat = catMap[(rev as any).category];
+                              if (!cat) return null;
+                              const CatIcon = cat.icon;
+                              return (
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 inline-flex items-center gap-1">
+                                  <CatIcon className="h-3 w-3" /> {cat.label}
+                                </Badge>
+                              );
+                            })()}
                           </div>
                           {rev.timestamp_marker && (
                             <Badge variant="outline" className="text-[10px] px-1.5 py-0">
