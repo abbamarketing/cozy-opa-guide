@@ -46,8 +46,8 @@ export function SlaCountdown({ slaDeadline, slaHours }: SlaCountdownProps) {
   };
 
   return (
-    <span className={`font-mono text-xs font-semibold ${colorMap[urgency]}`}>
-      ⏱ {timeLeft}
+    <span className={`font-mono text-xs font-semibold inline-flex items-center gap-1 ${colorMap[urgency]}`}>
+      <Timer className="h-3 w-3" /> {timeLeft}
     </span>
   );
 }

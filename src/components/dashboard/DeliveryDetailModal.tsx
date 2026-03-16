@@ -323,8 +323,8 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
                             })()}
                           </div>
                           {rev.timestamp_marker && (
-                            <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                              ⏱ {rev.timestamp_marker}
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 inline-flex items-center gap-1">
+                              <Timer className="h-3 w-3" /> {rev.timestamp_marker}
                             </Badge>
                           )}
                         </div>

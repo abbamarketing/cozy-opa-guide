@@ -221,9 +221,9 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
                       <Badge
                         variant="outline"
                         className="text-[9px] px-1 py-0 border-0 bg-primary/10 text-primary cursor-pointer"
-                        onClick={() => toast.info(`Ponto crítico: ⏱ ${msg.timestamp_marker}`, { duration: 3000 })}
+                        onClick={() => toast.info(`Ponto crítico: ${msg.timestamp_marker}`, { duration: 3000 })}
                       >
-                        ⏱ {msg.timestamp_marker}
+                        <Timer className="h-2.5 w-2.5 inline" /> {msg.timestamp_marker}
                       </Badge>
                     )}
                   </div>
