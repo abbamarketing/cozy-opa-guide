@@ -969,6 +969,7 @@ const EditorDashboard = () => {
               </label>
             </div>
 
+            <ViewToggle value={viewMode} onChange={handleViewChange} />
             <NotificationBell />
 
             <DropdownMenu>
