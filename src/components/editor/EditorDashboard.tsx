@@ -731,6 +731,7 @@ const EditorDashboard = () => {
             </div>
 
             <div className="flex items-center gap-1">
+              <ViewToggle value={viewMode} onChange={handleViewChange} />
               {/* Filter sheet */}
               <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
                 <SheetTrigger asChild>
