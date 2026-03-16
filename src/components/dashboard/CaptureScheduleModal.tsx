@@ -190,11 +190,17 @@ const CaptureScheduleModal = ({
           </div>
         ) : (
           <div className="space-y-4 pt-2">
+            {/* Status */}
+            <div className="p-3 rounded-lg bg-primary/10 border border-primary/20 flex items-center gap-2">
+              <Camera className="h-4 w-4 text-primary shrink-0" />
+              <p className="text-xs font-medium text-primary">Você pode agendar agora!</p>
+            </div>
+
             {/* Rules info */}
             <div className="p-3 rounded-lg bg-muted/50 border border-border/50 space-y-1">
               <p className="text-[11px] text-muted-foreground">• Seg–Sex, 08h às 18h</p>
               <p className="text-[11px] text-muted-foreground">• Mínimo 72h de antecedência</p>
-              <p className="text-[11px] text-muted-foreground">• 1 agendamento a cada 30 dias</p>
+              <p className="text-[11px] text-muted-foreground">• 1 agendamento a cada 28 dias</p>
             </div>
 
             {/* Date picker */}
