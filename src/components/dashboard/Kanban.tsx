@@ -3,7 +3,6 @@ import { Plus, Camera, AlertCircle, Video, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import DeliveryCard, { type DeliveryData } from './DeliveryCard';
@@ -13,6 +12,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import ViewToggle, { type ViewMode } from '@/components/shared/ViewToggle';
 import DeliveryListView from '@/components/shared/DeliveryListView';
 import DeliveryCalendarView from '@/components/shared/DeliveryCalendarView';
+import KanbanBoard, { type KanbanColumn } from '@/components/shared/KanbanBoard';
 
 const NewDeliveryModal = lazy(() => import('./NewDeliveryModal'));
 const DeliveryDetailModal = lazy(() => import('./DeliveryDetailModal'));
