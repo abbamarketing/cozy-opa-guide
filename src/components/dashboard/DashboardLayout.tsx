@@ -291,8 +291,6 @@ const DashboardLayout = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'studio':
-        return <StudioModule />;
       case 'deliveries':
         return userProject ? (
           <Kanban userProject={userProject} />
