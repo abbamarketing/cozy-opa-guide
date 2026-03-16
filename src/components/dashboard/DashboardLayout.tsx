@@ -256,17 +256,8 @@ const DashboardLayout = () => {
   const { isGod, loading: roleLoading } = useRole();
   const isMobile = useIsMobile();
 
-  const isStudio = userProject?.client_type === 'studio';
-
   const [activeTab, setActiveTab] = useState<DashboardTab>(tabFromUrl || 'deliveries');
   const [lockedTabAttempt, setLockedTabAttempt] = useState<DashboardTab | null>(null);
-
-  // Defina a aba correta assim que o projeto carregar
-  useEffect(() => {
-    if (isLoading) return;
-    if (tabFromUrl) return;
-    setActiveTab(isStudio ? 'studio' : 'deliveries');
-  }, [isLoading, isStudio, tabFromUrl]);
 
   // Sync tab da URL
   useEffect(() => {
