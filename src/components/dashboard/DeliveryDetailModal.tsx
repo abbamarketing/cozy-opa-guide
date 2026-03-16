@@ -237,7 +237,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
               {/* Checklist - only for review status */}
               {canReview && (
                 <>
-                  <DeliveryChecklist userProjectId={delivery.user_project_id} />
+                  <DeliveryChecklist userProjectId={delivery.user_project_id} deliveryId={delivery.id} />
                   <Separator className="bg-border/50" />
                 </>
               )}
