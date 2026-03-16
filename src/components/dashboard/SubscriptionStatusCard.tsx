@@ -26,7 +26,7 @@ interface InProgressDelivery {
 const SubscriptionStatusCard = ({ userProject }: Props) => {
   const [inProgress, setInProgress] = useState<InProgressDelivery | null>(null);
   const [queueCount, setQueueCount] = useState(0);
-  const [studioCredits, setStudioCredits] = useState<number | null>(null);
+  
   const [loading, setLoading] = useState(true);
 
   const tierLabel =
