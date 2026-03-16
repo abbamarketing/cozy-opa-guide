@@ -555,7 +555,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
               </TabsContent>
 
               {/* TAB 5: Entregas */}
-              <TabsContent value="deliver" className="space-y-4 mt-4">
+              <TabsContent value="deliver" className="space-y-4 mt-4" data-tour="editor-submit-modal">
                 <FileUpload
                   userProjectId={delivery.user_project_id}
                   deliveryId={delivery.id}
