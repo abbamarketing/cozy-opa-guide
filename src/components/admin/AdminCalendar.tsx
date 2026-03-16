@@ -100,7 +100,7 @@ const AdminCalendar = () => {
     setLoading(true);
     const [delRes, capRes, manRes] = await Promise.all([
       supabase.from('deliveries').select('id, title, due_date, status, delivery_type'),
-      supabase.from('capture_sessions').select('id, scheduled_date, location_name, status, user_project_id'),
+      supabase.from('capture_sessions').select('id, scheduled_date, location_name, status, user_project_id, user_projects!inner(user_id)'),
       supabase.from('calendar_events').select('*'),
     ]);
 
