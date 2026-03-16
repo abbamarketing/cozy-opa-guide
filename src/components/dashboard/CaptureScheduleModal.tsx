@@ -84,12 +84,26 @@ const CaptureScheduleModal = ({
         .limit(1);
 
       if (data && data.length > 0) {
-        // Parse YYYY-MM-DD as local date to avoid UTC shift
         const [y, m, d] = data[0].scheduled_date.split('-').map(Number);
         setLastSessionDate(new Date(y, m - 1, d));
       } else {
         setLastSessionDate(null);
       }
+
+      // Check max_captures quota
+      const capturesUsed = (userProject.captures_approved ?? 0) + (userProject.captures_reserved ?? 0);
+      const { data: cpData } = await supabase
+        .from('custom_projects')
+        .select('max_captures')
+        .eq('id', userProject.custom_project_id)
+        .maybeSingle();
+
+      if (cpData && capturesUsed >= cpData.max_captures) {
+        setQuotaExceeded(true);
+      } else {
+        setQuotaExceeded(false);
+      }
+
       setCheckingCooldown(false);
     };
 
