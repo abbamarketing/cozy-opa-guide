@@ -212,7 +212,11 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoadingCl
                     <Badge variant={status.variant} className="text-[10px]">{status.label}</Badge>
                   </TableCell>
                   <TableCell>
-                    <span className="text-xs text-muted-foreground">{getPersonName(d)}</span>
+                    {getPersonName(d) === null ? (
+                      <Skeleton className="h-4 w-24" />
+                    ) : (
+                      <span className="text-xs text-muted-foreground">{getPersonName(d)}</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     {d.due_date && !isCompleted ? (
