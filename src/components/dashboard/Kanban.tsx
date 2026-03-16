@@ -438,8 +438,8 @@ const Kanban = ({ userProject }: KanbanProps) => {
                         )}
                       </div>
                     ) : (
-                      items.map((d) => (
-                        <div key={d.id} className="relative">
+                      items.map((d, idx) => (
+                        <div key={d.id} className="relative" {...(idx === 0 && col.id === 'todo' ? { 'data-tour': 'delivery-card' } : {})}>
                           {col.id === 'queue' && (
                             <div className="absolute top-2 right-2 z-10">
                               <Badge variant="secondary" className="text-[9px] font-sans gap-1">
