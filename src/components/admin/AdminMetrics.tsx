@@ -33,7 +33,7 @@ const AdminMetrics = () => {
   const [slaBreached, setSlaBreached] = useState<number>(0);
   const [slaRate, setSlaRate] = useState<number | null>(null);
   const [editorRanking, setEditorRanking] = useState<[string, number][]>([]);
-  }>({ totalCalls: 0, totalTokens: 0, byFunction: [], dailyData: [] });
+  
 
   // Real-time SLA polling every 60s
   useEffect(() => {
