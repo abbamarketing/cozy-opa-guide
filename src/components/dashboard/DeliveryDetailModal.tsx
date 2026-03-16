@@ -144,7 +144,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
 
   return (
     <>
-      <ApprovalCelebration show={showCelebration} onComplete={handleCelebrationComplete} />
+      
 
       <Dialog open={open && !showRevisionModal} onOpenChange={onOpenChange}>
         <DialogContent className="max-h-[90vh] max-w-lg overflow-hidden p-0">
