@@ -217,6 +217,7 @@ const MobileBottomNav = ({
           <button
             key={item.id}
             onClick={() => onTabChange(item.id, item.locked)}
+            {...(item.id === 'calendar' ? { 'data-tour': 'nav-calendar' } : {})}
             className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors min-h-[56px] ${
               isActive
                 ? 'text-abba-lime'
