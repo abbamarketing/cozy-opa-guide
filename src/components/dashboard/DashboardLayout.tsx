@@ -331,7 +331,7 @@ const DashboardLayout = () => {
       <div className="flex-1 flex flex-col min-h-screen">
         <DashboardHeader />
 
-        <main className={`flex-1 overflow-y-auto p-3 md:p-6 space-y-4 ${isMobile ? 'pb-20' : ''}`}>
+        <main className={`flex-1 overflow-y-auto overflow-x-hidden p-3 md:p-6 space-y-4 ${isMobile ? 'pb-20' : ''}`}>
           {isLoading ? (
             <div className="space-y-3">
               <Skeleton className="h-12 w-full rounded-[20px]" />
