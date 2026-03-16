@@ -62,7 +62,7 @@ const CaptureScheduleModal = ({
 
   // Minimum 72h lead time (3 days)
   const MIN_LEAD_DAYS = 3;
-  const COOLDOWN_DAYS = 30;
+  const COOLDOWN_DAYS = 28;
 
   // Use the greater of captureLeadDays or 3 days (72h)
   const effectiveLeadDays = Math.max(captureLeadDays, MIN_LEAD_DAYS);
