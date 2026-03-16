@@ -317,7 +317,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
               <Separator className="bg-border/50" />
 
               {/* Chat */}
-              <div className="space-y-3">
+              <div className="space-y-3" data-tour="delivery-chat">
                 {delivery.editor_id ? (
                   <DeliveryChat
                     deliveryId={delivery.id}
