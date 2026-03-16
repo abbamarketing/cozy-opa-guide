@@ -113,11 +113,33 @@ Deno.serve(async (req) => {
       await adminClient.from("user_projects").delete().in("id", projectIds);
     }
 
+    // Delete Studio data
+    await adminClient.from("photo_shoots").delete().eq("user_id", targetUserId);
+    await adminClient.from("client_photo_profiles").delete().eq("user_id", targetUserId);
+    await adminClient.from("studio_credits").delete().eq("user_id", targetUserId);
+    await adminClient.from("studio_scripts").delete().eq("user_id", targetUserId);
+
+    // Delete user preferences
+    await adminClient.from("user_preferences").delete().eq("user_id", targetUserId);
+
+    // Delete AI usage logs
+    await adminClient.from("ai_usage_logs").delete().eq("user_id", targetUserId);
+
     // Delete onboarding briefings
     await adminClient.from("onboarding_briefings").delete().eq("user_id", targetUserId);
 
     // Delete notifications
     await adminClient.from("notifications").delete().eq("user_id", targetUserId);
+
+    // Clean up storage buckets
+    const buckets = ["studio-reference-photos", "studio-lora-references", "delivery-files"];
+    for (const bucket of buckets) {
+      const { data: files } = await adminClient.storage.from(bucket).list(targetUserId);
+      if (files && files.length > 0) {
+        const paths = files.map((f: any) => `${targetUserId}/${f.name}`);
+        await adminClient.storage.from(bucket).remove(paths);
+      }
+    }
 
     // Delete profile and roles
     await adminClient.from("user_roles").delete().eq("user_id", targetUserId);
