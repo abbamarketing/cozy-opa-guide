@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Video, Camera, Image, Layers, Clock, AlertTriangle, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { Video, Camera, Image, Layers, Clock, AlertTriangle, ShieldAlert, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,13 +35,13 @@ interface DeliveryListViewProps {
   clientNames?: Record<string, string | null>;
 }
 
-function getSlaLevel(dueDate: string | null): { label: string; level: 'ok' | 'warning' | 'danger' | 'overdue' | 'none' } {
+function getSlaLevel(dueDate: string | null): { label: string; level: 'ok' | 'warning' | 'danger' | 'overdue' | 'none'; icon?: 'alert' | 'shield' } {
   if (!dueDate) return { label: '—', level: 'none' };
   const bizMin = remainingBusinessMinutes(new Date(dueDate));
   const countdown = formatBusinessCountdown(bizMin);
-  if (bizMin < 0) return { label: `⛔ ${countdown}`, level: 'overdue' };
-  if (bizMin <= 360) return { label: `⚠️ ${countdown}`, level: 'danger' };
-  if (bizMin <= 720) return { label: `⚠️ ${countdown}`, level: 'warning' };
+  if (bizMin < 0) return { label: countdown, level: 'overdue', icon: 'shield' };
+  if (bizMin <= 360) return { label: countdown, level: 'danger', icon: 'alert' };
+  if (bizMin <= 720) return { label: countdown, level: 'warning', icon: 'alert' };
   return { label: countdown, level: 'ok' };
 }
 
@@ -185,7 +185,9 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames }: DeliveryL
                         <span className="text-[10px] text-muted-foreground block">
                           {format(new Date(d.due_date), "dd/MM HH'h'", { locale: ptBR })}
                         </span>
-                        <Badge variant="outline" className={`text-[9px] px-1.5 py-0 ${slaBadgeClass[sla.level]}`}>
+                        <Badge variant="outline" className={`text-[9px] px-1.5 py-0 inline-flex items-center gap-0.5 ${slaBadgeClass[sla.level]}`}>
+                          {sla.icon === 'shield' && <ShieldAlert className="h-2.5 w-2.5" />}
+                          {sla.icon === 'alert' && <AlertTriangle className="h-2.5 w-2.5" />}
                           {sla.label}
                         </Badge>
                       </div>
