@@ -52,6 +52,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { SlaCountdown } from '@/components/editor/SlaCountdown';
 import { logger } from '@/lib/logger';
 import DeliverySubmitModal from '@/components/editor/DeliverySubmitModal';
+import ViewToggle, { type ViewMode } from '@/components/shared/ViewToggle';
+import DeliveryListView from '@/components/shared/DeliveryListView';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 
 /* ─── Types ─── */
@@ -393,6 +395,15 @@ const EditorDashboard = () => {
   const [startingProduction, setStartingProduction] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [submitTarget, setSubmitTarget] = useState<EditorDelivery | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>(() =>
+    (localStorage.getItem('preferred_view_editor') as ViewMode) || 'kanban'
+  );
+
+  const handleViewChange = (v: ViewMode) => {
+    setViewMode(v);
+    localStorage.setItem('preferred_view_editor', v);
+  };
+
   // Filters
   const [clientFilter, setClientFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -575,6 +586,13 @@ const EditorDashboard = () => {
   const uniqueClients = useMemo(() => [...new Set(deliveries.map((d) => d.client_name).filter(Boolean))] as string[], [deliveries]);
   const uniqueTypes = useMemo(() => [...new Set(deliveries.map((d) => d.delivery_type))], [deliveries]);
 
+  // Build clientNames map for list view
+  const editorClientNames = useMemo(() => {
+    const map: Record<string, string | null> = {};
+    deliveries.forEach((d) => { map[d.id] = d.client_name; });
+    return map;
+  }, [deliveries]);
+
   // Subscription queue: count in-progress and start production
   const inProgressSubCount = subscriptionQueue.filter((d) => d.status === 'in_progress').length;
   const canStartProduction = inProgressSubCount < 2 && subscriptionQueue.some((d) => d.status === 'queue');
@@ -713,6 +731,7 @@ const EditorDashboard = () => {
             </div>
 
             <div className="flex items-center gap-1">
+              <ViewToggle value={viewMode} onChange={handleViewChange} />
               {/* Filter sheet */}
               <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
                 <SheetTrigger asChild>
@@ -854,6 +873,13 @@ const EditorDashboard = () => {
               <Skeleton className="h-24 rounded-lg" />
               <Skeleton className="h-24 rounded-lg" />
             </div>
+          ) : viewMode === 'list' ? (
+            <DeliveryListView
+              deliveries={filtered}
+              onSelect={setSelectedDelivery}
+              role="editor"
+              clientNames={editorClientNames}
+            />
           ) : items.length === 0 ? (
             <div className="rounded-lg border border-border bg-card p-8 text-center">
               <p className="text-xs font-mono text-muted-foreground">Nenhuma entrega</p>
@@ -943,6 +969,7 @@ const EditorDashboard = () => {
               </label>
             </div>
 
+            <ViewToggle value={viewMode} onChange={handleViewChange} />
             <NotificationBell />
 
             <DropdownMenu>
@@ -1008,12 +1035,18 @@ const EditorDashboard = () => {
         </div>
       )}
 
-      {/* Kanban desktop */}
       <main className="flex-1 overflow-x-auto p-4">
         {isLoading ? (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
             {COLUMNS.map((c) => <Skeleton key={c.id} className="h-64 rounded-xl" />)}
           </div>
+        ) : viewMode === 'list' ? (
+          <DeliveryListView
+            deliveries={filtered}
+            onSelect={setSelectedDelivery}
+            role="editor"
+            clientNames={editorClientNames}
+          />
         ) : (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
             {COLUMNS.map((col) => {

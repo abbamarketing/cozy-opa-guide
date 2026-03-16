@@ -10,6 +10,8 @@ import DeliveryCard, { type DeliveryData } from './DeliveryCard';
 import { useDeliveries } from '@/hooks/useDeliveries';
 import type { UserProjectData } from '@/hooks/useUserProject';
 import { useIsMobile } from '@/hooks/use-mobile';
+import ViewToggle, { type ViewMode } from '@/components/shared/ViewToggle';
+import DeliveryListView from '@/components/shared/DeliveryListView';
 
 const NewDeliveryModal = lazy(() => import('./NewDeliveryModal'));
 const DeliveryDetailModal = lazy(() => import('./DeliveryDetailModal'));
@@ -51,6 +53,14 @@ const Kanban = ({ userProject }: KanbanProps) => {
   const [captureLeadDays, setCaptureLeadDays] = useState(30);
   const [captureCheckDone, setCaptureCheckDone] = useState(false);
   const isMobile = useIsMobile();
+  const [viewMode, setViewMode] = useState<ViewMode>(() =>
+    (localStorage.getItem('preferred_view_client') as ViewMode) || 'kanban'
+  );
+
+  const handleViewChange = (v: ViewMode) => {
+    setViewMode(v);
+    localStorage.setItem('preferred_view_client', v);
+  };
 
   const isSubscription = userProject.client_type === 'subscription';
 
@@ -165,32 +175,35 @@ const Kanban = ({ userProject }: KanbanProps) => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-base font-sans font-semibold text-foreground">Entregas</h2>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span>
-                <Button
-                  size="sm"
-                  disabled={!canCreateDelivery}
-                  className="gap-1.5 h-9 bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light"
-                  onClick={handleNewClick}
-                  data-tour="new-delivery-btn"
-                >
-                  {needsCaptureFirst ? <Camera className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                  {needsCaptureFirst ? 'Agendar' : 'Nova'}
-                </Button>
-              </span>
-            </TooltipTrigger>
-            {!canCreateDelivery && !needsCaptureFirst && (
-              <TooltipContent>
-                <p>Você atingiu o limite de entregas do seu plano. Faça upgrade para continuar.</p>
-              </TooltipContent>
-            )}
-            {needsCaptureFirst && (
-              <TooltipContent>
-                <p>Agende uma captação para liberar entregas</p>
-              </TooltipContent>
-            )}
-          </Tooltip>
+          <div className="flex items-center gap-2">
+            <ViewToggle value={viewMode} onChange={handleViewChange} />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button
+                    size="sm"
+                    disabled={!canCreateDelivery}
+                    className="gap-1.5 h-9 bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light"
+                    onClick={handleNewClick}
+                    data-tour="new-delivery-btn"
+                  >
+                    {needsCaptureFirst ? <Camera className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                    {needsCaptureFirst ? 'Agendar' : 'Nova'}
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              {!canCreateDelivery && !needsCaptureFirst && (
+                <TooltipContent>
+                  <p>Você atingiu o limite de entregas do seu plano. Faça upgrade para continuar.</p>
+                </TooltipContent>
+              )}
+              {needsCaptureFirst && (
+                <TooltipContent>
+                  <p>Agende uma captação para liberar entregas</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </div>
         </div>
 
         {/* Column Tabs */}
@@ -209,6 +222,12 @@ const Kanban = ({ userProject }: KanbanProps) => {
               </div>
             ))}
           </div>
+        ) : viewMode === 'list' ? (
+          <DeliveryListView
+            deliveries={deliveries}
+            onSelect={setSelectedDelivery}
+            role="client"
+          />
         ) : (
           <>
             <div className="flex gap-2 p-1" data-tour="kanban-board">
@@ -312,32 +331,35 @@ const Kanban = ({ userProject }: KanbanProps) => {
 
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-sans font-semibold text-foreground">Minhas Entregas</h2>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span>
-              <Button
-                size="sm"
-                disabled={!canCreateDelivery}
-                className="gap-1.5 bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light"
-                onClick={handleNewClick}
-                data-tour="new-delivery-btn"
-              >
-                {needsCaptureFirst ? <Camera className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                {needsCaptureFirst ? 'Agendar Captação' : 'Nova Solicitação'}
-              </Button>
-            </span>
-          </TooltipTrigger>
-          {!canCreateDelivery && !needsCaptureFirst && (
-            <TooltipContent>
-              <p>Você atingiu o limite de entregas do seu plano. Faça upgrade para continuar.</p>
-            </TooltipContent>
-          )}
-          {needsCaptureFirst && (
-            <TooltipContent>
-              <p>Agende uma captação para liberar entregas</p>
-            </TooltipContent>
-          )}
-        </Tooltip>
+        <div className="flex items-center gap-3">
+          <ViewToggle value={viewMode} onChange={handleViewChange} />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span>
+                <Button
+                  size="sm"
+                  disabled={!canCreateDelivery}
+                  className="gap-1.5 bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light"
+                  onClick={handleNewClick}
+                  data-tour="new-delivery-btn"
+                >
+                  {needsCaptureFirst ? <Camera className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                  {needsCaptureFirst ? 'Agendar Captação' : 'Nova Solicitação'}
+                </Button>
+              </span>
+            </TooltipTrigger>
+            {!canCreateDelivery && !needsCaptureFirst && (
+              <TooltipContent>
+                <p>Você atingiu o limite de entregas do seu plano. Faça upgrade para continuar.</p>
+              </TooltipContent>
+            )}
+            {needsCaptureFirst && (
+              <TooltipContent>
+                <p>Agende uma captação para liberar entregas</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </div>
       </div>
 
       {isLoading ? (
@@ -358,6 +380,12 @@ const Kanban = ({ userProject }: KanbanProps) => {
             </div>
           ))}
         </div>
+      ) : viewMode === 'list' ? (
+        <DeliveryListView
+          deliveries={deliveries}
+          onSelect={setSelectedDelivery}
+          role="client"
+        />
       ) : (
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3" data-tour="kanban-board">
           {COLUMNS.map((col) => {

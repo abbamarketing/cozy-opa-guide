@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import ViewToggle, { type ViewMode } from '@/components/shared/ViewToggle';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,6 +21,8 @@ import { toast } from 'sonner';
 import { downloadCSV } from '@/lib/csv';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { remainingBusinessMinutes, formatBusinessCountdown } from '@/lib/business-hours';
+import DeliveryListView from '@/components/shared/DeliveryListView';
+import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 
 interface AdminDelivery {
   id: string;
@@ -74,6 +77,13 @@ const AdminDeliveries = () => {
   const [activeColumn, setActiveColumn] = useState('todo');
   const [page, setPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
+  const [viewMode, setViewMode] = useState<ViewMode>(() =>
+    (localStorage.getItem('preferred_view_admin') as ViewMode) || 'kanban'
+  );
+  const handleViewChange = (v: ViewMode) => {
+    setViewMode(v);
+    localStorage.setItem('preferred_view_admin', v);
+  };
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -302,11 +312,39 @@ const AdminDeliveries = () => {
             <Download className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">CSV</span>
           </Button>
+          <ViewToggle value={viewMode} onChange={handleViewChange} />
         </div>
       </div>
 
       {/* Mobile: Tab + single column */}
-      {isMobile ? (
+      {viewMode === 'list' ? (
+        <DeliveryListView
+          deliveries={filtered.map((d) => ({
+            ...d,
+            description: null,
+            revision_count: 0,
+            max_revisions: 2,
+            file_url: null,
+            thumbnail_url: null,
+            editor_name: d.editor_name || undefined,
+            editor_id: d.editor_id,
+            created_at: '',
+            delivered_at: null,
+            approved_at: null,
+            revision_notes: null,
+            user_project_id: d.user_project_id,
+            raw_file_url: null,
+            raw_drive_link: null,
+            client_notes: null,
+            is_exception: null,
+            exception_notes: null,
+            delivery_type: d.delivery_type as DeliveryData['delivery_type'],
+          }))}
+          onSelect={() => {}}
+          role="admin"
+          clientNames={Object.fromEntries(filtered.map((d) => [d.id, d.client_name]))}
+        />
+      ) : isMobile ? (
         <div className="space-y-3">
           <div className="flex gap-1 bg-secondary/50 rounded-lg p-1 border border-border/20">
             {COLUMNS.map((col) => {
