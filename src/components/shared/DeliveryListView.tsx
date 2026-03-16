@@ -84,8 +84,11 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoadingCl
 
   const personLabel = role === 'client' ? 'Editor' : 'Cliente';
 
+  const isClientNamesLoading = (role === 'editor' || role === 'admin') && (isLoadingClientNames || !clientNames);
+
   const getPersonName = (d: DeliveryData) => {
     if (role === 'client') return d.editor_name || '—';
+    if (isClientNamesLoading) return null; // signal to render skeleton
     return clientNames?.[d.id] || '—';
   };
 
