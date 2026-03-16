@@ -80,7 +80,7 @@ const AdminCalendar = () => {
 
   // Create form
   const [formTitle, setFormTitle] = useState('');
-  const [formType, setFormType] = useState('outro');
+  const [formType, setFormType] = useState('gravacao');
   const [formStartDate, setFormStartDate] = useState<Date | undefined>(undefined);
   const [formStartTime, setFormStartTime] = useState('09:00');
   const [formEndTime, setFormEndTime] = useState('10:00');
