@@ -34,7 +34,7 @@ import RevisionModal from './RevisionModal';
 import DeliveryChat from '@/components/shared/DeliveryChat';
 import SubtaskList from '@/components/shared/SubtaskList';
 import DeliveryChecklist from './DeliveryChecklist';
-import ApprovalCelebration from './ApprovalCelebration';
+
 
 interface DeliveryDetailModalProps {
   open: boolean;
