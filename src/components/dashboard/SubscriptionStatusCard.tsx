@@ -62,7 +62,7 @@ const SubscriptionStatusCard = ({ userProject }: Props) => {
     };
 
     fetchData();
-  }, [userProject.id, userProject.user_id, userProject.studio_access]);
+  }, [userProject.id]);
 
   const formatDeadlineBRT = (iso: string) => {
     const d = new Date(iso);
