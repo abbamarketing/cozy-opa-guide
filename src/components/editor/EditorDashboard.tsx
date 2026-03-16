@@ -1097,15 +1097,16 @@ const EditorDashboard = () => {
                           Nenhuma entrega
                         </p>
                       ) : (
-                        items.map((d) => (
-                          <EditorDeliveryCard
-                            key={d.id}
-                            delivery={d}
-                            isDragging={draggedId === d.id}
-                            onClick={() => setSelectedDelivery(d)}
-                            onDragStart={handleDragStart(d.id)}
-                            onSubmitDelivery={(del) => setSubmitTarget(del)}
-                          />
+                        items.map((d, idx) => (
+                          <div key={d.id} {...(idx === 0 && col.statuses.includes('in_progress') ? { 'data-tour': 'editor-card-production' } : {})}>
+                            <EditorDeliveryCard
+                              delivery={d}
+                              isDragging={draggedId === d.id}
+                              onClick={() => setSelectedDelivery(d)}
+                              onDragStart={handleDragStart(d.id)}
+                              onSubmitDelivery={(del) => setSubmitTarget(del)}
+                            />
+                          </div>
                         ))
                       )}
                     </div>
