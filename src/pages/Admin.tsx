@@ -54,8 +54,8 @@ const Admin = () => {
       case 'editores': return <EditorManagement />;
       case 'metricas': return <AdminMetrics />;
       case 'projetos': return <ProjectManager />;
+      case 'calendario': return <AdminCalendar />;
       case 'logs': return <LogViewer />;
-      
       default: return <AdminOverview />;
     }
   };
