@@ -29,6 +29,7 @@ const TABS = [
   { id: 'metricas', label: 'Métricas', icon: BarChart3 },
   { id: 'projetos', label: 'Projetos', icon: FolderKanban },
   { id: 'calendario', label: 'Calendário', icon: CalendarDays },
+  { id: 'comissoes', label: 'Comissões', icon: DollarSign },
   { id: 'logs', label: 'Logs', icon: ScrollText },
 ];
 
