@@ -405,56 +405,99 @@ const ClientAssignment = () => {
               <p className="text-xs sm:text-sm"><span className="text-muted-foreground">Cadastro:</span> {selectedClient ? format(new Date(selectedClient.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : ''}</p>
             </div>
 
-            {/* Project select */}
+            {/* Assignment mode toggle */}
             <div className="space-y-2">
-              <Label className="text-sm">Escolher Projeto</Label>
-              <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
+              <Label className="text-sm">Tipo de Cliente</Label>
+              <Select value={assignmentMode} onValueChange={(v) => { setAssignmentMode(v as 'custom' | 'influencer'); setSelectedProjectId(''); setSelectedTier(''); }}>
                 <SelectTrigger className="bg-secondary border-border h-11 sm:h-10 text-sm">
-                  <SelectValue placeholder="Selecione um projeto..." />
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {projects.map((p) => (
-                    <SelectItem key={p.id} value={p.id} className="text-sm py-2.5">{p.project_name}</SelectItem>
-                  ))}
+                  <SelectItem value="custom">Custom — Projeto personalizado</SelectItem>
+                  <SelectItem value="influencer">Influencer — Plano por tier</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Project preview */}
-            {selectedProject && (
-              <div className="glass rounded-xl p-4 sm:p-5 border border-primary/20 space-y-3 sm:space-y-4">
-                <h4 className="font-semibold text-base sm:text-lg">{selectedProject.project_name}</h4>
-
+            {assignmentMode === 'custom' ? (
+              <>
+                {/* Project select */}
                 <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Package className="h-3 w-3" /> Entregáveis</p>
-                  <div className="space-y-1.5 text-xs sm:text-sm">
-                    {selectedProject.youtube_videos > 0 && (
-                      <p className="flex items-center gap-2"><Youtube className="h-4 w-4 shrink-0 text-muted-foreground" />{selectedProject.youtube_videos} vídeos YouTube/mês</p>
-                    )}
-                    {selectedProject.instagram_videos > 0 && (
-                      <p className="flex items-center gap-2"><Instagram className="h-4 w-4 shrink-0 text-muted-foreground" />{selectedProject.instagram_videos} vídeos Instagram/mês</p>
-                    )}
-                    {selectedProject.include_thumbnails && (
-                      <p className="flex items-center gap-2"><Image className="h-4 w-4 shrink-0 text-muted-foreground" />Thumbnails incluídas</p>
-                    )}
-                    {selectedProject.include_covers && (
-                      <p className="flex items-center gap-2"><FileImage className="h-4 w-4 shrink-0 text-muted-foreground" />Capas Instagram incluídas</p>
-                    )}
-                    {selectedProject.include_script && (
-                      <p className="flex items-center gap-2"><FileText className="h-4 w-4 shrink-0 text-muted-foreground" />Roteiros IA incluídos</p>
-                    )}
-                    {selectedProject.include_capture && (
-                      <p className="flex items-center gap-2"><Camera className="h-4 w-4 shrink-0 text-muted-foreground" />Captação de vídeo incluída</p>
-                    )}
-                  </div>
+                  <Label className="text-sm">Escolher Projeto</Label>
+                  <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
+                    <SelectTrigger className="bg-secondary border-border h-11 sm:h-10 text-sm">
+                      <SelectValue placeholder="Selecione um projeto..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {projects.map((p) => (
+                        <SelectItem key={p.id} value={p.id} className="text-sm py-2.5">{p.project_name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 text-xs sm:text-sm">
-                  <p><span className="font-mono-code text-primary font-bold">R$ {Number(selectedProject.monthly_value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span><span className="text-muted-foreground">/mês</span></p>
-                  <p className="text-center">SLA: {selectedProject.deadline}</p>
-                  <p className="text-right">Até {selectedProject.max_revisions} revisões</p>
+                {/* Project preview */}
+                {selectedProject && (
+                  <div className="glass rounded-xl p-4 sm:p-5 border border-primary/20 space-y-3 sm:space-y-4">
+                    <h4 className="font-semibold text-base sm:text-lg">{selectedProject.project_name}</h4>
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Package className="h-3 w-3" /> Entregáveis</p>
+                      <div className="space-y-1.5 text-xs sm:text-sm">
+                        {selectedProject.youtube_videos > 0 && (
+                          <p className="flex items-center gap-2"><Youtube className="h-4 w-4 shrink-0 text-muted-foreground" />{selectedProject.youtube_videos} vídeos YouTube/mês</p>
+                        )}
+                        {selectedProject.instagram_videos > 0 && (
+                          <p className="flex items-center gap-2"><Instagram className="h-4 w-4 shrink-0 text-muted-foreground" />{selectedProject.instagram_videos} vídeos Instagram/mês</p>
+                        )}
+                        {selectedProject.include_thumbnails && (
+                          <p className="flex items-center gap-2"><Image className="h-4 w-4 shrink-0 text-muted-foreground" />Thumbnails incluídas</p>
+                        )}
+                        {selectedProject.include_covers && (
+                          <p className="flex items-center gap-2"><FileImage className="h-4 w-4 shrink-0 text-muted-foreground" />Capas Instagram incluídas</p>
+                        )}
+                        {selectedProject.include_script && (
+                          <p className="flex items-center gap-2"><FileText className="h-4 w-4 shrink-0 text-muted-foreground" />Roteiros IA incluídos</p>
+                        )}
+                        {selectedProject.include_capture && (
+                          <p className="flex items-center gap-2"><Camera className="h-4 w-4 shrink-0 text-muted-foreground" />Captação de vídeo incluída</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-xs sm:text-sm">
+                      <p><span className="font-mono-code text-primary font-bold">R$ {Number(selectedProject.monthly_value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span><span className="text-muted-foreground">/mês</span></p>
+                      <p className="text-center">SLA: {selectedProject.deadline}</p>
+                      <p className="text-right">Até {selectedProject.max_revisions} revisões</p>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                {/* Influencer tier select */}
+                <div className="space-y-2">
+                  <Label className="text-sm">Escolher Plano</Label>
+                  <Select value={selectedTier} onValueChange={setSelectedTier}>
+                    <SelectTrigger className="bg-secondary border-border h-11 sm:h-10 text-sm">
+                      <SelectValue placeholder="Selecione um tier..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(INFLUENCER_TIERS).map(([key, tier]) => (
+                        <SelectItem key={key} value={key} className="text-sm py-2.5">{tier.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
+
+                {selectedTier && (
+                  <div className="glass rounded-xl p-4 sm:p-5 border border-violet-500/20 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4 text-violet-500" />
+                      <h4 className="font-semibold text-sm sm:text-base">Influencer — {INFLUENCER_TIERS[selectedTier].subscription_tier.charAt(0).toUpperCase() + INFLUENCER_TIERS[selectedTier].subscription_tier.slice(1)}</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground">SLA: {INFLUENCER_TIERS[selectedTier].sla_hours}h · Faturamento externo · Sem Stripe</p>
+                  </div>
+                )}
+              </>
             )}
 
             {/* Options */}
@@ -468,11 +511,19 @@ const ClientAssignment = () => {
             {/* Actions */}
             <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 pt-2">
               <Button variant="ghost" className="h-11 sm:h-10" onClick={() => setModalOpen(false)}>Cancelar</Button>
-              <Button variant="neon" className="h-11 sm:h-10" disabled={!selectedProjectId || assigning} onClick={handleAssign}>
-                {assigning ? <Loader2 className="h-4 w-4 animate-spin" /> : (
-                  <><UserPlus className="h-4 w-4 mr-2" />Atribuir Projeto</>
-                )}
-              </Button>
+              {assignmentMode === 'custom' ? (
+                <Button variant="neon" className="h-11 sm:h-10" disabled={!selectedProjectId || assigning} onClick={handleAssign}>
+                  {assigning ? <Loader2 className="h-4 w-4 animate-spin" /> : (
+                    <><UserPlus className="h-4 w-4 mr-2" />Atribuir Projeto</>
+                  )}
+                </Button>
+              ) : (
+                <Button variant="neon" className="h-11 sm:h-10" disabled={!selectedTier || assigning} onClick={handleAssignInfluencer}>
+                  {assigning ? <Loader2 className="h-4 w-4 animate-spin" /> : (
+                    <><Star className="h-4 w-4 mr-2" />Criar Influencer</>
+                  )}
+                </Button>
+              )}
             </div>
           </div>
         </DialogContent>
