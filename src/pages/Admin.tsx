@@ -1,8 +1,9 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, Menu, CalendarDays, DollarSign, Eye } from 'lucide-react';
+import { LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, Menu, CalendarDays, DollarSign, Eye, Headphones } from 'lucide-react';
 import abbaLogo from '@/assets/abba-logo.png';
 import { useRole } from '@/hooks/useRole';
 import { useAuth } from '@/lib/auth';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -17,9 +18,11 @@ import ProjectManager from '@/components/admin/ProjectManager';
 import LogViewer from '@/components/admin/LogViewer';
 import AdminCalendar from '@/components/admin/AdminCalendar';
 import AdminCommissions from '@/components/admin/AdminCommissions';
+import AdminSupport from '@/components/admin/AdminSupport';
 import AdminTour, { restartAdminTour } from '@/components/admin/AdminTour';
 
 import NotificationBell from '@/components/shared/NotificationBell';
+import { useQuery } from '@tanstack/react-query';
 
 const TABS = [
   { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard },
@@ -30,6 +33,7 @@ const TABS = [
   { id: 'projetos', label: 'Projetos', icon: FolderKanban },
   { id: 'calendario', label: 'Calendário', icon: CalendarDays },
   { id: 'comissoes', label: 'Comissões', icon: DollarSign },
+  { id: 'suporte', label: 'Suporte', icon: Headphones },
   { id: 'logs', label: 'Logs', icon: ScrollText },
 ];
 
@@ -41,6 +45,18 @@ const Admin = () => {
   const activeTab = searchParams.get('tab') || 'overview';
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const { data: openTicketCount = 0 } = useQuery({
+    queryKey: ['admin-open-ticket-count'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('support_tickets')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'open');
+      return count ?? 0;
+    },
+    refetchInterval: 30000,
+  });
 
   const setTab = (tab: string) => {
     setSearchParams({ tab });
@@ -60,6 +76,7 @@ const Admin = () => {
       case 'projetos': return <ProjectManager />;
       case 'calendario': return <AdminCalendar />;
       case 'comissoes': return <AdminCommissions />;
+      case 'suporte': return <AdminSupport />;
       case 'logs': return <LogViewer />;
       default: return <AdminOverview />;
     }
@@ -99,6 +116,11 @@ const Admin = () => {
                       >
                         <tab.icon className="h-4 w-4" />
                         {tab.label}
+                        {tab.id === 'suporte' && openTicketCount > 0 && (
+                          <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1">
+                            {openTicketCount}
+                          </span>
+                        )}
                       </button>
                     ))}
                   </nav>
@@ -155,6 +177,11 @@ const Admin = () => {
               >
                 <tab.icon className="h-4 w-4" />
                 {tab.label}
+                {tab.id === 'suporte' && openTicketCount > 0 && (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1">
+                    {openTicketCount}
+                  </span>
+                )}
               </button>
             ))}
           </div>
