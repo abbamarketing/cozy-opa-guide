@@ -4,6 +4,7 @@ import { useRole } from '@/hooks/useRole';
 import { Navigate } from 'react-router-dom';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
+import UpgradeBanner from '@/components/dashboard/UpgradeBanner';
 import DeliveryHistory from '@/components/dashboard/DeliveryHistory';
 
 import BrandProfile from '@/components/dashboard/BrandProfile';
@@ -190,9 +191,10 @@ const DashboardSidebar = ({
           <QuotaCard userProject={userProject} />
         </div>
       )}
-      {!collapsed && userProject && userProject.client_type === 'subscription' && (
-        <div className="mt-auto p-2 border-t border-abba-surface">
+      {!collapsed && userProject && (userProject.client_type === 'subscription' || userProject.client_type === 'influencer') && (
+        <div className="mt-auto p-2 border-t border-abba-surface space-y-2">
           <SubscriptionStatusCard userProject={userProject} />
+          <UpgradeBanner userProject={userProject} />
         </div>
       )}
     </Sidebar>
@@ -343,7 +345,12 @@ const DashboardLayout = () => {
               {isMobile && userProject && activeTab !== 'settings' && (
                 <>
                   {userProject.client_type === 'custom' && <QuotaCard userProject={userProject} />}
-                  {userProject.client_type === 'subscription' && <SubscriptionStatusCard userProject={userProject} />}
+                  {(userProject.client_type === 'subscription' || userProject.client_type === 'influencer') && (
+                    <>
+                      <SubscriptionStatusCard userProject={userProject} />
+                      <UpgradeBanner userProject={userProject} />
+                    </>
+                  )}
                 </>
               )}
               {renderContent()}
