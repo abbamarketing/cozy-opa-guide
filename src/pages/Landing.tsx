@@ -428,61 +428,14 @@ const Landing = () => {
             <p className="text-white/50 font-sans text-sm">Escolha pela velocidade que o seu ritmo exige.</p>
           </motion.div>
 
-          <div className="grid gap-6 sm:grid-cols-2 max-w-3xl mx-auto">
-            {/* Studio Plan */}
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              custom={0}
-            >
-              <div className="flex flex-col rounded-[20px] bg-abba-surface border border-white/8 p-6 h-full">
-                <div className="flex items-center gap-2 mb-1">
-                  <FileText className="h-4 w-4 text-abba-lime" />
-                  <h3 className="text-lg font-sans font-bold text-white">Studio</h3>
-                </div>
-                <p className="text-xs font-sans text-white/50 mb-4">Comece aqui</p>
-                <p className="text-sm font-sans text-white/70 mb-4">
-                  Para quem quer gravar com mais clareza e consistência.
-                </p>
-                <ul className="space-y-2 text-sm font-sans text-white/60 flex-1">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    10 roteiros por mês com IA — para sempre
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    Pipeline guiado em 5 passos
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    Hook, desenvolvimento, CTA e palavras-chave
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    Histórico completo de roteiros gerados
-                  </li>
-                </ul>
-                <p className="text-xs font-sans text-white/40 mt-4 mb-4">
-                  Paga uma vez. Usa para sempre.
-                </p>
-                <Button
-                  className="w-full rounded-full font-bold border border-white/20 text-white hover:bg-abba-surface bg-transparent"
-                  asChild
-                >
-                  <Link to="/auth">Criar meu primeiro roteiro</Link>
-                </Button>
-              </div>
-            </motion.div>
-
+          <div className="max-w-md mx-auto">
             {/* Standard Plan */}
             <motion.div
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={1}
+              custom={0}
             >
               <div className="relative flex flex-col rounded-[20px] kpi-dark border-2 border-abba-lime p-6 h-full" style={{ minHeight: 'auto' }}>
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-abba-lime text-[#111] font-bold rounded-full px-3 py-0.5 text-[11px] uppercase tracking-widest flex items-center gap-1">
@@ -515,10 +468,6 @@ const Landing = () => {
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
                     Briefing de marca salvo — sem explicar de novo
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Sparkles className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    Studio incluso
                   </li>
                 </ul>
                 <p className="text-xs font-sans text-white/40 mt-4 mb-4">
