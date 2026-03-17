@@ -39,10 +39,6 @@ const FAQ = [
     a: 'Pede revisão no app, marca o segundo exato se precisar, e o vídeo volta para produção — com o mesmo prazo garantido. Sem limite de revisões, sem custo adicional.',
   },
   {
-    q: 'O que é o Studio?',
-    a: 'Ferramenta de roteiro com IA inclusa em todos os planos. Também disponível separado — paga uma vez e usa para sempre.',
-  },
-  {
     q: 'Posso cancelar?',
     a: 'Sim. A qualquer momento pelo portal do cliente. Sem multa, sem burocracia.',
   },
