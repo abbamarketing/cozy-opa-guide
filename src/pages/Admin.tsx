@@ -45,6 +45,18 @@ const Admin = () => {
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const { data: openTicketCount = 0 } = useQuery({
+    queryKey: ['admin-open-ticket-count'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('support_tickets')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'open');
+      return count ?? 0;
+    },
+    refetchInterval: 30000,
+  });
+
   const setTab = (tab: string) => {
     setSearchParams({ tab });
     setMenuOpen(false);
