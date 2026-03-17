@@ -566,6 +566,13 @@ const AdminClients = () => {
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
+                    {c.client_type === 'influencer' && (
+                      <TableRow key={`${c.user_id}-affiliate`} className="border-border/20 hover:bg-transparent">
+                        <TableCell colSpan={6} className="pt-0 pb-2">
+                          <AffiliateManager userId={c.user_id} fullName={c.full_name} />
+                        </TableCell>
+                      </TableRow>
+                    )}
                   );
                 })
               )}
