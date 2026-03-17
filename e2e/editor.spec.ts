@@ -5,7 +5,7 @@ import { test, expect } from "../playwright-fixture";
  * Set env vars E2E_EDITOR_EMAIL and E2E_EDITOR_PASSWORD.
  */
 
-const EDITOR_EMAIL = process.env.E2E_EDITOR_EMAIL || "testeditor@videoflow.test";
+const EDITOR_EMAIL = process.env.E2E_EDITOR_EMAIL || "testeditor@abbavideo.test";
 const EDITOR_PASSWORD = process.env.E2E_EDITOR_PASSWORD || "Test1234!";
 
 async function loginAs(page: any, email: string, password: string) {

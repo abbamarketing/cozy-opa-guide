@@ -98,7 +98,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
     const isSubscription = userProject.client_type === 'subscription';
     if (isSubscription) {
       const used = (userProject.instagram_reserved ?? 0) + (userProject.instagram_approved ?? 0);
-      const total = (userProject as any).monthly_quota ?? 0;
+      const total = userProject.monthly_quota ?? 0;
       return used < total;
     }
     const p = userProject.custom_project;
