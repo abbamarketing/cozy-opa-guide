@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, Menu, CalendarDays, DollarSign, Eye } from 'lucide-react';
 import abbaLogo from '@/assets/abba-logo.png';
 import { useRole } from '@/hooks/useRole';
