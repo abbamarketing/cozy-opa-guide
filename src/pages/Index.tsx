@@ -176,13 +176,7 @@ function handleSingleRoleRedirect(
         return <Navigate to="/payment" replace />;
       }
       // Route based on client_type
-      if (clientType === 'studio') {
-        if (!profile?.onboarding_complete) {
-          return <Navigate to="/onboarding" replace />;
-        }
-        return <Navigate to="/dashboard" replace />;
-      }
-      if (clientType === 'subscription') {
+      if (clientType === 'subscription' || clientType === 'influencer') {
         if (!profile?.onboarding_complete) {
           return <Navigate to="/onboarding" replace />;
         }

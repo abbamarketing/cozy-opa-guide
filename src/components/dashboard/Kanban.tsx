@@ -59,7 +59,7 @@ const Kanban = ({ userProject }: KanbanProps) => {
     localStorage.setItem('preferred_view_client', v);
   };
 
-  const isSubscription = userProject.client_type === 'subscription';
+  const isSubscription = userProject.client_type === 'subscription' || userProject.client_type === 'influencer';
 
   const COLUMNS = useMemo(() => {
     return ALL_COLUMNS.filter((col) => {

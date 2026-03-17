@@ -379,7 +379,7 @@ const AdminClients = () => {
               <SelectItem value="all">Todos tipos</SelectItem>
               <SelectItem value="custom">Custom</SelectItem>
               <SelectItem value="subscription">Assinatura</SelectItem>
-              <SelectItem value="studio">Studio</SelectItem>
+              <SelectItem value="influencer">Influencer</SelectItem>
             </SelectContent>
           </Select>
           <Button
