@@ -121,7 +121,7 @@ CONTEXTO DO CLIENTE:
 - Marca: ${briefing?.brand_name || "não informado"}
 - Estilo de conteúdo: ${briefing?.content_style || "não informado"}
 - Público-alvo: ${briefing?.target_audience || "não informado"}
-- Plano: ${planLabel}
+- Plano: ${planLabel}${slaInfo}
 
 ENTREGAS RECENTES:
 ${deliveriesText}
