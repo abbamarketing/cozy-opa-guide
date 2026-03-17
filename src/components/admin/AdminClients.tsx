@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Fragment } from 'react';
 import { useDebouncedValue } from '@/hooks/useDebounce';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Search, MoreHorizontal, Pause, Play, Loader2, Download, Trash2 } from 'lucide-react';
 import { downloadCSV } from '@/lib/csv';
+import AffiliateManager from './AffiliateManager';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -435,6 +436,9 @@ const AdminClients = () => {
                     <span>{c.plan_value ? `R$ ${c.plan_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '—'}</span>
                     <span>{format(new Date(c.created_at), 'dd/MM/yy', { locale: ptBR })}</span>
                   </div>
+                  {c.client_type === 'influencer' && (
+                    <AffiliateManager userId={c.user_id} fullName={c.full_name} />
+                  )}
                   <div className="flex justify-end gap-1">
                     {c.status !== 'active' && c.status !== 'no_project' && (
                       <Button
@@ -503,8 +507,9 @@ const AdminClients = () => {
               ) : (
                 clients.map((c) => {
                   const st = STATUS_MAP[c.status] || { label: 'Sem projeto', variant: 'secondary' as const };
-                  return (
-                    <TableRow key={c.user_id} className="border-border/30">
+                   return (
+                    <Fragment key={c.user_id}>
+                    <TableRow className="border-border/30">
                       <TableCell className="font-medium">{c.full_name || 'Sem nome'}</TableCell>
                       <TableCell className="text-sm">
                         <div className="flex items-center gap-1.5">
@@ -562,6 +567,14 @@ const AdminClients = () => {
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
+                    {c.client_type === 'influencer' && (
+                      <TableRow className="border-border/20 hover:bg-transparent">
+                        <TableCell colSpan={6} className="pt-0 pb-2">
+                          <AffiliateManager userId={c.user_id} fullName={c.full_name} />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    </Fragment>
                   );
                 })
               )}
