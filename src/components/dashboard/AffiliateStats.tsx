@@ -118,7 +118,7 @@ export function AffiliateStats() {
         </Card>
         <Card className="p-4 text-center space-y-1">
           <DollarSign className="h-5 w-5 mx-auto text-primary" />
-          <p className="text-2xl font-bold text-foreground">
+          <p className="text-lg font-bold text-foreground">
             R${(totalEarningsCents / 100).toFixed(2)}
           </p>
           <p className="text-[11px] text-muted-foreground">Total ganho</p>
