@@ -22,6 +22,7 @@ const CaptureScheduleModal = lazy(() => import('./CaptureScheduleModal'));
 // Interfaces
 interface KanbanProps {
   userProject: UserProjectData;
+  mockDeliveries?: DeliveryData[];
 }
 
 interface Column {
@@ -42,8 +43,9 @@ const ALL_COLUMNS: Column[] = [
 
 const PAGE_SIZE = 20;
 
-const Kanban = ({ userProject }: KanbanProps) => {
-  const { deliveries, isLoading, refetch } = useDeliveries(userProject.id);
+const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
+  const { deliveries: hookDeliveries, isLoading, refetch } = useDeliveries(userProject.id);
+  const deliveries = mockDeliveries ?? hookDeliveries;
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [showCaptureModal, setShowCaptureModal] = useState(false);

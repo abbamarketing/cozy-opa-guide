@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { useProfile } from '@/hooks/useProfile';
-import { useUserProject } from '@/hooks/useUserProject';
+import { useUserProject, type UserProjectData } from '@/hooks/useUserProject';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -55,6 +55,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import QuotaCard from '@/components/dashboard/QuotaCard';
 import SubscriptionStatusCard from '@/components/dashboard/SubscriptionStatusCard';
 import { useIsMobile } from '@/hooks/use-mobile';
+import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 
 type DashboardTab = 'deliveries' | 'calendar' | 'history' | 'brand' | 'settings' | 'affiliate';
 
@@ -66,14 +67,22 @@ interface NavItem {
   locked?: boolean;
 }
 
+interface DashboardLayoutProps {
+  isPreviewMode?: boolean;
+  previewUserProject?: UserProjectData;
+  previewDeliveries?: DeliveryData[];
+}
+
 /* ───── Header (compact on mobile) ───── */
-const DashboardHeader = () => {
+const DashboardHeader = ({ isPreviewMode }: { isPreviewMode?: boolean }) => {
   const { signOut } = useAuth();
   const { profile } = useProfile();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
-  const initials = profile?.full_name
+  const initials = isPreviewMode
+    ? 'CD'
+    : profile?.full_name
     ? profile.full_name
         .split(' ')
         .map((n) => n[0])
@@ -81,6 +90,8 @@ const DashboardHeader = () => {
         .slice(0, 2)
         .toUpperCase()
     : '?';
+
+  const displayName = isPreviewMode ? 'Cliente Demo' : (profile?.full_name || 'Usuario');
 
   return (
     <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-abba-surface bg-abba-dark/90 backdrop-blur-lg px-3 md:px-4 md:h-14">
@@ -95,46 +106,59 @@ const DashboardHeader = () => {
       </div>
 
       <div className="flex items-center gap-0.5">
-        <div className="glass-micro rounded-full">
-          <NotificationBell />
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground glass-micro rounded-full" aria-label="Ajuda e tour">
-              <HelpCircle className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-44">
-            <DropdownMenuItem onClick={restartTour}>
-              Reiniciar Tour
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {!isPreviewMode && (
+          <div className="glass-micro rounded-full">
+            <NotificationBell />
+          </div>
+        )}
+        {!isPreviewMode && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground glass-micro rounded-full" aria-label="Ajuda e tour">
+                <HelpCircle className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuItem onClick={restartTour}>
+                Reiniciar Tour
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="ml-0.5 gap-1.5 px-1.5 h-9 glass-micro rounded-full">
               <Avatar className="h-6 w-6">
-                <AvatarImage src={profile?.avatar_url || undefined} />
+                <AvatarImage src={isPreviewMode ? undefined : (profile?.avatar_url || undefined)} />
                 <AvatarFallback className="bg-primary/15 text-[10px] font-sans text-primary">
                   {initials}
                 </AvatarFallback>
               </Avatar>
               {!isMobile && (
                 <span className="max-w-[100px] truncate text-xs text-foreground">
-                  {profile?.full_name || 'Usuario'}
+                  {displayName}
                 </span>
               )}
               <ChevronDown className="h-3 w-3 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-44">
-            <DropdownMenuItem onClick={() => navigate('/dashboard?tab=settings')}>
-              <Settings className="mr-2 h-4 w-4" /> Configurações
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={signOut} className="text-destructive">
-              <LogOut className="mr-2 h-4 w-4" /> Sair
-            </DropdownMenuItem>
+            {!isPreviewMode && (
+              <>
+                <DropdownMenuItem onClick={() => navigate('/dashboard?tab=settings')}>
+                  <Settings className="mr-2 h-4 w-4" /> Configurações
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={signOut} className="text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" /> Sair
+                </DropdownMenuItem>
+              </>
+            )}
+            {isPreviewMode && (
+              <DropdownMenuItem disabled className="text-muted-foreground text-xs">
+                Modo Preview — sem ações reais
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -152,7 +176,7 @@ const DashboardSidebar = ({
   activeTab: DashboardTab;
   onTabChange: (t: DashboardTab, locked?: boolean) => void;
   navItems: NavItem[];
-  userProject: import('@/hooks/useUserProject').UserProjectData | null;
+  userProject: UserProjectData | null;
 }) => {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
@@ -257,12 +281,15 @@ const MobileBottomNav = ({
 );
 
 /* ───── Main Layout ───── */
-const DashboardLayout = () => {
+const DashboardLayout = ({ isPreviewMode, previewUserProject, previewDeliveries }: DashboardLayoutProps) => {
   const [searchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab') as DashboardTab | null;
-  const { userProject, isLoading } = useUserProject();
+  const { userProject: hookUserProject, isLoading: hookIsLoading } = useUserProject();
   const { isGod, loading: roleLoading } = useRole();
   const isMobile = useIsMobile();
+
+  const userProject = isPreviewMode ? (previewUserProject ?? null) : hookUserProject;
+  const isLoading = isPreviewMode ? false : hookIsLoading;
 
   const [activeTab, setActiveTab] = useState<DashboardTab>(tabFromUrl || 'deliveries');
   const [lockedTabAttempt, setLockedTabAttempt] = useState<DashboardTab | null>(null);
@@ -275,8 +302,8 @@ const DashboardLayout = () => {
     }
   }, [tabFromUrl]);
 
-  // Redirect to waiting if no project — god bypasses
-  if (!isLoading && !roleLoading && !userProject && !isGod()) {
+  // Redirect to waiting if no project — god bypasses, preview bypasses
+  if (!isPreviewMode && !isLoading && !roleLoading && !userProject && !isGod()) {
     return <Navigate to="/waiting" replace />;
   }
 
@@ -304,7 +331,7 @@ const DashboardLayout = () => {
     switch (activeTab) {
       case 'deliveries':
         return userProject ? (
-          <Kanban userProject={userProject} />
+          <Kanban userProject={userProject} mockDeliveries={isPreviewMode ? previewDeliveries : undefined} />
         ) : (
           <div className="rounded-[20px] border border-border bg-card p-8 text-center">
             <Video className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
@@ -323,7 +350,6 @@ const DashboardLayout = () => {
       case 'history':
         return <DeliveryHistory />;
       case 'brand':
-      case 'brand':
         return <BrandProfile />;
       case 'settings':
         return <SettingsComponent />;
@@ -334,18 +360,18 @@ const DashboardLayout = () => {
     }
   };
 
-  const tourReady = !isLoading && !!userProject;
+  const tourReady = !isPreviewMode && !isLoading && !!userProject;
 
   const mainContent = (
     <>
-      <ContextualTour ready={tourReady} />
+      {!isPreviewMode && <ContextualTour ready={tourReady} />}
 
       {!isMobile && (
         <DashboardSidebar activeTab={activeTab} onTabChange={handleTabChange} navItems={navItems} userProject={userProject} />
       )}
 
       <div className="flex-1 flex flex-col min-h-screen min-w-0">
-        <DashboardHeader />
+        <DashboardHeader isPreviewMode={isPreviewMode} />
 
         <main className={`flex-1 overflow-y-auto min-w-0 p-3 md:p-6 space-y-4 ${isMobile ? 'pb-20' : ''}`}>
           {isLoading ? (
