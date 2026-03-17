@@ -14,6 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      affiliate_codes: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      affiliate_commissions: {
+        Row: {
+          affiliate_code_id: string
+          amount_cents: number
+          created_at: string
+          id: string
+          month: string
+          paid_at: string | null
+          referral_id: string
+          status: string
+        }
+        Insert: {
+          affiliate_code_id: string
+          amount_cents: number
+          created_at?: string
+          id?: string
+          month: string
+          paid_at?: string | null
+          referral_id: string
+          status?: string
+        }
+        Update: {
+          affiliate_code_id?: string
+          amount_cents?: number
+          created_at?: string
+          id?: string
+          month?: string
+          paid_at?: string | null
+          referral_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_commissions_affiliate_code_id_fkey"
+            columns: ["affiliate_code_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_commissions_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_usage_logs: {
         Row: {
           completion_tokens: number
@@ -847,6 +919,7 @@ export type Database = {
           id: string
           onboarding_complete: boolean
           phone: string | null
+          referred_by: string | null
           role: string
           updated_at: string
           user_id: string
@@ -860,6 +933,7 @@ export type Database = {
           id?: string
           onboarding_complete?: boolean
           phone?: string | null
+          referred_by?: string | null
           role?: string
           updated_at?: string
           user_id: string
@@ -873,6 +947,7 @@ export type Database = {
           id?: string
           onboarding_complete?: boolean
           phone?: string | null
+          referred_by?: string | null
           role?: string
           updated_at?: string
           user_id?: string
@@ -924,6 +999,53 @@ export type Database = {
             columns: ["custom_project_id"]
             isOneToOne: false
             referencedRelation: "custom_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referrals: {
+        Row: {
+          affiliate_code_id: string
+          converted_at: string | null
+          created_at: string
+          id: string
+          plan: string | null
+          referred_user_id: string | null
+          status: string
+          stripe_subscription_id: string | null
+          trial_end: string | null
+          trial_start: string | null
+        }
+        Insert: {
+          affiliate_code_id: string
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          plan?: string | null
+          referred_user_id?: string | null
+          status?: string
+          stripe_subscription_id?: string | null
+          trial_end?: string | null
+          trial_start?: string | null
+        }
+        Update: {
+          affiliate_code_id?: string
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          plan?: string | null
+          referred_user_id?: string | null
+          status?: string
+          stripe_subscription_id?: string | null
+          trial_end?: string | null
+          trial_start?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_affiliate_code_id_fkey"
+            columns: ["affiliate_code_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_codes"
             referencedColumns: ["id"]
           },
         ]
