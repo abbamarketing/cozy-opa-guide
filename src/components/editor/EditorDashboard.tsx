@@ -1152,6 +1152,7 @@ const EditorDashboard = () => {
         deliveryTitle={submitTarget?.title ?? ''}
         onSubmitted={fetchDeliveries}
       />
+      <SupportChat role="editor" />
     </div>
   );
 };

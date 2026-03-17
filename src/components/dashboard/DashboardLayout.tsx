@@ -463,7 +463,10 @@ const DashboardLayout = ({ isPreviewMode, previewUserProject, previewDeliveries 
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">{mainContent}</div>
+      <div className="flex min-h-screen w-full bg-background">
+        {mainContent}
+        <SupportChat role="client" />
+      </div>
     </SidebarProvider>
   );
 };
