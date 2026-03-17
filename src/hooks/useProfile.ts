@@ -12,6 +12,7 @@ interface Profile {
   phone: string | null;
   company: string | null;
   onboarding_complete: boolean;
+  referred_by: string | null;
   created_at: string;
   updated_at: string;
 }
