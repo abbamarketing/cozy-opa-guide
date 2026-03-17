@@ -15,12 +15,21 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { UserPlus, Loader2, Youtube, Instagram, Image, FileImage, FileText, Camera, Package } from 'lucide-react';
+import { UserPlus, Loader2, Youtube, Instagram, Image, FileImage, FileText, Camera, Package, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { computeMonthlyQuota } from '@/lib/business-hours';
 import type { CustomProject } from '@/types/database';
+
+const INFLUENCER_TIERS: Record<string, { sla_hours: number; subscription_tier: string; label: string }> = {
+  standard: { sla_hours: 72, subscription_tier: 'standard', label: 'Standard — 7 vídeos/mês · SLA 72h' },
+  pro:      { sla_hours: 48, subscription_tier: 'pro',      label: 'Pro — 11 vídeos/mês · SLA 48h' },
+  business: { sla_hours: 24, subscription_tier: 'business', label: 'Business — 22 vídeos/mês · SLA 24h' },
+  premium:  { sla_hours: 8,  subscription_tier: 'premium',  label: 'Premium — 66 vídeos/mês · SLA 8h' },
+  agency:   { sla_hours: 4,  subscription_tier: 'agency',   label: 'Agency — 132 vídeos/mês · SLA 4h' },
+};
 
 interface ClientProfile {
   id: string;
