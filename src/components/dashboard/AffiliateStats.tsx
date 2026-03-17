@@ -108,7 +108,7 @@ export function AffiliateStats() {
       <div className="grid grid-cols-3 gap-3">
         <Card className="p-4 text-center space-y-1">
           <Users className="h-5 w-5 mx-auto text-primary" />
-          <p className="text-2xl font-bold text-foreground">{referrals.length}</p>
+          <p className="text-lg font-bold text-foreground">{referrals.length}</p>
           <p className="text-[11px] text-muted-foreground">Indicações</p>
         </Card>
         <Card className="p-4 text-center space-y-1">
