@@ -147,15 +147,14 @@ const AdminClients = () => {
 
       const planValue = proj
         ? Number(proj.monthly_value)
-        : (up?.client_type === 'subscription' && up?.subscription_tier)
+        : ((up?.client_type === 'subscription' || up?.client_type === 'influencer') && up?.subscription_tier)
           ? (SUBSCRIPTION_VALUES[up.subscription_tier] ?? null)
           : null;
 
       const displayName = proj?.project_name
-        || (up?.client_type === 'subscription'
-            ? `Assinatura ${up?.subscription_tier ? up.subscription_tier.charAt(0).toUpperCase() + up.subscription_tier.slice(1) : ''}`.trim()
+        || ((up?.client_type === 'subscription' || up?.client_type === 'influencer')
+            ? `${up?.client_type === 'influencer' ? 'Influencer' : 'Assinatura'} ${up?.subscription_tier ? up.subscription_tier.charAt(0).toUpperCase() + up.subscription_tier.slice(1) : ''}`.trim()
             : null)
-        || (up?.client_type === 'studio' ? 'Studio' : null)
         || 'Sem projeto';
 
       return {
