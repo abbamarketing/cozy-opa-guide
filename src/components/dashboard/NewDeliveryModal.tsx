@@ -184,7 +184,7 @@ const NewDeliveryModal = ({
 
   // Deadline calculation
   const getDeadlineHours = () => {
-    if (isSubscriptionLike) return (userProject as any).sla_hours ?? 72;
+    if (isSubscriptionLike) return userProject.sla_hours ?? 72;
     if (!project) return 72;
     return project.deadline === '24h' ? 24 : project.deadline === '48h' ? 48 : 72;
   };
