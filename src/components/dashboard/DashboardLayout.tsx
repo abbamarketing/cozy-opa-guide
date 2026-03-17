@@ -6,6 +6,7 @@ import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
 import UpgradeBanner from '@/components/dashboard/UpgradeBanner';
 import { TrialBanner } from '@/components/dashboard/TrialBanner';
+import { AffiliateStats } from '@/components/dashboard/AffiliateStats';
 import DeliveryHistory from '@/components/dashboard/DeliveryHistory';
 
 import BrandProfile from '@/components/dashboard/BrandProfile';
@@ -25,6 +26,7 @@ import {
   ChevronDown,
   
   Lock,
+  Link2,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { useProfile } from '@/hooks/useProfile';
@@ -54,7 +56,7 @@ import QuotaCard from '@/components/dashboard/QuotaCard';
 import SubscriptionStatusCard from '@/components/dashboard/SubscriptionStatusCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-type DashboardTab = 'deliveries' | 'calendar' | 'history' | 'brand' | 'settings';
+type DashboardTab = 'deliveries' | 'calendar' | 'history' | 'brand' | 'settings' | 'affiliate';
 
 interface NavItem {
   id: DashboardTab;
@@ -267,7 +269,7 @@ const DashboardLayout = () => {
 
   // Sync tab da URL
   useEffect(() => {
-    const valid: DashboardTab[] = ['deliveries', 'calendar', 'history', 'brand', 'settings'];
+    const valid: DashboardTab[] = ['deliveries', 'calendar', 'history', 'brand', 'settings', 'affiliate'];
     if (tabFromUrl && valid.includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
     }
@@ -287,13 +289,16 @@ const DashboardLayout = () => {
     setLockedTabAttempt(null);
   };
 
-  const navItems: NavItem[] = [
-    { id: 'deliveries', label: 'Minhas Entregas', shortLabel: 'ENTREGAS', icon: Video },
-    { id: 'calendar', label: 'Calendário', shortLabel: 'AGENDA', icon: Calendar },
-    { id: 'history', label: 'Histórico', shortLabel: 'HIST.', icon: CheckCircle2 },
-    { id: 'brand', label: 'Minha Marca', shortLabel: 'MARCA', icon: Palette },
-    { id: 'settings', label: 'Configurações', shortLabel: 'CONFIG', icon: Settings },
-  ];
+   const navItems: NavItem[] = [
+      { id: 'deliveries', label: 'Minhas Entregas', shortLabel: 'ENTREGAS', icon: Video },
+      { id: 'calendar', label: 'Calendário', shortLabel: 'AGENDA', icon: Calendar },
+      { id: 'history', label: 'Histórico', shortLabel: 'HIST.', icon: CheckCircle2 },
+      { id: 'brand', label: 'Minha Marca', shortLabel: 'MARCA', icon: Palette },
+      ...(userProject?.client_type === 'influencer'
+        ? [{ id: 'affiliate' as DashboardTab, label: 'Afiliados', shortLabel: 'AFIL.', icon: Link2 }]
+        : []),
+      { id: 'settings', label: 'Configurações', shortLabel: 'CONFIG', icon: Settings },
+    ];
 
   const renderContent = () => {
     switch (activeTab) {
@@ -322,6 +327,8 @@ const DashboardLayout = () => {
         return <BrandProfile />;
       case 'settings':
         return <SettingsComponent />;
+      case 'affiliate':
+        return <AffiliateStats />;
       default:
         return null;
     }
