@@ -269,7 +269,7 @@ const DashboardLayout = () => {
 
   // Sync tab da URL
   useEffect(() => {
-    const valid: DashboardTab[] = ['deliveries', 'calendar', 'history', 'brand', 'settings'];
+    const valid: DashboardTab[] = ['deliveries', 'calendar', 'history', 'brand', 'settings', 'affiliate'];
     if (tabFromUrl && valid.includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
     }
