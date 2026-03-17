@@ -1,13 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Video, Camera, Image, Layers, ChevronDown, ChevronUp, MapPin, FileText } from 'lucide-react';
+import { Video, Camera, Image, Layers, ChevronDown, ChevronUp, MapPin, Crown, Zap } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/auth';
 import type { UserProjectData } from '@/hooks/useUserProject';
-import { computeMonthlyQuota } from '@/lib/business-hours';
 
 const TIER_LABELS: Record<string, string> = {
   standard: 'Standard',
@@ -40,86 +38,67 @@ const QuotaRow = ({ label, icon, used, total }: QuotaLine) => {
         {icon}
         <span className={`text-xs font-sans ${pct >= 90 ? 'text-destructive' : 'text-foreground'}`}>{label}</span>
       </div>
-      <div className="progress-track" style={{ height: '32px' }}>
+      <div className="w-full rounded-full overflow-hidden bg-white/5" style={{ height: '6px' }}>
         <div
-          className="progress-fill text-[11px]"
+          className="h-full rounded-full transition-all bg-abba-lime"
           style={{ width: `${Math.min(pct, 100)}%` }}
-        >
-          {used}/{total}
-        </div>
+        />
       </div>
+      <p className="text-[10px] font-sans text-white/60">{used}/{total}</p>
     </div>
   );
 };
 
 
-// ─── Subscription view: shows only short video quota ───
-const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
-  const [expanded, setExpanded] = useState(false);
+// ─── Subscription/Influencer view: status only, no quota ───
+const SubscriptionStatusCard = ({ userProject }: QuotaCardProps) => {
   const isMobile = useIsMobile();
+  const [expanded, setExpanded] = useState(false);
   const periodEnd = new Date(userProject.current_period_end);
   const daysUntilRenewal = differenceInDays(periodEnd, new Date());
+  const tierLabel = getTierLabel(userProject.subscription_tier);
+  const slaHours = (userProject as any).sla_hours ?? 72;
 
-  const storedQuota = userProject.monthly_quota;
-  const totalVideos = storedQuota != null
-    ? storedQuota
-    : (userProject.sla_hours && userProject.current_period_start && userProject.current_period_end
-        ? computeMonthlyQuota(
-            userProject.sla_hours,
-            new Date(userProject.current_period_start),
-            new Date(userProject.current_period_end)
-          )
-        : userProject.custom_project?.instagram_videos ?? 0);
-  const usedVideos = userProject.instagram_reserved + userProject.instagram_approved;
-  const remaining = Math.max(0, totalVideos - usedVideos);
-
-  const quota: QuotaLine = {
-    label: 'Reels / Shorts / TikToks',
-    icon: <Video className="h-3.5 w-3.5 text-abba-lime" />,
-    used: usedVideos,
-    total: totalVideos,
-  };
+  const content = (
+    <div className="space-y-2">
+      {/* Plano + SLA */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          <Crown className="h-4 w-4 text-abba-lime" />
+          <span className="text-sm font-sans font-semibold text-abba-lime">{tierLabel}</span>
+        </div>
+        <Badge variant="outline" className="text-[10px] bg-abba-lime/10 text-abba-lime border-abba-lime/30 rounded-full px-2 py-0.5">
+          <Zap className="h-3 w-3 mr-0.5" />
+          SLA {slaHours}h
+        </Badge>
+      </div>
+      {/* Renovação */}
+      <p className="text-[10px] font-sans text-white/60">
+        Renova em {format(periodEnd, "dd 'de' MMM", { locale: ptBR })}
+        {daysUntilRenewal > 0 ? ` · ${daysUntilRenewal} dias` : ' · hoje'}
+      </p>
+    </div>
+  );
 
   if (isMobile) {
     return (
       <div data-tour="quota-card">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full rounded-[20px] bg-abba-surface border border-white/8 p-2.5 flex items-center gap-3"
+          className="w-full rounded-[20px] bg-abba-surface border border-white/8 p-2.5 flex items-center justify-between gap-3"
         >
-          <p className="text-xs font-sans font-semibold text-abba-lime truncate shrink-0">
-            {userProject.custom_project?.project_name ?? getTierLabel(userProject.subscription_tier)}
-          </p>
-          <div className="flex-1 flex items-center gap-2 overflow-hidden">
-            <div className="flex items-center gap-1 shrink-0">
-              <Video className="h-3.5 w-3.5 text-abba-lime" />
-              <span className="text-[10px] font-sans text-white/60">
-                {remaining} restantes
-              </span>
-            </div>
+          <div className="flex items-center gap-1.5">
+            <Crown className="h-3.5 w-3.5 text-abba-lime" />
+            <span className="text-xs font-sans font-semibold text-abba-lime">{tierLabel}</span>
           </div>
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-[10px] font-sans text-white/60">
-              {daysUntilRenewal > 0 ? `${daysUntilRenewal}d` : 'hoje'}
-            </span>
-            {expanded ? (
-              <ChevronUp className="h-3.5 w-3.5 text-white/60" />
-            ) : (
-              <ChevronDown className="h-3.5 w-3.5 text-white/60" />
-            )}
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-sans text-white/60">SLA {slaHours}h</span>
+            {expanded ? <ChevronUp className="h-3.5 w-3.5 text-white/60" /> : <ChevronDown className="h-3.5 w-3.5 text-white/60" />}
           </div>
         </button>
         {expanded && (
           <div className="mt-1 kpi-dark" style={{ minHeight: 'auto' }}>
-            <div className="space-y-2">
-              <QuotaRow {...quota} />
-              <Separator className="bg-white/10" />
-              <div className="flex items-center justify-between text-[10px] font-sans text-white/60">
-                <span>
-                  Período: {format(new Date(userProject.current_period_start), 'dd/MM', { locale: ptBR })} – {format(periodEnd, 'dd/MM', { locale: ptBR })}
-                </span>
-              </div>
-            </div>
+            {content}
           </div>
         )}
       </div>
@@ -129,37 +108,7 @@ const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
   return (
     <div data-tour="quota-card">
       <div className="kpi-dark" style={{ minHeight: 'auto' }}>
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="flex items-center justify-between w-full text-left"
-        >
-          <div>
-            <p className="text-[10px] font-sans font-semibold uppercase tracking-widest text-abba-lime">
-              SEU PLANO
-            </p>
-            <p className="text-sm font-sans font-semibold text-abba-lime mt-0.5">
-              {userProject.custom_project?.project_name ?? getTierLabel(userProject.subscription_tier)}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-sans text-white/60">
-              Renova em {daysUntilRenewal > 0 ? `${daysUntilRenewal}d` : 'hoje'}
-            </span>
-            {expanded ? <ChevronUp className="h-4 w-4 text-white/60" /> : <ChevronDown className="h-4 w-4 text-white/60" />}
-          </div>
-        </button>
-
-        {expanded && (
-          <div className="pt-3 space-y-2">
-            <QuotaRow {...quota} />
-            <Separator className="bg-white/10" />
-            <div className="flex items-center justify-between text-[10px] font-sans text-white/60">
-              <span>
-                Período: {format(new Date(userProject.current_period_start), 'dd/MM', { locale: ptBR })} – {format(periodEnd, 'dd/MM', { locale: ptBR })}
-              </span>
-            </div>
-          </div>
-        )}
+        {content}
       </div>
     </div>
   );
@@ -318,10 +267,10 @@ const QuotaCard = ({ userProject }: QuotaCardProps) => {
   const clientType = userProject.client_type;
 
   if (clientType === 'subscription' || clientType === 'influencer') {
-    return <SubscriptionQuotaCard userProject={userProject} />;
+    return <SubscriptionStatusCard userProject={userProject} />;
   }
 
-  // Default: custom — original behavior
+  // Default: custom
   return <CustomQuotaCard userProject={userProject} />;
 };
 

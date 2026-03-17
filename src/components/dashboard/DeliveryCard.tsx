@@ -5,6 +5,9 @@ import { Video, Camera, Image, Layers, Clock, AlertTriangle } from 'lucide-react
 import { Badge } from '@/components/ui/badge';
 import { remainingBusinessMinutes, formatBusinessCountdown } from '@/lib/business-hours';
 
+const isSubscriptionLike = (clientType: string | null | undefined) =>
+  clientType === 'subscription' || clientType === 'influencer';
+
 export interface DeliveryData {
   id: string;
   title: string;
@@ -55,26 +58,6 @@ interface SlaIndicator {
   progressPercent: number;
 }
 
-function formatCountdown(totalMinutes: number): string {
-  if (totalMinutes < 0) {
-    const absMin = Math.abs(totalMinutes);
-    if (absMin >= 1440) return `−${Math.floor(absMin / 1440)}d ${Math.floor((absMin % 1440) / 60)}h`;
-    if (absMin >= 60) return `−${Math.floor(absMin / 60)}h ${absMin % 60}m`;
-    return `−${absMin}m`;
-  }
-  if (totalMinutes >= 1440) {
-    const days = Math.floor(totalMinutes / 1440);
-    const hours = Math.floor((totalMinutes % 1440) / 60);
-    return `${days}d ${hours}h`;
-  }
-  if (totalMinutes >= 60) {
-    const hours = Math.floor(totalMinutes / 60);
-    const mins = totalMinutes % 60;
-    return `${hours}h ${mins}m`;
-  }
-  return `${totalMinutes}m`;
-}
-
 function getSlaIndicator(dueDate: string | null, createdAt: string): SlaIndicator {
   if (!dueDate) return { color: 'text-muted-foreground', label: 'Sem prazo', level: 'none', progressPercent: 0 };
 
@@ -88,7 +71,6 @@ function getSlaIndicator(dueDate: string | null, createdAt: string): SlaIndicato
 
   const countdown = formatBusinessCountdown(remainingBizMin);
 
-  // Thresholds in business minutes: 6h=360min, 12h=720min
   if (remainingBizMin < 0) {
     return { color: 'text-destructive', label: countdown, level: 'overdue', progressPercent: 100 };
   }
@@ -106,11 +88,13 @@ function getSlaIndicator(dueDate: string | null, createdAt: string): SlaIndicato
 interface DeliveryCardProps {
   delivery: DeliveryData;
   onClick: () => void;
+  clientType?: string | null;
 }
 
-const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
+const DeliveryCard = ({ delivery, onClick, clientType }: DeliveryCardProps) => {
   const config = typeConfig[delivery.delivery_type] || typeConfig.youtube_video;
   const Icon = config.icon;
+  const displayLabel = isSubscriptionLike(clientType) ? 'Vídeo' : config.label;
 
   // Live countdown
   const [, setNow] = useState(Date.now());
@@ -134,7 +118,7 @@ const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
         <div className="min-w-0 flex-1 overflow-hidden">
           <p className="truncate text-sm font-sans font-semibold text-foreground">{delivery.title}</p>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-[11px] font-sans text-white/60">{config.label}</span>
+            <span className="text-[11px] font-sans text-white/60">{displayLabel}</span>
             {delivery.editor_name && (
               <span className="text-[11px] font-sans text-white/60">· {delivery.editor_name}</span>
             )}
