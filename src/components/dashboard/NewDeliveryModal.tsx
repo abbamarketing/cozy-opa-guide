@@ -184,7 +184,7 @@ const NewDeliveryModal = ({
 
   // Deadline calculation
   const getDeadlineHours = () => {
-    if (isSubscriptionLike) return (userProject as any).sla_hours ?? 72;
+    if (isSubscriptionLike) return userProject.sla_hours ?? 72;
     if (!project) return 72;
     return project.deadline === '24h' ? 24 : project.deadline === '48h' ? 48 : 72;
   };
@@ -268,13 +268,13 @@ const NewDeliveryModal = ({
       let dueDate: string;
       let priorityLevel = 1;
 
-      if (isSubscriptionLike && (userProject as any).sla_hours) {
-        const deadline = countWeekdayHours(new Date(), (userProject as any).sla_hours);
+      if (isSubscriptionLike && userProject.sla_hours) {
+        const deadline = countWeekdayHours(new Date(), userProject.sla_hours);
         dueDate = deadline.toISOString();
-        priorityLevel = (userProject as any).priority_level ?? 1;
+        priorityLevel = userProject.priority_level ?? 1;
       } else {
         dueDate = addBusinessHours(new Date(), getDeadlineHours()).toISOString();
-        priorityLevel = (userProject as any).priority_level ?? 1;
+        priorityLevel = userProject.priority_level ?? 1;
       }
 
       let fullDescription = values.description;
@@ -401,7 +401,7 @@ const NewDeliveryModal = ({
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-card-foreground">Vídeo</p>
                   <p className="text-[10px] text-muted-foreground">
-                    Entrega garantida em até {(userProject as any).sla_hours ?? 72}h úteis (Seg–Sex)
+                    Entrega garantida em até {userProject.sla_hours ?? 72}h úteis (Seg–Sex)
                   </p>
                 </div>
               </div>

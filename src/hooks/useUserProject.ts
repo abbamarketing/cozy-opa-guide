@@ -45,7 +45,7 @@ export interface UserProjectData {
   subscription_slug?: string | null;
   custom_slug?: string | null;
   monthly_quota?: number | null;
-  
+  priority_level?: number | null;
 }
 
 const GOD_MOCK_PROJECT: Omit<UserProjectData, 'user_id'> = {
