@@ -346,7 +346,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-6 text-center rounded-lg border border-border/40 bg-muted/10">
-                    <MessageSquare className="h-8 w-8 text-muted-foreground/20 mb-2" />
+                    <MessageSquare className="h-6 w-6 text-muted-foreground/20 mb-2" />
                     <p className="text-xs text-muted-foreground">
                       O chat será habilitado quando um editor for atribuído à sua entrega.
                     </p>

@@ -175,7 +175,7 @@ const DeliveryCalendar = ({ userProject }: DeliveryCalendarProps) => {
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentDate(subMonths(currentDate, 1))}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <h2 className="min-w-[160px] text-center text-lg font-bold capitalize text-foreground">
+          <h2 className="min-w-[160px] text-center text-base font-bold capitalize text-foreground">
             {format(currentDate, 'MMMM yyyy', { locale: ptBR })}
           </h2>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentDate(addMonths(currentDate, 1))}>

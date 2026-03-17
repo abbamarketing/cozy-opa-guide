@@ -129,7 +129,7 @@ export function AffiliateStats() {
       {pendingCents > 0 && (
         <Card className="p-4 flex items-center justify-between border-amber-500/30 bg-amber-500/5">
           <span className="text-sm font-medium text-foreground">Comissão pendente</span>
-          <span className="text-lg font-bold text-amber-400">R${(pendingCents / 100).toFixed(2)}</span>
+          <span className="text-base font-bold text-amber-400">R${(pendingCents / 100).toFixed(2)}</span>
         </Card>
       )}
 
