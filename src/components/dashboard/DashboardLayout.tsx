@@ -345,7 +345,12 @@ const DashboardLayout = () => {
               {isMobile && userProject && activeTab !== 'settings' && (
                 <>
                   {userProject.client_type === 'custom' && <QuotaCard userProject={userProject} />}
-                  {userProject.client_type === 'subscription' && <SubscriptionStatusCard userProject={userProject} />}
+                  {(userProject.client_type === 'subscription' || userProject.client_type === 'influencer') && (
+                    <>
+                      <SubscriptionStatusCard userProject={userProject} />
+                      <UpgradeBanner userProject={userProject} />
+                    </>
+                  )}
                 </>
               )}
               {renderContent()}
