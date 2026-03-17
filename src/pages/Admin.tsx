@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, Menu, CalendarDays } from 'lucide-react';
+import { LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, Menu, CalendarDays, DollarSign } from 'lucide-react';
 import abbaLogo from '@/assets/abba-logo.png';
 import { useRole } from '@/hooks/useRole';
 import { useAuth } from '@/lib/auth';
@@ -16,6 +16,7 @@ import AdminMetrics from '@/components/admin/AdminMetrics';
 import ProjectManager from '@/components/admin/ProjectManager';
 import LogViewer from '@/components/admin/LogViewer';
 import AdminCalendar from '@/components/admin/AdminCalendar';
+import AdminCommissions from '@/components/admin/AdminCommissions';
 import AdminTour, { restartAdminTour } from '@/components/admin/AdminTour';
 
 import NotificationBell from '@/components/shared/NotificationBell';
@@ -28,6 +29,7 @@ const TABS = [
   { id: 'metricas', label: 'Métricas', icon: BarChart3 },
   { id: 'projetos', label: 'Projetos', icon: FolderKanban },
   { id: 'calendario', label: 'Calendário', icon: CalendarDays },
+  { id: 'comissoes', label: 'Comissões', icon: DollarSign },
   { id: 'logs', label: 'Logs', icon: ScrollText },
 ];
 
@@ -56,6 +58,7 @@ const Admin = () => {
       case 'metricas': return <AdminMetrics />;
       case 'projetos': return <ProjectManager />;
       case 'calendario': return <AdminCalendar />;
+      case 'comissoes': return <AdminCommissions />;
       case 'logs': return <LogViewer />;
       default: return <AdminOverview />;
     }
