@@ -289,13 +289,16 @@ const DashboardLayout = () => {
     setLockedTabAttempt(null);
   };
 
-  const navItems: NavItem[] = [
-    { id: 'deliveries', label: 'Minhas Entregas', shortLabel: 'ENTREGAS', icon: Video },
-    { id: 'calendar', label: 'Calendário', shortLabel: 'AGENDA', icon: Calendar },
-    { id: 'history', label: 'Histórico', shortLabel: 'HIST.', icon: CheckCircle2 },
-    { id: 'brand', label: 'Minha Marca', shortLabel: 'MARCA', icon: Palette },
-    { id: 'settings', label: 'Configurações', shortLabel: 'CONFIG', icon: Settings },
-  ];
+   const navItems: NavItem[] = [
+      { id: 'deliveries', label: 'Minhas Entregas', shortLabel: 'ENTREGAS', icon: Video },
+      { id: 'calendar', label: 'Calendário', shortLabel: 'AGENDA', icon: Calendar },
+      { id: 'history', label: 'Histórico', shortLabel: 'HIST.', icon: CheckCircle2 },
+      { id: 'brand', label: 'Minha Marca', shortLabel: 'MARCA', icon: Palette },
+      ...(userProject?.client_type === 'influencer'
+        ? [{ id: 'affiliate' as DashboardTab, label: 'Afiliados', shortLabel: 'AFIL.', icon: Link2 }]
+        : []),
+      { id: 'settings', label: 'Configurações', shortLabel: 'CONFIG', icon: Settings },
+    ];
 
   const renderContent = () => {
     switch (activeTab) {
