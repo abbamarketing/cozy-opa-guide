@@ -327,6 +327,8 @@ const DashboardLayout = () => {
         return <BrandProfile />;
       case 'settings':
         return <SettingsComponent />;
+      case 'affiliate':
+        return <AffiliateStats />;
       default:
         return null;
     }
