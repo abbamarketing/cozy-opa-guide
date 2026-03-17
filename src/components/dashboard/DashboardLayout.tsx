@@ -26,6 +26,7 @@ import {
   ChevronDown,
   
   Lock,
+  Link2,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { useProfile } from '@/hooks/useProfile';
