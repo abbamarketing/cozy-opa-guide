@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle, Clock, ArrowRight, ArrowDown, Sparkles, MessageSquare, Send, FileText, Zap } from 'lucide-react';
+import { CheckCircle, Clock, ArrowRight, ArrowDown, Camera, Calendar, MessageSquare, Send, Zap } from 'lucide-react';
 import abbaLogo from '@/assets/abba-logo.png';
 import screenshotDashboard from '@/assets/screenshot-dashboard-desktop.jpg';
 import { Button } from '@/components/ui/button';
