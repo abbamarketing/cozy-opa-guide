@@ -4,7 +4,7 @@
 // =============================================
 
 // Status & Category types (mirror DB enums)
-export type DeliveryStatus = 'pending' | 'in_progress' | 'review' | 'revision' | 'approved' | 'cancelled';
+export type DeliveryStatus = 'pending' | 'queue' | 'in_progress' | 'review' | 'revision' | 'approved' | 'cancelled';
 export type DeliveryType = 'youtube_video' | 'instagram_video' | 'thumbnail' | 'cover';
 export type UserProjectStatus = 'pending_payment' | 'active' | 'suspended' | 'cancelled';
 export type AppRole = 'admin' | 'editor' | 'client' | 'god';
