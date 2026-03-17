@@ -86,6 +86,38 @@ const Index = () => {
     return () => { supabase.removeChannel(channel); };
   }, [user, roles, assignedProjectId, checkProjectStatus]);
 
+  // Apply affiliate referral code to profile after login
+  useEffect(() => {
+    const applyAffiliateRef = async () => {
+      if (!user || !profile) return;
+      if ((profile as any).referred_by) return;
+
+      const refCode = localStorage.getItem('affiliate_ref');
+      if (!refCode) return;
+
+      const { data: affiliateCode } = await supabase
+        .from('affiliate_codes')
+        .select('id, user_id')
+        .eq('code', refCode)
+        .eq('active', true)
+        .maybeSingle();
+
+      if (!affiliateCode || affiliateCode.user_id === user.id) {
+        localStorage.removeItem('affiliate_ref');
+        return;
+      }
+
+      await supabase
+        .from('profiles')
+        .update({ referred_by: refCode } as any)
+        .eq('user_id', user.id);
+
+      localStorage.removeItem('affiliate_ref');
+    };
+
+    applyAffiliateRef();
+  }, [user, profile]);
+
   // Loading states
   if (authLoading || profileLoading || checkingProject) {
     return (

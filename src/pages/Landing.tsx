@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle, Clock, ArrowRight, ArrowDown, Camera, Calendar, MessageSquare, Send, Zap } from 'lucide-react';
@@ -73,6 +74,14 @@ const KANBAN_COLS = [
 ];
 
 const Landing = () => {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref && ref.trim()) {
+      localStorage.setItem('affiliate_ref', ref.trim().toLowerCase());
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-abba-dark text-foreground">
       {/* ─── NAV ─── */}
