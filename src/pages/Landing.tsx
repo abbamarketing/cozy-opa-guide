@@ -576,9 +576,9 @@ const Landing = () => {
               <Link to="/auth">Começar 7 dias grátis</Link>
             </Button>
             <Button variant="outline" size="lg" asChild className="border border-white/20 text-white rounded-full hover:bg-abba-surface">
-              <Link to="/auth">
-                Criar roteiro com IA <Sparkles className="ml-2 h-4 w-4" />
-              </Link>
+              <a href="#planos">
+                Ver planos <ArrowRight className="ml-2 h-4 w-4" />
+              </a>
             </Button>
           </div>
           <p className="text-xs font-sans text-white/40">
