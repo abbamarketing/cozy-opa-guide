@@ -21,6 +21,7 @@ import AdminSupport from '@/components/admin/AdminSupport';
 import AdminTour, { restartAdminTour } from '@/components/admin/AdminTour';
 
 import NotificationBell from '@/components/shared/NotificationBell';
+import { useQuery } from '@tanstack/react-query';
 
 const TABS = [
   { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard },
@@ -31,6 +32,7 @@ const TABS = [
   { id: 'projetos', label: 'Projetos', icon: FolderKanban },
   { id: 'calendario', label: 'Calendário', icon: CalendarDays },
   { id: 'comissoes', label: 'Comissões', icon: DollarSign },
+  { id: 'suporte', label: 'Suporte', icon: Headphones },
   { id: 'logs', label: 'Logs', icon: ScrollText },
 ];
 
