@@ -339,7 +339,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
                 {([
                   { name: 'include_thumbnails' as const, label: 'Thumbnails', icon: Image },
                   { name: 'include_covers' as const, label: 'Capas Instagram', icon: FileImage },
-                  { name: 'include_script' as const, label: 'Roteiro IA', icon: FileText },
+                  
                   { name: 'include_capture' as const, label: 'Captação de Vídeo', icon: Camera },
                 ]).map(({ name, label, icon: Icon }) => (
                   <Controller
