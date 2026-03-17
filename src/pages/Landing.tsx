@@ -74,6 +74,14 @@ const KANBAN_COLS = [
 ];
 
 const Landing = () => {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref && ref.trim()) {
+      localStorage.setItem('affiliate_ref', ref.trim().toLowerCase());
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-abba-dark text-foreground">
       {/* ─── NAV ─── */}
