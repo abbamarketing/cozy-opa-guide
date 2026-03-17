@@ -100,20 +100,10 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
   }, [checkCapture]);
 
   const hasQuota = useCallback(() => {
-    const isSubscription = userProject.client_type === 'subscription';
-    if (isSubscription) {
-      const used = (userProject.instagram_reserved ?? 0) + (userProject.instagram_approved ?? 0);
-      const storedQuota = userProject.monthly_quota;
-      const total = storedQuota != null
-        ? storedQuota
-        : (userProject.sla_hours && userProject.current_period_start && userProject.current_period_end
-            ? computeMonthlyQuota(
-                userProject.sla_hours,
-                new Date(userProject.current_period_start),
-                new Date(userProject.current_period_end)
-              )
-            : 0);
-      return used < total;
+    const isSub = userProject.client_type === 'subscription' || userProject.client_type === 'influencer';
+    if (isSub) {
+      // Subscription/influencer: always allow — no hard quota shown to client
+      return true;
     }
     const p = userProject.custom_project;
     if (!p) return false;
@@ -166,10 +156,10 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
     );
   };
 
-  // Unified layout (mobile uses KanbanBoard with scroll-snap, desktop uses grid)
+  // Unified layout
   return (
     <div className="flex flex-col min-w-0 flex-1">
-      {/* HEADER — fora do scroll, nunca se move */}
+      {/* HEADER */}
       <div className="shrink-0 space-y-4 px-0 pb-4">
         <CaptureBanner />
 
@@ -207,7 +197,7 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
         </div>
       </div>
 
-      {/* WRAPPER DE SCROLL — cria contexto isolado para as colunas */}
+      {/* SCROLL WRAPPER */}
       <div className="flex-1 min-h-0 w-full overflow-x-hidden">
         {isLoading ? (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
@@ -257,6 +247,7 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
                 <DeliveryCard
                   delivery={d}
                   onClick={() => setSelectedDelivery(d)}
+                  clientType={userProject.client_type}
                 />
               </div>
             )}

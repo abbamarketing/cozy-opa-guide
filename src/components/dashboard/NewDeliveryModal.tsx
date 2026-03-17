@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { addBusinessHours, countWeekdayHours } from '@/lib/business-hours';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -31,7 +31,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, Video, Camera, Image, Layers, Upload, Link, Clock, X, AlertTriangle } from 'lucide-react';
+import { Loader2, Video, Camera, Image, Layers, Upload, Link, Clock, X, AlertTriangle, Zap } from 'lucide-react';
 import type { UserProjectData } from '@/hooks/useUserProject';
 
 interface NewDeliveryModalProps {
@@ -101,16 +101,23 @@ const NewDeliveryModal = ({
   const [exceptionNotes, setExceptionNotes] = useState('');
 
   const project = userProject.custom_project;
-  const isSubscription = userProject.client_type === 'subscription';
+  const isSubscriptionLike = userProject.client_type === 'subscription' || userProject.client_type === 'influencer';
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      delivery_type: undefined,
+      delivery_type: isSubscriptionLike ? 'instagram_video' : undefined,
       title: '',
       description: '',
     },
   });
+
+  // Auto-select delivery type for subscription/influencer
+  useEffect(() => {
+    if (isSubscriptionLike && !form.getValues('delivery_type')) {
+      form.setValue('delivery_type', 'instagram_video');
+    }
+  }, [isSubscriptionLike]);
 
   const selectedType = form.watch('delivery_type');
   const isVideo = selectedType === 'youtube_video' || selectedType === 'instagram_video';
@@ -120,21 +127,10 @@ const NewDeliveryModal = ({
     ? (rawTab === 'upload' && rawFileUrl) || (rawTab === 'link' && rawDriveLink.trim().length > 0)
     : true; // non-video types don't require raw material
 
-  // Build quota info — subscription clients only see short videos
+  // Build quota info — subscription/influencer: empty (no selector shown)
   const quotas = useMemo<QuotaInfo[]>(() => {
-    const isSubscription = userProject.client_type === 'subscription';
-
-    if (isSubscription) {
-      const used = userProject.instagram_reserved + userProject.instagram_approved;
-      const total = (userProject as any).monthly_quota ?? (project?.instagram_videos ?? 0);
-      return [{
-        type: 'instagram_video' as DeliveryType,
-        label: 'Reels / Shorts / TikToks',
-        icon: Video,
-        total,
-        used,
-        available: total - used,
-      }];
+    if (isSubscriptionLike) {
+      return [];
     }
 
     // Custom / other — show all available types
@@ -184,11 +180,11 @@ const NewDeliveryModal = ({
       });
     }
     return result;
-  }, [userProject, project]);
+  }, [userProject, project, isSubscriptionLike]);
 
   // Deadline calculation
   const getDeadlineHours = () => {
-    if (isSubscription) return (userProject as any).sla_hours ?? 72;
+    if (isSubscriptionLike) return (userProject as any).sla_hours ?? 72;
     if (!project) return 72;
     return project.deadline === '24h' ? 24 : project.deadline === '48h' ? 48 : 72;
   };
@@ -272,13 +268,12 @@ const NewDeliveryModal = ({
       let dueDate: string;
       let priorityLevel = 1;
 
-      if ((userProject as any).client_type === 'subscription' && (userProject as any).sla_hours) {
+      if (isSubscriptionLike && (userProject as any).sla_hours) {
         const deadline = countWeekdayHours(new Date(), (userProject as any).sla_hours);
         dueDate = deadline.toISOString();
         priorityLevel = (userProject as any).priority_level ?? 1;
       } else {
         dueDate = addBusinessHours(new Date(), getDeadlineHours()).toISOString();
-        // Para clientes custom, usar o priority_level configurado no projeto
         priorityLevel = (userProject as any).priority_level ?? 1;
       }
 
@@ -292,11 +287,11 @@ const NewDeliveryModal = ({
         delivery_type: values.delivery_type,
         title: values.title,
         description: fullDescription,
-        status: (userProject as any).client_type === 'subscription' ? 'queue' : 'pending',
+        status: isSubscriptionLike ? 'queue' : 'pending',
         due_date: dueDate,
         sla_deadline: dueDate,
         priority_level: priorityLevel,
-        max_revisions: isSubscription ? 2 : (project?.max_revisions ?? 2),
+        max_revisions: isSubscriptionLike ? 2 : (project?.max_revisions ?? 2),
       };
 
       // Raw material fields
@@ -346,56 +341,71 @@ const NewDeliveryModal = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            {/* 1. Tipo de Entrega */}
-            <FormField
-              control={form.control}
-              name="delivery_type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tipo de Entrega</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      className="grid grid-cols-2 gap-2"
-                    >
-                      {quotas.map((q) => {
-                        const disabled = q.available <= 0;
-                        const Icon = q.icon;
-                        return (
-                          <label
-                            key={q.type}
-                            className={`flex cursor-pointer items-center gap-2 rounded-lg border p-3 transition-colors ${
-                              disabled
-                                ? 'cursor-not-allowed border-border/30 opacity-40'
-                                : field.value === q.type
-                                ? 'border-primary bg-primary/10'
-                                : 'border-border hover:border-border/80'
-                            }`}
-                          >
-                            <RadioGroupItem
-                              value={q.type}
-                              disabled={disabled}
-                              className="sr-only"
-                            />
-                            <Icon className="h-4 w-4 shrink-0 text-primary" />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium text-card-foreground">
-                                {q.label}
-                              </p>
-                              <p className="text-[10px] text-muted-foreground">
-                                {q.available} disponíve{q.available !== 1 ? 'is' : 'l'}
-                              </p>
-                            </div>
-                          </label>
-                        );
-                      })}
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* 1. Tipo de Entrega — apenas para clientes custom */}
+            {!isSubscriptionLike && (
+              <FormField
+                control={form.control}
+                name="delivery_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de Entrega</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="grid grid-cols-2 gap-2"
+                      >
+                        {quotas.map((q) => {
+                          const disabled = q.available <= 0;
+                          const Icon = q.icon;
+                          return (
+                            <label
+                              key={q.type}
+                              className={`flex cursor-pointer items-center gap-2 rounded-lg border p-3 transition-colors ${
+                                disabled
+                                  ? 'cursor-not-allowed border-border/30 opacity-40'
+                                  : field.value === q.type
+                                  ? 'border-primary bg-primary/10'
+                                  : 'border-border hover:border-border/80'
+                              }`}
+                            >
+                              <RadioGroupItem
+                                value={q.type}
+                                disabled={disabled}
+                                className="sr-only"
+                              />
+                              <Icon className="h-4 w-4 shrink-0 text-primary" />
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium text-card-foreground">
+                                  {q.label}
+                                </p>
+                                <p className="text-[10px] text-muted-foreground">
+                                  {q.available} disponíve{q.available !== 1 ? 'is' : 'l'}
+                                </p>
+                              </div>
+                            </label>
+                          );
+                        })}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {/* For subscription/influencer: show SLA info */}
+            {isSubscriptionLike && (
+              <div className="flex items-center gap-3 rounded-lg border border-border/50 p-3">
+                <Zap className="h-4 w-4 shrink-0 text-abba-lime" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-card-foreground">Vídeo</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    Entrega garantida em até {(userProject as any).sla_hours ?? 72}h úteis (Seg–Sex)
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* 2. Título */}
             <FormField
@@ -446,8 +456,8 @@ const NewDeliveryModal = ({
               )}
             />
 
-            {/* 4. Roteiro (condicional) */}
-            {project.include_script && (
+            {/* 4. Roteiro (condicional — only custom projects with include_script) */}
+            {!isSubscriptionLike && project.include_script && (
               <div className="space-y-3 rounded-lg border border-border/50 p-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm">Roteiro</Label>
