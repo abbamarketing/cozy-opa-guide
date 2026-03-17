@@ -164,7 +164,7 @@ export function formatBusinessCountdown(businessMinutes: number): string {
  * Uso exclusivo para clientes de assinatura (subscription).
  *
  * @param startDate - Data/hora de início (quando a entrega foi criada)
- * @param slaHours - Número de horas úteis do SLA (72, 48, 24, 8 ou 4)
+ * @param slaHours - Horas SLA sem fim de semana: 72 (Standard) · 48 (Pro) · 24 (Business) · 8 (Premium) · 4 (Agency)
  * @returns Data/hora do deadline
  */
 export function countWeekdayHours(startDate: Date, slaHours: number): Date {
