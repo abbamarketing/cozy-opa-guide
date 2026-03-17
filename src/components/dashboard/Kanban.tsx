@@ -235,7 +235,7 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
             canDragBetweenColumns={false}
             dataTour="kanban-board"
             renderCard={(d) => (
-              <div className="relative" data-tour={d.status === 'pending' ? 'delivery-card' : undefined}>
+              <div className="relative w-full min-w-0" data-tour={d.status === 'pending' ? 'delivery-card' : undefined}>
                 {d.status === 'queue' && (
                   <div className="absolute top-2 right-2 z-10">
                     <Badge variant="secondary" className="text-[9px] font-sans gap-1">
