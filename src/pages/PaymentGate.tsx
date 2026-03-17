@@ -84,7 +84,7 @@ export default function PaymentGate() {
     project.instagram_videos > 0 && `${project.instagram_videos} vídeos Instagram/mês`,
     project.include_thumbnails && 'Thumbnails personalizadas',
     project.include_covers && 'Capas Instagram',
-    project.include_script && 'Roteiros com IA',
+    
     project.include_capture && 'Captação de vídeo',
     `Até ${project.max_revisions} revisões por entrega`,
     `Entrega em ${project.deadline}`,

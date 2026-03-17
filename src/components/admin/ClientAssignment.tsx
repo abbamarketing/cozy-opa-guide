@@ -455,9 +455,6 @@ const ClientAssignment = () => {
                         {selectedProject.include_covers && (
                           <p className="flex items-center gap-2"><FileImage className="h-4 w-4 shrink-0 text-muted-foreground" />Capas Instagram incluídas</p>
                         )}
-                        {selectedProject.include_script && (
-                          <p className="flex items-center gap-2"><FileText className="h-4 w-4 shrink-0 text-muted-foreground" />Roteiros IA incluídos</p>
-                        )}
                         {selectedProject.include_capture && (
                           <p className="flex items-center gap-2"><Camera className="h-4 w-4 shrink-0 text-muted-foreground" />Captação de vídeo incluída</p>
                         )}

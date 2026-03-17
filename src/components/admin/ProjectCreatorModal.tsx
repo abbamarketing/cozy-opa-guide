@@ -339,7 +339,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
                 {([
                   { name: 'include_thumbnails' as const, label: 'Thumbnails', icon: Image },
                   { name: 'include_covers' as const, label: 'Capas Instagram', icon: FileImage },
-                  { name: 'include_script' as const, label: 'Roteiro IA', icon: FileText },
+                  
                   { name: 'include_capture' as const, label: 'Captação de Vídeo', icon: Camera },
                 ]).map(({ name, label, icon: Icon }) => (
                   <Controller
@@ -534,7 +534,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
                 {values.instagram_videos > 0 && <Badge variant="secondary"><Instagram className="h-3 w-3 mr-1" />{values.instagram_videos} IG/mês</Badge>}
                 {values.include_thumbnails && <Badge variant="secondary"><Image className="h-3 w-3 mr-1" />Thumbnails</Badge>}
                 {values.include_covers && <Badge variant="secondary"><FileImage className="h-3 w-3 mr-1" />Capas</Badge>}
-                {values.include_script && <Badge variant="secondary"><FileText className="h-3 w-3 mr-1" />Roteiro IA</Badge>}
+                
                 {values.include_capture && <Badge variant="secondary"><Camera className="h-3 w-3 mr-1" />Captação {values.max_captures}x/mês ({values.capture_lead_days}d)</Badge>}
               </div>
               <div className="flex gap-4 text-xs text-muted-foreground flex-wrap">

@@ -127,7 +127,7 @@ const baseMock = {
   subscription_slug: null,
   custom_slug: null,
   monthly_quota: null,
-  script_credits: 0,
+  
 };
 
 const MOCK_PROJECTS: Record<string, UserProjectData> = {
