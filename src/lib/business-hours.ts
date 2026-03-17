@@ -206,3 +206,28 @@ export function countWeekdayHours(startDate: Date, slaHours: number): Date {
 
   return current;
 }
+
+/**
+ * Calcula quantos vídeos podem ser produzidos em um período de billing.
+ * O relógio corre 24h/dia apenas em dias úteis (Seg–Sex).
+ * Sábado e domingo pausam o relógio.
+ *
+ * @param slaHours - horas do SLA (72, 48, 24, 8 ou 4)
+ * @param periodStart - início do período
+ * @param periodEnd - fim do período
+ */
+export function computeMonthlyQuota(
+  slaHours: number,
+  periodStart: Date,
+  periodEnd: Date
+): number {
+  let weekdayHours = 0;
+  const cursor = new Date(periodStart);
+  cursor.setHours(0, 0, 0, 0);
+  while (cursor < periodEnd) {
+    const day = cursor.getDay(); // 0=Dom, 6=Sab
+    if (day !== 0 && day !== 6) weekdayHours += 24;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return Math.floor(weekdayHours / slaHours);
+}

@@ -143,11 +143,14 @@ Deno.serve(async (req) => {
 
         // ─── Handler Subscription Tiers ───
         if (productId && SUBSCRIPTION_TIERS[productId]) {
-          const { tier, sla, priority, monthly_quota } = SUBSCRIPTION_TIERS[productId];
+          const { tier, sla, priority } = SUBSCRIPTION_TIERS[productId];
           console.log(`Processing subscription ${tier} for user: ${userId}`);
 
-          const now = new Date().toISOString();
-          const periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+          const periodStart = new Date();
+          const periodEndDate = new Date(periodStart.getTime() + 30 * 24 * 60 * 60 * 1000);
+          const monthly_quota = computeMonthlyQuota(sla, periodStart, periodEndDate);
+          const now = periodStart.toISOString();
+          const periodEnd = periodEndDate.toISOString();
 
           const brandName = session.metadata?.brand_name
             || session.customer_details?.name
