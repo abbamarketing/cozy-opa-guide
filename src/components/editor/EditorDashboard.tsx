@@ -58,6 +58,7 @@ import DeliveryCalendarView from '@/components/shared/DeliveryCalendarView';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 import EditorTour, { restartEditorTour } from '@/components/editor/EditorTour';
 import KanbanBoard from '@/components/shared/KanbanBoard';
+import { SupportChat } from '@/components/shared/SupportChat';
 
 /* ─── Types ─── */
 interface EditorDelivery extends DeliveryData {
@@ -935,6 +936,7 @@ const EditorDashboard = () => {
           deliveryTitle={submitTarget?.title ?? ''}
           onSubmitted={fetchDeliveries}
         />
+        <SupportChat role="editor" />
       </div>
     );
   }
@@ -1150,6 +1152,7 @@ const EditorDashboard = () => {
         deliveryTitle={submitTarget?.title ?? ''}
         onSubmitted={fetchDeliveries}
       />
+      <SupportChat role="editor" />
     </div>
   );
 };

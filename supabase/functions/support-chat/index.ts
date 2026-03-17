@@ -87,11 +87,23 @@ serve(async (req) => {
 
     const planLabel = userProject?.client_type === "subscription"
       ? `Assinatura ${userProject.subscription_tier || ""}`
+      : userProject?.client_type === "influencer"
+      ? `Influencer ${userProject.subscription_tier || ""}`
       : userProject?.client_type === "custom"
       ? "Projeto Customizado"
       : userProject?.client_type === "studio"
       ? "Studio"
       : "sem plano ativo";
+
+    const slaInfo = userProject?.client_type === 'subscription' || userProject?.client_type === 'influencer'
+      ? `\nSLA do plano: ${
+          userProject.subscription_tier === 'standard' ? '72h' :
+          userProject.subscription_tier === 'pro' ? '48h' :
+          userProject.subscription_tier === 'business' ? '24h' :
+          userProject.subscription_tier === 'premium' ? '8h' :
+          userProject.subscription_tier === 'agency' ? '4h' : 'não definido'
+        } (horas úteis, Segunda a Sexta)`
+      : '';
 
     const deliveriesText = recentDeliveries.length
       ? recentDeliveries.map(d => `- ${d.title}: ${d.status} (prazo: ${d.due_date || "não definido"})`).join("\n")
@@ -109,7 +121,7 @@ CONTEXTO DO CLIENTE:
 - Marca: ${briefing?.brand_name || "não informado"}
 - Estilo de conteúdo: ${briefing?.content_style || "não informado"}
 - Público-alvo: ${briefing?.target_audience || "não informado"}
-- Plano: ${planLabel}
+- Plano: ${planLabel}${slaInfo}
 
 ENTREGAS RECENTES:
 ${deliveriesText}

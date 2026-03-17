@@ -58,6 +58,7 @@ import QuotaCard from '@/components/dashboard/QuotaCard';
 import SubscriptionStatusCard from '@/components/dashboard/SubscriptionStatusCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
+import { SupportChat } from '@/components/shared/SupportChat';
 
 type DashboardTab = 'deliveries' | 'calendar' | 'history' | 'brand' | 'settings' | 'affiliate';
 
@@ -462,7 +463,10 @@ const DashboardLayout = ({ isPreviewMode, previewUserProject, previewDeliveries 
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">{mainContent}</div>
+      <div className="flex min-h-screen w-full bg-background">
+        {mainContent}
+        <SupportChat role="client" />
+      </div>
     </SidebarProvider>
   );
 };
