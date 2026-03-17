@@ -354,6 +354,12 @@ const DashboardLayout = () => {
                   {userProject.client_type === 'custom' && <QuotaCard userProject={userProject} />}
                   {(userProject.client_type === 'subscription' || userProject.client_type === 'influencer') && (
                     <>
+                      {userProject.status === 'trialing' && (
+                        <TrialBanner
+                          trialEndDate={userProject.current_period_end}
+                          onUpgrade={() => window.location.href = '/payment'}
+                        />
+                      )}
                       <SubscriptionStatusCard userProject={userProject} />
                       <UpgradeBanner userProject={userProject} />
                     </>
