@@ -195,14 +195,6 @@ Deno.serve(async (req) => {
             });
           }
 
-          // Grant Studio credits
-          await supabase.from("studio_credits").upsert({
-            user_id: userId,
-            credits_available: 10,
-            credits_used: 0,
-            period_start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
-            period_end: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString(),
-          }, { onConflict: "user_id,period_start" });
 
           await supabase.from("system_logs").insert({
             level: "info",
