@@ -132,7 +132,7 @@ const Admin = () => {
                 </SheetContent>
               </Sheet>
             )}
-            <img src={abbaLogo} alt="AbbaVideo" className="h-8 w-8 rounded-lg" />
+            <img src={abbaLogo} alt="AbbaVideo" className="h-8 w-8" />
             <span className="text-lg font-bold hidden md:inline">
               Abba<span className="text-primary">Video</span>
             </span>
