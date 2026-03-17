@@ -164,7 +164,7 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
         <CaptureBanner />
 
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-sans font-semibold text-foreground">Minhas Entregas</h2>
+          <h2 className="text-base font-sans font-semibold text-foreground">Minhas Entregas</h2>
           <div className="flex items-center gap-3">
             <ViewToggle value={viewMode} onChange={handleViewChange} />
             <Tooltip>
