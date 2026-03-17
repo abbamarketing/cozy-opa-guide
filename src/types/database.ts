@@ -78,6 +78,13 @@ export interface UserProject {
   tour_completed: boolean;
   created_at: string;
   updated_at: string;
+  client_type: 'custom' | 'subscription' | 'influencer' | null;
+  subscription_tier: string | null;
+  subscription_slug: string | null;
+  sla_hours: number | null;
+  monthly_quota: number | null;
+  priority_level: number | null;
+  trial_ends_at: string | null;
   // Joined data
   custom_project?: CustomProject;
 }
