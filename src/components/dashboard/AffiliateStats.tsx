@@ -113,7 +113,7 @@ export function AffiliateStats() {
         </Card>
         <Card className="p-4 text-center space-y-1">
           <TrendingUp className="h-5 w-5 mx-auto text-primary" />
-          <p className="text-2xl font-bold text-foreground">{activeReferrals}</p>
+          <p className="text-lg font-bold text-foreground">{activeReferrals}</p>
           <p className="text-[11px] text-muted-foreground">Ativos</p>
         </Card>
         <Card className="p-4 text-center space-y-1">
