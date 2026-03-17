@@ -235,7 +235,7 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
             canDragBetweenColumns={false}
             dataTour="kanban-board"
             renderCard={(d) => (
-              <div className="relative w-full min-w-0" data-tour={d.status === 'pending' ? 'delivery-card' : undefined}>
+              <div className="relative w-full min-w-0 overflow-hidden" data-tour={d.status === 'pending' ? 'delivery-card' : undefined}>
                 <DeliveryCard
                   delivery={d}
                   onClick={() => setSelectedDelivery(d)}
