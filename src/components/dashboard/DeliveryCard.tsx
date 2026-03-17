@@ -110,13 +110,13 @@ const DeliveryCard = ({ delivery, onClick, clientType }: DeliveryCardProps) => {
   return (
     <div
       onClick={onClick}
-      className="cursor-pointer card-elevate rounded-[20px] bg-abba-surface border border-white/8 p-3 space-y-2 w-full"
+      className="cursor-pointer card-elevate rounded-[20px] bg-abba-surface border border-white/8 p-3 space-y-2 w-full max-w-full overflow-hidden"
     >
       {/* Linha 1: ícone + título + status de fila */}
       <div className="flex items-start gap-2 min-w-0">
         <Icon className="mt-0.5 h-4 w-4 shrink-0 text-abba-lime" />
         <div className="min-w-0 flex-1 overflow-hidden">
-          <p className="truncate text-sm font-sans font-semibold text-foreground">{delivery.title}</p>
+          <p className="truncate text-sm font-sans font-semibold text-foreground">{delivery.title.length > 38 ? delivery.title.slice(0, 38) + '…' : delivery.title}</p>
           <div className="mt-0.5 flex items-center gap-1.5 text-[11px] font-sans text-white/60">
             <span>{displayLabel}</span>
             {delivery.editor_name && <span>· {delivery.editor_name}</span>}
