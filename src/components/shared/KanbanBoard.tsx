@@ -142,7 +142,7 @@ function KanbanColumnComponent<T extends { id: string; status: string }>({
 
       <ScrollArea className="flex-1">
         <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
-          <div className="space-y-2 p-0.5 min-h-[60px]">
+          <div className="space-y-2 p-0.5 min-h-[60px] w-full">
             {items.length === 0 ? (
               renderEmpty ? (
                 renderEmpty(column, hasAnyItems)

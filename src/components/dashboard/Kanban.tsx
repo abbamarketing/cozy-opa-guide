@@ -198,7 +198,7 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
       </div>
 
       {/* SCROLL WRAPPER */}
-      <div className="flex-1 min-h-0 w-full overflow-x-hidden">
+      <div className="flex-1 min-h-0 w-full">
         {isLoading ? (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
             {ALL_COLUMNS.filter(c => c.id !== 'queue' || isSubscription).map((c) => (
@@ -235,7 +235,7 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
             canDragBetweenColumns={false}
             dataTour="kanban-board"
             renderCard={(d) => (
-              <div className="relative" data-tour={d.status === 'pending' ? 'delivery-card' : undefined}>
+              <div className="relative w-full min-w-0" data-tour={d.status === 'pending' ? 'delivery-card' : undefined}>
                 {d.status === 'queue' && (
                   <div className="absolute top-2 right-2 z-10">
                     <Badge variant="secondary" className="text-[9px] font-sans gap-1">
