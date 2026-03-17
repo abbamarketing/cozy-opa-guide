@@ -101,7 +101,7 @@ const DashboardHeader = ({ isPreviewMode }: { isPreviewMode?: boolean }) => {
       <div className="flex items-center gap-2">
         {!isMobile && <SidebarTrigger className="mr-1" />}
         <div className="flex items-center gap-1.5">
-           <img src={abbaLogo} alt="AbbaVideo" className="h-6 w-6 rounded-md" />
+           <img src={abbaLogo} alt="AbbaVideo" className="h-6 w-6" />
           <span className="text-sm font-sans font-bold tracking-tight">
             Abba<span className="text-primary">Video</span>
           </span>

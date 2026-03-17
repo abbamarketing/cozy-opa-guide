@@ -88,7 +88,7 @@ const Landing = () => {
       <nav className="sticky top-0 z-50 bg-abba-dark/90 backdrop-blur-lg border-b border-abba-surface">
         <div className="mx-auto max-w-6xl flex items-center justify-between px-6 py-3">
           <div className="flex items-center gap-2">
-            <img src={abbaLogo} alt="AbbaVideo" className="h-8 w-8 rounded-lg" />
+            <img src={abbaLogo} alt="AbbaVideo" className="h-8 w-8" />
             <span className="text-lg font-sans font-bold">
               Abba<span className="text-abba-lime">Video</span>
             </span>
@@ -600,7 +600,7 @@ const Landing = () => {
       <footer className="border-t border-abba-surface py-10 px-6">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 text-center text-sm font-sans text-muted-foreground sm:flex-row sm:justify-between sm:text-left">
           <div className="flex items-center gap-2">
-            <img src={abbaLogo} alt="AbbaVideo" className="h-6 w-6 rounded-md" />
+            <img src={abbaLogo} alt="AbbaVideo" className="h-6 w-6" />
             <p>© {new Date().getFullYear()} AbbaVideo</p>
           </div>
           <div className="flex gap-4">

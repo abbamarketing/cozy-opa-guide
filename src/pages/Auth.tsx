@@ -61,7 +61,7 @@ const AuthPage = () => {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.1, duration: 0.4 }}
         >
-          <img src={abbaLogo} alt="AbbaVideo" className="h-12 w-12 rounded-xl" />
+          <img src={abbaLogo} alt="AbbaVideo" className="h-12 w-12" />
           <div>
             <span className="text-2xl font-bold">
               Abba<span className="text-primary">Video</span>

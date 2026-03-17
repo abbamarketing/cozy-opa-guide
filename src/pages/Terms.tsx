@@ -24,7 +24,7 @@ const Terms = () => {
     <div className="min-h-screen bg-background p-8">
       <div className="container mx-auto max-w-3xl">
         <div className="flex items-center gap-2 mb-8">
-          <img src={abbaLogo} alt="AbbaVideo" className="h-8 w-8 rounded-lg" />
+          <img src={abbaLogo} alt="AbbaVideo" className="h-8 w-8" />
           <span className="text-lg font-bold">
             Abba<span className="text-primary">Video</span>
           </span>

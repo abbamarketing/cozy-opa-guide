@@ -97,7 +97,7 @@ const Admin = () => {
                 </SheetTrigger>
                 <SheetContent side="left" className="w-64 p-0">
                   <div className="flex items-center gap-2 border-b border-border/50 px-4 py-4">
-                    <img src={abbaLogo} alt="AbbaVideo" className="h-7 w-7 rounded-lg" />
+                    <img src={abbaLogo} alt="AbbaVideo" className="h-7 w-7" />
                     <span className="text-sm font-bold">
                       Abba<span className="text-primary">Video</span>
                     </span>
@@ -132,7 +132,7 @@ const Admin = () => {
                 </SheetContent>
               </Sheet>
             )}
-            <img src={abbaLogo} alt="AbbaVideo" className="h-8 w-8 rounded-lg" />
+            <img src={abbaLogo} alt="AbbaVideo" className="h-8 w-8" />
             <span className="text-lg font-bold hidden md:inline">
               Abba<span className="text-primary">Video</span>
             </span>

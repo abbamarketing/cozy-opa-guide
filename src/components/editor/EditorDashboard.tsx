@@ -729,7 +729,7 @@ const EditorDashboard = () => {
         <header className="sticky top-0 z-30 border-b border-border/50 bg-background/80 backdrop-blur-md">
           <div className="flex h-14 items-center justify-between px-4">
             <div className="flex items-center gap-2">
-              <img src={abbaLogo} alt="AbbaVideo" className="h-7 w-7 rounded-lg" />
+              <img src={abbaLogo} alt="AbbaVideo" className="h-7 w-7" />
               <Badge variant="secondary" className="text-xs">
                 {pendingCount} pendente{pendingCount !== 1 ? 's' : ''}
               </Badge>
@@ -949,7 +949,7 @@ const EditorDashboard = () => {
       <header className="sticky top-0 z-30 border-b border-border/50 bg-background/80 backdrop-blur-md">
         <div className="flex h-14 items-center justify-between px-4">
           <div className="flex items-center gap-3">
-            <img src={abbaLogo} alt="AbbaVideo" className="h-7 w-7 rounded-lg" />
+            <img src={abbaLogo} alt="AbbaVideo" className="h-7 w-7" />
             <span className="text-sm font-bold">
               Abba<span className="text-primary">Video</span>
             </span>
