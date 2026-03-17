@@ -17,6 +17,7 @@ const Onboarding = lazy(() => import("./pages/Onboarding"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Editor = lazy(() => import("./pages/Editor"));
 const Admin = lazy(() => import("./pages/Admin"));
+const AdminPreview = lazy(() => import("./pages/AdminPreview"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const PaymentGate = lazy(() => import("./pages/PaymentGate"));
