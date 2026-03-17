@@ -273,6 +273,8 @@ Deno.serve(async (req) => {
         // Map Stripe status to our status
         if (subscription.status === "active") {
           updateData.status = "active";
+        } else if (subscription.status === "trialing") {
+          updateData.status = "active"; // treat trialing as active for access
         } else if (subscription.status === "past_due" || subscription.status === "unpaid") {
           updateData.status = "suspended";
         } else if (subscription.status === "canceled") {
