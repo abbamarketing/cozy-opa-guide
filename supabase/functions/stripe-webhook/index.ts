@@ -365,6 +365,47 @@ Deno.serve(async (req) => {
         break;
       }
 
+      // ─── invoice.payment_succeeded ───
+      case "invoice.payment_succeeded": {
+        const invoice = event.data.object as any;
+        if (!invoice.subscription || invoice.billing_reason === "subscription_create") {
+          break;
+        }
+
+        const { data: referral } = await supabase
+          .from("referrals")
+          .select("id, affiliate_code_id, status")
+          .eq("stripe_subscription_id", invoice.subscription)
+          .maybeSingle();
+
+        if (referral) {
+          const commissionCents = Math.floor((invoice.amount_paid ?? 0) * 0.20);
+          const monthDate = new Date();
+          monthDate.setDate(1);
+          const monthStr = monthDate.toISOString().split("T")[0];
+
+          await supabase
+            .from("affiliate_commissions")
+            .upsert({
+              affiliate_code_id: referral.affiliate_code_id,
+              referral_id: referral.id,
+              month: monthStr,
+              amount_cents: commissionCents,
+              status: "pending",
+            }, { onConflict: "referral_id,month", ignoreDuplicates: true });
+
+          if (referral.status === "trialing") {
+            await supabase
+              .from("referrals")
+              .update({ status: "active", converted_at: new Date().toISOString() })
+              .eq("id", referral.id);
+          }
+
+          console.log(`Commission ${commissionCents}c registered for referral ${referral.id}`);
+        }
+        break;
+      }
+
       // ─── customer.subscription.deleted ───
       case "customer.subscription.deleted": {
         const subscription = event.data.object;
@@ -374,7 +415,6 @@ Deno.serve(async (req) => {
           .from("user_projects")
           .update({
             status: "cancelled",
-            // Keep current_period_end so user retains access until end of paid period
             current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
           })
           .eq("stripe_subscription_id", subscriptionId);
@@ -384,6 +424,12 @@ Deno.serve(async (req) => {
         } else {
           console.log(`Subscription ${subscriptionId} cancelled — access until period end`);
         }
+
+        // Mark referral as cancelled
+        await supabase
+          .from("referrals")
+          .update({ status: "cancelled" })
+          .eq("stripe_subscription_id", subscriptionId);
 
         await supabase.from("system_logs").insert({
           level: "warn",
