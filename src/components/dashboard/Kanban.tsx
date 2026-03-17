@@ -22,6 +22,7 @@ const CaptureScheduleModal = lazy(() => import('./CaptureScheduleModal'));
 // Interfaces
 interface KanbanProps {
   userProject: UserProjectData;
+  mockDeliveries?: DeliveryData[];
 }
 
 interface Column {
