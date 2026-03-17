@@ -76,6 +76,7 @@ const Admin = () => {
       case 'projetos': return <ProjectManager />;
       case 'calendario': return <AdminCalendar />;
       case 'comissoes': return <AdminCommissions />;
+      case 'suporte': return <AdminSupport />;
       case 'logs': return <LogViewer />;
       default: return <AdminOverview />;
     }
