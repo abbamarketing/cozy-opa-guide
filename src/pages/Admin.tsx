@@ -17,6 +17,7 @@ import ProjectManager from '@/components/admin/ProjectManager';
 import LogViewer from '@/components/admin/LogViewer';
 import AdminCalendar from '@/components/admin/AdminCalendar';
 import AdminCommissions from '@/components/admin/AdminCommissions';
+import AdminSupport from '@/components/admin/AdminSupport';
 import AdminTour, { restartAdminTour } from '@/components/admin/AdminTour';
 
 import NotificationBell from '@/components/shared/NotificationBell';
