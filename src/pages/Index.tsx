@@ -90,7 +90,7 @@ const Index = () => {
   useEffect(() => {
     const applyAffiliateRef = async () => {
       if (!user || !profile) return;
-      if ((profile as any).referred_by) return;
+      if (profile.referred_by) return;
 
       const refCode = localStorage.getItem('affiliate_ref');
       if (!refCode) return;
