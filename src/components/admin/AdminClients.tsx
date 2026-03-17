@@ -436,6 +436,9 @@ const AdminClients = () => {
                     <span>{c.plan_value ? `R$ ${c.plan_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '—'}</span>
                     <span>{format(new Date(c.created_at), 'dd/MM/yy', { locale: ptBR })}</span>
                   </div>
+                  {c.client_type === 'influencer' && (
+                    <AffiliateManager userId={c.user_id} fullName={c.full_name} />
+                  )}
                   <div className="flex justify-end gap-1">
                     {c.status !== 'active' && c.status !== 'no_project' && (
                       <Button
