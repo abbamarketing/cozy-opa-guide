@@ -100,13 +100,26 @@ Deno.serve(async (req) => {
   }
 
   // ─── Subscription tier mapping ───
-  const SUBSCRIPTION_TIERS: Record<string, { tier: string; sla: number; priority: number; monthly_quota: number }> = {
-    "abbavideo_standard": { tier: "standard", sla: 72, priority: 1, monthly_quota: 4  },
-    "abbavideo_pro":      { tier: "pro",      sla: 48, priority: 2, monthly_quota: 8  },
-    "abbavideo_business": { tier: "business", sla: 48, priority: 3, monthly_quota: 16 },
-    "abbavideo_premium":  { tier: "premium",  sla: 8,  priority: 4, monthly_quota: 30 },
-    "abbavideo_agency":   { tier: "agency",   sla: 4,  priority: 5, monthly_quota: 60 },
+  const SUBSCRIPTION_TIERS: Record<string, { tier: string; sla: number; priority: number }> = {
+    "abbavideo_standard": { tier: "standard", sla: 72, priority: 1 },
+    "abbavideo_pro":      { tier: "pro",      sla: 48, priority: 2 },
+    "abbavideo_business": { tier: "business", sla: 24, priority: 3 },
+    "abbavideo_premium":  { tier: "premium",  sla: 8,  priority: 4 },
+    "abbavideo_agency":   { tier: "agency",   sla: 4,  priority: 5 },
   };
+
+  /** Quota mensal: horas úteis do período / SLA. Usa 24h/dia, Seg-Sex. */
+  function computeMonthlyQuota(slaHours: number, periodStart: Date, periodEnd: Date): number {
+    let weekdayHours = 0;
+    const cursor = new Date(periodStart);
+    cursor.setHours(0, 0, 0, 0);
+    while (cursor < periodEnd) {
+      const day = cursor.getDay();
+      if (day !== 0 && day !== 6) weekdayHours += 24;
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    return Math.floor(weekdayHours / slaHours);
+  }
 
   try {
     switch (event.type) {
@@ -130,11 +143,14 @@ Deno.serve(async (req) => {
 
         // ─── Handler Subscription Tiers ───
         if (productId && SUBSCRIPTION_TIERS[productId]) {
-          const { tier, sla, priority, monthly_quota } = SUBSCRIPTION_TIERS[productId];
+          const { tier, sla, priority } = SUBSCRIPTION_TIERS[productId];
           console.log(`Processing subscription ${tier} for user: ${userId}`);
 
-          const now = new Date().toISOString();
-          const periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+          const periodStart = new Date();
+          const periodEndDate = new Date(periodStart.getTime() + 30 * 24 * 60 * 60 * 1000);
+          const monthly_quota = computeMonthlyQuota(sla, periodStart, periodEndDate);
+          const now = periodStart.toISOString();
+          const periodEnd = periodEndDate.toISOString();
 
           const brandName = session.metadata?.brand_name
             || session.customer_details?.name

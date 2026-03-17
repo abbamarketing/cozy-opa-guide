@@ -7,6 +7,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import type { UserProjectData } from '@/hooks/useUserProject';
+import { computeMonthlyQuota } from '@/lib/business-hours';
 
 const TIER_LABELS: Record<string, string> = {
   standard: 'Standard',
@@ -59,9 +60,16 @@ const SubscriptionQuotaCard = ({ userProject }: QuotaCardProps) => {
   const periodEnd = new Date(userProject.current_period_end);
   const daysUntilRenewal = differenceInDays(periodEnd, new Date());
 
-  const totalVideos = userProject.custom_project?.instagram_videos
-    ?? (userProject as any).monthly_quota
-    ?? 0;
+  const storedQuota = userProject.monthly_quota;
+  const totalVideos = storedQuota != null
+    ? storedQuota
+    : (userProject.sla_hours && userProject.current_period_start && userProject.current_period_end
+        ? computeMonthlyQuota(
+            userProject.sla_hours,
+            new Date(userProject.current_period_start),
+            new Date(userProject.current_period_end)
+          )
+        : userProject.custom_project?.instagram_videos ?? 0);
   const usedVideos = userProject.instagram_reserved + userProject.instagram_approved;
   const remaining = Math.max(0, totalVideos - usedVideos);
 

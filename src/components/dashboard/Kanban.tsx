@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import DeliveryCard, { type DeliveryData } from './DeliveryCard';
 import { useDeliveries } from '@/hooks/useDeliveries';
+import { computeMonthlyQuota } from '@/lib/business-hours';
 import type { UserProjectData } from '@/hooks/useUserProject';
 
 import ViewToggle, { type ViewMode } from '@/components/shared/ViewToggle';
@@ -98,7 +99,16 @@ const Kanban = ({ userProject }: KanbanProps) => {
     const isSubscription = userProject.client_type === 'subscription';
     if (isSubscription) {
       const used = (userProject.instagram_reserved ?? 0) + (userProject.instagram_approved ?? 0);
-      const total = userProject.monthly_quota ?? 0;
+      const storedQuota = userProject.monthly_quota;
+      const total = storedQuota != null
+        ? storedQuota
+        : (userProject.sla_hours && userProject.current_period_start && userProject.current_period_end
+            ? computeMonthlyQuota(
+                userProject.sla_hours,
+                new Date(userProject.current_period_start),
+                new Date(userProject.current_period_end)
+              )
+            : 0);
       return used < total;
     }
     const p = userProject.custom_project;
