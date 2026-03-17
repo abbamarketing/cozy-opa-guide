@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-
-import { Crown, Zap, Clock, Film } from 'lucide-react';
+import { Crown, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
-import { SlaCountdown } from '@/components/editor/SlaCountdown';
 import type { UserProjectData } from '@/hooks/useUserProject';
 
 interface Props {
@@ -12,21 +11,14 @@ interface Props {
 
 const TIER_LABELS: Record<string, string> = {
   standard: 'Standard',
-  pro:      'Pro',
+  pro: 'Pro',
   business: 'Business',
-  premium:  'Premium',
-  agency:   'Agency',
+  premium: 'Premium',
+  agency: 'Agency',
 };
 
-interface InProgressDelivery {
-  title: string;
-  sla_deadline: string | null;
-}
-
 const SubscriptionStatusCard = ({ userProject }: Props) => {
-  const [inProgress, setInProgress] = useState<InProgressDelivery | null>(null);
-  const [queueCount, setQueueCount] = useState(0);
-  
+  const [usedCount, setUsedCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const tierLabel =
@@ -34,98 +26,58 @@ const SubscriptionStatusCard = ({ userProject }: Props) => {
     userProject.subscription_tier ||
     'Assinatura';
   const sla = userProject.sla_hours;
+  const quota = (userProject as any).monthly_quota ?? 0;
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchUsed = async () => {
       setLoading(true);
-
-      const { data: deliveryData } = await supabase
-        .from('deliveries')
-        .select('title, sla_deadline')
-        .eq('user_project_id', userProject.id)
-        .eq('status', 'in_progress')
-        .limit(1)
-        .maybeSingle();
-
-      setInProgress(deliveryData as InProgressDelivery | null);
-
       const { count } = await supabase
         .from('deliveries')
         .select('*', { count: 'exact', head: true })
         .eq('user_project_id', userProject.id)
-        .eq('status', 'queue');
-
-      setQueueCount(count ?? 0);
-
-
+        .in('status', ['in_progress', 'review', 'revision', 'approved', 'queue'] as any[]);
+      setUsedCount(count ?? 0);
       setLoading(false);
     };
-
-    fetchData();
+    fetchUsed();
   }, [userProject.id]);
 
-  const formatDeadlineBRT = (iso: string) => {
-    const d = new Date(iso);
-    return d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-  };
+  const pct = quota > 0 ? Math.min(100, Math.round((usedCount / quota) * 100)) : 0;
 
   if (loading) {
-    return (
-      <div className="kpi-dark animate-pulse" style={{ minHeight: '80px' }} />
-    );
+    return <div className="animate-pulse rounded-lg bg-muted/20 h-[88px]" />;
   }
 
   return (
-    <div data-tour="subscription-card">
-      <div className="kpi-dark" style={{ minHeight: 'auto' }}>
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <Crown className="h-4 w-4 text-abba-lime" />
-            <span className="text-sm font-sans font-semibold text-abba-lime">{tierLabel}</span>
-          </div>
-          {sla && (
-            <Badge variant="outline" className="text-[10px] bg-abba-lime/10 text-abba-lime border-abba-lime/30 rounded-full">
-              <Zap className="h-3 w-3 mr-0.5" /> SLA {sla}h
-            </Badge>
-          )}
+    <div data-tour="subscription-card" className="rounded-lg border border-border/30 bg-card/60 p-3 space-y-2.5">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          <Crown className="h-4 w-4 text-abba-lime" />
+          <span className="text-sm font-semibold text-abba-lime">{tierLabel}</span>
         </div>
-
-        <div className="space-y-2">
-          {/* In-progress delivery */}
-          {inProgress ? (
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-1.5">
-                <Film className="h-3 w-3 text-abba-lime" />
-                <span className="text-xs font-sans text-foreground truncate">
-                  {inProgress.title}
-                </span>
-              </div>
-              {inProgress.sla_deadline && sla && (
-                <div className="flex items-center gap-2 ml-[18px]">
-                  <span className="text-[10px] font-sans text-white/60">
-                    deadline: {formatDeadlineBRT(inProgress.sla_deadline)}
-                  </span>
-                  <SlaCountdown slaDeadline={inProgress.sla_deadline} slaHours={sla} />
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex items-center gap-1.5">
-              <Clock className="h-3 w-3 text-white/60" />
-              <span className="text-xs font-sans text-white/60">
-                Nenhum vídeo em produção agora
-              </span>
-            </div>
-          )}
-
-          {/* Queue count */}
-          <div className="text-[10px] font-sans text-white/60">
-            Fila: {queueCount} vídeo(s) aguardando
-          </div>
-
-
-        </div>
+        {sla && (
+          <Badge variant="outline" className="text-[10px] bg-abba-lime/10 text-abba-lime border-abba-lime/30 rounded-full px-2 py-0.5">
+            <Zap className="h-3 w-3 mr-0.5" /> SLA {sla}h
+          </Badge>
+        )}
       </div>
+
+      {/* Usage bar */}
+      {quota > 0 && (
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-muted-foreground">Vídeos este mês</span>
+            <span className="text-[11px] font-medium text-foreground">{usedCount} / {quota}</span>
+          </div>
+          <Progress value={pct} className="h-1.5 bg-muted/30 [&>div]:bg-abba-lime" />
+        </div>
+      )}
+
+      {/* Period end */}
+      <p className="text-[10px] text-muted-foreground">
+        Renova em {new Date(userProject.current_period_end).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+      </p>
     </div>
   );
 };
