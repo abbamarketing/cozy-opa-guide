@@ -128,6 +128,10 @@ const Admin = () => {
           </div>
           <div className="flex items-center gap-2">
             <NotificationBell />
+            <Button variant="ghost" size="sm" onClick={() => navigate('/admin/preview')} className="hidden md:flex text-xs gap-1.5 border border-amber-500/30 text-amber-400 hover:bg-amber-500/10">
+              <Eye className="h-3.5 w-3.5" />
+              Preview
+            </Button>
             <Button variant="ghost" size="sm" onClick={restartAdminTour} className="hidden md:flex text-xs">Reiniciar Tour</Button>
             <Button variant="ghost" size="sm" onClick={signOut} className="hidden md:flex">Sair</Button>
           </div>
