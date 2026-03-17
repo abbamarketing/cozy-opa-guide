@@ -50,7 +50,7 @@ const SUBSCRIPTION_VALUES: Record<string, number> = {
 const CLIENT_TYPE_BADGE: Record<string, { label: string; className: string }> = {
   custom: { label: 'Custom', className: 'bg-blue-500/15 text-blue-500 border-blue-500/30' },
   subscription: { label: 'Assinatura', className: 'bg-green-500/15 text-green-500 border-green-500/30' },
-  studio: { label: 'Studio', className: 'bg-purple-500/15 text-purple-500 border-purple-500/30' },
+  influencer: { label: 'Influencer', className: 'bg-violet-500/15 text-violet-500 border-violet-500/30' },
 };
 
 const STATUS_MAP: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
