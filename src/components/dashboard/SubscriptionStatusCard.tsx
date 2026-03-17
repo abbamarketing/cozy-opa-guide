@@ -1,3 +1,5 @@
+// 🎨 Design system: ver DESIGN_SYSTEM.md na raiz do projeto.
+// Regras: cards p-4, text-sm para labels, ícones h-4 w-4, banners compactos em 1 linha.
 import { useEffect, useState } from 'react';
 import { Crown, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
