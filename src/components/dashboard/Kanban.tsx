@@ -5,7 +5,7 @@ import { Plus, Camera, AlertCircle, Video, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Badge } from '@/components/ui/badge';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import DeliveryCard, { type DeliveryData } from './DeliveryCard';
 import { useDeliveries } from '@/hooks/useDeliveries';
@@ -236,14 +236,6 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
             dataTour="kanban-board"
             renderCard={(d) => (
               <div className="relative w-full min-w-0" data-tour={d.status === 'pending' ? 'delivery-card' : undefined}>
-                {d.status === 'queue' && (
-                  <div className="absolute top-2 right-2 z-10">
-                    <Badge variant="secondary" className="text-[9px] font-sans gap-1">
-                      <Clock className="h-2.5 w-2.5" />
-                      Aguardando editor
-                    </Badge>
-                  </div>
-                )}
                 <DeliveryCard
                   delivery={d}
                   onClick={() => setSelectedDelivery(d)}

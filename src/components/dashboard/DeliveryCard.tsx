@@ -112,21 +112,24 @@ const DeliveryCard = ({ delivery, onClick, clientType }: DeliveryCardProps) => {
       onClick={onClick}
       className="cursor-pointer card-elevate rounded-[20px] bg-abba-surface border border-white/8 p-3 space-y-2 w-full"
     >
-      {/* Title row */}
-      <div className="flex items-start gap-2">
+      {/* Linha 1: ícone + título + status de fila */}
+      <div className="flex items-start gap-2 min-w-0">
         <Icon className="mt-0.5 h-4 w-4 shrink-0 text-abba-lime" />
         <div className="min-w-0 flex-1 overflow-hidden">
           <p className="truncate text-sm font-sans font-semibold text-foreground">{delivery.title}</p>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-[11px] font-sans text-white/60">{displayLabel}</span>
-            {delivery.editor_name && (
-              <span className="text-[11px] font-sans text-white/60">· {delivery.editor_name}</span>
+          <div className="mt-0.5 flex items-center gap-1.5 text-[11px] font-sans text-white/60">
+            <span>{displayLabel}</span>
+            {delivery.editor_name && <span>· {delivery.editor_name}</span>}
+            {delivery.status === 'queue' && (
+              <Badge variant="secondary" className="h-4 px-1.5 text-[9px] font-sans leading-none">
+                · Aguardando editor
+              </Badge>
             )}
           </div>
         </div>
       </div>
 
-      {/* SLA section */}
+      {/* Linha 2: SLA + barra de progresso */}
       {delivery.due_date && !isCompleted && (
         <div className="space-y-1.5">
           <div className="flex items-center gap-1.5 text-[11px] font-sans">
@@ -138,13 +141,10 @@ const DeliveryCard = ({ delivery, onClick, clientType }: DeliveryCardProps) => {
             <span className="text-white/60">
               {format(new Date(delivery.due_date), "dd/MM HH'h'", { locale: ptBR })}
             </span>
-            <span className={`ml-auto font-medium ${sla.color}`}>
-              {sla.label}
-            </span>
+            <span className={`ml-auto font-medium ${sla.color}`}>{sla.label}</span>
           </div>
 
-          {/* Progress bar */}
-          <div className="w-full rounded-full overflow-hidden bg-white/5" style={{ height: '6px' }}>
+          <div className="h-[6px] w-full overflow-hidden rounded-full bg-white/5">
             <div
               className="h-full rounded-full transition-all"
               style={{
@@ -156,6 +156,7 @@ const DeliveryCard = ({ delivery, onClick, clientType }: DeliveryCardProps) => {
         </div>
       )}
 
+      {/* SLA para entrega concluída */}
       {delivery.due_date && isCompleted && (
         <div className="flex items-center gap-1.5 text-[11px] font-sans">
           <Clock className="h-3 w-3 text-white/60" />
@@ -165,6 +166,7 @@ const DeliveryCard = ({ delivery, onClick, clientType }: DeliveryCardProps) => {
         </div>
       )}
 
+      {/* Revisões */}
       <p className="text-[11px] font-sans text-white/60">
         Revisões: {delivery.revision_count}/{delivery.max_revisions}
       </p>
