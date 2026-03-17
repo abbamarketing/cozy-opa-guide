@@ -1149,6 +1149,53 @@ export type Database = {
         }
         Relationships: []
       }
+      support_tickets: {
+        Row: {
+          admin_notes: string | null
+          client_type: string | null
+          created_at: string
+          description: string
+          id: string
+          resolved_at: string | null
+          status: string
+          title: string
+          user_id: string
+          user_project_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          client_type?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          resolved_at?: string | null
+          status?: string
+          title: string
+          user_id: string
+          user_project_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          client_type?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          resolved_at?: string | null
+          status?: string
+          title?: string
+          user_id?: string
+          user_project_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_user_project_id_fkey"
+            columns: ["user_project_id"]
+            isOneToOne: false
+            referencedRelation: "user_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suppressed_emails: {
         Row: {
           created_at: string
