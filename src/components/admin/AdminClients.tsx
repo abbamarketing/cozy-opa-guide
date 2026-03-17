@@ -50,7 +50,7 @@ const SUBSCRIPTION_VALUES: Record<string, number> = {
 const CLIENT_TYPE_BADGE: Record<string, { label: string; className: string }> = {
   custom: { label: 'Custom', className: 'bg-blue-500/15 text-blue-500 border-blue-500/30' },
   subscription: { label: 'Assinatura', className: 'bg-green-500/15 text-green-500 border-green-500/30' },
-  studio: { label: 'Studio', className: 'bg-purple-500/15 text-purple-500 border-purple-500/30' },
+  influencer: { label: 'Influencer', className: 'bg-violet-500/15 text-violet-500 border-violet-500/30' },
 };
 
 const STATUS_MAP: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
@@ -147,15 +147,14 @@ const AdminClients = () => {
 
       const planValue = proj
         ? Number(proj.monthly_value)
-        : (up?.client_type === 'subscription' && up?.subscription_tier)
+        : ((up?.client_type === 'subscription' || up?.client_type === 'influencer') && up?.subscription_tier)
           ? (SUBSCRIPTION_VALUES[up.subscription_tier] ?? null)
           : null;
 
       const displayName = proj?.project_name
-        || (up?.client_type === 'subscription'
-            ? `Assinatura ${up?.subscription_tier ? up.subscription_tier.charAt(0).toUpperCase() + up.subscription_tier.slice(1) : ''}`.trim()
+        || ((up?.client_type === 'subscription' || up?.client_type === 'influencer')
+            ? `${up?.client_type === 'influencer' ? 'Influencer' : 'Assinatura'} ${up?.subscription_tier ? up.subscription_tier.charAt(0).toUpperCase() + up.subscription_tier.slice(1) : ''}`.trim()
             : null)
-        || (up?.client_type === 'studio' ? 'Studio' : null)
         || 'Sem projeto';
 
       return {
@@ -272,7 +271,7 @@ const AdminClients = () => {
           toast.error('Erro ao atualizar status', { description: message });
         }
       } else {
-        // Custom/studio — local update only
+        // Custom/influencer — local update only
         const { error } = await supabase
           .from('user_projects')
           .update({ status: newStatus } as any)
@@ -380,7 +379,7 @@ const AdminClients = () => {
               <SelectItem value="all">Todos tipos</SelectItem>
               <SelectItem value="custom">Custom</SelectItem>
               <SelectItem value="subscription">Assinatura</SelectItem>
-              <SelectItem value="studio">Studio</SelectItem>
+              <SelectItem value="influencer">Influencer</SelectItem>
             </SelectContent>
           </Select>
           <Button
