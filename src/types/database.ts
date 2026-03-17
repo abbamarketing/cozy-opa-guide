@@ -202,3 +202,56 @@ export interface CaptureSession {
   created_at: string;
   updated_at: string;
 }
+
+// Support Ticket
+export interface SupportTicket {
+  id: string;
+  user_id: string;
+  user_project_id: string | null;
+  client_type: string | null;
+  title: string;
+  description: string;
+  status: 'open' | 'in_progress' | 'resolved';
+  admin_notes: string | null;
+  resolved_at: string | null;
+  created_at: string;
+  // Joined
+  profiles?: { full_name: string | null };
+}
+
+// Affiliate System
+export interface AffiliateCode {
+  id: string;
+  user_id: string;
+  code: string;
+  active: boolean;
+  created_at: string;
+  // Joined
+  profiles?: { full_name: string | null };
+}
+
+export interface Referral {
+  id: string;
+  referred_user_id: string;
+  affiliate_code_id: string;
+  status: 'trialing' | 'converted' | 'churned';
+  trial_started_at: string;
+  converted_at: string | null;
+  churned_at: string | null;
+  created_at: string;
+  // Joined
+  profiles?: { full_name: string | null };
+}
+
+export interface AffiliateCommission {
+  id: string;
+  affiliate_code_id: string;
+  referral_id: string;
+  stripe_invoice_id: string;
+  amount_cents: number;
+  currency: string;
+  month: string;
+  status: 'pending' | 'paid';
+  paid_at: string | null;
+  created_at: string;
+}
