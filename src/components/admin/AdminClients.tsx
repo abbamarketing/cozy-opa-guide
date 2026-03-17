@@ -507,8 +507,9 @@ const AdminClients = () => {
               ) : (
                 clients.map((c) => {
                   const st = STATUS_MAP[c.status] || { label: 'Sem projeto', variant: 'secondary' as const };
-                  return (
-                    <TableRow key={c.user_id} className="border-border/30">
+                   return (
+                    <Fragment key={c.user_id}>
+                    <TableRow className="border-border/30">
                       <TableCell className="font-medium">{c.full_name || 'Sem nome'}</TableCell>
                       <TableCell className="text-sm">
                         <div className="flex items-center gap-1.5">
@@ -567,12 +568,13 @@ const AdminClients = () => {
                       </TableCell>
                     </TableRow>
                     {c.client_type === 'influencer' && (
-                      <TableRow key={`${c.user_id}-affiliate`} className="border-border/20 hover:bg-transparent">
+                      <TableRow className="border-border/20 hover:bg-transparent">
                         <TableCell colSpan={6} className="pt-0 pb-2">
                           <AffiliateManager userId={c.user_id} fullName={c.full_name} />
                         </TableCell>
                       </TableRow>
                     )}
+                    </Fragment>
                   );
                 })
               )}
