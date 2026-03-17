@@ -128,64 +128,6 @@ Deno.serve(async (req) => {
           break;
         }
 
-        // ─── Handler Studio (pagamento único) ───
-        if (productId === "abbavideo_studio") {
-          console.log(`Processing Studio purchase for user: ${userId}`);
-
-          await supabase.from("studio_credits").upsert({
-            user_id: userId,
-            credits_available: 10,
-            credits_used: 0,
-            period_start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
-            period_end: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString(),
-          }, { onConflict: "user_id,period_start" });
-
-          const { data: existingUp } = await supabase
-            .from("user_projects")
-            .select("id")
-            .eq("user_id", userId)
-            .maybeSingle();
-
-          if (existingUp) {
-            // Usuário já tem projeto (assinatura) — apenas habilita studio_access
-            await supabase
-              .from("user_projects")
-              .update({ studio_access: true })
-              .eq("id", existingUp.id);
-          } else {
-            // Usuário comprou SOMENTE o Studio — criar user_project com client_type studio
-            await supabase.from("user_projects").insert({
-              user_id: userId,
-              client_type: "studio",
-              status: "active",
-              studio_access: true,
-              current_period_start: new Date().toISOString(),
-              current_period_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-              youtube_reserved: 0,
-              youtube_approved: 0,
-              instagram_reserved: 0,
-              instagram_approved: 0,
-              thumbnails_reserved: 0,
-              thumbnails_approved: 0,
-              covers_reserved: 0,
-              covers_approved: 0,
-              captures_reserved: 0,
-              captures_approved: 0,
-              tour_completed: false,
-            });
-          }
-
-          await supabase.from("system_logs").insert({
-            level: "info",
-            message: `Studio purchase completed for user ${userId}`,
-            source: "stripe-webhook",
-            user_id: userId,
-            context: { event_id: event.id, session_id: session.id, product_id: productId },
-          });
-
-          break;
-        }
-
         // ─── Handler Subscription Tiers ───
         if (productId && SUBSCRIPTION_TIERS[productId]) {
           const { tier, sla, priority, monthly_quota } = SUBSCRIPTION_TIERS[productId];
