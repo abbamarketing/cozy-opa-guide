@@ -49,6 +49,8 @@ const ClientAssignment = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<(ClientProfile & { email?: string }) | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
+  const [assignmentMode, setAssignmentMode] = useState<'custom' | 'influencer'>('custom');
+  const [selectedTier, setSelectedTier] = useState<string>('');
   const [sendEmail, setSendEmail] = useState(true);
   const [assigning, setAssigning] = useState(false);
 
