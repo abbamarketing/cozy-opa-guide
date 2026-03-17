@@ -401,7 +401,7 @@ const NewDeliveryModal = ({
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-card-foreground">Vídeo</p>
                   <p className="text-[10px] text-muted-foreground">
-                    Entrega garantida em até {(userProject as any).sla_hours ?? 72}h úteis (Seg–Sex)
+                    Entrega garantida em até {userProject.sla_hours ?? 72}h úteis (Seg–Sex)
                   </p>
                 </div>
               </div>

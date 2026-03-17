@@ -109,7 +109,7 @@ const Index = () => {
 
       await supabase
         .from('profiles')
-        .update({ referred_by: refCode } as any)
+        .update({ referred_by: refCode })
         .eq('user_id', user.id);
 
       localStorage.removeItem('affiliate_ref');

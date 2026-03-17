@@ -57,7 +57,7 @@ const SubscriptionStatusCard = ({ userProject }: QuotaCardProps) => {
   const periodEnd = new Date(userProject.current_period_end);
   const daysUntilRenewal = differenceInDays(periodEnd, new Date());
   const tierLabel = getTierLabel(userProject.subscription_tier);
-  const slaHours = (userProject as any).sla_hours ?? 72;
+  const slaHours = userProject.sla_hours ?? 72;
 
   const content = (
     <div className="space-y-2">

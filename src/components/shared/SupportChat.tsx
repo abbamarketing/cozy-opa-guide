@@ -70,7 +70,7 @@ export function SupportChat({ role = 'client' }: SupportChatProps) {
     if (!reportTitle.trim() || !reportDesc.trim() || !session) return;
     setReportLoading(true);
     try {
-      await supabase.from('support_tickets' as any).insert({
+      await supabase.from('support_tickets').insert({
         user_id: session.user.id,
         user_project_id: userProject?.id ?? null,
         client_type: userProject?.client_type ?? role,
