@@ -160,16 +160,14 @@ const DeliveryCard = ({ delivery, onClick }: DeliveryCardProps) => {
           </div>
 
           {/* Progress bar */}
-          <div className="progress-track" style={{ height: '28px' }}>
+          <div className="w-full rounded-full overflow-hidden bg-white/5" style={{ height: '6px' }}>
             <div
-              className="progress-fill text-[11px]"
+              className="h-full rounded-full transition-all"
               style={{
                 width: `${sla.progressPercent}%`,
                 background: sla.level === 'danger' || sla.level === 'overdue' ? '#ef4444' : '#A0E870',
               }}
-            >
-              {sla.label}
-            </div>
+            />
           </div>
         </div>
       )}

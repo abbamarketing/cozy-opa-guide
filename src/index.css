@@ -118,21 +118,6 @@
     pointer-events: none;
   }
 
-  /* Barra de progresso grossa */
-  .progress-track {
-    height: 44px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.06);
-    overflow: hidden;
-    position: relative;
-  }
-  .progress-fill {
-    height: 100%; border-radius: 999px;
-    background: #A0E870;
-    display: flex; align-items: center; padding: 0 20px;
-    font-size: 15px; font-weight: 700; color: #111;
-  }
 
   /* FAB */
   .fab {
