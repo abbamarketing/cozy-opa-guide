@@ -268,13 +268,13 @@ const NewDeliveryModal = ({
       let dueDate: string;
       let priorityLevel = 1;
 
-      if (isSubscriptionLike && (userProject as any).sla_hours) {
-        const deadline = countWeekdayHours(new Date(), (userProject as any).sla_hours);
+      if (isSubscriptionLike && userProject.sla_hours) {
+        const deadline = countWeekdayHours(new Date(), userProject.sla_hours);
         dueDate = deadline.toISOString();
-        priorityLevel = (userProject as any).priority_level ?? 1;
+        priorityLevel = userProject.priority_level ?? 1;
       } else {
         dueDate = addBusinessHours(new Date(), getDeadlineHours()).toISOString();
-        priorityLevel = (userProject as any).priority_level ?? 1;
+        priorityLevel = userProject.priority_level ?? 1;
       }
 
       let fullDescription = values.description;
