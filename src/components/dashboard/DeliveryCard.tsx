@@ -116,7 +116,7 @@ const DeliveryCard = ({ delivery, onClick, clientType }: DeliveryCardProps) => {
       <div className="flex items-start gap-2 min-w-0">
         <Icon className="mt-0.5 h-4 w-4 shrink-0 text-abba-lime" />
         <div className="min-w-0 flex-1 overflow-hidden">
-          <p className="truncate text-sm font-sans font-semibold text-foreground">{delivery.title.length > 38 ? delivery.title.slice(0, 38) + '…' : delivery.title}</p>
+          <p className="line-clamp-2 break-words text-sm font-sans font-semibold text-foreground">{delivery.title}</p>
           <div className="mt-0.5 flex items-center gap-1.5 text-[11px] font-sans text-white/60">
             <span>{displayLabel}</span>
             {delivery.editor_name && <span>· {delivery.editor_name}</span>}
