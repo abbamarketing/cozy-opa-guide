@@ -44,6 +44,7 @@ export interface CustomProject {
   payment_frequency: PaymentFrequency;
   max_revisions: number;
   deadline: DeadlineType;
+  custom_slug: string | null;
   stripe_product_id: string | null;
   stripe_price_id: string | null;
   active: boolean;
