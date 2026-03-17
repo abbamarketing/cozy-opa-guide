@@ -321,6 +321,47 @@ Deno.serve(async (req) => {
           context: { event_id: event.id, subscription_status: subscription.status, new_period: isNewPeriod },
         });
 
+        // Create referral record if subscription is trialing
+        if (subscription.status === "trialing") {
+          const { data: upWithProfile } = await supabase
+            .from("user_projects")
+            .select("user_id")
+            .eq("stripe_subscription_id", subscriptionId)
+            .maybeSingle();
+
+          if (upWithProfile) {
+            const { data: prof } = await supabase
+              .from("profiles")
+              .select("referred_by")
+              .eq("user_id", upWithProfile.user_id)
+              .maybeSingle();
+
+            if (prof?.referred_by) {
+              const { data: affCode } = await supabase
+                .from("affiliate_codes")
+                .select("id")
+                .eq("code", prof.referred_by)
+                .single();
+
+              if (affCode) {
+                await supabase.from("referrals").upsert({
+                  affiliate_code_id: affCode.id,
+                  referred_user_id: upWithProfile.user_id,
+                  trial_start: subscription.trial_start
+                    ? new Date(subscription.trial_start * 1000).toISOString() : null,
+                  trial_end: subscription.trial_end
+                    ? new Date(subscription.trial_end * 1000).toISOString() : null,
+                  stripe_subscription_id: subscription.id,
+                  plan: "standard",
+                  status: "trialing",
+                }, { onConflict: "stripe_subscription_id" });
+
+                console.log(`Referral created for user ${upWithProfile.user_id} via code ${prof.referred_by}`);
+              }
+            }
+          }
+        }
+
         break;
       }
 
