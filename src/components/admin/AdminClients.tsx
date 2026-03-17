@@ -271,7 +271,7 @@ const AdminClients = () => {
           toast.error('Erro ao atualizar status', { description: message });
         }
       } else {
-        // Custom/studio — local update only
+        // Custom/influencer — local update only
         const { error } = await supabase
           .from('user_projects')
           .update({ status: newStatus } as any)
