@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle, Clock, ArrowRight, ArrowDown, Sparkles, MessageSquare, Send, FileText, Zap } from 'lucide-react';
+import { CheckCircle, Clock, ArrowRight, ArrowDown, Camera, Calendar, MessageSquare, Send, Zap } from 'lucide-react';
 import abbaLogo from '@/assets/abba-logo.png';
 import screenshotDashboard from '@/assets/screenshot-dashboard-desktop.jpg';
 import { Button } from '@/components/ui/button';
@@ -37,10 +37,6 @@ const FAQ = [
   {
     q: 'E se eu não gostar da edição?',
     a: 'Pede revisão no app, marca o segundo exato se precisar, e o vídeo volta para produção — com o mesmo prazo garantido. Sem limite de revisões, sem custo adicional.',
-  },
-  {
-    q: 'O que é o Studio?',
-    a: 'Ferramenta de roteiro com IA inclusa em todos os planos. Também disponível separado — paga uma vez e usa para sempre.',
   },
   {
     q: 'Posso cancelar?',
@@ -182,7 +178,7 @@ const Landing = () => {
         </motion.div>
       </section>
 
-      {/* ─── CRIE O ROTEIRO (STUDIO) ─── */}
+      {/* ─── CAPTAÇÃO PROFISSIONAL ─── */}
       <section className="border-t border-abba-surface bg-abba-surface/30 py-20 px-6">
         <div className="mx-auto max-w-4xl">
           <motion.div
@@ -192,50 +188,33 @@ const Landing = () => {
             className="text-center space-y-4 mb-12"
           >
             <Badge variant="secondary" className="text-xs font-sans rounded-full">
-              <Sparkles className="h-3 w-3 mr-1" /> Studio — IA para Roteiros
+              <Camera className="h-3 w-3 mr-1" /> Captação Profissional
             </Badge>
-            <h2 className="text-2xl font-sans font-bold sm:text-3xl">Crie o roteiro</h2>
-            <p className="text-white/50 font-sans text-sm">Antes de gravar, tenha o roteiro certo.</p>
+            <h2 className="text-2xl font-sans font-bold sm:text-3xl">Do briefing à entrega</h2>
+            <p className="text-white/50 font-sans text-sm">Agende sua sessão, acompanhe cada etapa no kanban e aprove o resultado final.</p>
           </motion.div>
 
-          {/* Studio mock */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="rounded-[20px] bg-abba-surface border border-white/8 p-6 sm:p-8 space-y-6"
+            className="rounded-[20px] bg-abba-surface border border-white/8 p-6 sm:p-8"
           >
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1">
-                {['Tema', 'Público', 'Tom', 'Referência', 'Gerar'].map((step, i) => (
-                  <span
-                    key={step}
-                    className={`px-3 py-1 rounded-full text-[11px] font-sans font-semibold ${
-                      i === 4
-                        ? 'bg-abba-lime text-[#111]'
-                        : i < 4
-                        ? 'bg-abba-lime/20 text-abba-lime'
-                        : 'bg-white/10 text-white/40'
-                    }`}
-                  >
-                    {step}
-                  </span>
-                ))}
-              </div>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {[
+                { step: '1', icon: <Calendar className="h-5 w-5 text-abba-lime" />, label: 'Briefing', desc: 'Defina identidade, tom e referências do projeto.' },
+                { step: '2', icon: <Camera className="h-5 w-5 text-abba-lime" />, label: 'Captação', desc: 'Agende a sessão e acompanhe o status em tempo real.' },
+                { step: '3', icon: <CheckCircle className="h-5 w-5 text-abba-lime" />, label: 'Entrega', desc: 'Revise, peça ajustes e aprove com um clique.' },
+              ].map((item) => (
+                <div key={item.step} className="rounded-xl bg-abba-dark/60 border border-white/6 p-5 space-y-3 text-center">
+                  <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-abba-lime/15">
+                    {item.icon}
+                  </div>
+                  <p className="text-sm font-sans font-semibold text-white">{item.step}. {item.label}</p>
+                  <p className="text-xs font-sans text-white/50">{item.desc}</p>
+                </div>
+              ))}
             </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="rounded-xl bg-abba-dark/60 border border-white/6 p-4 space-y-2">
-                <p className="text-[11px] font-sans font-semibold text-white/40 uppercase tracking-wider">Tema</p>
-                <p className="text-sm font-sans text-white/80">5 hábitos que mudaram minha produtividade</p>
-              </div>
-              <div className="rounded-xl bg-abba-dark/60 border border-white/6 p-4 space-y-2">
-                <p className="text-[11px] font-sans font-semibold text-white/40 uppercase tracking-wider">Tom</p>
-                <p className="text-sm font-sans text-white/80">Direto, confiante, sem enrolação</p>
-              </div>
-            </div>
-            <Button className="bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light w-full sm:w-auto">
-              <Sparkles className="h-4 w-4 mr-2" /> Gerar Roteiro
-            </Button>
           </motion.div>
 
           <motion.div
@@ -245,14 +224,10 @@ const Landing = () => {
             className="mt-8 text-center space-y-3"
           >
             <p className="text-sm font-sans text-white/70">
-              O Studio é a ferramenta de roteiro com IA do AbbaVideo. Em 5 passos, você transforma um tema em roteiro estruturado
-              — com hook, desenvolvimento, CTA e palavras-chave prontas para gravar.
+              Todo o processo acontece dentro do seu dashboard — do agendamento da captação até a aprovação final, sem sair da plataforma.
             </p>
             <p className="text-sm font-sans text-white font-medium">
-              Hook que para o scroll. Estrutura que segura até o fim. Tom que é o seu.
-            </p>
-            <p className="text-xs font-sans text-abba-lime font-semibold">
-              10 roteiros por mês. Todo mês. Incluso em todos os planos.
+              Transparência total. Controle total. Do início ao fim.
             </p>
           </motion.div>
         </div>
@@ -453,61 +428,14 @@ const Landing = () => {
             <p className="text-white/50 font-sans text-sm">Escolha pela velocidade que o seu ritmo exige.</p>
           </motion.div>
 
-          <div className="grid gap-6 sm:grid-cols-2 max-w-3xl mx-auto">
-            {/* Studio Plan */}
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              custom={0}
-            >
-              <div className="flex flex-col rounded-[20px] bg-abba-surface border border-white/8 p-6 h-full">
-                <div className="flex items-center gap-2 mb-1">
-                  <FileText className="h-4 w-4 text-abba-lime" />
-                  <h3 className="text-lg font-sans font-bold text-white">Studio</h3>
-                </div>
-                <p className="text-xs font-sans text-white/50 mb-4">Comece aqui</p>
-                <p className="text-sm font-sans text-white/70 mb-4">
-                  Para quem quer gravar com mais clareza e consistência.
-                </p>
-                <ul className="space-y-2 text-sm font-sans text-white/60 flex-1">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    10 roteiros por mês com IA — para sempre
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    Pipeline guiado em 5 passos
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    Hook, desenvolvimento, CTA e palavras-chave
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    Histórico completo de roteiros gerados
-                  </li>
-                </ul>
-                <p className="text-xs font-sans text-white/40 mt-4 mb-4">
-                  Paga uma vez. Usa para sempre.
-                </p>
-                <Button
-                  className="w-full rounded-full font-bold border border-white/20 text-white hover:bg-abba-surface bg-transparent"
-                  asChild
-                >
-                  <Link to="/auth">Criar meu primeiro roteiro</Link>
-                </Button>
-              </div>
-            </motion.div>
-
+          <div className="max-w-md mx-auto">
             {/* Standard Plan */}
             <motion.div
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={1}
+              custom={0}
             >
               <div className="relative flex flex-col rounded-[20px] kpi-dark border-2 border-abba-lime p-6 h-full" style={{ minHeight: 'auto' }}>
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-abba-lime text-[#111] font-bold rounded-full px-3 py-0.5 text-[11px] uppercase tracking-widest flex items-center gap-1">
@@ -540,10 +468,6 @@ const Landing = () => {
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
                     Briefing de marca salvo — sem explicar de novo
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Sparkles className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    Studio incluso
                   </li>
                 </ul>
                 <p className="text-xs font-sans text-white/40 mt-4 mb-4">
@@ -652,9 +576,9 @@ const Landing = () => {
               <Link to="/auth">Começar 7 dias grátis</Link>
             </Button>
             <Button variant="outline" size="lg" asChild className="border border-white/20 text-white rounded-full hover:bg-abba-surface">
-              <Link to="/auth">
-                Criar roteiro com IA <Sparkles className="ml-2 h-4 w-4" />
-              </Link>
+              <a href="#planos">
+                Ver planos <ArrowRight className="ml-2 h-4 w-4" />
+              </a>
             </Button>
           </div>
           <p className="text-xs font-sans text-white/40">
