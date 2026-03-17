@@ -1,3 +1,5 @@
+// 🎨 Design system: ver DESIGN_SYSTEM.md na raiz do projeto.
+// Regras: cards p-4, text-sm para labels, ícones h-4 w-4, banners compactos em 1 linha.
 import { useState, useEffect } from 'react';
 import abbaLogo from '@/assets/abba-logo.png';
 import { useRole } from '@/hooks/useRole';
