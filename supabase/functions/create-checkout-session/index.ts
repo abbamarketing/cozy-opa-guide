@@ -105,9 +105,30 @@ Deno.serve(async (req) => {
     // 4. Get or create Stripe customer
     const { data: profile } = await supabase
       .from("profiles")
-      .select("full_name")
+      .select("full_name, referred_by")
       .eq("user_id", userId)
       .maybeSingle();
+
+    // Check for affiliate trial eligibility (Standard plan + active affiliate code)
+    let trialDays = 0;
+    if (profile?.referred_by) {
+      const adminClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      );
+      const { data: affiliateCode } = await adminClient
+        .from("affiliate_codes")
+        .select("id, active")
+        .eq("code", profile.referred_by)
+        .single();
+
+      const isStandard = template?.custom_slug === "abbavideo_standard" ||
+        userProject.subscription_tier === "standard";
+
+      if (affiliateCode?.active && isStandard) {
+        trialDays = 7;
+      }
+    }
 
     // Search for existing customer by email
     let customerId: string | null = null;
@@ -172,7 +193,7 @@ Deno.serve(async (req) => {
 
     // 7. Create checkout session
     const siteUrl = Deno.env.get("SITE_URL") || req.headers.get("origin") || "http://localhost:5173";
-    const session = await stripeRequest("/checkout/sessions", "POST", {
+    const sessionParams: Record<string, string> = {
       customer: customerId!,
       "line_items[0][price]": stripePriceId!,
       "line_items[0][quantity]": "1",
@@ -184,7 +205,13 @@ Deno.serve(async (req) => {
       "metadata[project_template_id]": template.id,
       "subscription_data[metadata][user_id]": userId,
       "subscription_data[metadata][user_project_id]": userProject.id,
-    });
+    };
+
+    if (trialDays > 0) {
+      sessionParams["subscription_data[trial_period_days]"] = String(trialDays);
+    }
+
+    const session = await stripeRequest("/checkout/sessions", "POST", sessionParams);
 
     return new Response(
       JSON.stringify({ url: session.url, session_id: session.id }),

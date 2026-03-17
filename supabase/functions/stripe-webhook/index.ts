@@ -273,6 +273,8 @@ Deno.serve(async (req) => {
         // Map Stripe status to our status
         if (subscription.status === "active") {
           updateData.status = "active";
+        } else if (subscription.status === "trialing") {
+          updateData.status = "active"; // treat trialing as active for access
         } else if (subscription.status === "past_due" || subscription.status === "unpaid") {
           updateData.status = "suspended";
         } else if (subscription.status === "canceled") {
@@ -319,6 +321,88 @@ Deno.serve(async (req) => {
           context: { event_id: event.id, subscription_status: subscription.status, new_period: isNewPeriod },
         });
 
+        // Create referral record if subscription is trialing
+        if (subscription.status === "trialing") {
+          const { data: upWithProfile } = await supabase
+            .from("user_projects")
+            .select("user_id")
+            .eq("stripe_subscription_id", subscriptionId)
+            .maybeSingle();
+
+          if (upWithProfile) {
+            const { data: prof } = await supabase
+              .from("profiles")
+              .select("referred_by")
+              .eq("user_id", upWithProfile.user_id)
+              .maybeSingle();
+
+            if (prof?.referred_by) {
+              const { data: affCode } = await supabase
+                .from("affiliate_codes")
+                .select("id")
+                .eq("code", prof.referred_by)
+                .single();
+
+              if (affCode) {
+                await supabase.from("referrals").upsert({
+                  affiliate_code_id: affCode.id,
+                  referred_user_id: upWithProfile.user_id,
+                  trial_start: subscription.trial_start
+                    ? new Date(subscription.trial_start * 1000).toISOString() : null,
+                  trial_end: subscription.trial_end
+                    ? new Date(subscription.trial_end * 1000).toISOString() : null,
+                  stripe_subscription_id: subscription.id,
+                  plan: "standard",
+                  status: "trialing",
+                }, { onConflict: "stripe_subscription_id" });
+
+                console.log(`Referral created for user ${upWithProfile.user_id} via code ${prof.referred_by}`);
+              }
+            }
+          }
+        }
+
+        break;
+      }
+
+      // ─── invoice.payment_succeeded ───
+      case "invoice.payment_succeeded": {
+        const invoice = event.data.object as any;
+        if (!invoice.subscription || invoice.billing_reason === "subscription_create") {
+          break;
+        }
+
+        const { data: referral } = await supabase
+          .from("referrals")
+          .select("id, affiliate_code_id, status")
+          .eq("stripe_subscription_id", invoice.subscription)
+          .maybeSingle();
+
+        if (referral) {
+          const commissionCents = Math.floor((invoice.amount_paid ?? 0) * 0.20);
+          const monthDate = new Date();
+          monthDate.setDate(1);
+          const monthStr = monthDate.toISOString().split("T")[0];
+
+          await supabase
+            .from("affiliate_commissions")
+            .upsert({
+              affiliate_code_id: referral.affiliate_code_id,
+              referral_id: referral.id,
+              month: monthStr,
+              amount_cents: commissionCents,
+              status: "pending",
+            }, { onConflict: "referral_id,month", ignoreDuplicates: true });
+
+          if (referral.status === "trialing") {
+            await supabase
+              .from("referrals")
+              .update({ status: "active", converted_at: new Date().toISOString() })
+              .eq("id", referral.id);
+          }
+
+          console.log(`Commission ${commissionCents}c registered for referral ${referral.id}`);
+        }
         break;
       }
 
@@ -331,7 +415,6 @@ Deno.serve(async (req) => {
           .from("user_projects")
           .update({
             status: "cancelled",
-            // Keep current_period_end so user retains access until end of paid period
             current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
           })
           .eq("stripe_subscription_id", subscriptionId);
@@ -341,6 +424,12 @@ Deno.serve(async (req) => {
         } else {
           console.log(`Subscription ${subscriptionId} cancelled — access until period end`);
         }
+
+        // Mark referral as cancelled
+        await supabase
+          .from("referrals")
+          .update({ status: "cancelled" })
+          .eq("stripe_subscription_id", subscriptionId);
 
         await supabase.from("system_logs").insert({
           level: "warn",
