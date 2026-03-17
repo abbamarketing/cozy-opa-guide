@@ -178,7 +178,7 @@ const Landing = () => {
         </motion.div>
       </section>
 
-      {/* ─── CRIE O ROTEIRO (STUDIO) ─── */}
+      {/* ─── CAPTAÇÃO PROFISSIONAL ─── */}
       <section className="border-t border-abba-surface bg-abba-surface/30 py-20 px-6">
         <div className="mx-auto max-w-4xl">
           <motion.div
@@ -188,50 +188,33 @@ const Landing = () => {
             className="text-center space-y-4 mb-12"
           >
             <Badge variant="secondary" className="text-xs font-sans rounded-full">
-              <Sparkles className="h-3 w-3 mr-1" /> Studio — IA para Roteiros
+              <Camera className="h-3 w-3 mr-1" /> Captação Profissional
             </Badge>
-            <h2 className="text-2xl font-sans font-bold sm:text-3xl">Crie o roteiro</h2>
-            <p className="text-white/50 font-sans text-sm">Antes de gravar, tenha o roteiro certo.</p>
+            <h2 className="text-2xl font-sans font-bold sm:text-3xl">Do briefing à entrega</h2>
+            <p className="text-white/50 font-sans text-sm">Agende sua sessão, acompanhe cada etapa no kanban e aprove o resultado final.</p>
           </motion.div>
 
-          {/* Studio mock */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="rounded-[20px] bg-abba-surface border border-white/8 p-6 sm:p-8 space-y-6"
+            className="rounded-[20px] bg-abba-surface border border-white/8 p-6 sm:p-8"
           >
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1">
-                {['Tema', 'Público', 'Tom', 'Referência', 'Gerar'].map((step, i) => (
-                  <span
-                    key={step}
-                    className={`px-3 py-1 rounded-full text-[11px] font-sans font-semibold ${
-                      i === 4
-                        ? 'bg-abba-lime text-[#111]'
-                        : i < 4
-                        ? 'bg-abba-lime/20 text-abba-lime'
-                        : 'bg-white/10 text-white/40'
-                    }`}
-                  >
-                    {step}
-                  </span>
-                ))}
-              </div>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {[
+                { step: '1', icon: <Calendar className="h-5 w-5 text-abba-lime" />, label: 'Briefing', desc: 'Defina identidade, tom e referências do projeto.' },
+                { step: '2', icon: <Camera className="h-5 w-5 text-abba-lime" />, label: 'Captação', desc: 'Agende a sessão e acompanhe o status em tempo real.' },
+                { step: '3', icon: <CheckCircle className="h-5 w-5 text-abba-lime" />, label: 'Entrega', desc: 'Revise, peça ajustes e aprove com um clique.' },
+              ].map((item) => (
+                <div key={item.step} className="rounded-xl bg-abba-dark/60 border border-white/6 p-5 space-y-3 text-center">
+                  <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-abba-lime/15">
+                    {item.icon}
+                  </div>
+                  <p className="text-sm font-sans font-semibold text-white">{item.step}. {item.label}</p>
+                  <p className="text-xs font-sans text-white/50">{item.desc}</p>
+                </div>
+              ))}
             </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="rounded-xl bg-abba-dark/60 border border-white/6 p-4 space-y-2">
-                <p className="text-[11px] font-sans font-semibold text-white/40 uppercase tracking-wider">Tema</p>
-                <p className="text-sm font-sans text-white/80">5 hábitos que mudaram minha produtividade</p>
-              </div>
-              <div className="rounded-xl bg-abba-dark/60 border border-white/6 p-4 space-y-2">
-                <p className="text-[11px] font-sans font-semibold text-white/40 uppercase tracking-wider">Tom</p>
-                <p className="text-sm font-sans text-white/80">Direto, confiante, sem enrolação</p>
-              </div>
-            </div>
-            <Button className="bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light w-full sm:w-auto">
-              <Sparkles className="h-4 w-4 mr-2" /> Gerar Roteiro
-            </Button>
           </motion.div>
 
           <motion.div
@@ -241,14 +224,10 @@ const Landing = () => {
             className="mt-8 text-center space-y-3"
           >
             <p className="text-sm font-sans text-white/70">
-              O Studio é a ferramenta de roteiro com IA do AbbaVideo. Em 5 passos, você transforma um tema em roteiro estruturado
-              — com hook, desenvolvimento, CTA e palavras-chave prontas para gravar.
+              Todo o processo acontece dentro do seu dashboard — do agendamento da captação até a aprovação final, sem sair da plataforma.
             </p>
             <p className="text-sm font-sans text-white font-medium">
-              Hook que para o scroll. Estrutura que segura até o fim. Tom que é o seu.
-            </p>
-            <p className="text-xs font-sans text-abba-lime font-semibold">
-              10 roteiros por mês. Todo mês. Incluso em todos os planos.
+              Transparência total. Controle total. Do início ao fim.
             </p>
           </motion.div>
         </div>
