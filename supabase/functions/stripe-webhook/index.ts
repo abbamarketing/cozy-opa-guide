@@ -187,13 +187,11 @@ Deno.serve(async (req) => {
               sla_hours: sla,
               priority_level: priority,
               monthly_quota: monthly_quota,
-              studio_access: true,
               subscription_slug: slug,
               stripe_subscription_id: session.subscription,
               current_period_start: now,
               current_period_end: periodEnd,
               payment_confirmed_at: now,
-              script_credits: 12,
             });
           }
 
