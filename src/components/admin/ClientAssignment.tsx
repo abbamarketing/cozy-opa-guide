@@ -123,6 +123,72 @@ const ClientAssignment = () => {
 
   const selectedProject = projects.find((p) => p.id === selectedProjectId);
 
+  const handleAssignInfluencer = async () => {
+    if (!selectedClient || !selectedTier) return;
+    setAssigning(true);
+
+    const tierConfig = INFLUENCER_TIERS[selectedTier];
+    if (!tierConfig) { setAssigning(false); return; }
+
+    const periodStart = new Date();
+    const periodEnd = new Date(periodStart.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const quota = computeMonthlyQuota(tierConfig.sla_hours, periodStart, periodEnd);
+
+    // We need a custom_project_id — use the first active project as placeholder
+    const placeholderProjectId = projects[0]?.id;
+    if (!placeholderProjectId) {
+      toast.error('Nenhum projeto ativo encontrado para usar como base');
+      setAssigning(false);
+      return;
+    }
+
+    const { error: insertError } = await supabase
+      .from('user_projects')
+      .insert({
+        user_id: selectedClient.user_id,
+        custom_project_id: placeholderProjectId,
+        client_type: 'influencer',
+        status: 'active',
+        subscription_tier: tierConfig.subscription_tier,
+        monthly_quota: quota,
+        sla_hours: tierConfig.sla_hours,
+        current_period_start: periodStart.toISOString(),
+        current_period_end: periodEnd.toISOString(),
+        youtube_reserved: 0, youtube_approved: 0,
+        instagram_reserved: 0, instagram_approved: 0,
+        thumbnails_reserved: 0, thumbnails_approved: 0,
+        covers_reserved: 0, covers_approved: 0,
+      } as any);
+
+    if (insertError) {
+      toast.error('Erro ao criar projeto influencer', { description: insertError.message });
+      setAssigning(false);
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ assigned_project_id: placeholderProjectId } as any)
+      .eq('user_id', selectedClient.user_id);
+
+    if (updateError) {
+      toast.error('Erro ao atualizar perfil', { description: updateError.message });
+      setAssigning(false);
+      return;
+    }
+
+    logger.info('Influencer atribuído', { tier: selectedTier, client: selectedClient.full_name }, 'admin');
+    toast.success('Influencer configurado!', {
+      description: `${tierConfig.subscription_tier.charAt(0).toUpperCase() + tierConfig.subscription_tier.slice(1)} → ${selectedClient.full_name || 'Cliente'}`,
+    });
+
+    setModalOpen(false);
+    setSelectedClient(null);
+    setSelectedTier('');
+    setAssigning(false);
+    fetchData();
+  };
+
   const handleAssign = async () => {
     if (!selectedClient || !selectedProject) return;
     setAssigning(true);
