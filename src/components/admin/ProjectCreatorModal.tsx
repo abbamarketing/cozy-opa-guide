@@ -534,7 +534,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
                 {values.instagram_videos > 0 && <Badge variant="secondary"><Instagram className="h-3 w-3 mr-1" />{values.instagram_videos} IG/mês</Badge>}
                 {values.include_thumbnails && <Badge variant="secondary"><Image className="h-3 w-3 mr-1" />Thumbnails</Badge>}
                 {values.include_covers && <Badge variant="secondary"><FileImage className="h-3 w-3 mr-1" />Capas</Badge>}
-                {values.include_script && <Badge variant="secondary"><FileText className="h-3 w-3 mr-1" />Roteiro IA</Badge>}
+                
                 {values.include_capture && <Badge variant="secondary"><Camera className="h-3 w-3 mr-1" />Captação {values.max_captures}x/mês ({values.capture_lead_days}d)</Badge>}
               </div>
               <div className="flex gap-4 text-xs text-muted-foreground flex-wrap">

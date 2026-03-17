@@ -73,7 +73,7 @@ const GOD_MOCK_PROJECT: Omit<UserProjectData, 'user_id'> = {
   subscription_slug: null,
   custom_slug: null,
   monthly_quota: 999,
-  script_credits: 999,
+  
 };
 
 export const useUserProject = () => {
