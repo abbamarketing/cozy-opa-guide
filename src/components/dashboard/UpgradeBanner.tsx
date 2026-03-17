@@ -56,7 +56,9 @@ const UpgradeBanner = ({ userProject }: UpgradeBannerProps) => {
   const clientType = userProject.client_type;
   const tier = userProject.subscription_tier;
 
-  if (clientType !== 'subscription' && clientType !== 'influencer') return null;
+  // Se for influencer, não mostrar nada
+  if (userProject?.client_type === 'influencer') return null;
+  if (clientType !== 'subscription') return null;
   if (!tier || tier === 'agency') return null;
 
   const nextPlan = UPGRADE_MAP[tier];

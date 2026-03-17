@@ -229,7 +229,7 @@ const DashboardSidebar = ({
             />
           )}
           <SubscriptionStatusCard userProject={userProject} />
-          <UpgradeBanner userProject={userProject} />
+          {userProject?.client_type !== 'influencer' && <UpgradeBanner userProject={userProject} />}
         </div>
       )}
     </Sidebar>
@@ -396,7 +396,7 @@ const DashboardLayout = ({ isPreviewMode, previewUserProject, previewDeliveries 
                         />
                       )}
                       <SubscriptionStatusCard userProject={userProject} />
-                      <UpgradeBanner userProject={userProject} />
+                      {userProject?.client_type !== 'influencer' && <UpgradeBanner userProject={userProject} />}
                     </>
                   )}
                 </>
