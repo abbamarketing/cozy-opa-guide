@@ -123,13 +123,6 @@ const SubscriptionStatusCard = ({ userProject }: Props) => {
             Fila: {queueCount} vídeo(s) aguardando
           </div>
 
-          {/* Script credits */}
-          {['subscription', 'custom'].includes(userProject.client_type || '') && (
-            <div className="flex items-center gap-1.5 text-xs font-sans text-white/60">
-              <FileText className="h-3 w-3" />
-              <span>Roteiros: <strong className="text-foreground">{(userProject as any).script_credits ?? 0}</strong> créditos</span>
-            </div>
-          )}
 
         </div>
       </div>
