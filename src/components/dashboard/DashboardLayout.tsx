@@ -5,6 +5,7 @@ import { Navigate } from 'react-router-dom';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
 import UpgradeBanner from '@/components/dashboard/UpgradeBanner';
+import { TrialBanner } from '@/components/dashboard/TrialBanner';
 import DeliveryHistory from '@/components/dashboard/DeliveryHistory';
 
 import BrandProfile from '@/components/dashboard/BrandProfile';

@@ -89,7 +89,7 @@ export const useUserProject = () => {
         .from('user_projects')
         .select('*, custom_project:custom_projects(*)')
         .eq('user_id', user!.id)
-        .in('status', ['active', 'pending_payment'])
+        .in('status', ['active', 'pending_payment', 'trialing'])
         .maybeSingle();
 
       if (err) throw new Error(err.message);
