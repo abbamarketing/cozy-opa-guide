@@ -114,7 +114,7 @@ function KanbanColumnComponent<T extends { id: string; status: string }>({
   return (
     <div
       className={cn(
-        'flex flex-col rounded-[20px] bg-abba-surface/40 border p-2 shrink-0 transition-colors',
+'flex flex-col rounded-[20px] bg-abba-surface/40 border p-2 shrink-0 transition-colors overflow-hidden',
         isMobile
           ? 'w-[85vw] min-w-[85vw] snap-start'
           : 'min-w-[280px] max-w-[320px]',
