@@ -7,6 +7,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import type { UserProjectData } from '@/hooks/useUserProject';
+import { computeMonthlyQuota } from '@/lib/business-hours';
 
 const TIER_LABELS: Record<string, string> = {
   standard: 'Standard',
