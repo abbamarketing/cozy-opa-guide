@@ -244,6 +244,8 @@ const ClientAssignment = () => {
   const openModal = (client: ClientProfile & { email?: string }) => {
     setSelectedClient(client);
     setSelectedProjectId('');
+    setSelectedTier('');
+    setAssignmentMode('custom');
     setSendEmail(true);
     setModalOpen(true);
   };
