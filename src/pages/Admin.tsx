@@ -116,6 +116,11 @@ const Admin = () => {
                       >
                         <tab.icon className="h-4 w-4" />
                         {tab.label}
+                        {tab.id === 'suporte' && openTicketCount > 0 && (
+                          <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1">
+                            {openTicketCount}
+                          </span>
+                        )}
                       </button>
                     ))}
                   </nav>
