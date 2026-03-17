@@ -110,7 +110,7 @@ const DeliveryCard = ({ delivery, onClick, clientType }: DeliveryCardProps) => {
   return (
     <div
       onClick={onClick}
-      className="cursor-pointer card-elevate rounded-[20px] bg-abba-surface border border-white/8 p-3 space-y-2 w-full"
+      className="cursor-pointer card-elevate rounded-[20px] bg-abba-surface border border-white/8 p-3 space-y-2 w-full max-w-full overflow-hidden"
     >
       {/* Linha 1: ícone + título + status de fila */}
       <div className="flex items-start gap-2 min-w-0">
