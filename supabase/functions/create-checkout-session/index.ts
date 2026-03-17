@@ -193,7 +193,7 @@ Deno.serve(async (req) => {
 
     // 7. Create checkout session
     const siteUrl = Deno.env.get("SITE_URL") || req.headers.get("origin") || "http://localhost:5173";
-    const session = await stripeRequest("/checkout/sessions", "POST", {
+    const sessionParams: Record<string, string> = {
       customer: customerId!,
       "line_items[0][price]": stripePriceId!,
       "line_items[0][quantity]": "1",
@@ -205,7 +205,13 @@ Deno.serve(async (req) => {
       "metadata[project_template_id]": template.id,
       "subscription_data[metadata][user_id]": userId,
       "subscription_data[metadata][user_project_id]": userProject.id,
-    });
+    };
+
+    if (trialDays > 0) {
+      sessionParams["subscription_data[trial_period_days]"] = String(trialDays);
+    }
+
+    const session = await stripeRequest("/checkout/sessions", "POST", sessionParams);
 
     return new Response(
       JSON.stringify({ url: session.url, session_id: session.id }),
