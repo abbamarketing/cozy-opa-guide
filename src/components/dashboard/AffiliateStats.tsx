@@ -108,17 +108,17 @@ export function AffiliateStats() {
       <div className="grid grid-cols-3 gap-3">
         <Card className="p-4 text-center space-y-1">
           <Users className="h-5 w-5 mx-auto text-primary" />
-          <p className="text-2xl font-bold text-foreground">{referrals.length}</p>
+          <p className="text-lg font-bold text-foreground">{referrals.length}</p>
           <p className="text-[11px] text-muted-foreground">Indicações</p>
         </Card>
         <Card className="p-4 text-center space-y-1">
           <TrendingUp className="h-5 w-5 mx-auto text-primary" />
-          <p className="text-2xl font-bold text-foreground">{activeReferrals}</p>
+          <p className="text-lg font-bold text-foreground">{activeReferrals}</p>
           <p className="text-[11px] text-muted-foreground">Ativos</p>
         </Card>
         <Card className="p-4 text-center space-y-1">
           <DollarSign className="h-5 w-5 mx-auto text-primary" />
-          <p className="text-2xl font-bold text-foreground">
+          <p className="text-lg font-bold text-foreground">
             R${(totalEarningsCents / 100).toFixed(2)}
           </p>
           <p className="text-[11px] text-muted-foreground">Total ganho</p>
@@ -129,7 +129,7 @@ export function AffiliateStats() {
       {pendingCents > 0 && (
         <Card className="p-4 flex items-center justify-between border-amber-500/30 bg-amber-500/5">
           <span className="text-sm font-medium text-foreground">Comissão pendente</span>
-          <span className="text-lg font-bold text-amber-400">R${(pendingCents / 100).toFixed(2)}</span>
+          <span className="text-base font-bold text-amber-400">R${(pendingCents / 100).toFixed(2)}</span>
         </Card>
       )}
 

@@ -335,8 +335,8 @@ const DashboardLayout = ({ isPreviewMode, previewUserProject, previewDeliveries 
         return userProject ? (
           <Kanban userProject={userProject} mockDeliveries={isPreviewMode ? previewDeliveries : undefined} />
         ) : (
-          <div className="rounded-[20px] border border-border bg-card p-8 text-center">
-            <Video className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+          <div className="rounded-[20px] border border-border bg-card p-5 text-center">
+            <Video className="h-6 w-6 text-muted-foreground/30 mx-auto mb-2" />
             <p className="text-sm text-muted-foreground">Nenhum projeto ativo</p>
           </div>
         );
@@ -344,8 +344,8 @@ const DashboardLayout = ({ isPreviewMode, previewUserProject, previewDeliveries 
         return userProject ? (
           <DeliveryCalendar userProject={userProject} />
         ) : (
-          <div className="rounded-[20px] border border-border bg-card p-8 text-center">
-            <Calendar className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+          <div className="rounded-[20px] border border-border bg-card p-5 text-center">
+            <Calendar className="h-6 w-6 text-muted-foreground/30 mx-auto mb-2" />
             <p className="text-sm text-muted-foreground">Nenhum projeto ativo</p>
           </div>
         );

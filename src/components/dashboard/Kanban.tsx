@@ -164,7 +164,7 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
         <CaptureBanner />
 
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-sans font-semibold text-foreground">Minhas Entregas</h2>
+          <h2 className="text-base font-sans font-semibold text-foreground">Minhas Entregas</h2>
           <div className="flex items-center gap-3">
             <ViewToggle value={viewMode} onChange={handleViewChange} />
             <Tooltip>
@@ -253,7 +253,7 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
             )}
             renderEmpty={(col, hasAnyItems) => (
               <div className="py-8 text-center space-y-3">
-                <Video className="h-8 w-8 text-muted-foreground/30 mx-auto" />
+                <Video className="h-6 w-6 text-muted-foreground/30 mx-auto" />
                 {!hasAnyItems && col.statuses.includes('pending') ? (
                   <>
                     <p className="text-sm font-sans font-medium text-muted-foreground">Você ainda não tem entregas</p>

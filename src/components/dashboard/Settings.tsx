@@ -279,7 +279,7 @@ export default function Settings() {
                     {userProject.status === 'active' ? 'Ativo' : 'Pendente'}
                   </Badge>
                 </div>
-                <p className="text-lg font-mono font-bold text-primary">
+                <p className="text-base font-mono font-bold text-primary">
                   R$ {Number(userProject.custom_project.monthly_value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   <span className="text-[10px] text-muted-foreground font-normal">/mês</span>
                 </p>

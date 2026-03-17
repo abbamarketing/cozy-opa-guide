@@ -51,9 +51,9 @@ export default function DeliveryHistory() {
 
   if (deliveries.length === 0) {
     return (
-      <div className="glass rounded-2xl p-12 text-center space-y-3">
-        <CheckCircle2 className="h-12 w-12 text-muted-foreground/30 mx-auto" />
-        <h3 className="text-lg font-semibold text-card-foreground">Nenhuma entrega aprovada ainda</h3>
+      <div className="glass rounded-2xl p-8 text-center space-y-3">
+        <CheckCircle2 className="h-6 w-6 text-muted-foreground/30 mx-auto" />
+        <h3 className="text-base font-semibold text-card-foreground">Nenhuma entrega aprovada ainda</h3>
         <p className="text-sm text-muted-foreground">
           Quando você aprovar entregas, elas aparecerão aqui para download.
         </p>
