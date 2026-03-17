@@ -317,7 +317,7 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
 const QuotaCard = ({ userProject }: QuotaCardProps) => {
   const clientType = userProject.client_type;
 
-  if (clientType === 'subscription') {
+  if (clientType === 'subscription' || clientType === 'influencer') {
     return <SubscriptionQuotaCard userProject={userProject} />;
   }
 
