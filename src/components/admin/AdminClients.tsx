@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Fragment } from 'react';
 import { useDebouncedValue } from '@/hooks/useDebounce';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
