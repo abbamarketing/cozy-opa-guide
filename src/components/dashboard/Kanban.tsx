@@ -198,7 +198,7 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
       </div>
 
       {/* SCROLL WRAPPER */}
-      <div className="flex-1 min-h-0 w-full overflow-x-hidden">
+      <div className="flex-1 min-h-0 w-full">
         {isLoading ? (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
             {ALL_COLUMNS.filter(c => c.id !== 'queue' || isSubscription).map((c) => (
