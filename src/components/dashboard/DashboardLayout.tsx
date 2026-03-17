@@ -5,6 +5,7 @@ import { Navigate } from 'react-router-dom';
 import Kanban from '@/components/dashboard/Kanban';
 import DeliveryCalendar from '@/components/dashboard/DeliveryCalendar';
 import UpgradeBanner from '@/components/dashboard/UpgradeBanner';
+import { TrialBanner } from '@/components/dashboard/TrialBanner';
 import DeliveryHistory from '@/components/dashboard/DeliveryHistory';
 
 import BrandProfile from '@/components/dashboard/BrandProfile';
@@ -193,6 +194,12 @@ const DashboardSidebar = ({
       )}
       {!collapsed && userProject && (userProject.client_type === 'subscription' || userProject.client_type === 'influencer') && (
         <div className="mt-auto p-2 border-t border-abba-surface space-y-2">
+          {userProject.status === 'trialing' && (
+            <TrialBanner
+              trialEndDate={userProject.current_period_end}
+              onUpgrade={() => window.location.href = '/payment'}
+            />
+          )}
           <SubscriptionStatusCard userProject={userProject} />
           <UpgradeBanner userProject={userProject} />
         </div>
@@ -347,6 +354,12 @@ const DashboardLayout = () => {
                   {userProject.client_type === 'custom' && <QuotaCard userProject={userProject} />}
                   {(userProject.client_type === 'subscription' || userProject.client_type === 'influencer') && (
                     <>
+                      {userProject.status === 'trialing' && (
+                        <TrialBanner
+                          trialEndDate={userProject.current_period_end}
+                          onUpgrade={() => window.location.href = '/payment'}
+                        />
+                      )}
                       <SubscriptionStatusCard userProject={userProject} />
                       <UpgradeBanner userProject={userProject} />
                     </>
