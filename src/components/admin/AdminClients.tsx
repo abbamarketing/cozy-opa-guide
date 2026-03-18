@@ -205,7 +205,7 @@ const AdminClients = () => {
 
     if (confirmAction.type === 'delete') {
       try {
-        const { data: sessionData } = await supabase.auth.getSession();
+        const { data: sessionData } = await (supabase.auth as any).getSession();
         const accessToken = sessionData?.session?.access_token;
         if (!accessToken) throw new Error('Sessão expirada');
 
