@@ -93,7 +93,7 @@ const AdminMetrics = () => {
         const activeInMonth = (allUserProjects || []).filter((up: any) =>
           new Date(up.created_at) <= m.end && up.status === 'active'
         );
-        const customMrr = activeInMonth.reduce((sum: number, up: any) => sum + (valueMap.get(up.custom_project_id) || 0), 0);
+        const customMrr = activeInMonth.reduce((sum: number, up: any) => sum + (Number(valueMap.get(up.custom_project_id)) || 0), 0);
         const subMrr = activeInMonth
           .filter((up: any) => up.client_type === 'subscription' && up.subscription_tier)
           .reduce((sum: number, up: any) => sum + (TIER_VALUES[up.subscription_tier] ?? 0), 0);

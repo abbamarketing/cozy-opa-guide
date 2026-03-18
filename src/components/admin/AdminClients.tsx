@@ -139,12 +139,12 @@ const AdminClients = () => {
       .select('id, project_name, monthly_value')
       .in('id', projectIds.length > 0 ? projectIds : ['none']);
 
-    const projectMap = new Map((projects || []).map((p: any) => [p.id, p]));
-    const upMap = new Map((userProjects || []).map((up: any) => [up.user_id, up]));
+    const projectMap = new Map<string, any>((projects || []).map((p: any) => [p.id, p]));
+    const upMap = new Map<string, any>((userProjects || []).map((up: any) => [up.user_id, up]));
 
     let rows: ClientRow[] = (profiles || []).map((p: any) => {
-      const up = upMap.get(p.user_id);
-      const proj = up?.custom_project_id ? projectMap.get(up.custom_project_id) : null;
+      const up: any = upMap.get(p.user_id);
+      const proj: any = up?.custom_project_id ? projectMap.get(up.custom_project_id) : null;
 
       const planValue = proj
         ? Number(proj.monthly_value)
