@@ -82,7 +82,7 @@ const AdminOverview = () => {
           : { data: [] };
 
         const valueMap = new Map((projects || []).map((p: any) => [p.id, Number(p.monthly_value)]));
-        customMRR = activeProjects.reduce((sum: number, p: any) => sum + (valueMap.get(p.custom_project_id) || 0), 0);
+        customMRR = activeProjects.reduce((sum: number, p: any) => sum + (Number(valueMap.get(p.custom_project_id)) || 0), 0);
         subscriptionMRR = activeProjects
           .filter((up: any) => up.client_type === 'subscription' && up.subscription_tier)
           .reduce((sum: number, up: any) => sum + (SUBSCRIPTION_TIER_VALUES[up.subscription_tier] ?? 0), 0);
