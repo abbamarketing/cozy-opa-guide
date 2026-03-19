@@ -145,7 +145,7 @@ const AdminDeliveries = () => {
 
   const handleDrop = async (colStatuses: string[]) => {
     if (!draggedId) return;
-    const newStatus = colStatuses[0];
+    const newStatus = colStatuses[0] as "pending" | "in_progress" | "review" | "revision" | "approved" | "cancelled" | "queue";
     const { error } = await supabase
       .from('deliveries')
       .update({ status: newStatus })
