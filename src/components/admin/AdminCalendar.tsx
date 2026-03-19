@@ -160,7 +160,7 @@ const AdminCalendar = () => {
         date: format(startOfDay(new Date(m.starts_at)), 'yyyy-MM-dd'),
         type: 'manual',
         color: getManualColor(m.type),
-        raw: m,
+        raw: m as unknown as CalendarEventRaw,
       });
     });
 
