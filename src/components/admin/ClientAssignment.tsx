@@ -251,7 +251,7 @@ const ClientAssignment = () => {
   };
 
   const STATUS_LABELS: Record<string, { label: string; className: string }> = {
-    pending_payment: { label: 'Pendente Pagamento', className: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
+    pending_payment: { label: 'Pendente Pagamento', className: 'bg-muted text-muted-foreground border-border' },
     active: { label: 'Ativo', className: 'bg-primary/20 text-primary border-primary/30' },
     suspended: { label: 'Suspenso', className: 'bg-destructive/20 text-destructive border-destructive/30' },
     cancelled: { label: 'Cancelado', className: 'bg-muted text-muted-foreground border-border' },
@@ -486,9 +486,9 @@ const ClientAssignment = () => {
                 </div>
 
                 {selectedTier && (
-                  <div className="glass rounded-xl p-4 sm:p-5 border border-violet-500/20 space-y-2">
+                  <div className="glass rounded-xl p-4 sm:p-5 border border-border space-y-2">
                     <div className="flex items-center gap-2">
-                      <Star className="h-4 w-4 text-violet-500" />
+                      <Star className="h-4 w-4 text-primary" />
                       <h4 className="font-semibold text-sm sm:text-base">Influencer — {INFLUENCER_TIERS[selectedTier].subscription_tier.charAt(0).toUpperCase() + INFLUENCER_TIERS[selectedTier].subscription_tier.slice(1)}</h4>
                     </div>
                     <p className="text-xs text-muted-foreground">SLA: {INFLUENCER_TIERS[selectedTier].sla_hours}h · Faturamento externo · Sem Stripe</p>

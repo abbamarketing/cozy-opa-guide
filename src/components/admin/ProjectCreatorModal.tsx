@@ -251,9 +251,9 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
         </DialogHeader>
 
         {isEditing && clientCount > 0 && (
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-            <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0" />
-            <p className="text-xs text-yellow-500">
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-muted border border-border">
+            <AlertTriangle className="h-4 w-4 text-muted-foreground shrink-0" />
+            <p className="text-xs text-muted-foreground">
               {clientCount} cliente(s) utiliza(m) este projeto. Mudanças afetarão apenas novos clientes.
             </p>
           </div>

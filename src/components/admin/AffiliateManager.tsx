@@ -145,14 +145,14 @@ const AffiliateManager = ({ userId, fullName }: AffiliateManagerProps) => {
   const fullLink = `${baseUrl}/?ref=${affiliateCode.code}`;
 
   return (
-    <div className="border border-violet-500/20 bg-violet-500/5 rounded-lg p-3 mt-2 space-y-2">
+    <div className="border border-border bg-secondary/50 rounded-lg p-3 mt-2 space-y-2">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <p className="text-xs font-medium">Afiliação</p>
           <Badge
             variant="outline"
             className={affiliateCode.active
-              ? 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30 text-[9px] px-1.5 py-0 h-4'
+              ? 'bg-primary/10 text-foreground border-border text-[9px] px-1.5 py-0 h-4'
               : 'bg-muted text-muted-foreground border-border text-[9px] px-1.5 py-0 h-4'
             }
           >
@@ -178,7 +178,7 @@ const AffiliateManager = ({ userId, fullName }: AffiliateManagerProps) => {
           className="h-7 w-7 p-0 shrink-0"
           onClick={copyLink}
         >
-          {copied ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
+          {copied ? <Check className="h-3 w-3 text-primary" /> : <Copy className="h-3 w-3" />}
         </Button>
       </div>
     </div>

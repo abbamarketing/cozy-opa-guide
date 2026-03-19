@@ -27,9 +27,9 @@ interface Ticket {
 
 const clientTypeBadge = (type: string | null) => {
   switch (type) {
-    case 'influencer': return <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">Influencer</Badge>;
-    case 'subscription': return <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">Subscription</Badge>;
-    case 'custom': return <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">Custom</Badge>;
+    case 'influencer': return <Badge className="bg-primary/10 text-foreground border-border">Influencer</Badge>;
+    case 'subscription': return <Badge className="bg-primary/10 text-foreground border-border">Subscription</Badge>;
+    case 'custom': return <Badge className="bg-primary/10 text-foreground border-border">Custom</Badge>;
     case 'editor': return <Badge className="bg-muted text-muted-foreground border-border">Editor</Badge>;
     default: return <Badge variant="outline">{type || '—'}</Badge>;
   }
@@ -108,9 +108,9 @@ const AdminSupport = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3 text-sm">
-          <span className="text-destructive font-semibold">{openCount} abertos</span>
+          <span className="text-foreground font-semibold">{openCount} abertos</span>
           <span className="text-muted-foreground">·</span>
-          <span className="text-emerald-400 font-semibold">{resolvedCount} resolvidos</span>
+          <span className="text-foreground font-semibold">{resolvedCount} resolvidos</span>
         </div>
         <Select value={filter} onValueChange={setFilter}>
           <SelectTrigger className="w-40">
@@ -162,7 +162,7 @@ const AdminSupport = () => {
                     {ticket.status === 'open' ? (
                       <Badge className="bg-destructive/20 text-destructive border-destructive/30">Aberto</Badge>
                     ) : (
-                      <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">Resolvido</Badge>
+                      <Badge className="bg-primary/10 text-foreground border-border">Resolvido</Badge>
                     )}
                   </TableCell>
                   <TableCell className="text-muted-foreground text-xs whitespace-nowrap">

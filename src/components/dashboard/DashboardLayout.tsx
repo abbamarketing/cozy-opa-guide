@@ -15,10 +15,8 @@ import BrandProfile from '@/components/dashboard/BrandProfile';
 import SettingsComponent from '@/components/dashboard/Settings';
 
 import NotificationBell from '@/components/shared/NotificationBell';
-import ContextualTour, { restartTour } from '@/components/dashboard/ContextualTour';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  HelpCircle,
   Video,
   Calendar,
   CheckCircle2,
@@ -126,21 +124,6 @@ const DashboardHeader = ({ isPreviewMode }: { isPreviewMode?: boolean }) => {
             <NotificationBell />
           </div>
         )}
-        {!isPreviewMode && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground glass-micro rounded-full" aria-label="Ajuda e tour">
-                <HelpCircle className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-44">
-              <DropdownMenuItem onClick={restartTour}>
-                Reiniciar Tour
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="ml-0.5 gap-1.5 px-1.5 h-9 glass-micro rounded-full">
@@ -375,12 +358,8 @@ const DashboardLayout = ({ isPreviewMode, previewUserProject, previewDeliveries 
     }
   };
 
-  const tourReady = !isPreviewMode && !isLoading && !!userProject;
-
   const mainContent = (
     <>
-      {!isPreviewMode && <ContextualTour ready={tourReady} />}
-
       {!isMobile && (
         <DashboardSidebar activeTab={activeTab} onTabChange={handleTabChange} navItems={navItems} userProject={userProject} />
       )}

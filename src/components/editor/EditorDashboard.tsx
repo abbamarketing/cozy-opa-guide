@@ -119,10 +119,10 @@ const typeLabels: Record<string, string> = {
 };
 
 const PRIORITY_CONFIG: Record<number, { label: string; color: string }> = {
-  5: { label: 'Agência', color: 'bg-purple-700 text-white' },
-  4: { label: 'Premium', color: 'bg-blue-600 text-white' },
-  3: { label: 'Business', color: 'bg-emerald-600 text-white' },
-  2: { label: 'Pro', color: 'bg-yellow-500 text-black' },
+  5: { label: 'Agência', color: 'bg-primary text-primary-foreground' },
+  4: { label: 'Premium', color: 'bg-foreground text-background' },
+  3: { label: 'Business', color: 'bg-foreground/80 text-background' },
+  2: { label: 'Pro', color: 'bg-foreground/60 text-background' },
   1: { label: 'Standard', color: 'bg-muted text-muted-foreground' },
 };
 
@@ -174,7 +174,7 @@ const SubscriptionQueueCard = ({ item, onClick }: { item: SubscriptionQueueItem;
 
         {/* Status */}
         {isInProgress ? (
-          <Badge variant="default" className="shrink-0 bg-emerald-600 text-[10px] text-white">
+          <Badge variant="default" className="shrink-0 bg-primary text-[10px] text-primary-foreground">
             EM PRODUÇÃO
           </Badge>
         ) : (
@@ -255,7 +255,7 @@ const EditorDeliveryCard = ({
       {/* Revision badge + notes */}
       {delivery.status === 'revision' && (
         <div className={`mt-1.5 space-y-1 ${onDragStart ? 'pl-[42px]' : 'pl-8'}`}>
-          <Badge className="bg-orange-500/15 text-orange-600 border-orange-500/30 text-[10px] font-mono">
+          <Badge className="bg-destructive/15 text-destructive border-destructive/30 text-[10px] font-mono">
             Revisão solicitada
           </Badge>
           {delivery.revision_notes && (

@@ -65,10 +65,12 @@ const AdminOverview = () => {
 
       // All independent queries in parallel — use allSettled so partial data still shows
       const results = await Promise.allSettled([
-        supabase.from('user_projects').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+        // Exclude influencers from "active clients" count — they are not paying customers
+        supabase.from('user_projects').select('*', { count: 'exact', head: true }).eq('status', 'active').neq('client_type', 'influencer'),
         supabase.from('deliveries').select('*', { count: 'exact', head: true }).in('status', ['queue', 'pending', 'in_progress', 'revision']),
         supabase.from('deliveries').select('*', { count: 'exact', head: true }).in('status', ['queue', 'pending', 'in_progress', 'revision']).not('due_date', 'is', null).lt('due_date', new Date().toISOString()),
-        supabase.from('user_projects').select('custom_project_id, client_type, subscription_tier').eq('status', 'active'),
+        // Exclude influencers from revenue data — they don't pay
+        supabase.from('user_projects').select('custom_project_id, client_type, subscription_tier').eq('status', 'active').neq('client_type', 'influencer'),
         supabase.from('deliveries').select('created_at').gte('created_at', weeks[0].start.toISOString()).neq('status', 'cancelled'),
         supabase.from('deliveries').select('id, title, due_date, status, delivery_type').in('status', ['queue', 'pending', 'in_progress', 'revision']).not('due_date', 'is', null).lte('due_date', in24h).order('due_date', { ascending: true }).limit(10),
       ]);
@@ -90,7 +92,10 @@ const AdminOverview = () => {
           : { data: [] as { id: string; monthly_value: number }[] };
 
         const valueMap = new Map((projects || []).map((p) => [p.id, Number(p.monthly_value)]));
-        customMRR = activeProjects.reduce((sum, p) => sum + (Number(valueMap.get(p.custom_project_id)) || 0), 0);
+        // Only custom-type projects contribute to customMRR (influencers already excluded from query)
+        customMRR = activeProjects
+          .filter((p) => p.client_type === 'custom')
+          .reduce((sum, p) => sum + (Number(valueMap.get(p.custom_project_id)) || 0), 0);
         subscriptionMRR = activeProjects
           .filter((up) => up.client_type === 'subscription' && up.subscription_tier)
           .reduce((sum, up) => sum + (SUBSCRIPTION_TIER_VALUES[up.subscription_tier ?? ''] ?? 0), 0);

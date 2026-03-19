@@ -115,7 +115,7 @@ const AdminCommissions = () => {
             <CardTitle className="text-xs text-muted-foreground font-normal">Total pendente</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4">
-            <p className="text-xl font-bold text-amber-400">R${(totalPending / 100).toFixed(2)}</p>
+            <p className="text-xl font-bold text-foreground">R${(totalPending / 100).toFixed(2)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -123,7 +123,7 @@ const AdminCommissions = () => {
             <CardTitle className="text-xs text-muted-foreground font-normal">Total pago</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4">
-            <p className="text-xl font-bold text-emerald-500">R${(totalPaid / 100).toFixed(2)}</p>
+            <p className="text-xl font-bold text-foreground">R${(totalPaid / 100).toFixed(2)}</p>
           </CardContent>
         </Card>
       </div>
@@ -155,7 +155,7 @@ const AdminCommissions = () => {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">{c.influencer_name}</span>
-                      <Badge variant="outline" className="bg-violet-500/15 text-violet-400 border-violet-500/30 text-[10px] px-1.5 py-0 h-4">
+                      <Badge variant="outline" className="bg-primary/10 text-foreground border-border text-[10px] px-1.5 py-0 h-4">
                         Influencer
                       </Badge>
                     </div>
@@ -167,8 +167,8 @@ const AdminCommissions = () => {
                     <Badge
                       variant="outline"
                       className={c.status === 'paid'
-                        ? 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30 text-[10px]'
-                        : 'bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px]'
+                        ? 'bg-primary/10 text-foreground border-border text-[10px]'
+                        : 'bg-muted text-muted-foreground border-border text-[10px]'
                       }
                     >
                       {c.status === 'paid' ? 'Pago' : 'Pendente'}

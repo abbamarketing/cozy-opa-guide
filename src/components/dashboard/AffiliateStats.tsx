@@ -95,7 +95,7 @@ export function AffiliateStats() {
             className="gap-1.5 shrink-0 h-9"
             onClick={copyLink}
           >
-            {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? <Check className="h-3.5 w-3.5 text-primary" /> : <Copy className="h-3.5 w-3.5" />}
             {copied ? 'Copiado' : 'Copiar'}
           </Button>
         </div>
@@ -127,9 +127,9 @@ export function AffiliateStats() {
 
       {/* Comissões pendentes */}
       {pendingCents > 0 && (
-        <Card className="p-4 flex items-center justify-between border-amber-500/30 bg-amber-500/5">
+        <Card className="p-4 flex items-center justify-between border-border bg-secondary/50">
           <span className="text-sm font-medium text-foreground">Comissão pendente</span>
-          <span className="text-base font-bold text-amber-400">R${(pendingCents / 100).toFixed(2)}</span>
+          <span className="text-base font-bold text-foreground">R${(pendingCents / 100).toFixed(2)}</span>
         </Card>
       )}
 
@@ -150,8 +150,8 @@ export function AffiliateStats() {
                   <Badge
                     variant="outline"
                     className={c.status === 'paid'
-                      ? 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30 text-[10px]'
-                      : 'bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px]'
+                      ? 'bg-primary/10 text-foreground border-border text-[10px]'
+                      : 'bg-secondary text-muted-foreground border-border text-[10px]'
                     }
                   >
                     {c.status === 'paid' ? 'Pago' : 'Pendente'}

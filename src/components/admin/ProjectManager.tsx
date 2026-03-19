@@ -206,7 +206,7 @@ const ProjectManager = () => {
                       <p className="text-[11px] text-muted-foreground truncate">{p.description}</p>
                     )}
                   </div>
-                  <Badge variant={p.active ? 'default' : 'secondary'} className={`shrink-0 text-[10px] ${p.active ? 'bg-primary/20 text-primary border-primary/30' : ''}`}>
+                  <Badge variant={p.active ? 'default' : 'secondary'} className={`shrink-0 text-[10px] ${p.active ? 'bg-primary/10 text-foreground border-border' : ''}`}>
                     {p.active ? 'Ativo' : 'Inativo'}
                   </Badge>
                 </div>
@@ -276,7 +276,7 @@ const ProjectManager = () => {
                     </TableCell>
                     <TableCell><span className="font-mono-code">{clientCounts[p.id] || 0}</span></TableCell>
                     <TableCell>
-                      <Badge variant={p.active ? 'default' : 'secondary'} className={p.active ? 'bg-primary/20 text-primary border-primary/30' : ''}>
+                      <Badge variant={p.active ? 'default' : 'secondary'} className={p.active ? 'bg-primary/10 text-foreground border-border' : ''}>
                         {p.active ? 'Ativo' : 'Inativo'}
                       </Badge>
                     </TableCell>

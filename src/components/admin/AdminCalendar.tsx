@@ -56,10 +56,10 @@ const deliveryColor = 'bg-primary/15 border-primary/30 text-primary';
 const captureColor  = 'bg-[hsl(var(--queue-green))]/20 border-[hsl(var(--queue-green))]/40 text-[hsl(var(--queue-green))]';
 
 const MANUAL_TYPE_COLORS: Record<string, string> = {
-  gravacao: 'bg-purple-500/20 border-purple-500/40 text-purple-400',
-  captacao_externa: 'bg-orange-500/20 border-orange-500/40 text-orange-400',
-  sessao_cliente: 'bg-blue-500/20 border-blue-500/40 text-blue-400',
-  revisao_ao_vivo: 'bg-yellow-500/20 border-yellow-500/40 text-yellow-400',
+  gravacao: 'bg-primary/20 border-primary/40 text-primary',
+  captacao_externa: 'bg-destructive/20 border-destructive/40 text-destructive',
+  sessao_cliente: 'bg-foreground/10 border-foreground/20 text-foreground',
+  revisao_ao_vivo: 'bg-muted border-border text-muted-foreground',
 };
 const manualColorFallback = 'bg-muted/20 border-muted/40 text-muted-foreground';
 

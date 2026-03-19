@@ -49,9 +49,9 @@ const SUBSCRIPTION_VALUES: Record<string, number> = {
 };
 
 const CLIENT_TYPE_BADGE: Record<string, { label: string; className: string }> = {
-  custom: { label: 'Custom', className: 'bg-blue-500/15 text-blue-500 border-blue-500/30' },
-  subscription: { label: 'Assinatura', className: 'bg-green-500/15 text-green-500 border-green-500/30' },
-  influencer: { label: 'Influencer', className: 'bg-violet-500/15 text-violet-500 border-violet-500/30' },
+  custom: { label: 'Custom', className: 'bg-primary/10 text-foreground border-border' },
+  subscription: { label: 'Assinatura', className: 'bg-primary/10 text-foreground border-border' },
+  influencer: { label: 'Influencer', className: 'bg-primary/10 text-foreground border-border' },
 };
 
 const STATUS_MAP: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
@@ -149,17 +149,23 @@ const AdminClients = () => {
       const up = upMap.get(p.user_id);
       const proj = up?.custom_project_id ? projectMap.get(up.custom_project_id) : null;
 
-      const planValue = proj
-        ? Number(proj.monthly_value)
-        : ((up?.client_type === 'subscription' || up?.client_type === 'influencer') && up?.subscription_tier)
-          ? (SUBSCRIPTION_VALUES[up.subscription_tier] ?? null)
-          : null;
+      // Influencers do not pay — show no monetary value for them
+      const planValue = up?.client_type === 'influencer'
+        ? null
+        : proj
+          ? Number(proj.monthly_value)
+          : (up?.client_type === 'subscription' && up?.subscription_tier)
+            ? (SUBSCRIPTION_VALUES[up.subscription_tier] ?? null)
+            : null;
 
-      const displayName = proj?.project_name
-        || ((up?.client_type === 'subscription' || up?.client_type === 'influencer')
-            ? `${up?.client_type === 'influencer' ? 'Influencer' : 'Assinatura'} ${up?.subscription_tier ? up.subscription_tier.charAt(0).toUpperCase() + up.subscription_tier.slice(1) : ''}`.trim()
-            : null)
-        || 'Sem projeto';
+      const displayName = up?.client_type === 'influencer'
+        // Influencer: show tier label without implying it's a paid subscription
+        ? `Influencer${up?.subscription_tier ? ' — ' + up.subscription_tier.charAt(0).toUpperCase() + up.subscription_tier.slice(1) : ''}`
+        : proj?.project_name
+          || (up?.client_type === 'subscription' && up?.subscription_tier
+              ? `Assinatura ${up.subscription_tier.charAt(0).toUpperCase() + up.subscription_tier.slice(1)}`
+              : null)
+          || 'Sem projeto';
 
       return {
         user_id: p.user_id,

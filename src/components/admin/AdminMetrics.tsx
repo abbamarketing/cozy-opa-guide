@@ -90,10 +90,13 @@ const AdminMetrics = () => {
       const valueMap = new Map((allProjects || []).map((p) => [p.id, Number(p.monthly_value)]));
 
       const mrrMonthly = months.map((m) => {
+        // Exclude influencers — they don't pay, so they must not contribute to MRR
         const activeInMonth = (allUserProjects || []).filter((up) =>
-          new Date(up.created_at) <= m.end && up.status === 'active'
+          new Date(up.created_at) <= m.end && up.status === 'active' && up.client_type !== 'influencer'
         );
-        const customMrr = activeInMonth.reduce((sum, up) => sum + (Number(valueMap.get(up.custom_project_id)) || 0), 0);
+        const customMrr = activeInMonth
+          .filter((up) => up.client_type === 'custom')
+          .reduce((sum, up) => sum + (Number(valueMap.get(up.custom_project_id)) || 0), 0);
         const subMrr = activeInMonth
           .filter((up) => up.client_type === 'subscription' && up.subscription_tier)
           .reduce((sum, up) => sum + (TIER_VALUES[up.subscription_tier ?? ''] ?? 0), 0);
@@ -101,10 +104,13 @@ const AdminMetrics = () => {
       });
       setMrrData(mrrMonthly);
 
+      // Count new paid subscriptions/custom projects only — exclude influencers
       const subsMonthly = months.map((m) => ({
         month: m.label,
         count: (allUserProjects || []).filter((up) =>
-          new Date(up.created_at) >= m.start && new Date(up.created_at) <= m.end
+          new Date(up.created_at) >= m.start &&
+          new Date(up.created_at) <= m.end &&
+          up.client_type !== 'influencer'
         ).length,
       }));
       setSubsData(subsMonthly);
@@ -176,7 +182,8 @@ const AdminMetrics = () => {
       const prevMrr = mrrMonthly[mrrMonthly.length - 2]?.mrr ?? 0;
       const mrrChange = prevMrr > 0 ? Math.round(((currentMrr - prevMrr) / prevMrr) * 100) : 0;
 
-      const activeClients = (allUserProjects || []).filter((up) => up.status === 'active').length;
+      // Active paying clients only — influencers are excluded
+      const activeClients = (allUserProjects || []).filter((up) => up.status === 'active' && up.client_type !== 'influencer').length;
 
       const totalDeliveries = (deliveries || []).length;
       const thisMonthDeliveries = (deliveries || []).filter((d) => {
@@ -265,8 +272,8 @@ const AdminMetrics = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="kpi-dark flex flex-col justify-between" style={{ minHeight: 'auto' }}>
           <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-yellow-500" />
-            <span className="text-[11px] font-sans font-semibold uppercase tracking-widest text-yellow-500">SLA em Risco</span>
+            <AlertTriangle className="h-4 w-4 text-foreground" />
+            <span className="text-[11px] font-sans font-semibold uppercase tracking-widest text-foreground">SLA em Risco</span>
           </div>
           <p className="text-[42px] font-sans font-extrabold leading-none tracking-[-0.045em] text-inherit mt-2">{slaRisk}</p>
           <p className="text-[11px] font-sans opacity-60 mt-1">Deadline em menos de 4h</p>
@@ -399,7 +406,7 @@ const AdminMetrics = () => {
       {editorRanking.length > 0 && (
         <div className="kpi-dark" style={{ minHeight: 'auto' }}>
           <div className="flex items-center gap-2 mb-4">
-            <Trophy className="h-4 w-4 text-yellow-500" />
+            <Trophy className="h-4 w-4 text-foreground" />
             <h3 className="text-sm font-sans font-semibold text-inherit">Entregas por Editor — Mês Atual</h3>
           </div>
           <div className="space-y-2">

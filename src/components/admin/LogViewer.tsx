@@ -19,10 +19,10 @@ interface LogRow {
 }
 
 const LEVEL_CONFIG: Record<string, { color: string; icon: React.ReactNode; rowBg: string }> = {
-  info: { color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: <Info className="h-3 w-3" />, rowBg: 'bg-emerald-500/5' },
-  warn: { color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30', icon: <AlertTriangle className="h-3 w-3" />, rowBg: 'bg-yellow-500/5' },
-  error: { color: 'bg-destructive/20 text-red-400 border-destructive/30', icon: <AlertCircle className="h-3 w-3" />, rowBg: 'bg-destructive/5' },
-  debug: { color: 'bg-muted text-muted-foreground border-border', icon: <Bug className="h-3 w-3" />, rowBg: 'bg-destructive/5' },
+  info: { color: 'bg-primary/10 text-foreground border-border', icon: <Info className="h-3 w-3" />, rowBg: 'bg-primary/5' },
+  warn: { color: 'bg-muted text-muted-foreground border-border', icon: <AlertTriangle className="h-3 w-3" />, rowBg: 'bg-muted/30' },
+  error: { color: 'bg-destructive/20 text-destructive border-destructive/30', icon: <AlertCircle className="h-3 w-3" />, rowBg: 'bg-destructive/5' },
+  debug: { color: 'bg-muted text-muted-foreground border-border', icon: <Bug className="h-3 w-3" />, rowBg: 'bg-muted/20' },
 };
 
 const LogViewer = () => {

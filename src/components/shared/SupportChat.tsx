@@ -182,7 +182,7 @@ export function SupportChat({ role = 'client' }: SupportChatProps) {
                     setView('report');
                     setReportSent(false);
                   }}
-                  className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/5 py-1.5 text-[11px] font-medium text-red-400/70 transition-colors hover:bg-red-500/10 hover:text-red-400"
+                  className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-destructive/20 bg-destructive/5 py-1.5 text-[11px] font-medium text-destructive/70 transition-colors hover:bg-destructive/10 hover:text-destructive"
                 >
                   <AlertTriangle className="h-3.5 w-3.5" />
                   Reportar um erro
@@ -194,11 +194,11 @@ export function SupportChat({ role = 'client' }: SupportChatProps) {
           {view === 'report' && (
             <div className="space-y-3 p-3">
               {reportSent ? (
-                <div className="rounded-xl border border-green-500/25 bg-green-500/10 p-3 text-center">
-                  <div className="mx-auto mb-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-green-500/20 text-sm text-green-300">
+                <div className="rounded-xl border border-border bg-primary/10 p-3 text-center">
+                  <div className="mx-auto mb-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-sm text-primary">
                     ✓
                   </div>
-                  <p className="text-sm font-semibold text-green-300">Erro reportado!</p>
+                  <p className="text-sm font-semibold text-foreground">Erro reportado!</p>
                   <p className="mt-1 text-xs text-white/60">Nossa equipe vai analisar em breve. Obrigado por reportar.</p>
                   <button
                     onClick={() => {
@@ -238,7 +238,7 @@ export function SupportChat({ role = 'client' }: SupportChatProps) {
                   <button
                     onClick={submitReport}
                     disabled={!reportTitle.trim() || !reportDesc.trim() || reportLoading}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-500/80 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-500 disabled:opacity-40"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-destructive py-2.5 text-sm font-semibold text-white transition-colors hover:bg-destructive/90 disabled:opacity-40"
                   >
                     {reportLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Enviar relatório'}
                   </button>

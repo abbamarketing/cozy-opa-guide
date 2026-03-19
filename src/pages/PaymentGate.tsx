@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, CreditCard, Lock, Loader2, CheckCircle2, Shield, Zap, Clock } from 'lucide-react';
 import { useUserProject } from '@/hooks/useUserProject';
@@ -63,11 +63,17 @@ export default function PaymentGate() {
     );
   }
 
+  // Subscription and influencer clients pay via Stripe checkout — redirect them to dashboard.
+  // Only custom projects with pending_payment status use this manual payment step.
+  if (userProject.client_type === 'subscription' || userProject.client_type === 'influencer') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   const project = userProject.custom_project;
   if (!project) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-muted-foreground">Carregando projeto...</p>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p className="text-muted-foreground">Projeto não encontrado. Entre em contato com o suporte.</p>
       </div>
     );
   }

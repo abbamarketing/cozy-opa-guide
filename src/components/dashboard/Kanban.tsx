@@ -132,9 +132,9 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
   const CaptureBanner = () => {
     if (!needsCaptureFirst) return null;
     return (
-      <div className="flex items-center gap-3 rounded-[20px] border border-yellow-500/30 bg-yellow-500/5 p-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-500/15">
-          <Camera className="h-4 w-4 text-yellow-500" />
+      <div className="flex items-center gap-3 rounded-[20px] border border-border bg-secondary/50 p-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
+          <Camera className="h-4 w-4 text-foreground" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-card-foreground">
@@ -147,7 +147,7 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
         <Button
           size="sm"
           variant="outline"
-          className="shrink-0 gap-1.5 border-yellow-500/30 text-yellow-600 hover:bg-yellow-500/10"
+          className="shrink-0 gap-1.5 border-border text-foreground hover:bg-secondary"
           onClick={() => setShowCaptureModal(true)}
         >
           <Camera className="h-3.5 w-3.5" />

@@ -234,14 +234,14 @@ export default function AdminPreview() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Preview banner */}
-      <div className="sticky top-0 z-[60] flex items-center justify-between gap-4 px-4 py-2 bg-amber-500/90 backdrop-blur text-black flex-wrap">
+      <div className="sticky top-0 z-[60] flex items-center justify-between gap-4 px-4 py-2 bg-secondary border-b border-border backdrop-blur flex-wrap">
         <div className="flex items-center gap-3">
-          <Eye className="h-4 w-4 shrink-0" />
+          <Eye className="h-4 w-4 shrink-0 text-muted-foreground" />
           <div>
-            <span className="text-sm font-bold">
+            <span className="text-sm font-bold text-foreground">
               Modo Preview — {PLAN_LABELS[selectedPlan]}
             </span>
-            <span className="text-xs opacity-70 ml-2 hidden sm:inline">
+            <span className="text-xs text-muted-foreground ml-2 hidden sm:inline">
               Dados de exemplo · nenhuma ação real
             </span>
           </div>
@@ -253,10 +253,10 @@ export default function AdminPreview() {
             <button
               key={plan}
               onClick={() => setSelectedPlan(plan)}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                 selectedPlan === plan
-                  ? 'bg-black text-amber-400'
-                  : 'text-black/50 hover:text-black hover:bg-black/10'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
               }`}
             >
               {PLAN_LABELS[plan]}
@@ -266,7 +266,7 @@ export default function AdminPreview() {
 
         <button
           onClick={() => navigate('/admin')}
-          className="flex items-center gap-1.5 text-xs text-black/60 hover:text-black transition-colors shrink-0"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
         >
           <X className="h-4 w-4" />
           Sair
