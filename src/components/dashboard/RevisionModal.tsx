@@ -105,7 +105,7 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProje
 
       // Recalcular SLA deadline para clientes de assinatura
       if (userProject?.client_type === 'subscription' && userProject?.sla_hours) {
-        const newDeadline = countWeekdayHours(new Date(), userProject.sla_hours);
+        const newDeadline = countWeekdayHours(new Date(), userProject.sla_hours as number);
         updateData.sla_deadline = newDeadline.toISOString();
       }
 

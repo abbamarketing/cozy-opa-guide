@@ -270,7 +270,7 @@ const AdminCalendar = () => {
     };
 
     if (editingEvent) {
-      const { error } = await supabase.from('calendar_events').update(payload).eq('id', editingEvent.id);
+      const { error } = await supabase.from('calendar_events').update(payload).eq('id', editingEvent.id as string);
       if (error) { toast.error('Erro ao atualizar: ' + error.message); setSaving(false); return; }
       toast.success('Evento atualizado');
     } else {

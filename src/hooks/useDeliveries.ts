@@ -5,7 +5,7 @@ import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 
 const DELIVERIES_KEY = 'deliveries';
 
-const mapDelivery = (d: Record<string, unknown>): DeliveryData => ({
+const mapDelivery = (d: any): DeliveryData => ({
   id: d.id,
   title: d.title,
   description: d.description,
@@ -16,7 +16,7 @@ const mapDelivery = (d: Record<string, unknown>): DeliveryData => ({
   max_revisions: d.max_revisions,
   file_url: d.file_url,
   thumbnail_url: d.thumbnail_url,
-  editor_name: (d.editor as Record<string, unknown>)?.display_name as string || null,
+  editor_name: d.editor?.display_name || null,
   editor_id: d.editor_id,
   created_at: d.created_at,
   delivered_at: d.delivered_at,

@@ -459,8 +459,8 @@ const EditorDashboard = () => {
       const profileMap = new Map((profiles || []).map((p) => [p.user_id, p]));
 
       setSubscriptionQueue(
-        subItems.map((d) => {
-          const up = d.user_project as Record<string, unknown> | undefined;
+        subItems.map((d: any) => {
+          const up = d.user_project as any;
           return {
           id: d.id,
           title: d.title,
