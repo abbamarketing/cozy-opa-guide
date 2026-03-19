@@ -112,11 +112,11 @@ const T = {
 
     // Portfolio
     portfolio: [
-      { type: 'Reels', name: 'Fitness & Saúde', vids: 47 },
-      { type: 'Shorts', name: 'Tech Reviews', vids: 32 },
-      { type: 'TikTok', name: 'Lifestyle', vids: 61 },
-      { type: 'Conteúdo', name: 'Gastronomia', vids: 28 },
-      { type: 'Cortes', name: 'Podcast', vids: 53 },
+      { name: 'Dra. Amanda Souto', type: 'Estética', video: 'https://assets.cdn.filesafe.space/iiiSVxqjDsjJESXX2UqE/media/69bc86397e5b8d65048fdf7b.mp4' },
+      { name: 'Dr. Rodrigo Pongeluppi', type: 'Neurocirurgião', video: 'https://assets.cdn.filesafe.space/iiiSVxqjDsjJESXX2UqE/media/69bc8639a37cc2a95f116653.mp4' },
+      { name: 'Bárbara Marques', type: 'Contadora', video: 'https://assets.cdn.filesafe.space/iiiSVxqjDsjJESXX2UqE/media/69bc86392f5f65459954d311.mp4' },
+      { name: 'Iron Horse', type: 'Suplementos', video: 'https://assets.cdn.filesafe.space/iiiSVxqjDsjJESXX2UqE/media/69bc8639d8f04789a65d218f.mp4' },
+      { name: 'Doutor Hérnia', type: 'Fisioterapia', video: 'https://assets.cdn.filesafe.space/iiiSVxqjDsjJESXX2UqE/media/69bc863907f24f9d465b5093.mp4' },
     ],
   },
   en: {
@@ -226,11 +226,11 @@ const T = {
 
     // Portfolio
     portfolio: [
-      { type: 'Reels', name: 'Fitness & Health', vids: 47 },
-      { type: 'Shorts', name: 'Tech Reviews', vids: 32 },
-      { type: 'TikTok', name: 'Lifestyle', vids: 61 },
-      { type: 'Content', name: 'Gastronomy', vids: 28 },
-      { type: 'Clips', name: 'Podcast', vids: 53 },
+      { name: 'Dra. Amanda Souto', type: 'Aesthetics', video: 'https://assets.cdn.filesafe.space/iiiSVxqjDsjJESXX2UqE/media/69bc86397e5b8d65048fdf7b.mp4' },
+      { name: 'Dr. Rodrigo Pongeluppi', type: 'Neurosurgeon', video: 'https://assets.cdn.filesafe.space/iiiSVxqjDsjJESXX2UqE/media/69bc8639a37cc2a95f116653.mp4' },
+      { name: 'Bárbara Marques', type: 'Accountant', video: 'https://assets.cdn.filesafe.space/iiiSVxqjDsjJESXX2UqE/media/69bc86392f5f65459954d311.mp4' },
+      { name: 'Iron Horse', type: 'Supplements', video: 'https://assets.cdn.filesafe.space/iiiSVxqjDsjJESXX2UqE/media/69bc8639d8f04789a65d218f.mp4' },
+      { name: 'Doutor Hérnia', type: 'Physiotherapy', video: 'https://assets.cdn.filesafe.space/iiiSVxqjDsjJESXX2UqE/media/69bc863907f24f9d465b5093.mp4' },
     ],
   },
 };
@@ -358,11 +358,10 @@ export default function Landing() {
               <div className="prow">
                 {t.portfolio.map((p, i) => (
                   <div key={p.name} className={`pc pc-anim${i}`}>
-                    <div className="pc-placeholder" />
+                    <video className="pc-video" src={p.video} muted loop playsInline preload="metadata" onMouseEnter={e => (e.target as HTMLVideoElement).play()} onMouseLeave={e => { const v = e.target as HTMLVideoElement; v.pause(); v.currentTime = 0; }} />
                     <div>
-                      <div className="pct">{p.type}</div>
                       <div className="pcn">{p.name}</div>
-                      <div className="pc-stat">{p.vids} {t.s2Stat}</div>
+                      <div className="pct">{p.type}</div>
                     </div>
                   </div>
                 ))}
@@ -500,7 +499,7 @@ export default function Landing() {
         <footer className="fo">
           <span>© 2026 AbbaVideo</span>
           <div className="fl">
-            <a href="#">Instagram</a>
+            <a href="https://instagram.com/abbamarketing" target="_blank" rel="noopener noreferrer">Instagram</a>
             <Link to="/terms">{t.footerTerms}</Link>
             <Link to="/privacy">{t.footerPrivacy}</Link>
           </div>
@@ -650,9 +649,9 @@ const CSS = `
 .sc.on .pc-anim3{transition-delay:.34s}
 .sc.on .pc-anim4{transition-delay:.42s}
 .sc:not(.on) .pc{opacity:0;transform:translateY(12px)}
-.pc-placeholder{flex:1;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.04);margin-bottom:14px}
-.pct{font-size:9px;color:var(--tw3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:3px}
-.pcn{font-family:var(--fd);font-weight:600;font-size:15px;color:var(--tw);margin-bottom:6px}
+.pc-video{flex:1;border-radius:10px;width:100%;object-fit:cover;background:#0A0A0A;margin-bottom:12px;cursor:pointer}
+.pcn{font-family:var(--fd);font-weight:600;font-size:14px;color:var(--tw);margin-bottom:2px}
+.pct{font-size:9px;color:var(--tw3);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
 .pc-stat{font-size:10px;color:var(--tw3);font-weight:500}
 
 .fw{max-width:560px;width:100%;text-align:left}

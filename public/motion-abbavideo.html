@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>AbbaVideo — Motion</title>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&f[]=satoshi@300,400,500,600,700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --cd:'Clash Display',sans-serif;
+  --st:'Satoshi',sans-serif;
+  --mg:#C0C0C0;--gr:#A0A0A0;--bl:#B0B0B0;--pr:#A8A8A8;
+  --pk:#B8B8B8;--co:#C8C8C8;--or:#D0D0D0;--yl:#D8D8D8;
+  --ease:cubic-bezier(0.23,1,0.32,1);
+  --rainbow:linear-gradient(90deg,rgba(255,255,255,.06),rgba(255,255,255,.12),rgba(255,255,255,.06));
+}
+html,body{width:100%;height:100%;overflow:hidden;background:#050505;font-family:var(--st)}
+#V{width:100%;height:100%;position:relative;overflow:hidden}
+
+/* ═══ SLIDE ═══ */
+.sl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;opacity:0;filter:blur(12px);transform:scale(1.04);transition:opacity .6s,filter .6s var(--ease),transform .6s var(--ease);pointer-events:none;text-align:center}
+.sl.on{opacity:1;filter:blur(0);transform:scale(1)}
+.sl.out{opacity:0;filter:blur(16px);transform:scale(0.96)}
+.sl.hero-bg{background:#FBFBFA}
+.sl.dark-bg{background:#050505}
+
+/* ═══ TYPOGRAPHY ═══ */
+.lb{font-family:var(--st);font-weight:600;font-size:clamp(9px,1.2vw,11px);text-transform:uppercase;letter-spacing:.14em;color:var(--mg);margin-bottom:12px}
+.h{font-family:var(--cd);font-weight:700;line-height:.9;letter-spacing:-.04em}
+.h-dark{color:#F5F5F5}
+.h-light{color:#1D1D1F}
+.h1{font-size:clamp(40px,9vw,80px)}
+.h2{font-size:clamp(32px,7vw,64px)}
+.h3{font-size:clamp(24px,5vw,48px)}
+.h em{font-style:normal}
+.sub{font-family:var(--st);font-weight:400;font-size:clamp(12px,1.6vw,15px);line-height:1.5;margin-top:16px;max-width:420px}
+.sub-d{color:rgba(255,255,255,.35)}
+.sub-l{color:rgba(0,0,0,.4)}
+
+/* ═══ GRADIENT LINE ═══ */
+.gl{width:40px;height:2px;background:var(--rainbow);border-radius:1px;margin-bottom:16px}
+
+/* ═══ FEATURE ROW ═══ */
+.fr{display:flex;flex-direction:column;gap:12px;margin-top:20px;text-align:left;max-width:380px;width:100%}
+.fi{display:flex;align-items:center;gap:10px}
+.fd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.fn{font-family:var(--st);font-weight:600;font-size:clamp(12px,1.4vw,14px);color:rgba(255,255,255,.7)}
+
+/* ═══ STEPS ═══ */
+.sp{display:flex;flex-direction:column;gap:16px;margin-top:16px;text-align:left;max-width:360px;width:100%}
+.si{display:flex;gap:12px;align-items:center}
+.sn{font-family:var(--cd);font-weight:700;font-size:clamp(32px,5vw,48px);color:rgba(255,255,255,.05);line-height:1}
+.st2{font-family:var(--cd);font-weight:700;font-size:clamp(16px,2.5vw,20px);color:#F5F5F5}
+
+/* ═══ PRICING CARDS ═══ */
+.pg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:500px;width:100%;margin-top:16px}
+@media(max-width:500px){.pg{grid-template-columns:repeat(2,1fr)}}
+.pc{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 8px;text-align:center;position:relative;overflow:hidden}
+.pc::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px}
+.pc:nth-child(1)::before,.pc:nth-child(2)::before,.pc:nth-child(3)::before,.pc:nth-child(4)::before{background:rgba(255,255,255,.12)}
+.pn{font-family:var(--cd);font-weight:700;font-size:11px;color:#F5F5F5;margin-top:2px}
+.ps{font-family:var(--st);font-size:9px;color:rgba(255,255,255,.3);margin:2px 0 8px}
+.pp{font-family:var(--cd);font-weight:700;font-size:clamp(16px,2.5vw,22px)}
+.pp{color:#F5F5F5}
+.pm{font-family:var(--st);font-size:9px;color:rgba(255,255,255,.3)}
+
+/* ═══ DIFFS ═══ */
+.dl{display:flex;flex-direction:column;gap:10px;margin-top:16px;text-align:left;max-width:400px;width:100%}
+.di{padding-left:12px;border-left:3px solid transparent}
+.di{border-color:rgba(255,255,255,.12)}
+.dt2{font-family:var(--cd);font-weight:700;font-size:13px;color:#F5F5F5}
+.dd2{font-family:var(--st);font-size:10px;color:rgba(255,255,255,.35);margin-top:1px}
+
+/* ═══ CTA ═══ */
+.cta{display:inline-flex;padding:14px 32px;background:#fff;color:#000;border:none;border-radius:100px;font-family:var(--st);font-weight:600;font-size:14px;cursor:pointer;margin-top:20px;text-decoration:none;transition:background .2s}
+.cta:hover{background:rgba(255,255,255,.85)}
+
+/* ═══ FOOTER DOTS ═══ */
+.fdots{display:flex;gap:4px;position:absolute;bottom:52px;left:32px}
+.fdt{width:4px;height:4px;border-radius:50%}
+.fdt{background:rgba(255,255,255,.1)}
+.fcopy{position:absolute;bottom:52px;right:32px;font-size:9px;color:rgba(255,255,255,.2)}
+
+/* ═══ CONTROLS ═══ */
+.ct{position:absolute;bottom:0;left:0;width:100%;z-index:300;padding:8px 16px;display:flex;align-items:center;gap:8px;background:rgba(5,5,5,.9);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.04)}
+.cb{width:28px;height:28px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.cb:hover{background:rgba(255,255,255,.06)}
+.cb svg{width:12px;height:12px;fill:#fff}
+.pb{flex:1;height:2px;background:rgba(255,255,255,.06);border-radius:1px;cursor:pointer;overflow:hidden}
+.pf{height:100%;background:var(--rainbow);border-radius:1px;width:0}
+.tm{font-family:var(--st);font-size:9px;color:rgba(255,255,255,.3);font-variant-numeric:tabular-nums;min-width:50px;text-align:right}
+.lg{position:absolute;top:12px;right:16px;z-index:200;display:flex;border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden}
+.lg button{border:none;padding:4px 10px;font-family:var(--st);font-size:9px;font-weight:600;cursor:pointer;background:transparent;color:rgba(255,255,255,.25);transition:all .2s}
+.lg button.on{background:#fff;color:#000}
+
+/* ═══ COUNTER ═══ */
+.cnt{font-family:var(--cd);font-weight:700;font-size:clamp(48px,10vw,96px);line-height:1;margin-top:8px}
+</style>
+</head>
+<body>
+<div id="V">
+  <div class="lg"><button class="on" onclick="L('pt')">PT</button><button onclick="L('en')">EN</button></div>
+
+  <!-- 0: Logo -->
+  <div class="sl dark-bg" id="s0"><span class="h h-dark h1" style="opacity:.08">AbbaVideo</span></div>
+
+  <!-- 1: Hero headline -->
+  <div class="sl hero-bg" id="s1"><div class="h h-light h1" data-pt="Edição de vídeo<br>com prazo<br><em style='color:rgba(255,255,255,.3)'>garantido.</em>" data-en="Video editing<br>with guaranteed<br><em style='color:rgba(255,255,255,.3)'>turnaround.</em>">Edição de vídeo<br>com prazo<br><em style="color:rgba(255,255,255,.3)">garantido.</em></div></div>
+
+  <!-- 2: Subtitle -->
+  <div class="sl hero-bg" id="s2"><p class="sub sub-l" style="font-size:clamp(14px,2vw,18px);max-width:480px;opacity:1" data-pt="Plataforma de edição de vídeo curto com SLA, fila ilimitada e identidade visual." data-en="Short video editing platform with SLA, unlimited queue and brand identity.">Plataforma de edição de vídeo curto com SLA, fila ilimitada e identidade visual.</p></div>
+
+  <!-- 3: O Problema label -->
+  <div class="sl dark-bg" id="s3"><div class="gl"></div><p class="lb">O PROBLEMA</p><div class="h h-dark h2" data-pt="Criadores não<br>conseguem <em style='color:rgba(255,255,255,.3)'>escalar.</em>" data-en="Creators can't<br><em style='color:rgba(255,255,255,.3)'>scale.</em>">Criadores não<br>conseguem <em style="color:rgba(255,255,255,.3)">escalar.</em></div></div>
+
+  <!-- 4: Bullets -->
+  <div class="sl dark-bg" id="s4">
+    <div class="fr">
+      <div class="fi"><div class="fd" style="background:rgba(255,255,255,.15)"></div><span class="fn" data-pt="Freelancers lentos e inconsistentes" data-en="Slow, inconsistent freelancers">Freelancers lentos e inconsistentes</span></div>
+      <div class="fi"><div class="fd" style="background:rgba(255,255,255,.15)"></div><span class="fn" data-pt="Agências caras e sem volume" data-en="Expensive agencies, no volume">Agências caras e sem volume</span></div>
+      <div class="fi"><div class="fd" style="background:rgba(255,255,255,.15)"></div><span class="fn" data-pt="Horas perdidas no WhatsApp" data-en="Hours wasted on WhatsApp">Horas perdidas no WhatsApp</span></div>
+      <div class="fi"><div class="fd" style="background:rgba(255,255,255,.15)"></div><span class="fn" data-pt="Sem prazo. Sem identidade visual." data-en="No deadline. No brand identity.">Sem prazo. Sem identidade visual.</span></div>
+    </div>
+  </div>
+
+  <!-- 5: A Solução -->
+  <div class="sl dark-bg" id="s5"><div class="gl"></div><p class="lb" data-pt="A SOLUÇÃO" data-en="THE SOLUTION">A SOLUÇÃO</p><div class="h h-dark h2" data-pt="Vídeos editados em<br><em style='color:rgba(255,255,255,.3)'>até 4 horas.</em>" data-en="Edited videos in<br><em style='color:rgba(255,255,255,.3)'>under 4 hours.</em>">Vídeos editados em<br><em style="color:rgba(255,255,255,.3)">até 4 horas.</em></div></div>
+
+  <!-- 6: Features -->
+  <div class="sl dark-bg" id="s6">
+    <div class="fr">
+      <div class="fi"><div class="fd" style="background:rgba(255,255,255,.15)"></div><span class="fn" data-pt="Fila ilimitada" data-en="Unlimited queue">Fila ilimitada</span></div>
+      <div class="fi"><div class="fd" style="background:rgba(255,255,255,.15)"></div><span class="fn" data-pt="SLA garantido" data-en="Guaranteed SLA">SLA garantido</span></div>
+      <div class="fi"><div class="fd" style="background:rgba(255,255,255,.15)"></div><span class="fn" data-pt="Identidade visual aplicada" data-en="Brand identity applied">Identidade visual aplicada</span></div>
+      <div class="fi"><div class="fd" style="background:rgba(255,255,255,.15)"></div><span class="fn" data-pt="Revisões ilimitadas" data-en="Unlimited revisions">Revisões ilimitadas</span></div>
+      <div class="fi"><div class="fd" style="background:rgba(255,255,255,.15)"></div><span class="fn" data-pt="Editor dedicado" data-en="Dedicated editor">Editor dedicado</span></div>
+    </div>
+  </div>
+
+  <!-- 7: Como funciona label -->
+  <div class="sl dark-bg" id="s7"><div class="gl"></div><p class="lb" data-pt="COMO FUNCIONA" data-en="HOW IT WORKS">COMO FUNCIONA</p><div class="h h-dark h2" data-pt="Envie. Acompanhe.<br><em style='color:rgba(255,255,255,.3)'>Receba.</em>" data-en="Send. Track.<br><em style='color:rgba(255,255,255,.3)'>Receive.</em>">Envie. Acompanhe.<br><em style="color:rgba(255,255,255,.3)">Receba.</em></div></div>
+
+  <!-- 8: Step 1 -->
+  <div class="sl dark-bg" id="s8"><div class="si"><div class="sn">01</div><div><div class="st2" data-pt="Envie" data-en="Send">Envie</div><p class="sub sub-d" style="margin-top:4px;max-width:280px;opacity:1" data-pt="Upload ou link. Briefing já salvo." data-en="Upload or link. Brief already saved.">Upload ou link. Briefing já salvo.</p></div></div></div>
+
+  <!-- 9: Step 2 -->
+  <div class="sl dark-bg" id="s9"><div class="si"><div class="sn">02</div><div><div class="st2" data-pt="Acompanhe" data-en="Track">Acompanhe</div><p class="sub sub-d" style="margin-top:4px;max-width:280px;opacity:1" data-pt="Countdown de SLA. Status ao vivo." data-en="SLA countdown. Live status.">Countdown de SLA. Status ao vivo.</p></div></div></div>
+
+  <!-- 10: Step 3 -->
+  <div class="sl dark-bg" id="s10"><div class="si"><div class="sn">03</div><div><div class="st2" data-pt="Receba" data-en="Receive">Receba</div><p class="sub sub-d" style="margin-top:4px;max-width:280px;opacity:1" data-pt="Revise com timestamps. Aprove com um clique." data-en="Review with timestamps. Approve with one click.">Revise com timestamps. Aprove com um clique.</p></div></div></div>
+
+  <!-- 11: Planos label -->
+  <div class="sl dark-bg" id="s11"><div class="gl"></div><p class="lb" data-pt="PLANOS" data-en="PRICING">PLANOS</p><div class="h h-dark h2" data-pt="Quão rápido você<br><em style='color:rgba(255,255,255,.3)'>precisa?</em>" data-en="How fast do you<br><em style='color:rgba(255,255,255,.3)'>need it?</em>">Quão rápido você<br><em style="color:rgba(255,255,255,.3)">precisa?</em></div></div>
+
+  <!-- 12: Cards -->
+  <div class="sl dark-bg" id="s12">
+    <div class="pg">
+      <div class="pc"><div class="pn">Standard</div><div class="ps" data-pt="72h úteis" data-en="72 biz hrs">72h úteis</div><div class="pp" id="p0">R$490</div><div class="pm" data-pt="/mês" data-en="/mo">/mês</div></div>
+      <div class="pc"><div class="pn">Pro</div><div class="ps" data-pt="48h úteis" data-en="48 biz hrs">48h úteis</div><div class="pp" id="p1">R$660</div><div class="pm" data-pt="/mês" data-en="/mo">/mês</div></div>
+      <div class="pc"><div class="pn">Business</div><div class="ps" data-pt="24h úteis" data-en="24 biz hrs">24h úteis</div><div class="pp" id="p2">R$1.100</div><div class="pm" data-pt="/mês" data-en="/mo">/mês</div></div>
+      <div class="pc"><div class="pn">Premium</div><div class="ps" data-pt="8h úteis" data-en="8 biz hrs">8h úteis</div><div class="pp" id="p3">R$2.970</div><div class="pm" data-pt="/mês" data-en="/mo">/mês</div></div>
+    </div>
+  </div>
+
+  <!-- 13: Incluso -->
+  <div class="sl dark-bg" id="s13">
+    <div class="fr" style="gap:8px">
+      <div class="fi"><span class="fn" style="color:rgba(255,255,255,.3)" data-pt="✓ Fila ilimitada" data-en="✓ Unlimited queue">✓ Fila ilimitada</span></div>
+      <div class="fi"><span class="fn" style="color:rgba(255,255,255,.3)" data-pt="✓ Revisões ilimitadas" data-en="✓ Unlimited revisions">✓ Revisões ilimitadas</span></div>
+      <div class="fi"><span class="fn" style="color:rgba(255,255,255,.3)" data-pt="✓ Identidade visual" data-en="✓ Brand identity">✓ Identidade visual</span></div>
+      <div class="fi"><span class="fn" style="color:rgba(255,255,255,.3)" data-pt="✓ Cancele quando quiser" data-en="✓ Cancel anytime">✓ Cancele quando quiser</span></div>
+    </div>
+  </div>
+
+  <!-- 14: Diferenciais label -->
+  <div class="sl dark-bg" id="s14"><div class="gl"></div><p class="lb" data-pt="DIFERENCIAIS" data-en="WHY US">DIFERENCIAIS</p><div class="h h-dark h2" data-pt="Por que<br><em style='color:rgba(255,255,255,.3)'>AbbaVideo?</em>" data-en="Why<br><em style='color:rgba(255,255,255,.3)'>AbbaVideo?</em>">Por que<br><em style="color:rgba(255,255,255,.3)">AbbaVideo?</em></div></div>
+
+  <!-- 15: Diffs -->
+  <div class="sl dark-bg" id="s15">
+    <div class="dl">
+      <div class="di"><div class="dt2" data-pt="SLA Garantido" data-en="Guaranteed SLA">SLA Garantido</div><div class="dd2" data-pt="Countdown visível. Sem surpresa." data-en="Visible countdown. No surprises.">Countdown visível. Sem surpresa.</div></div>
+      <div class="di"><div class="dt2" data-pt="Fila Ilimitada" data-en="Unlimited Queue">Fila Ilimitada</div><div class="dd2" data-pt="Sem cota. Sem limite." data-en="No cap. No limit.">Sem cota. Sem limite.</div></div>
+      <div class="di"><div class="dt2" data-pt="Revisões Sem Limite" data-en="Unlimited Revisions">Revisões Sem Limite</div><div class="dd2" data-pt="Marca o segundo exato." data-en="Mark the exact second.">Marca o segundo exato.</div></div>
+      <div class="di"><div class="dt2" data-pt="Editor Dedicado" data-en="Dedicated Editor">Editor Dedicado</div><div class="dd2" data-pt="Consistência garantida." data-en="Guaranteed consistency.">Consistência garantida.</div></div>
+    </div>
+  </div>
+
+  <!-- 16: CTA headline -->
+  <div class="sl dark-bg" id="s16"><div class="h h-dark h1" data-pt="Seu próximo vídeo<br>poderia estar em<br>produção <em style='color:rgba(255,255,255,.3)'>agora.</em>" data-en="Your next video<br>could be in<br>production <em style='color:rgba(255,255,255,.3)'>now.</em>">Seu próximo vídeo<br>poderia estar em<br>produção <em style="color:rgba(255,255,255,.3)">agora.</em></div></div>
+
+  <!-- 17: CTA button -->
+  <div class="sl dark-bg" id="s17">
+    <p class="sub sub-d" style="opacity:1;font-size:clamp(13px,1.8vw,16px)" data-pt="A partir de R$490/mês." data-en="Starting at R$490/mo.">A partir de R$490/mês.</p>
+    <a class="cta" href="https://video.abba.marketing/auth" style="opacity:1" data-pt="Começar agora" data-en="Get started">Começar agora</a>
+    <div class="fdots"><div class="fdt"></div><div class="fdt"></div><div class="fdt"></div><div class="fdt"></div><div class="fdt"></div><div class="fdt"></div><div class="fdt"></div><div class="fdt"></div></div>
+    <div class="fcopy">AbbaVideo &copy; 2026</div>
+  </div>
+
+  <!-- Controls -->
+  <div class="ct">
+    <button class="cb" onclick="tp()"><svg viewBox="0 0 24 24" id="ic"><polygon points="5,3 19,12 5,21"/></svg></button>
+    <div class="pb" onclick="sk(event)"><div class="pf" id="pf"></div></div>
+    <div class="tm" id="tm">0:00 / 0:54</div>
+  </div>
+</div>
+
+<script>
+// 18 slides x 3s = 54s total
+const N=18,D=3,T=N*D;
+let ct=0,pl=false,lf=0,cs=-1,lang='pt';
+
+function L(l){
+  lang=l;
+  document.querySelectorAll('.lg button').forEach(b=>b.classList.toggle('on',b.textContent===l.toUpperCase()));
+  document.querySelectorAll('[data-'+l+']').forEach(el=>{
+    if(el.querySelector('em')||el.innerHTML.includes('<em')||el.innerHTML.includes('<br')){
+      el.innerHTML=el.dataset[l];
+    }else{
+      el.textContent=el.dataset[l];
+    }
+  });
+}
+
+function tp(){
+  pl=!pl;
+  document.getElementById('ic').innerHTML=pl
+    ?'<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'
+    :'<polygon points="5,3 19,12 5,21"/>';
+  if(pl){lf=performance.now();requestAnimationFrame(tk)}
+}
+
+function sk(e){
+  const r=e.currentTarget.getBoundingClientRect();
+  ct=((e.clientX-r.left)/r.width)*T;
+  cs=-1;up();
+}
+
+function tk(now){
+  if(!pl)return;
+  ct+=(now-lf)/1000;lf=now;
+  if(ct>=T){ct=0;cs=-1} // loop
+  up();requestAnimationFrame(tk);
+}
+
+function up(){
+  document.getElementById('pf').style.width=(ct/T*100)+'%';
+  const m=Math.floor(ct/60),s=Math.floor(ct%60);
+  const tm2=Math.floor(T/60),ts=Math.floor(T%60);
+  document.getElementById('tm').textContent=`${m}:${String(s).padStart(2,'0')} / ${tm2}:${String(ts).padStart(2,'0')}`;
+
+  const ns=Math.min(Math.floor(ct/D),N-1);
+  if(ns!==cs){
+    // Transition
+    for(let i=0;i<N;i++){
+      const el=document.getElementById('s'+i);
+      if(i===ns){el.classList.add('on');el.classList.remove('out')}
+      else if(i===cs){el.classList.remove('on');el.classList.add('out')}
+      else{el.classList.remove('on','out')}
+    }
+    cs=ns;
+  }
+}
+
+// Init — show first slide
+document.getElementById('s0').classList.add('on');
+cs=0;
+// Auto-play
+setTimeout(()=>{if(!pl)tp()},800);
+</script>
+</body>
+</html>
