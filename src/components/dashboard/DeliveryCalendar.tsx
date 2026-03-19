@@ -74,7 +74,7 @@ const DeliveryCalendar = ({ userProject }: DeliveryCalendarProps) => {
 
     if (!error && data) {
       setDeliveries(
-        data.map((d: any) => ({
+        data.map((d) => ({
           id: d.id,
           title: d.title,
           description: d.description,
@@ -85,7 +85,7 @@ const DeliveryCalendar = ({ userProject }: DeliveryCalendarProps) => {
           max_revisions: d.max_revisions,
           file_url: d.file_url,
           thumbnail_url: d.thumbnail_url,
-          editor_name: d.editor?.display_name || null,
+          editor_name: (d.editor as Record<string, unknown>)?.display_name as string || null,
           editor_id: d.editor_id,
           created_at: d.created_at,
           delivered_at: d.delivered_at,
@@ -105,6 +105,7 @@ const DeliveryCalendar = ({ userProject }: DeliveryCalendarProps) => {
 
   useEffect(() => {
     fetchDeliveries();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchDeliveries is stable
   }, [userProject.id]);
 
   // Build calendar events

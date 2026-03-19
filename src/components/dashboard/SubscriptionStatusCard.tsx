@@ -30,11 +30,11 @@ const SubscriptionStatusCard = ({ userProject }: Props) => {
       {/* Plano + SLA */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <Crown className="h-4 w-4 text-abba-lime" />
-          <span className="text-sm font-semibold text-abba-lime">{tierLabel}</span>
+          <Crown className="h-4 w-4 text-primary" />
+          <span className="text-sm font-semibold text-primary">{tierLabel}</span>
         </div>
         {sla && (
-          <Badge variant="outline" className="text-[10px] bg-abba-lime/10 text-abba-lime border-abba-lime/30 rounded-full px-2 py-0.5">
+          <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/30 rounded-full px-2 py-0.5">
             <Zap className="h-3 w-3 mr-0.5" /> SLA {sla}h
           </Badge>
         )}

@@ -35,7 +35,7 @@ export default function ClientGuard({ children, requireStep }: ClientGuardProps)
   }
 
   const isPendingPayment = userProject.status === 'pending_payment';
-  const isActive = userProject.status === 'active';
+  const isActive = userProject.status === 'active' || userProject.status === 'trialing';
   const onboardingDone = profile?.onboarding_complete ?? false;
 
   switch (requireStep) {

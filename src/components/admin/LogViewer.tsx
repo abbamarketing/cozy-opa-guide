@@ -41,8 +41,9 @@ const LogViewer = () => {
   const fetchLogs = useCallback(async () => {
     setLoading(true);
 
-    let query = supabase
-      .from('system_logs' as any)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- system_logs is not in generated types
+    let query = (supabase as any)
+      .from('system_logs')
       .select('*', { count: 'exact' });
 
     if (filterLevel !== 'all') query = query.eq('level', filterLevel);
@@ -87,8 +88,9 @@ const LogViewer = () => {
     const batchSize = 1000;
 
     while (offset < totalCount) {
-      let query = supabase
-        .from('system_logs' as any)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- system_logs is not in generated types
+      let query = (supabase as any)
+        .from('system_logs')
         .select('*')
         .order('created_at', { ascending: false })
         .range(offset, offset + batchSize - 1);
@@ -119,12 +121,15 @@ const LogViewer = () => {
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `logs-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success('Download concluído!');
+    try {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `logs-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      toast.success('Download concluído!');
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   };
 
   const toggleExpand = (id: string) => {

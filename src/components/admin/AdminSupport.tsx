@@ -59,7 +59,11 @@ const AdminSupport = () => {
         .select(`*, profiles:user_id ( full_name )`)
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return (data ?? []) as unknown as Ticket[];
+      const rows = (data ?? []) as Ticket[];
+      if (rows.length > 0 && rows[0].profiles === undefined) {
+        console.warn('AdminSupport: ticket rows are missing joined "profiles" — check the select query');
+      }
+      return rows;
     },
   });
 

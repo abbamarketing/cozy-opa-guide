@@ -87,7 +87,7 @@ const SubtaskList = ({ deliveryId, role }: SubtaskListProps) => {
 
   const updateSubtask = async (id: string, status: string) => {
     setUpdatingId(id);
-    const updateData: Record<string, any> = { status };
+    const updateData: Record<string, unknown> = { status };
     if (status === 'completed' || status === 'approved') {
       updateData.completed_at = new Date().toISOString();
       updateData.completed_by = user?.id;
@@ -95,6 +95,7 @@ const SubtaskList = ({ deliveryId, role }: SubtaskListProps) => {
 
     const { error } = await supabase
       .from('delivery_subtasks')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic update payload
       .update(updateData as any)
       .eq('id', id);
 

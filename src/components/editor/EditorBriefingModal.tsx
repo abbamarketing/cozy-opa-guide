@@ -63,8 +63,8 @@ interface BriefingData {
   logo_url: string | null;
   primary_color: string | null;
   secondary_color: string | null;
-  brand_colors: any;
-  brand_fonts: any;
+  brand_colors: unknown;
+  brand_fonts: unknown;
   legend_style: string | null;
   content_style: string | null;
   target_audience: string | null;
@@ -97,28 +97,53 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
   const fetchData = useCallback(async () => {
     if (!delivery) return;
 
-    const { data: up } = await supabase
-      .from('user_projects')
-      .select('user_id')
-      .eq('id', delivery.user_project_id)
-      .single();
-
-    if (up) {
-      const { data: b } = await supabase
-        .from('onboarding_briefings')
-        .select('*')
-        .eq('user_id', up.user_id)
-        .limit(1)
+    try {
+      const { data: up, error: upError } = await supabase
+        .from('user_projects')
+        .select('user_id')
+        .eq('id', delivery.user_project_id)
         .single();
-      if (b) setBriefing(b as any);
-    }
 
-    const { data: revs } = await supabase
-      .from('delivery_revisions')
-      .select('*')
-      .eq('delivery_id', delivery.id)
-      .order('created_at', { ascending: false });
-    if (revs) setRevisions(revs as any);
+      if (upError) {
+        logger.info('Erro ao buscar projeto', { error: upError.message }, 'editor');
+        toast.error('Erro ao carregar dados do projeto.');
+        return;
+      }
+
+      if (up) {
+        const { data: b, error: bError } = await supabase
+          .from('onboarding_briefings')
+          .select('*')
+          .eq('user_id', up.user_id)
+          .limit(1)
+          .single();
+
+        if (bError) {
+          logger.info('Erro ao buscar briefing', { error: bError.message }, 'editor');
+        }
+
+        if (b) {
+          setBriefing(b as BriefingData);
+        } else {
+          setBriefing(null);
+        }
+      }
+
+      const { data: revs, error: revsError } = await supabase
+        .from('delivery_revisions')
+        .select('*')
+        .eq('delivery_id', delivery.id)
+        .order('created_at', { ascending: false });
+
+      if (revsError) {
+        logger.info('Erro ao buscar revisões', { error: revsError.message }, 'editor');
+      }
+
+      if (revs) setRevisions(revs as RevisionRecord[]);
+    } catch (err) {
+      logger.info('Erro inesperado ao carregar briefing', { error: String(err) }, 'editor');
+      toast.error('Erro inesperado ao carregar dados do briefing.');
+    }
   }, [delivery]);
 
   useEffect(() => {
@@ -142,7 +167,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
     }
     setIsDelivering(true);
 
-    const updateData: Record<string, any> = {
+    const updateData: Record<string, unknown> = {
       status: 'review',
       delivered_at: new Date().toISOString(),
     };
@@ -172,7 +197,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
       return;
     }
     setSelectedStatus(newStatus);
-    const updateData: Record<string, any> = { status: newStatus };
+    const updateData: Record<string, unknown> = { status: newStatus };
     if (newStatus === 'review') {
       updateData.delivered_at = new Date().toISOString();
     }
@@ -192,9 +217,10 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
   const colors: { hex: string; label: string }[] = [];
   if (briefing?.primary_color) colors.push({ hex: briefing.primary_color, label: 'Primária' });
   if (briefing?.secondary_color) colors.push({ hex: briefing.secondary_color, label: 'Secundária' });
+  const isValidHex = (color: string) => /^#[0-9A-Fa-f]{6}$/.test(color);
   if (Array.isArray(briefing?.brand_colors)) {
-    briefing.brand_colors.forEach((c: any, i: number) => {
-      if (typeof c === 'string' && !colors.find((x) => x.hex === c)) {
+    briefing.brand_colors.forEach((c: unknown, i: number) => {
+      if (typeof c === 'string' && isValidHex(c) && !colors.find((x) => x.hex === c)) {
         colors.push({ hex: c, label: `Cor ${i + 1}` });
       }
     });
@@ -248,7 +274,7 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
               <div className="flex items-center gap-2 text-xs rounded-lg bg-muted/40 px-3 py-2">
                 <Clock className={`h-3.5 w-3.5 ${
                   deadlineHours !== null && deadlineHours < 0 ? 'text-destructive' :
-                  deadlineHours !== null && deadlineHours <= 12 ? 'text-[hsl(45,93%,47%)]' : 'text-primary'
+                  deadlineHours !== null && deadlineHours <= 12 ? 'text-queue-yellow' : 'text-primary'
                 }`} />
                 <span className="text-muted-foreground">
                   Prazo: {format(new Date(delivery.due_date), "dd/MM 'às' HH'h'", { locale: ptBR })}
@@ -457,9 +483,9 @@ const EditorBriefingModal = ({ open, onOpenChange, delivery, onUpdated }: Editor
                           <Type className="h-3 w-3" /> Fontes
                         </h4>
                         <div className="flex flex-wrap gap-2">
-                          {fonts.map((f: any, i: number) => (
+                          {fonts.map((f: unknown, i: number) => (
                             <Badge key={i} variant="secondary" className="text-xs">
-                              {typeof f === 'string' ? f : f.name || JSON.stringify(f)}
+                              {typeof f === 'string' ? f : (f as Record<string, unknown>)?.name as string || JSON.stringify(f)}
                             </Badge>
                           ))}
                         </div>

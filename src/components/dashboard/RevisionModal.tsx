@@ -34,7 +34,7 @@ interface RevisionModalProps {
   onOpenChange: (open: boolean) => void;
   delivery: DeliveryData;
   onRevisionSent: () => void;
-  userProject: any;
+  userProject: Record<string, unknown> | null;
 }
 
 const FEEDBACK_CATEGORIES = [
@@ -80,6 +80,7 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProje
 
   const onSubmit = async (values: RevisionValues) => {
     if (!user) return;
+    if (remaining !== null && remaining <= 0) return;
     setIsSubmitting(true);
 
     const catLabel = FEEDBACK_CATEGORIES.find((c) => c.id === values.category)?.label || '';
@@ -92,10 +93,11 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProje
         notes: formattedNotes,
         timestamp_marker: values.timestamp_marker || null,
         category: values.category,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic insert payload
       } as any);
       if (revError) throw revError;
 
-      const updateData: Record<string, any> = {
+      const updateData: Record<string, unknown> = {
         status: 'revision',
         revision_count: delivery.revision_count + 1,
         revision_notes: formattedNotes,
@@ -118,8 +120,9 @@ const RevisionModal = ({ open, onOpenChange, delivery, onRevisionSent, userProje
       form.reset();
       onOpenChange(false);
       onRevisionSent();
-    } catch (err: any) {
-      toast.error(err.message || 'Erro ao solicitar revisão');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro ao solicitar revisão';
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }

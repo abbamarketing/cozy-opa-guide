@@ -11,7 +11,7 @@ interface LogEntry {
 
 const LOG_BATCH_SIZE = 10;
 const FLUSH_INTERVAL = 3000;
-let logBuffer: LogEntry[] = [];
+const logBuffer: LogEntry[] = [];
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
 
 const redactSensitive = (data: Record<string, unknown>): Record<string, unknown> => {

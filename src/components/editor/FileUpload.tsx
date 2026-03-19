@@ -64,6 +64,7 @@ const FileUpload = ({
   const [isSavingDrive, setIsSavingDrive] = useState(false);
   const abortRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const xhrRef = useRef<XMLHttpRequest | null>(null);
 
   // Cleanup preview URL
   useEffect(() => {
@@ -71,6 +72,16 @@ const FileUpload = ({
       if (videoPreview) URL.revokeObjectURL(videoPreview);
     };
   }, [videoPreview]);
+
+  // Abort XHR upload on unmount
+  useEffect(() => {
+    return () => {
+      if (xhrRef.current) {
+        xhrRef.current.abort();
+        xhrRef.current = null;
+      }
+    };
+  }, []);
 
   const validateFile = (f: File): string | null => {
     if (!ACCEPTED_TYPES.includes(f.type)) {
@@ -83,6 +94,7 @@ const FileUpload = ({
   };
 
   const generatePreview = (f: File) => {
+    if (videoPreview) URL.revokeObjectURL(videoPreview);
     if (f.type.startsWith('video/')) {
       const url = URL.createObjectURL(f);
       setVideoPreview(url);
@@ -100,6 +112,7 @@ const FileUpload = ({
     setFile(f);
     setUploadComplete(false);
     generatePreview(f);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- generatePreview is stable
   }, []);
 
   const handleDrop = useCallback(
@@ -134,6 +147,7 @@ const FileUpload = ({
           upsert: true,
           contentType: file.type,
           duplex: 'half',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- duplex option not in storage types
         } as any);
 
         if (error) throw error;
@@ -172,7 +186,7 @@ const FileUpload = ({
           xhr.onabort = () => reject(new Error('Upload cancelado'));
 
           // Store ref for cancel
-          (window as any).__currentUploadXhr = xhr;
+          xhrRef.current = xhr;
 
           xhr.send(file);
         });
@@ -193,20 +207,20 @@ const FileUpload = ({
       setUploadComplete(true);
       toast.success('Upload concluído!');
       onUploaded(urlData.publicUrl);
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (!abortRef.current) {
-        toast.error(err.message || 'Erro no upload');
+        const message = err instanceof Error ? err.message : 'Erro no upload';
+        toast.error(message);
       }
     } finally {
       setIsUploading(false);
-      (window as any).__currentUploadXhr = undefined;
+      xhrRef.current = null;
     }
   };
 
   const cancelUpload = () => {
     abortRef.current = true;
-    const xhr = (window as any).__currentUploadXhr;
-    if (xhr) xhr.abort();
+    if (xhrRef.current) xhrRef.current.abort();
     setIsUploading(false);
     setProgress(0);
     toast.info('Upload cancelado');
@@ -234,6 +248,7 @@ const FileUpload = ({
 
     const { error } = await supabase
       .from('deliveries')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- drive_link not in generated types
       .update({ drive_link: driveLink.trim() } as any)
       .eq('id', deliveryId);
 

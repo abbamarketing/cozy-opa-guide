@@ -24,6 +24,7 @@ export default function DeliveryHistory() {
 
   useEffect(() => {
     if (userProject?.id) loadApproved();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadApproved is stable
   }, [userProject?.id]);
 
   const loadApproved = async () => {
@@ -112,19 +113,19 @@ export default function DeliveryHistory() {
                     </a>
                   </Button>
                 )}
-                {d.drive_link && (
+                {d.raw_drive_link && (
                   <Button
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
                     asChild
                   >
-                    <a href={d.drive_link} target="_blank" rel="noopener noreferrer" title="Abrir Drive">
+                    <a href={d.raw_drive_link} target="_blank" rel="noopener noreferrer" title="Abrir Drive">
                       <ExternalLink className="h-4 w-4" />
                     </a>
                   </Button>
                 )}
-                {!d.file_url && !d.drive_link && (
+                {!d.file_url && !d.raw_drive_link && (
                   <span className="text-[10px] text-muted-foreground">Sem arquivo</span>
                 )}
               </div>

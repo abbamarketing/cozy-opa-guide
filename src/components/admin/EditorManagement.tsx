@@ -85,7 +85,7 @@ const parseFunctionErrorMessage = async (error: unknown) => {
       : null;
 
   if (context && typeof (context as { json?: unknown }).json === 'function') {
-    const payload = await (context as { json: () => Promise<any> }).json().catch(() => null);
+    const payload = await (context as { json: () => Promise<Record<string, unknown>> }).json().catch(() => null);
     if (payload?.error && typeof payload.error === 'string') {
       message = payload.error;
     }
@@ -133,28 +133,28 @@ const EditorManagement = () => {
     if (!editorsList) { setLoading(false); return; }
 
     // Get profiles for avatar/email
-    const userIds = editorsList.map((e: any) => e.user_id);
+    const userIds = editorsList.map((e) => e.user_id);
     const { data: profiles } = await supabase
       .from('profiles')
       .select('user_id, avatar_url, full_name')
       .in('user_id', userIds);
 
-    const profileMap = new Map((profiles || []).map((p: any) => [p.user_id, p]));
+    const profileMap = new Map((profiles || []).map((p) => [p.user_id, p]));
 
     // Get delivery stats
     const { data: allDeliveries } = await supabase
       .from('deliveries')
       .select('editor_id, status, due_date, delivered_at')
-      .in('editor_id', editorsList.map((e: any) => e.id));
+      .in('editor_id', editorsList.map((e) => e.id));
 
-    const cards: EditorData[] = editorsList.map((e: any) => {
+    const cards: EditorData[] = editorsList.map((e) => {
       const prof = profileMap.get(e.user_id);
-      const mine = (allDeliveries || []).filter((d: any) => d.editor_id === e.id);
-      const active = mine.filter((d: any) =>
+      const mine = (allDeliveries || []).filter((d) => d.editor_id === e.id);
+      const active = mine.filter((d) =>
         ['pending', 'in_progress', 'revision'].includes(d.status)
       ).length;
-      const completed = mine.filter((d: any) => d.status === 'approved');
-      const onTime = completed.filter((d: any) => {
+      const completed = mine.filter((d) => d.status === 'approved');
+      const onTime = completed.filter((d) => {
         if (!d.due_date || !d.delivered_at) return true;
         return new Date(d.delivered_at) <= new Date(d.due_date);
       }).length;
@@ -250,7 +250,7 @@ const EditorManagement = () => {
       setBlockedEditor({
         editor,
         count: inProd ?? 0,
-        titles: (inProdData || []).map((d: any) => d.title),
+        titles: (inProdData || []).map((d) => d.title),
       });
       setBlockedModalOpen(true);
       return;
@@ -293,37 +293,42 @@ const EditorManagement = () => {
     setDetailEditor(editor);
     setDetailLoading(true);
 
-    const { data } = await supabase
-      .from('deliveries')
-      .select('id, title, status, delivery_type, due_date, delivered_at, created_at, user_project_id')
-      .eq('editor_id', editor.id)
-      .order('created_at', { ascending: false });
+    try {
+      const { data } = await supabase
+        .from('deliveries')
+        .select('id, title, status, delivery_type, due_date, delivered_at, created_at, user_project_id')
+        .eq('editor_id', editor.id)
+        .order('created_at', { ascending: false });
 
-    if (data) {
-      // Get client names
-      const upIds = [...new Set(data.map((d: any) => d.user_project_id))];
-      const { data: ups } = await supabase
-        .from('user_projects')
-        .select('id, user_id')
-        .in('id', upIds);
+      if (data) {
+        // Get client names
+        const upIds = [...new Set(data.map((d) => d.user_project_id))];
+        const { data: ups } = await supabase
+          .from('user_projects')
+          .select('id, user_id')
+          .in('id', upIds);
 
-      const userIds = [...new Set((ups || []).map((u: any) => u.user_id))];
-      const { data: profs } = await supabase
-        .from('profiles')
-        .select('user_id, full_name')
-        .in('user_id', userIds);
+        const userIds = [...new Set((ups || []).map((u) => u.user_id))];
+        const { data: profs } = await supabase
+          .from('profiles')
+          .select('user_id, full_name')
+          .in('user_id', userIds);
 
-      const upUserMap = new Map((ups || []).map((u: any) => [u.id, u.user_id]));
-      const nameMap = new Map((profs || []).map((p: any) => [p.user_id, p.full_name]));
+        const upUserMap = new Map((ups || []).map((u) => [u.id, u.user_id]));
+        const nameMap = new Map((profs || []).map((p) => [p.user_id, p.full_name]));
 
-      setDetailDeliveries(
-        data.map((d: any) => ({
-          ...d,
-          client_name: nameMap.get(upUserMap.get(d.user_project_id) || '') || null,
-        }))
-      );
+        setDetailDeliveries(
+          data.map((d) => ({
+            ...d,
+            client_name: nameMap.get(upUserMap.get(d.user_project_id) || '') || null,
+          }))
+        );
+      }
+    } catch (err) {
+      toast.error('Erro ao carregar detalhes do editor');
+    } finally {
+      setDetailLoading(false);
     }
-    setDetailLoading(false);
   };
 
   /* ─── Edit Editor ─── */

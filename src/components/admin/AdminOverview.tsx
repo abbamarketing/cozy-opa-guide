@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
@@ -27,6 +26,14 @@ interface KPIs {
   subscriptionMRR: number;
 }
 
+interface UrgentDelivery {
+  id: string;
+  title: string;
+  due_date: string;
+  status: string;
+  delivery_type: string;
+}
+
 const SUBSCRIPTION_TIER_VALUES: Record<string, number> = {
   standard: 490,
   pro:      660,
@@ -38,7 +45,7 @@ const SUBSCRIPTION_TIER_VALUES: Record<string, number> = {
 const AdminOverview = () => {
   const [kpis, setKpis] = useState<KPIs | null>(null);
   const [weeklyData, setWeeklyData] = useState<{ week: string; count: number }[]>([]);
-  const [urgentDeliveries, setUrgentDeliveries] = useState<any[]>([]);
+  const [urgentDeliveries, setUrgentDeliveries] = useState<UrgentDelivery[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -56,15 +63,8 @@ const AdminOverview = () => {
         });
       }
 
-      // All independent queries in parallel
-      const [
-        activeClientsRes,
-        pendingRes,
-        lateRes,
-        activeProjectsRes,
-        recentRes,
-        urgentRes,
-      ] = await Promise.all([
+      // All independent queries in parallel — use allSettled so partial data still shows
+      const results = await Promise.allSettled([
         supabase.from('user_projects').select('*', { count: 'exact', head: true }).eq('status', 'active'),
         supabase.from('deliveries').select('*', { count: 'exact', head: true }).in('status', ['queue', 'pending', 'in_progress', 'revision']),
         supabase.from('deliveries').select('*', { count: 'exact', head: true }).in('status', ['queue', 'pending', 'in_progress', 'revision']).not('due_date', 'is', null).lt('due_date', new Date().toISOString()),
@@ -73,20 +73,27 @@ const AdminOverview = () => {
         supabase.from('deliveries').select('id, title, due_date, status, delivery_type').in('status', ['queue', 'pending', 'in_progress', 'revision']).not('due_date', 'is', null).lte('due_date', in24h).order('due_date', { ascending: true }).limit(10),
       ]);
 
+      const activeClientsRes = results[0].status === 'fulfilled' ? results[0].value : { count: 0, data: null };
+      const pendingRes = results[1].status === 'fulfilled' ? results[1].value : { count: 0, data: null };
+      const lateRes = results[2].status === 'fulfilled' ? results[2].value : { count: 0, data: null };
+      const activeProjectsRes = results[3].status === 'fulfilled' ? results[3].value : { data: null };
+      const recentRes = results[4].status === 'fulfilled' ? results[4].value : { data: null };
+      const urgentRes = results[5].status === 'fulfilled' ? results[5].value : { data: null };
+
       let customMRR = 0;
       let subscriptionMRR = 0;
       const activeProjects = activeProjectsRes.data;
       if (activeProjects && activeProjects.length > 0) {
-        const projectIds = [...new Set(activeProjects.map((p: any) => p.custom_project_id).filter(Boolean))];
+        const projectIds = [...new Set(activeProjects.map((p) => p.custom_project_id).filter(Boolean))];
         const { data: projects } = projectIds.length > 0
           ? await supabase.from('custom_projects').select('id, monthly_value').in('id', projectIds)
-          : { data: [] };
+          : { data: [] as { id: string; monthly_value: number }[] };
 
-        const valueMap = new Map((projects || []).map((p: any) => [p.id, Number(p.monthly_value)]));
-        customMRR = activeProjects.reduce((sum: number, p: any) => sum + (Number(valueMap.get(p.custom_project_id)) || 0), 0);
+        const valueMap = new Map((projects || []).map((p) => [p.id, Number(p.monthly_value)]));
+        customMRR = activeProjects.reduce((sum, p) => sum + (Number(valueMap.get(p.custom_project_id)) || 0), 0);
         subscriptionMRR = activeProjects
-          .filter((up: any) => up.client_type === 'subscription' && up.subscription_tier)
-          .reduce((sum: number, up: any) => sum + (SUBSCRIPTION_TIER_VALUES[up.subscription_tier] ?? 0), 0);
+          .filter((up) => up.client_type === 'subscription' && up.subscription_tier)
+          .reduce((sum, up) => sum + (SUBSCRIPTION_TIER_VALUES[up.subscription_tier ?? ''] ?? 0), 0);
       }
 
       setKpis({
@@ -101,12 +108,12 @@ const AdminOverview = () => {
       const weekCounts = weeks.map((w) => ({
         week: w.week,
         count: (recentRes.data || []).filter(
-          (d: any) => new Date(d.created_at) >= w.start && new Date(d.created_at) <= w.end
+          (d) => new Date(d.created_at) >= w.start && new Date(d.created_at) <= w.end
         ).length,
       }));
       setWeeklyData(weekCounts);
 
-      setUrgentDeliveries(urgentRes.data || []);
+      setUrgentDeliveries((urgentRes.data || []) as UrgentDelivery[]);
       setLoading(false);
     };
 
@@ -203,7 +210,7 @@ const AdminOverview = () => {
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="text-sm font-medium text-card-foreground truncate">{d.title}</span>
                     <Badge variant="outline" className="text-[10px] shrink-0">
-                      {{ youtube_video: 'YouTube', instagram_video: 'Instagram', thumbnail: 'Thumbnail', cover: 'Capa' }[d.delivery_type] || d.delivery_type}
+                      {{ youtube_video: 'YouTube', instagram_video: 'Instagram', thumbnail: 'Thumbnail', cover: 'Capa' }[d.delivery_type as string] || d.delivery_type}
                     </Badge>
                   </div>
                   <span className={`text-xs font-medium shrink-0 ${bizMin < 0 ? 'text-destructive' : 'text-[hsl(45,93%,47%)]'}`}>

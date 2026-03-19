@@ -18,7 +18,9 @@ export const useEditor = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
+    let cancelled = false;
+
+    if (!user?.id) {
       setEditor(null);
       setIsLoading(false);
       return;
@@ -32,12 +34,15 @@ export const useEditor = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
+      if (cancelled) return;
+
       if (data) setEditor(data as unknown as EditorInfo);
       setIsLoading(false);
     };
 
     fetch();
-  }, [user]);
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   return { editor, isLoading };
 };

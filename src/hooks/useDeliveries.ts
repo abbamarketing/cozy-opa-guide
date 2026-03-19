@@ -5,7 +5,7 @@ import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
 
 const DELIVERIES_KEY = 'deliveries';
 
-const mapDelivery = (d: any): DeliveryData => ({
+const mapDelivery = (d: Record<string, unknown>): DeliveryData => ({
   id: d.id,
   title: d.title,
   description: d.description,
@@ -16,7 +16,7 @@ const mapDelivery = (d: any): DeliveryData => ({
   max_revisions: d.max_revisions,
   file_url: d.file_url,
   thumbnail_url: d.thumbnail_url,
-  editor_name: d.editor?.display_name || null,
+  editor_name: (d.editor as Record<string, unknown>)?.display_name as string || null,
   editor_id: d.editor_id,
   created_at: d.created_at,
   delivered_at: d.delivered_at,
@@ -75,11 +75,13 @@ export function useDeliveries(userProjectId: string) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userProjectId, queryClient]); // queryKey is stable via userProjectId
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- queryKey is derived from userProjectId which is already a dep
+  }, [userProjectId, queryClient]);
 
   // Create delivery mutation
   const createDelivery = useMutation({
-    mutationFn: async (insertData: Record<string, any>) => {
+    mutationFn: async (insertData: Record<string, unknown>) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic insert payload
       const { error } = await supabase.from('deliveries').insert(insertData as any);
       if (error) throw error;
     },
@@ -90,7 +92,7 @@ export function useDeliveries(userProjectId: string) {
 
   // Update delivery mutation
   const updateDelivery = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Record<string, any> }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: Record<string, unknown> }) => {
       const { error } = await supabase
         .from('deliveries')
         .update(updates)

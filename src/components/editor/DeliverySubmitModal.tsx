@@ -94,6 +94,7 @@ export default function DeliverySubmitModal({
     setDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (file) handleFileSelect(file);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- handleFileSelect is stable
   }, []);
 
   const uploadFile = async (): Promise<string> => {
@@ -161,12 +162,17 @@ export default function DeliverySubmitModal({
         finalUrl = await uploadFile();
       }
 
+      if (!finalUrl || !finalUrl.startsWith('http')) {
+        toast.error('Falha no upload: URL do arquivo inválida. Tente novamente.');
+        return;
+      }
+
       const { error } = await supabase
         .from('deliveries')
         .update({
           file_url: finalUrl,
           revision_notes: notes.trim() || null,
-          status: 'review' as any,
+          status: 'review',
           delivered_at: new Date().toISOString(),
         })
         .eq('id', deliveryId);
@@ -178,8 +184,9 @@ export default function DeliverySubmitModal({
       resetForm();
       onOpenChange(false);
       onSubmitted();
-    } catch (err: any) {
-      toast.error(err.message || 'Erro ao confirmar entrega');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro ao confirmar entrega';
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }

@@ -31,7 +31,7 @@ const PaymentSuccess = () => {
         .eq('user_id', user!.id)
         .maybeSingle();
 
-      const ct = (up as any)?.client_type;
+      const ct = (up as { client_type: string | null } | null)?.client_type;
       if (ct === 'studio') {
         navigate('/dashboard', { replace: true });
       } else if (ct === 'subscription') {
@@ -75,7 +75,7 @@ const PaymentSuccess = () => {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          if (payload.new && (payload.new as any).payment_confirmed_at) {
+          if (payload.new && (payload.new as Record<string, unknown>).payment_confirmed_at) {
             handleConfirmed();
           }
         },
@@ -96,6 +96,7 @@ const PaymentSuccess = () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (pollRef.current) clearTimeout(pollRef.current);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- user object reference changes; user?.id captures the meaningful dep
   }, [user?.id, navigate, confirmed, timedOut]);
 
   return (

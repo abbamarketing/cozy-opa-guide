@@ -70,6 +70,7 @@ export default function BrandProfile() {
 
   useEffect(() => {
     if (user) loadBrand();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadBrand depends on user which is already a dep
   }, [user]);
 
   const loadBrand = async () => {
@@ -83,7 +84,7 @@ export default function BrandProfile() {
       .maybeSingle();
 
     if (data) {
-      const fonts = (data.brand_fonts as any) || {};
+      const fonts = (data.brand_fonts as Record<string, unknown>) || {};
       setBriefingId(data.id);
       setBrand({
         brand_name: data.brand_name || '',
@@ -113,7 +114,7 @@ export default function BrandProfile() {
     setLoading(false);
   };
 
-  const update = (key: keyof BrandData, value: any) =>
+  const update = (key: keyof BrandData, value: string | boolean | Record<string, string>) =>
     setBrand((prev) => ({ ...prev, [key]: value }));
 
   const updateFont = (key: 'primary' | 'secondary', value: string) =>
@@ -193,6 +194,7 @@ export default function BrandProfile() {
       logo_url: brand.logo_url || null,
       intro_url: brand.intro_url || null,
       outro_url: brand.outro_url || null,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- brand_fonts JSON shape
       brand_fonts: brand.brand_fonts as any,
     };
 
@@ -209,6 +211,7 @@ export default function BrandProfile() {
           ...payload,
           user_id: user!.id,
           user_project_id: userProject?.id || null,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic insert payload
         } as any));
     }
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -85,26 +84,26 @@ const AdminMetrics = () => {
         .select('id, monthly_value');
 
       const TIER_VALUES: Record<string, number> = {
-        pro: 690,
+        standard: 490, pro: 660, business: 1100, premium: 2970, agency: 5590,
       };
 
-      const valueMap = new Map((allProjects || []).map((p: any) => [p.id, Number(p.monthly_value)]));
+      const valueMap = new Map((allProjects || []).map((p) => [p.id, Number(p.monthly_value)]));
 
       const mrrMonthly = months.map((m) => {
-        const activeInMonth = (allUserProjects || []).filter((up: any) =>
+        const activeInMonth = (allUserProjects || []).filter((up) =>
           new Date(up.created_at) <= m.end && up.status === 'active'
         );
-        const customMrr = activeInMonth.reduce((sum: number, up: any) => sum + (Number(valueMap.get(up.custom_project_id)) || 0), 0);
+        const customMrr = activeInMonth.reduce((sum, up) => sum + (Number(valueMap.get(up.custom_project_id)) || 0), 0);
         const subMrr = activeInMonth
-          .filter((up: any) => up.client_type === 'subscription' && up.subscription_tier)
-          .reduce((sum: number, up: any) => sum + (TIER_VALUES[up.subscription_tier] ?? 0), 0);
+          .filter((up) => up.client_type === 'subscription' && up.subscription_tier)
+          .reduce((sum, up) => sum + (TIER_VALUES[up.subscription_tier ?? ''] ?? 0), 0);
         return { month: m.label, mrr: customMrr + subMrr };
       });
       setMrrData(mrrMonthly);
 
       const subsMonthly = months.map((m) => ({
         month: m.label,
-        count: (allUserProjects || []).filter((up: any) =>
+        count: (allUserProjects || []).filter((up) =>
           new Date(up.created_at) >= m.start && new Date(up.created_at) <= m.end
         ).length,
       }));
@@ -121,34 +120,34 @@ const AdminMetrics = () => {
         thumbnail: 'Thumbnail',
         cover: 'Capa',
       };
-      (deliveries || []).forEach((d: any) => {
+      (deliveries || []).forEach((d) => {
         const label = typeLabels[d.delivery_type] || d.delivery_type;
         typeCounts[label] = (typeCounts[label] || 0) + 1;
       });
       setTypeDistribution(Object.entries(typeCounts).map(([name, value]) => ({ name, value })));
 
       const revCounts = { 'Sem revisão': 0, '1 revisão': 0, '2+ revisões': 0 };
-      (deliveries || []).forEach((d: any) => {
+      (deliveries || []).forEach((d) => {
         if (d.revision_count === 0) revCounts['Sem revisão']++;
         else if (d.revision_count === 1) revCounts['1 revisão']++;
         else revCounts['2+ revisões']++;
       });
       setRevisionData(Object.entries(revCounts).map(([label, count]) => ({ label, count })));
 
-      const completedDeliveries = (deliveries || []).filter((d: any) => d.delivered_at && d.created_at);
+      const completedDeliveries = (deliveries || []).filter((d) => d.delivered_at && d.created_at);
       let avgHours = 0;
       if (completedDeliveries.length > 0) {
-        const avgTime = completedDeliveries.reduce((acc: number, d: any) => {
-          return acc + (new Date(d.delivered_at).getTime() - new Date(d.created_at).getTime());
+        const avgTime = completedDeliveries.reduce((acc, d) => {
+          return acc + (new Date(d.delivered_at!).getTime() - new Date(d.created_at).getTime());
         }, 0) / completedDeliveries.length;
         avgHours = Math.round(avgTime / (1000 * 60 * 60));
       }
 
       const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-      const approvedMonth = (deliveries || []).filter((d: any) =>
+      const approvedMonth = (deliveries || []).filter((d) =>
         d.status === 'approved' && d.approved_at && new Date(d.approved_at) >= monthStart
       );
-      const onTime = approvedMonth.filter((d: any) =>
+      const onTime = approvedMonth.filter((d) =>
         d.approved_at && d.sla_deadline &&
         new Date(d.approved_at) <= new Date(d.sla_deadline)
       ).length;
@@ -164,6 +163,7 @@ const AdminMetrics = () => {
         .gte('approved_at', monthStart.toISOString());
 
       const ranking = Object.entries(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (byEditor ?? []).reduce((acc: Record<string, number>, d: any) => {
           const name = d.editors?.display_name ?? d.editor_id ?? 'desconhecido';
           acc[name] = (acc[name] ?? 0) + 1;
@@ -172,14 +172,14 @@ const AdminMetrics = () => {
       ).sort(([, a], [, b]) => (b as number) - (a as number)) as [string, number][];
       setEditorRanking(ranking);
 
-      const currentMrr = mrrMonthly[mrrMonthly.length - 1]?.mrr || 0;
-      const prevMrr = mrrMonthly[mrrMonthly.length - 2]?.mrr || 0;
+      const currentMrr = mrrMonthly[mrrMonthly.length - 1]?.mrr ?? 0;
+      const prevMrr = mrrMonthly[mrrMonthly.length - 2]?.mrr ?? 0;
       const mrrChange = prevMrr > 0 ? Math.round(((currentMrr - prevMrr) / prevMrr) * 100) : 0;
 
-      const activeClients = (allUserProjects || []).filter((up: any) => up.status === 'active').length;
+      const activeClients = (allUserProjects || []).filter((up) => up.status === 'active').length;
 
       const totalDeliveries = (deliveries || []).length;
-      const thisMonthDeliveries = (deliveries || []).filter((d: any) => {
+      const thisMonthDeliveries = (deliveries || []).filter((d) => {
         const created = new Date(d.due_date || '');
         return created >= months[months.length - 1].start;
       }).length;
@@ -191,7 +191,7 @@ const AdminMetrics = () => {
           change: `${mrrChange >= 0 ? '+' : ''}${mrrChange}%`,
           trend: mrrChange >= 0 ? 'up' : 'down',
           icon: DollarSign,
-          color: 'text-abba-lime',
+          color: 'text-primary',
         },
         {
           title: 'Clientes Ativos',
@@ -199,7 +199,7 @@ const AdminMetrics = () => {
           change: `${subsMonthly[subsMonthly.length - 1]?.count || 0} novos`,
           trend: 'up',
           icon: Users,
-          color: 'text-white',
+          color: 'text-inherit',
         },
         {
           title: 'Entregas/Mês',
@@ -207,7 +207,7 @@ const AdminMetrics = () => {
           change: `${totalDeliveries} total`,
           trend: 'up',
           icon: Video,
-          color: 'text-abba-lime',
+          color: 'text-primary',
         },
         {
           title: 'Tempo Médio',
@@ -215,7 +215,7 @@ const AdminMetrics = () => {
           change: completedDeliveries.length > 0 ? `${completedDeliveries.length} entregas` : 'N/A',
           trend: 'down',
           icon: Clock,
-          color: 'text-white',
+          color: 'text-inherit',
         },
       ]);
 
@@ -268,8 +268,8 @@ const AdminMetrics = () => {
             <AlertTriangle className="h-4 w-4 text-yellow-500" />
             <span className="text-[11px] font-sans font-semibold uppercase tracking-widest text-yellow-500">SLA em Risco</span>
           </div>
-          <p className="text-[42px] font-sans font-extrabold leading-none tracking-[-0.045em] text-white mt-2">{slaRisk}</p>
-          <p className="text-[11px] font-sans text-white/60 mt-1">Deadline em menos de 4h</p>
+          <p className="text-[42px] font-sans font-extrabold leading-none tracking-[-0.045em] text-inherit mt-2">{slaRisk}</p>
+          <p className="text-[11px] font-sans opacity-60 mt-1">Deadline em menos de 4h</p>
         </div>
 
         <div className="kpi-dark flex flex-col justify-between" style={{ minHeight: 'auto' }}>
@@ -277,19 +277,19 @@ const AdminMetrics = () => {
             <ShieldAlert className="h-4 w-4 text-destructive" />
             <span className="text-[11px] font-sans font-semibold uppercase tracking-widest text-destructive">SLA Estourado</span>
           </div>
-          <p className="text-[42px] font-sans font-extrabold leading-none tracking-[-0.045em] text-white mt-2">{slaBreached}</p>
-          <p className="text-[11px] font-sans text-white/60 mt-1">Deadline ultrapassado</p>
+          <p className="text-[42px] font-sans font-extrabold leading-none tracking-[-0.045em] text-inherit mt-2">{slaBreached}</p>
+          <p className="text-[11px] font-sans opacity-60 mt-1">Deadline ultrapassado</p>
         </div>
 
         <div className="kpi-dark flex flex-col justify-between" style={{ minHeight: 'auto' }}>
           <div className="flex items-center gap-2">
-            <CheckCircle className="h-4 w-4 text-abba-lime" />
-            <span className="text-[11px] font-sans font-semibold uppercase tracking-widest text-abba-lime">Taxa de SLA — Mês Atual</span>
+            <CheckCircle className="h-4 w-4 text-primary" />
+            <span className="text-[11px] font-sans font-semibold uppercase tracking-widest text-primary">Taxa de SLA — Mês Atual</span>
           </div>
-          <p className="text-[42px] font-sans font-extrabold leading-none tracking-[-0.045em] text-white mt-2">
+          <p className="text-[42px] font-sans font-extrabold leading-none tracking-[-0.045em] text-inherit mt-2">
             {slaRate !== null ? `${slaRate}%` : 'N/A'}
           </p>
-          <p className="text-[11px] font-sans text-white/60 mt-1">Entregas dentro do prazo</p>
+          <p className="text-[11px] font-sans opacity-60 mt-1">Entregas dentro do prazo</p>
         </div>
       </div>
 
@@ -303,12 +303,12 @@ const AdminMetrics = () => {
             <div key={kpi.title} className={isLime ? 'kpi-lime' : 'kpi-dark'}>
               <div className="flex items-center justify-between">
                 <span className={`text-[11px] font-sans font-semibold uppercase tracking-widest ${isLime ? 'opacity-60' : 'opacity-60'}`}>{kpi.title}</span>
-                <Icon className={`h-4 w-4 ${isLime ? 'text-[#111]/60' : 'text-white/60'}`} />
+                <Icon className={`h-4 w-4 ${isLime ? 'opacity-60' : 'opacity-60'}`} />
               </div>
-              <p className={`text-[42px] font-sans font-extrabold leading-none tracking-[-0.045em] mt-2 ${isLime ? 'text-[#111]' : 'text-white'}`}>{kpi.value}</p>
+              <p className={`text-[42px] font-sans font-extrabold leading-none tracking-[-0.045em] mt-2 ${isLime ? 'text-inherit' : 'text-inherit'}`}>{kpi.value}</p>
               <div className="flex items-center gap-1 text-xs mt-2">
-                <TrendIcon className={`h-3 w-3 ${kpi.trend === 'up' ? (isLime ? 'text-[#111]/70' : 'text-abba-lime') : 'text-destructive'}`} />
-                <span className={isLime ? 'text-[#111]/60' : 'text-white/60'}>{kpi.change}</span>
+                <TrendIcon className={`h-3 w-3 ${kpi.trend === 'up' ? (isLime ? 'opacity-70' : 'text-primary') : 'text-destructive'}`} />
+                <span className={isLime ? 'opacity-60' : 'opacity-60'}>{kpi.change}</span>
               </div>
             </div>
           );
@@ -319,43 +319,43 @@ const AdminMetrics = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* MRR */}
         <div className="kpi-dark" style={{ minHeight: 'auto' }}>
-          <h3 className="text-sm font-sans font-semibold mb-1 text-white">Receita Mensal (MRR)</h3>
-          <p className="text-[11px] font-sans text-white/60 mb-4">Últimos 6 meses</p>
+          <h3 className="text-sm font-sans font-semibold mb-1 text-inherit">Receita Mensal (MRR)</h3>
+          <p className="text-[11px] font-sans opacity-60 mb-4">Últimos 6 meses</p>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={mrrData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} />
-              <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--foreground) / 0.08)" />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'hsl(var(--foreground) / 0.5)' }} />
+              <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--foreground) / 0.5)' }} tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#1A231B', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px', color: 'hsl(var(--card-foreground))' }}
                 formatter={(v: number) => [`R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 'MRR']}
               />
-              <Line type="monotone" dataKey="mrr" stroke="#A0E870" strokeWidth={2} dot={{ fill: '#A0E870', r: 4 }} />
+              <Line type="monotone" dataKey="mrr" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ fill: 'hsl(var(--primary))', r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
         {/* Subscriptions */}
         <div className="kpi-dark" style={{ minHeight: 'auto' }}>
-          <h3 className="text-sm font-sans font-semibold mb-1 text-white">Novas Assinaturas</h3>
-          <p className="text-[11px] font-sans text-white/60 mb-4">Por mês</p>
+          <h3 className="text-sm font-sans font-semibold mb-1 text-inherit">Novas Assinaturas</h3>
+          <p className="text-[11px] font-sans opacity-60 mb-4">Por mês</p>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={subsData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} />
-              <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} allowDecimals={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--foreground) / 0.08)" />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'hsl(var(--foreground) / 0.5)' }} />
+              <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--foreground) / 0.5)' }} allowDecimals={false} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#1A231B', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px', color: 'hsl(var(--card-foreground))' }}
               />
-              <Bar dataKey="count" radius={[4, 4, 0, 0]} name="Assinaturas" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.20)" strokeWidth={1} />
+              <Bar dataKey="count" radius={[4, 4, 0, 0]} name="Assinaturas" fill="hsl(var(--foreground) / 0.08)" stroke="hsl(var(--foreground) / 0.20)" strokeWidth={1} />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
         {/* Type distribution */}
         <div className="kpi-dark" style={{ minHeight: 'auto' }}>
-          <h3 className="text-sm font-sans font-semibold mb-1 text-white">Entregas por Tipo</h3>
-          <p className="text-[11px] font-sans text-white/60 mb-4">Este mês</p>
+          <h3 className="text-sm font-sans font-semibold mb-1 text-inherit">Entregas por Tipo</h3>
+          <p className="text-[11px] font-sans opacity-60 mb-4">Este mês</p>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie
@@ -371,7 +371,7 @@ const AdminMetrics = () => {
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{ backgroundColor: '#1A231B', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px', color: 'hsl(var(--card-foreground))' }}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -379,17 +379,17 @@ const AdminMetrics = () => {
 
         {/* Satisfaction */}
         <div className="kpi-dark" style={{ minHeight: 'auto' }}>
-          <h3 className="text-sm font-sans font-semibold mb-1 text-white">Satisfação (Revisões)</h3>
-          <p className="text-[11px] font-sans text-white/60 mb-4">Menos revisões = mais satisfação</p>
+          <h3 className="text-sm font-sans font-semibold mb-1 text-inherit">Satisfação (Revisões)</h3>
+          <p className="text-[11px] font-sans opacity-60 mb-4">Menos revisões = mais satisfação</p>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={revisionData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-              <XAxis type="number" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} allowDecimals={false} />
-              <YAxis type="category" dataKey="label" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} width={100} />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--foreground) / 0.08)" />
+              <XAxis type="number" tick={{ fontSize: 11, fill: 'hsl(var(--foreground) / 0.5)' }} allowDecimals={false} />
+              <YAxis type="category" dataKey="label" tick={{ fontSize: 11, fill: 'hsl(var(--foreground) / 0.5)' }} width={100} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#1A231B', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px', color: 'hsl(var(--card-foreground))' }}
               />
-              <Bar dataKey="count" radius={[0, 4, 4, 0]} name="Entregas" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.20)" strokeWidth={1} />
+              <Bar dataKey="count" radius={[0, 4, 4, 0]} name="Entregas" fill="hsl(var(--foreground) / 0.08)" stroke="hsl(var(--foreground) / 0.20)" strokeWidth={1} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -400,16 +400,16 @@ const AdminMetrics = () => {
         <div className="kpi-dark" style={{ minHeight: 'auto' }}>
           <div className="flex items-center gap-2 mb-4">
             <Trophy className="h-4 w-4 text-yellow-500" />
-            <h3 className="text-sm font-sans font-semibold text-white">Entregas por Editor — Mês Atual</h3>
+            <h3 className="text-sm font-sans font-semibold text-inherit">Entregas por Editor — Mês Atual</h3>
           </div>
           <div className="space-y-2">
             {editorRanking.map(([name, count], i) => (
-              <div key={name} className="flex items-center justify-between py-2 px-3 rounded-[20px] bg-white/5">
+              <div key={name} className="flex items-center justify-between py-2 px-3 rounded-[20px] bg-foreground/5">
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-sans font-extrabold text-abba-lime w-6">{i + 1}º</span>
-                  <span className="text-sm font-sans text-white">{name}</span>
+                  <span className="text-sm font-sans font-extrabold text-primary w-6">{i + 1}º</span>
+                  <span className="text-sm font-sans text-inherit">{name}</span>
                 </div>
-                <span className="text-sm font-sans font-semibold text-abba-lime">{count} {count === 1 ? 'entrega' : 'entregas'}</span>
+                <span className="text-sm font-sans font-semibold text-primary">{count} {count === 1 ? 'entrega' : 'entregas'}</span>
               </div>
             ))}
           </div>

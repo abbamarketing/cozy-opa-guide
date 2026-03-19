@@ -92,7 +92,7 @@ export function SupportChat({ role = 'client' }: SupportChatProps) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className={`fixed bottom-5 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-[#A0E870] shadow-lg shadow-black/30 transition-all hover:scale-105 active:scale-95 ${open ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+        className={`fixed bottom-5 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-[#1D1D1F] shadow-lg shadow-black/30 transition-all hover:scale-105 active:scale-95 ${open ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
         aria-label="Abrir suporte"
       >
         <MessageCircle className="h-5 w-5 text-[#111]" />
@@ -113,7 +113,7 @@ export function SupportChat({ role = 'client' }: SupportChatProps) {
               </button>
             )}
 
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#A0E870]/15 text-[#A0E870]">✦</div>
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1D1D1F]/15 text-[#1D1D1F]">✦</div>
 
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-white">{view === 'chat' ? 'Olívia' : 'Reportar erro'}</p>
@@ -134,7 +134,7 @@ export function SupportChat({ role = 'client' }: SupportChatProps) {
                   <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div
                       className={`max-w-[85%] rounded-2xl px-3 py-2 text-[13px] leading-relaxed ${
-                        m.role === 'user' ? 'bg-[#A0E870] text-[#111]' : 'bg-white/5 text-white/90'
+                        m.role === 'user' ? 'bg-[#1D1D1F] text-[#111]' : 'bg-white/5 text-white/90'
                       }`}
                     >
                       {m.content}
@@ -157,7 +157,7 @@ export function SupportChat({ role = 'client' }: SupportChatProps) {
                   <textarea
                     rows={2}
                     placeholder="Digite sua mensagem..."
-                    className="min-h-[40px] flex-1 resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[13px] text-white placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-[#A0E870]/60"
+                    className="min-h-[40px] flex-1 resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[13px] text-white placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-[#1D1D1F]/60"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => {
@@ -171,7 +171,7 @@ export function SupportChat({ role = 'client' }: SupportChatProps) {
                   <button
                     onClick={sendMessage}
                     disabled={!input.trim() || loading}
-                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#A0E870] text-[#111] transition-colors hover:brightness-95 disabled:opacity-40"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1D1D1F] text-[#111] transition-colors hover:brightness-95 disabled:opacity-40"
                   >
                     <Send className="h-4 w-4" />
                   </button>
@@ -205,7 +205,7 @@ export function SupportChat({ role = 'client' }: SupportChatProps) {
                       setView('chat');
                       setReportSent(false);
                     }}
-                    className="mt-2 text-xs text-[#A0E870] hover:underline"
+                    className="mt-2 text-xs text-[#1D1D1F] hover:underline"
                   >
                     Voltar ao chat
                   </button>

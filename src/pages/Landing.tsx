@@ -1,626 +1,806 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { CheckCircle, Clock, ArrowRight, ArrowDown, Camera, Calendar, MessageSquare, Send, Zap } from 'lucide-react';
 import abbaLogo from '@/assets/abba-logo.png';
-import screenshotDashboard from '@/assets/screenshot-dashboard-desktop.jpg';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.12, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const },
-  }),
-} as const;
+type Lang = 'pt' | 'en';
 
-const FAQ = [
-  {
-    q: 'O que é fila ilimitada?',
-    a: 'Você envia quantos vídeos quiser, quando quiser. Não existe cota mensal de quantidade. Processamos um por vez, na ordem de envio, dentro do prazo garantido do seu plano.',
-  },
-  {
-    q: 'Como funciona o SLA?',
-    a: 'Cada vídeo tem um prazo contado em horas úteis a partir do envio. O countdown fica visível no seu dashboard em tempo real. No plano mais avançado, seu vídeo sai em até 4 horas.',
-  },
-  {
-    q: 'O que a edição inclui?',
-    a: 'Short videos de até 90 segundos: Reels, Shorts e TikTok. Corte, legenda, ritmo e identidade visual. Não inclui vídeos longos, thumbnails ou capas.',
-  },
-  {
-    q: 'E se eu não gostar da edição?',
-    a: 'Pede revisão no app, marca o segundo exato se precisar, e o vídeo volta para produção — com o mesmo prazo garantido. Sem limite de revisões, sem custo adicional.',
-  },
-  {
-    q: 'Posso cancelar?',
-    a: 'Sim. A qualquer momento pelo portal do cliente. Sem multa, sem burocracia.',
-  },
-];
+const T = {
+  pt: {
+    // Nav
+    navHow: 'Como funciona',
+    navPlans: 'Planos',
+    navCta: 'Começar',
 
-const KANBAN_COLS = [
-  {
-    title: 'Fila',
-    cards: [
-      { type: 'Reel', title: 'Rotina de manhã', sla: 'Na fila', slaColor: 'bg-white/10 text-white/50' },
-      { type: 'Short', title: 'Review produto X', sla: 'Na fila', slaColor: 'bg-white/10 text-white/50' },
+    // Hero
+    heroL1: 'Luz.',
+    heroL2: 'Câmera.',
+    heroL3: 'Ação.',
+    heroSub: 'Seu vídeo editado em até 4 horas.',
+    heroBtn1: 'Ver planos',
+    heroBtn2: 'Como funciona →',
+
+    // Scene 0
+    s0Label: 'A real',
+    s0Title1: 'Edição boa era cara',
+    s0Title2: 'e lenta.',
+    s0Em: 'Resolvemos.',
+
+    // Scene 1
+    s1Label: 'Especialidade',
+    s1Title: 'Feitos pra',
+    s1Em: 'short video.',
+    s1Desc: 'Corte, legenda, ritmo e identidade visual. Até 90 segundos. É só o que a gente faz. E a gente faz muito bem.',
+
+    // Scene 2
+    s2Label: 'Portfólio',
+    s2Em: 'Obras.',
+    s2Stat: 'vídeos entregues',
+
+    // Scene 3
+    s3Label: 'Como funciona',
+    s3Title: 'Envie. Acompanhe.',
+    s3Em: 'Receba.',
+    s3Step1T: 'Envie',
+    s3Step1D: 'Upload ou link. Briefing já salvo.',
+    s3Step2T: 'Acompanhe',
+    s3Step2D: 'Countdown do prazo. Status ao vivo.',
+    s3Step3T: 'Receba',
+    s3Step3D: 'Vídeo pronto. Marque o segundo, peça ajuste.',
+
+    // Scene 4
+    s4Label: 'Na prática',
+    s4Title: 'Veja o fluxo',
+    s4Em: 'rodando.',
+    s4Col1: 'NA FILA',
+    s4Col2: 'PRODUÇÃO',
+    s4Col3: 'REVISAR',
+    s4Col4: 'CONCLUÍDO',
+    s4Waiting: 'Aguardando',
+    s4InQueue: 'Na fila',
+    s4Ready: 'Pronto',
+    s4Review: 'Revisar',
+    s4Approve: '✓ Aprovar',
+
+    // Scene 5
+    s5L1: 'Manda tudo.',
+    s5L2: 'A gente edita tudo.',
+    s5Em: 'Um preço fixo por mês.',
+
+    // Scene 6
+    s6Label: 'Planos',
+    s6Title: 'Escolha o',
+    s6Em: 'prazo.',
+    s6PerMonth: 'por mês',
+    s6Cancel: 'Cancele quando quiser. Sem multa.',
+    s6F1: '✓ Reels, Shorts e TikTok até 90s',
+    s6F2: '✓ Sem cota mensal',
+    s6F3: '✓ Sua identidade visual',
+    s6F4: '✓ Briefing salvo',
+
+    // Scene 7
+    s7Title: 'Dúvidas.',
+
+    // Scene 8
+    s8L1: 'Seu próximo vídeo',
+    s8L2: 'poderia estar em',
+    s8L3: 'produção',
+    s8Em: 'agora.',
+    s8Btn: 'Começar agora',
+    s8Sub: 'A partir de R$490/mês.',
+
+    // Footer
+    footerTerms: 'Termos',
+    footerPrivacy: 'Privacidade',
+
+    // Tiers
+    tiers: [
+      { sla: 'Entrega em 72h úteis', price: 'R$490', tier: 'Standard', btn: 'Começar com Standard' },
+      { sla: 'Entrega em 48h úteis', price: 'R$660', tier: 'Pro', btn: 'Começar com Pro' },
+      { sla: 'Entrega em 24h úteis', price: 'R$1.100', tier: 'Business', btn: 'Começar com Business' },
+      { sla: 'Entrega em 8h úteis', price: 'R$2.970', tier: 'Premium', btn: 'Começar com Premium' },
+      { sla: 'Entrega em 4h úteis', price: 'R$5.590', tier: 'Agency', btn: 'Começar com Agency' },
+    ],
+
+    // FAQ
+    faq: [
+      { q: 'Fila ilimitada?', a: 'Peça sem limite. Entregamos na ordem, dentro do prazo contratado. Um sai, outro entra.' },
+      { q: 'Como funciona o prazo?', a: 'Horas úteis a partir do envio. Countdown no dashboard.' },
+      { q: 'O que inclui?', a: 'Corte, legenda, ritmo, identidade visual. Até 90s.' },
+      { q: 'Não gostei.', a: 'Marca o segundo, descreve o ajuste. Sem limite. Sem custo extra.' },
+      { q: 'Cancelar?', a: 'Quando quiser. Sem multa.' },
+    ],
+
+    // Portfolio
+    portfolio: [
+      { type: 'Reels', name: 'Fitness & Saúde', vids: 47 },
+      { type: 'Shorts', name: 'Tech Reviews', vids: 32 },
+      { type: 'TikTok', name: 'Lifestyle', vids: 61 },
+      { type: 'Conteúdo', name: 'Gastronomia', vids: 28 },
+      { type: 'Cortes', name: 'Podcast', vids: 53 },
     ],
   },
-  {
-    title: 'Em produção',
-    cards: [
-      { type: 'TikTok', title: 'Trend challenge', sla: '3h 42min restantes', slaColor: 'bg-abba-lime/20 text-abba-lime' },
+  en: {
+    // Nav
+    navHow: 'How it works',
+    navPlans: 'Pricing',
+    navCta: 'Get started',
+
+    // Hero
+    heroL1: 'Lights.',
+    heroL2: 'Camera.',
+    heroL3: 'Action.',
+    heroSub: 'Your video edited in up to 4 hours.',
+    heroBtn1: 'See plans',
+    heroBtn2: 'How it works →',
+
+    // Scene 0
+    s0Label: 'The truth',
+    s0Title1: 'Good editing was expensive',
+    s0Title2: 'and slow.',
+    s0Em: 'We fixed it.',
+
+    // Scene 1
+    s1Label: 'Expertise',
+    s1Title: 'Built for',
+    s1Em: 'short video.',
+    s1Desc: 'Cut, subtitles, pacing and brand identity. Up to 90 seconds. It\'s all we do. And we do it really well.',
+
+    // Scene 2
+    s2Label: 'Portfolio',
+    s2Em: 'Work.',
+    s2Stat: 'videos delivered',
+
+    // Scene 3
+    s3Label: 'How it works',
+    s3Title: 'Send. Track.',
+    s3Em: 'Receive.',
+    s3Step1T: 'Send',
+    s3Step1D: 'Upload or link. Brief already saved.',
+    s3Step2T: 'Track',
+    s3Step2D: 'SLA countdown. Live status.',
+    s3Step3T: 'Receive',
+    s3Step3D: 'Video ready. Mark the second, request changes.',
+
+    // Scene 4
+    s4Label: 'In practice',
+    s4Title: 'See the flow',
+    s4Em: 'running.',
+    s4Col1: 'QUEUE',
+    s4Col2: 'PRODUCTION',
+    s4Col3: 'REVIEW',
+    s4Col4: 'DONE',
+    s4Waiting: 'Waiting',
+    s4InQueue: 'In queue',
+    s4Ready: 'Ready',
+    s4Review: 'Review',
+    s4Approve: '✓ Approve',
+
+    // Scene 5
+    s5L1: 'Send everything.',
+    s5L2: 'We edit everything.',
+    s5Em: 'One flat price per month.',
+
+    // Scene 6
+    s6Label: 'Pricing',
+    s6Title: 'Choose your',
+    s6Em: 'turnaround.',
+    s6PerMonth: 'per month',
+    s6Cancel: 'Cancel anytime. No penalty.',
+    s6F1: '✓ Reels, Shorts & TikTok up to 90s',
+    s6F2: '✓ No monthly cap',
+    s6F3: '✓ Your brand identity',
+    s6F4: '✓ Brief saved',
+
+    // Scene 7
+    s7Title: 'Questions.',
+
+    // Scene 8
+    s8L1: 'Your next video',
+    s8L2: 'could be in',
+    s8L3: 'production',
+    s8Em: 'now.',
+    s8Btn: 'Get started',
+    s8Sub: 'Starting at R$490/mo.',
+
+    // Footer
+    footerTerms: 'Terms',
+    footerPrivacy: 'Privacy',
+
+    // Tiers
+    tiers: [
+      { sla: 'Delivery in 72 biz hours', price: 'R$490', tier: 'Standard', btn: 'Start with Standard' },
+      { sla: 'Delivery in 48 biz hours', price: 'R$660', tier: 'Pro', btn: 'Start with Pro' },
+      { sla: 'Delivery in 24 biz hours', price: 'R$1.100', tier: 'Business', btn: 'Start with Business' },
+      { sla: 'Delivery in 8 biz hours', price: 'R$2.970', tier: 'Premium', btn: 'Start with Premium' },
+      { sla: 'Delivery in 4 biz hours', price: 'R$5.590', tier: 'Agency', btn: 'Start with Agency' },
+    ],
+
+    // FAQ
+    faq: [
+      { q: 'Unlimited queue?', a: 'Request without limits. We deliver in order, within your contracted turnaround. One goes out, another comes in.' },
+      { q: 'How does the turnaround work?', a: 'Business hours from submission. Countdown on the dashboard.' },
+      { q: 'What\'s included?', a: 'Cut, subtitles, pacing, brand identity. Up to 90s.' },
+      { q: 'I didn\'t like it.', a: 'Mark the second, describe the change. No limit. No extra cost.' },
+      { q: 'Cancel?', a: 'Anytime. No penalty.' },
+    ],
+
+    // Portfolio
+    portfolio: [
+      { type: 'Reels', name: 'Fitness & Health', vids: 47 },
+      { type: 'Shorts', name: 'Tech Reviews', vids: 32 },
+      { type: 'TikTok', name: 'Lifestyle', vids: 61 },
+      { type: 'Content', name: 'Gastronomy', vids: 28 },
+      { type: 'Clips', name: 'Podcast', vids: 53 },
     ],
   },
-  {
-    title: 'Revisar',
-    cards: [
-      { type: 'Reel', title: 'Dica rápida #12', sla: 'Pronto', slaColor: 'bg-abba-lime/20 text-abba-lime' },
-    ],
-  },
-  {
-    title: 'Aprovado',
-    cards: [
-      { type: 'Short', title: 'Unboxing novo setup', sla: 'Entregue', slaColor: 'bg-abba-lime/20 text-abba-lime' },
-    ],
-  },
-];
-
-const Landing = () => {
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const ref = params.get('ref');
-    if (ref && ref.trim()) {
-      localStorage.setItem('affiliate_ref', ref.trim().toLowerCase());
-    }
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-abba-dark text-foreground">
-      {/* ─── NAV ─── */}
-      <nav className="sticky top-0 z-50 bg-abba-dark/90 backdrop-blur-lg border-b border-abba-surface">
-        <div className="mx-auto max-w-6xl flex items-center justify-between px-6 py-3">
-          <div className="flex items-center gap-2">
-            <img src={abbaLogo} alt="AbbaVideo" className="h-8 w-8" />
-            <span className="text-lg font-sans font-bold">
-              Abba<span className="text-abba-lime">Video</span>
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" asChild className="text-white/60 hover:text-white hidden sm:inline-flex">
-              <a href="#planos">Planos</a>
-            </Button>
-            <Button size="sm" asChild className="bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light">
-              <Link to="/auth">Entrar</Link>
-            </Button>
-          </div>
-        </div>
-      </nav>
-
-      {/* ─── HERO ─── */}
-      <section className="relative flex min-h-[85vh] flex-col items-center justify-center px-6 text-center">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          className="mx-auto max-w-3xl space-y-6"
-        >
-          <motion.p
-            variants={fadeUp}
-            custom={0}
-            className="text-sm font-sans text-white/50 tracking-wide"
-          >
-            Edição profissional de vídeo sempre foi cara, lenta e imprevisível.
-          </motion.p>
-
-          <motion.h1
-            variants={fadeUp}
-            custom={1}
-            className="text-3xl font-sans font-extrabold leading-tight tracking-[-0.04em] sm:text-5xl lg:text-6xl"
-          >
-            A tecnologia{' '}
-            <span className="text-abba-lime"><em className="font-light">mudou</em></span>{' '}
-            isso.
-          </motion.h1>
-
-          <motion.p
-            variants={fadeUp}
-            custom={2}
-            className="mx-auto max-w-2xl text-base text-white/70 sm:text-lg font-sans leading-relaxed"
-          >
-            AbbaVideo entrega short videos editados com sua identidade visual em até 4 horas
-            — fila ilimitada, sem cota, sem surpresa.
-          </motion.p>
-
-          <motion.p
-            variants={fadeUp}
-            custom={3}
-            className="text-sm font-sans text-abba-lime font-semibold"
-          >
-            7 dias grátis. Cancela quando quiser.
-          </motion.p>
-
-          <motion.div variants={fadeUp} custom={4} className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <Button size="lg" asChild className="bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light">
-              <Link to="/auth">Começar agora</Link>
-            </Button>
-            <Button variant="outline" size="lg" asChild className="border border-white/20 text-white rounded-full hover:bg-abba-surface">
-              <a href="#o-que-mudou">
-                Ver como funciona <ArrowDown className="ml-2 h-4 w-4" />
-              </a>
-            </Button>
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* ─── O QUE MUDOU ─── */}
-      <section id="o-que-mudou" className="border-t border-abba-surface py-20 px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mx-auto max-w-2xl space-y-6 text-center"
-        >
-          <h2 className="text-2xl font-sans font-bold sm:text-3xl">O que mudou</h2>
-          <div className="space-y-4 text-sm sm:text-base font-sans text-white/70 leading-relaxed text-left">
-            <p>
-              Durante anos, ter uma equipe de edição profissional era privilégio de quem tinha orçamento de agência.
-            </p>
-            <p>
-              Freelancer era a alternativa. E quem usou sabe o que significa: prazo que "depende da demanda",
-              qualidade inconsistente, nenhuma memória de marca entre um vídeo e outro.
-            </p>
-            <p className="text-white font-medium">
-              AbbaVideo existe porque bom serviço não deveria funcionar assim.
-            </p>
-            <p>
-              Tecnologia aplicada com inteligência muda a equação.{' '}
-              <span className="text-abba-lime font-semibold">Fila ilimitada. Prazo garantido. Identidade visual aplicada em todo vídeo — sempre.</span>
-            </p>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* ─── CAPTAÇÃO PROFISSIONAL ─── */}
-      <section className="border-t border-abba-surface bg-abba-surface/30 py-20 px-6">
-        <div className="mx-auto max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center space-y-4 mb-12"
-          >
-            <Badge variant="secondary" className="text-xs font-sans rounded-full">
-              <Camera className="h-3 w-3 mr-1" /> Captação Profissional
-            </Badge>
-            <h2 className="text-2xl font-sans font-bold sm:text-3xl">Do briefing à entrega</h2>
-            <p className="text-white/50 font-sans text-sm">Agende sua sessão, acompanhe cada etapa no kanban e aprove o resultado final.</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="rounded-[20px] bg-abba-surface border border-white/8 p-6 sm:p-8"
-          >
-            <div className="grid sm:grid-cols-3 gap-4">
-              {[
-                { step: '1', icon: <Calendar className="h-5 w-5 text-abba-lime" />, label: 'Briefing', desc: 'Defina identidade, tom e referências do projeto.' },
-                { step: '2', icon: <Camera className="h-5 w-5 text-abba-lime" />, label: 'Captação', desc: 'Agende a sessão e acompanhe o status em tempo real.' },
-                { step: '3', icon: <CheckCircle className="h-5 w-5 text-abba-lime" />, label: 'Entrega', desc: 'Revise, peça ajustes e aprove com um clique.' },
-              ].map((item) => (
-                <div key={item.step} className="rounded-xl bg-abba-dark/60 border border-white/6 p-5 space-y-3 text-center">
-                  <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-abba-lime/15">
-                    {item.icon}
-                  </div>
-                  <p className="text-sm font-sans font-semibold text-white">{item.step}. {item.label}</p>
-                  <p className="text-xs font-sans text-white/50">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="mt-8 text-center space-y-3"
-          >
-            <p className="text-sm font-sans text-white/70">
-              Todo o processo acontece dentro do seu dashboard — do agendamento da captação até a aprovação final, sem sair da plataforma.
-            </p>
-            <p className="text-sm font-sans text-white font-medium">
-              Transparência total. Controle total. Do início ao fim.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── ENVIE E ACOMPANHE ─── */}
-      <section className="border-t border-abba-surface py-20 px-6">
-        <div className="mx-auto max-w-5xl">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center space-y-4 mb-12"
-          >
-            <h2 className="text-2xl font-sans font-bold sm:text-3xl">Envie e acompanhe</h2>
-            <p className="text-white/50 font-sans text-sm">Sem email. Sem WhatsApp. Sem ruído.</p>
-          </motion.div>
-
-          {/* Kanban mock */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
-          >
-            {KANBAN_COLS.map((col) => (
-              <div key={col.title} className="rounded-[20px] bg-abba-surface/60 border border-white/8 p-4">
-                <p className="mb-3 text-xs font-sans font-semibold uppercase tracking-wider text-white/60">
-                  {col.title}
-                </p>
-                <div className="space-y-3">
-                  {col.cards.map((card) => (
-                    <div
-                      key={card.title}
-                      className="rounded-[20px] bg-abba-surface border border-white/8 p-3 space-y-2"
-                    >
-                      <div className="flex items-center justify-between">
-                        <Badge variant="secondary" className="text-[10px] font-sans rounded-full">
-                          {card.type}
-                        </Badge>
-                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-sans font-medium ${card.slaColor}`}>
-                          {card.sla}
-                        </span>
-                      </div>
-                      <p className="text-sm font-sans font-medium text-white">{card.title}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="mt-8 text-center space-y-3 max-w-2xl mx-auto"
-          >
-            <p className="text-sm font-sans text-white/70">
-              Cada vídeo tem um status em tempo real. Você sabe exatamente onde está, quando chega e quanto tempo falta
-              — sem precisar perguntar para ninguém.
-            </p>
-            <p className="text-sm font-sans text-white/70">
-              Envia o arquivo bruto ou um link. O briefing de marca já está salvo. Sua equipe sabe o que fazer.
-            </p>
-            <p className="text-sm font-sans text-abba-lime font-semibold">
-              Fila ilimitada. Sem cota mensal. Envia quantos quiser.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── VÍDEO PRONTO EM HORAS ─── */}
-      <section className="border-t border-abba-surface bg-abba-surface/30 py-20 px-6">
-        <div className="mx-auto max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center space-y-4 mb-12"
-          >
-            <h2 className="text-2xl font-sans font-bold sm:text-3xl">Vídeo pronto em horas</h2>
-            <p className="text-white/50 font-sans text-sm">Não em dias. Em horas.</p>
-          </motion.div>
-
-          {/* SLA card mock */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="rounded-[20px] bg-abba-surface border border-white/8 p-6 sm:p-8 max-w-md mx-auto"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <Badge variant="secondary" className="text-[10px] font-sans rounded-full">TikTok</Badge>
-              <Badge className="bg-abba-lime/20 text-abba-lime text-[10px] rounded-full border-0">Standard</Badge>
-            </div>
-            <p className="text-sm font-sans font-semibold text-white mb-3">Trend challenge — edição rápida</p>
-            <div className="progress-track" style={{ height: '36px' }}>
-              <div className="progress-fill text-[12px]" style={{ width: '62%' }}>
-                3h 42min restantes
-              </div>
-            </div>
-            <p className="text-[11px] font-sans text-white/40 mt-2">SLA: 72h úteis · Enviado há 44h</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="mt-8 text-center space-y-3 max-w-2xl mx-auto"
-          >
-            <p className="text-sm font-sans text-white/70">
-              Dependendo do plano, seu vídeo sai editado em até 4 horas.
-            </p>
-            <p className="text-sm font-sans text-white/70">
-              Cada entrega tem um prazo garantido contado em horas úteis a partir do momento do envio.
-              Você acompanha o countdown em tempo real. Quando o vídeo chega, você recebe uma notificação
-              — e aprova com um clique.
-            </p>
-            <p className="text-sm font-sans text-white font-medium">
-              Isso não existia antes. Agora existe.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── REVISE COM PRECISÃO ─── */}
-      <section className="border-t border-abba-surface py-20 px-6">
-        <div className="mx-auto max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center space-y-4 mb-12"
-          >
-            <h2 className="text-2xl font-sans font-bold sm:text-3xl">Revise com precisão</h2>
-            <p className="text-white/50 font-sans text-sm">Pediu ajuste, foi ajustado.</p>
-          </motion.div>
-
-          {/* Revision mock */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="rounded-[20px] bg-abba-surface border border-white/8 p-6 sm:p-8 max-w-md mx-auto space-y-4"
-          >
-            <div className="rounded-xl bg-abba-dark/60 border border-white/6 p-4 space-y-2">
-              <div className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-abba-lime" />
-                <p className="text-[11px] font-sans font-semibold text-white/40 uppercase tracking-wider">Revisão</p>
-              </div>
-              <div className="rounded-lg bg-abba-dark border border-white/6 p-3">
-                <p className="text-xs font-sans text-white/60 mb-1">
-                  <span className="text-abba-lime font-mono">00:14</span> — cortar pausa
-                </p>
-                <p className="text-xs font-sans text-white/60">
-                  <span className="text-abba-lime font-mono">00:32</span> — legenda cortou o texto
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 text-[11px] font-sans text-white/40">
-              <Clock className="h-3 w-3" />
-              Revisão anterior: 2h atrás · Entregue com sucesso
-            </div>
-            <Button className="bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light w-full">
-              <Send className="h-4 w-4 mr-2" /> Enviar revisão
-            </Button>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="mt-8 text-center space-y-3 max-w-2xl mx-auto"
-          >
-            <p className="text-sm font-sans text-white/70">
-              Cada entrega tem um canal próprio. Você indica o ajuste, marca o segundo exato se precisar,
-              e o vídeo volta para produção — com o mesmo prazo garantido.
-            </p>
-            <p className="text-sm font-sans text-abba-lime font-semibold">
-              Sem limite de revisões. Sem cobranças extras. Sem atrito.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── PLANOS ─── */}
-      <section id="planos" className="border-t border-abba-surface bg-abba-surface/30 py-20 px-6">
-        <div className="mx-auto max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center space-y-4 mb-12"
-          >
-            <h2 className="text-2xl font-sans font-bold sm:text-3xl">Planos</h2>
-            <p className="text-white/50 font-sans text-sm">Escolha pela velocidade que o seu ritmo exige.</p>
-          </motion.div>
-
-          <div className="max-w-md mx-auto">
-            {/* Standard Plan */}
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              custom={0}
-            >
-              <div className="relative flex flex-col rounded-[20px] kpi-dark border-2 border-abba-lime p-6 h-full" style={{ minHeight: 'auto' }}>
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-abba-lime text-[#111] font-bold rounded-full px-3 py-0.5 text-[11px] uppercase tracking-widest flex items-center gap-1">
-                  <Zap className="h-3 w-3" /> 7 dias grátis
-                </span>
-                <div className="flex items-center gap-2 mb-1 mt-2">
-                  <h3 className="text-lg font-sans font-bold text-white">Standard</h3>
-                  <span className="text-abba-lime text-lg">★</span>
-                </div>
-                <p className="text-sm font-sans text-white/70 mb-4">
-                  Para quem quer escalar sem depender de ninguém.
-                </p>
-                <ul className="space-y-2 text-sm font-sans text-white/60 flex-1">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    Reels, Shorts e TikTok de até 90 segundos
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    Fila ilimitada — sem cota mensal
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Clock className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    Vídeo pronto em até 72 horas
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    Identidade visual aplicada em todo vídeo
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-abba-lime shrink-0 mt-0.5" />
-                    Briefing de marca salvo — sem explicar de novo
-                  </li>
-                </ul>
-                <p className="text-xs font-sans text-white/40 mt-4 mb-4">
-                  Cancele quando quiser, sem multa.
-                </p>
-                <Button
-                  className="w-full rounded-full font-bold bg-abba-lime text-[#111] hover:bg-abba-light"
-                  asChild
-                >
-                  <Link to="/auth">Começar 7 dias grátis</Link>
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* More speed CTA */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="mt-10 text-center rounded-[20px] bg-abba-surface border border-white/8 p-6 max-w-xl mx-auto"
-          >
-            <p className="text-sm font-sans text-white font-medium mb-2">
-              Precisa de mais velocidade?
-            </p>
-            <p className="text-xs font-sans text-white/50 mb-4">
-              Temos planos com entrega em 48h, 24h, 8h e até 4 horas — para criadores e times que
-              produzem em alto volume e não podem esperar.
-            </p>
-            <Button
-              variant="outline"
-              className="rounded-full border border-white/20 text-white hover:bg-abba-surface"
-              asChild
-            >
-              <Link to="/auth">Falar com a equipe <ArrowRight className="ml-2 h-4 w-4" /></Link>
-            </Button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── MANIFESTO ─── */}
-      <section className="border-t border-abba-surface py-20 px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mx-auto max-w-2xl text-center space-y-6"
-        >
-          <h2 className="text-2xl font-sans font-bold sm:text-3xl">Manifesto</h2>
-          <div className="space-y-4 text-sm sm:text-base font-sans text-white/70 leading-relaxed">
-            <p>Acreditamos que produção profissional deveria ser acessível.</p>
-            <p>
-              Não como desconto. Não como versão inferior.
-              <br />
-              Como serviço real, com prazo real, para criadores reais.
-            </p>
-            <p className="text-white font-medium">
-              É isso que a tecnologia permite quando usada do jeito certo.
-              <br />
-              É isso que o AbbaVideo entrega.
-            </p>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* ─── FAQ ─── */}
-      <section className="border-t border-abba-surface bg-abba-surface/30 py-20 px-6">
-        <div className="mx-auto max-w-2xl">
-          <motion.h2
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-10 text-center text-2xl font-sans font-bold sm:text-3xl"
-          >
-            FAQ
-          </motion.h2>
-
-          <Accordion type="single" collapsible className="space-y-2">
-            {FAQ.map((item, i) => (
-              <AccordionItem key={i} value={`faq-${i}`} className="border border-white/8 rounded-[20px] px-4">
-                <AccordionTrigger className="text-sm font-sans font-medium text-left">
-                  {item.q}
-                </AccordionTrigger>
-                <AccordionContent className="text-sm font-sans text-muted-foreground">
-                  {item.a}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
-      </section>
-
-      {/* ─── CTA FINAL ─── */}
-      <section className="border-t border-abba-surface py-20 px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mx-auto max-w-2xl text-center space-y-6"
-        >
-          <h2 className="text-2xl font-sans font-bold sm:text-3xl">
-            O próximo vídeo do seu canal poderia estar em produção agora.
-          </h2>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button size="lg" asChild className="bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light">
-              <Link to="/auth">Começar 7 dias grátis</Link>
-            </Button>
-            <Button variant="outline" size="lg" asChild className="border border-white/20 text-white rounded-full hover:bg-abba-surface">
-              <a href="#planos">
-                Ver planos <ArrowRight className="ml-2 h-4 w-4" />
-              </a>
-            </Button>
-          </div>
-          <p className="text-xs font-sans text-white/40">
-            Fila ilimitada. Prazo garantido. Identidade visual em todo vídeo.
-          </p>
-        </motion.div>
-      </section>
-
-      {/* ─── FOOTER ─── */}
-      <footer className="border-t border-abba-surface py-10 px-6">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 text-center text-sm font-sans text-muted-foreground sm:flex-row sm:justify-between sm:text-left">
-          <div className="flex items-center gap-2">
-            <img src={abbaLogo} alt="AbbaVideo" className="h-6 w-6" />
-            <p>© {new Date().getFullYear()} AbbaVideo</p>
-          </div>
-          <div className="flex gap-4">
-            <Link to="/auth" className="hover:text-foreground transition-colors">
-              Entrar
-            </Link>
-            <a href="#planos" className="hover:text-foreground transition-colors">
-              Planos
-            </a>
-            <Link to="/termos" className="hover:text-foreground transition-colors">
-              Termos
-            </Link>
-            <Link to="/privacidade" className="hover:text-foreground transition-colors">
-              Privacidade
-            </Link>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
 };
 
-export default Landing;
+const BLOBS = [
+  { w: '35vw', b: '-18vw', l: '-5%', c: 'green', r: 1.0 },
+  { w: '28vw', b: '-14vw', l: '12%', c: 'blue', r: 1.3 },
+  { w: '40vw', b: '-20vw', l: '25%', c: 'purple', r: 0.85 },
+  { w: '30vw', b: '-15vw', l: '40%', c: 'magenta', r: 1.15 },
+  { w: '45vw', b: '-22vw', l: '50%', c: 'pink', r: 0.95 },
+  { w: '32vw', b: '-16vw', l: '65%', c: 'coral', r: 1.25 },
+  { w: '38vw', b: '-19vw', l: '78%', c: 'orange', r: 1.05 },
+  { w: '34vw', b: '-17vw', l: '92%', c: 'yellow', r: 0.9 },
+];
+const TOTAL_SCENES = 9; // statement, expertise, portfolio, howItWorks, demo, valueProps, pricing, faq, cta
+
+export default function Landing() {
+  const [sp, setSp] = useState(0);
+  const [slider, setSlider] = useState(0);
+  const [faq, setFaq] = useState<number | null>(null);
+  const [lang, setLang] = useState<Lang>('pt');
+
+  const t = T[lang];
+  const tier = t.tiers[slider];
+
+  useEffect(() => {
+    const r = new URLSearchParams(window.location.search).get('ref');
+    if (r?.trim()) localStorage.setItem('affiliate_ref', r.trim().toLowerCase());
+  }, []);
+
+  const onScroll = useCallback(() => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    setSp(max > 0 ? window.scrollY / max : 0);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [onScroll]);
+
+  // Scroll to scene by index (since anchor links don't work with fixed layout)
+  const scrollToScene = useCallback((sceneIndex: number) => {
+    const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const heroPhase = 0.2;
+    const scenePhase = 0.8;
+    const targetProgress = heroPhase + (sceneIndex / TOTAL_SCENES) * scenePhase + 0.01;
+    window.scrollTo({ top: targetProgress * totalHeight, behavior: 'smooth' });
+  }, []);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement).closest('a[href^="#"]');
+      if (!target) return;
+      const href = target.getAttribute('href');
+      if (!href) return;
+      e.preventDefault();
+      const map: Record<string, number> = { '#howit': 3, '#plans': 6 };
+      if (map[href] !== undefined) scrollToScene(map[href]);
+    };
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, [scrollToScene]);
+
+  // Hero phase: first 20% of scroll
+  const heroP = Math.min(1, sp / 0.2);
+  // Scene phase: remaining 80%
+  const sceneP = Math.max(0, (sp - 0.2) / 0.8);
+  const scene = Math.min(TOTAL_SCENES - 1, Math.floor(sceneP * TOTAL_SCENES));
+
+  const gooOpacity = heroP < 0.55 ? 1 : Math.max(0, 1 - (heroP - 0.55) / 0.2);
+  const heroOpacity = Math.max(0, 1 - heroP * 2.5);
+  const showGoo = heroP < 0.8;
+
+  const sc = (i: number) => `sc${i === scene ? ' on' : i < scene ? ' up' : ' dn'}`;
+
+  return (
+    <>
+      <style>{CSS}</style>
+      <div className="lp">
+        <nav className={`nv ${heroP < 0.5 ? 'light' : 'dark'}`}>
+          <a href="#" className="nv-l"><img src={abbaLogo} alt="" className="nv-logo" />AbbaVideo</a>
+          <div className="nv-r">
+            <a href="#howit">{t.navHow}</a>
+            <a href="#plans">{t.navPlans}</a>
+            <button
+              onClick={() => setLang(lang === 'pt' ? 'en' : 'pt')}
+              className="lang-btn"
+            >
+              {lang === 'pt' ? 'EN' : 'PT'}
+            </button>
+            <a href="#plans" className="nv-c">{t.navCta}</a>
+          </div>
+        </nav>
+
+        {/* L1: Dark scenes */}
+        <div className="dark-layer">
+          {heroP >= 0.9 && <div className="dots">{Array.from({ length: TOTAL_SCENES }).map((_, i) => <div key={i} className={`dot${i === scene ? ' on' : ''}`} />)}</div>}
+          <div className="stage">
+            <div className={sc(0)}><div><p className="lb">{t.s0Label}</p><h2 className="hl hm">{t.s0Title1}<br/>{t.s0Title2} <em>{t.s0Em}</em></h2></div></div>
+
+            {/* Scene 1: Expertise — orbit */}
+            <div className={sc(1)}><div style={{ width: '100%', maxWidth: 600, textAlign: 'center' }}>
+              <p className="lb">{t.s1Label}</p>
+              <h2 className="hl hm" style={{ marginBottom: 40 }}>{t.s1Title} <em>{t.s1Em}</em></h2>
+              <div className="orbit">
+                <div className="orbit-center">▶</div>
+                <div className="orbit-spin orbit-r1">
+                  {['✂','♫','Aa'].map((icon, i) => {
+                    const angle = (i / 3) * 360;
+                    return <div key={i} className="oi-wrap" style={{ transform: `rotate(${angle}deg) translateX(var(--r1))` }}><div className="oi"><span style={{ transform: `rotate(-${angle}deg)` }} className="oi-icon oi-i1">{icon}</span></div></div>;
+                  })}
+                </div>
+                <div className="orbit-spin orbit-r2">
+                  {['▶','◎','⊞'].map((icon, i) => {
+                    const angle = (i / 3) * 360;
+                    return <div key={i} className="oi-wrap" style={{ transform: `rotate(${angle}deg) translateX(var(--r2))` }}><div className="oi"><span style={{ transform: `rotate(-${angle}deg)` }} className="oi-icon oi-i2">{icon}</span></div></div>;
+                  })}
+                </div>
+              </div>
+              <p style={{ fontSize: 13, color: 'var(--tw3)', marginTop: 32, maxWidth: 360, margin: '32px auto 0' }}>{t.s1Desc}</p>
+            </div></div>
+
+            <div className={sc(2)}><div style={{ width: '100%', maxWidth: 820 }}>
+              <p className="lb">{t.s2Label}</p><h2 className="hl hm" style={{ marginBottom: 32 }}><em>{t.s2Em}</em></h2>
+              <div className="prow">
+                {t.portfolio.map((p, i) => (
+                  <div key={p.name} className={`pc pc-anim${i}`}>
+                    <div className="pc-placeholder" />
+                    <div>
+                      <div className="pct">{p.type}</div>
+                      <div className="pcn">{p.name}</div>
+                      <div className="pc-stat">{p.vids} {t.s2Stat}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div></div>
+
+            <div className={sc(3)} id="howit"><div>
+              <p className="lb">{t.s3Label}</p><h2 className="hl hm">{t.s3Title} <em>{t.s3Em}</em></h2>
+              <div className="fts">
+                <div className="ft"><div className="ft-t">{t.s3Step1T}</div><div className="ft-d">{t.s3Step1D}</div></div>
+                <div className="ft"><div className="ft-t">{t.s3Step2T}</div><div className="ft-d">{t.s3Step2D}</div></div>
+                <div className="ft"><div className="ft-t">{t.s3Step3T}</div><div className="ft-d">{t.s3Step3D}</div></div>
+              </div>
+            </div></div>
+
+            {/* Scene 4: Demo — Real dashboard mockup */}
+            <div className={sc(4)}><div style={{ width: '100%', maxWidth: 820 }}>
+              <p className="lb">{t.s4Label}</p>
+              <h2 className="hl hm" style={{ marginBottom: 28 }}>{t.s4Title} <em>{t.s4Em}</em></h2>
+              <div className="dash">
+                {/* Kanban columns */}
+                <div className="dash-col">
+                  <div className="dash-hd"><span>{t.s4Col1}</span><span className="dash-cnt">2</span></div>
+                  <div className="d-card d-anim1">
+                    <div className="d-top"><span className="d-type">Reel</span><span className="d-editor">{t.s4Waiting}</span></div>
+                    <div className="d-title">Rotina de manhã</div>
+                    <div className="d-sla d-sla-g">{t.s4InQueue}</div>
+                  </div>
+                  <div className="d-card d-anim2">
+                    <div className="d-top"><span className="d-type">Short</span></div>
+                    <div className="d-title">Review produto</div>
+                    <div className="d-sla d-sla-g">{t.s4InQueue}</div>
+                  </div>
+                </div>
+                <div className="dash-col">
+                  <div className="dash-hd"><span>{t.s4Col2}</span><span className="dash-cnt">1</span></div>
+                  <div className="d-card d-anim3">
+                    <div className="d-top"><span className="d-type">TikTok</span><span className="d-editor">Carlos E.</span></div>
+                    <div className="d-title">Trend challenge</div>
+                    <div className="d-sla d-sla-y">3h 42min</div>
+                    <div className="d-bar"><div className="d-fill d-fill-anim" style={{ width: '62%' }} /></div>
+                  </div>
+                </div>
+                <div className="dash-col">
+                  <div className="dash-hd"><span>{t.s4Col3}</span><span className="dash-cnt">1</span></div>
+                  <div className="d-card d-anim4">
+                    <div className="d-top"><span className="d-type">Reel</span><span className="d-editor">Carlos E.</span></div>
+                    <div className="d-title">Dica rápida #12</div>
+                    <div className="d-sla d-sla-ok">{t.s4Ready}</div>
+                    <div className="d-actions">
+                      <span className="d-btn-rev">{t.s4Review}</span>
+                      <span className="d-btn-ok">{t.s4Approve}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="dash-col">
+                  <div className="dash-hd"><span>{t.s4Col4}</span><span className="dash-cnt">1</span></div>
+                  <div className="d-card d-anim5">
+                    <div className="d-top"><span className="d-type">Short</span><span className="d-editor">Carlos E.</span></div>
+                    <div className="d-title">Unboxing setup</div>
+                    <div className="d-sla d-sla-done">2h 14min ✓</div>
+                  </div>
+                </div>
+              </div>
+            </div></div>
+
+            <div className={sc(5)}><div><h2 className="hl hm">{t.s5L1}<br/>{t.s5L2}<br/><em>{t.s5Em}</em></h2></div></div>
+
+            <div className={sc(6)} id="plans"><div className="pw">
+              <p className="lb" style={{ textAlign: 'center' }}>{t.s6Label}</p>
+              <h2 className="hl hm" style={{ textAlign: 'center' }}>{t.s6Title} <em>{t.s6Em}</em></h2>
+              <div className="pg">
+                <div className="pl">
+                  <div className="slr"><span>72h</span><span>4h</span></div>
+                  <div className="slw"><input type="range" min={0} max={4} step={1} value={slider} onChange={e => setSlider(+e.target.value)} /><div className="slf" style={{ width: `${(slider / 4) * 100}%` }} /></div>
+                  <div className="psla">{tier.sla}</div>
+                  <div className="pval"><span>{tier.price}</span></div>
+                  <div className="pper">{t.s6PerMonth}</div>
+                  <div className="ptier">{tier.tier}</div>
+                </div>
+                <div className="pr">
+                  <div className="pf">{t.s6F1}</div>
+                  <div className="pf">{t.s6F2}</div>
+                  <div className="pf">{t.s6F3}</div>
+                  <div className="pf">{t.s6F4}</div>
+                  <Link to="/auth" className="pb">{tier.btn}</Link>
+                  <div className="pn">{t.s6Cancel}</div>
+                </div>
+              </div>
+            </div></div>
+
+            <div className={sc(7)}><div className="fw">
+              <h2 className="faq-t">{t.s7Title}</h2>
+              {t.faq.map((item, i) => <div key={i} className="fi">
+                <button className={`fiq${faq === i ? ' open' : ''}`} onClick={() => setFaq(faq === i ? null : i)}>{item.q}</button>
+                <div className={`fia${faq === i ? ' open' : ''}`}><p>{item.a}</p></div>
+              </div>)}
+            </div></div>
+
+            <div className={sc(8)}><div style={{ textAlign: 'center' }}>
+              <h2 className="hl hm">{t.s8L1}<br/>{t.s8L2}<br/>{t.s8L3} <em>{t.s8Em}</em></h2>
+              <div style={{ marginTop: 30 }}><a href="#plans" style={{ display: 'inline-block', padding: '12px 32px', borderRadius: 100, background: '#F5F5F7', color: '#0A0A0A', fontSize: 14, fontWeight: 600 }}>{t.s8Btn}</a></div>
+              <p style={{ marginTop: 16, fontSize: 13, color: 'var(--tw3)' }}>{t.s8Sub}</p>
+            </div></div>
+          </div>
+        </div>
+
+        {/* L2: Goo blobs */}
+        {showGoo && (
+          <div className="goo" style={{ opacity: gooOpacity }}>
+            {BLOBS.map((b, i) => {
+              const localP = Math.max(0, heroP - i * 0.04);
+              const scale = Math.min(localP * b.r * 2.5, 3.5);
+              return <div key={i} className={`blob ${b.c}`} style={{ width: b.w, height: b.w, bottom: b.b, left: b.l, transform: `scale(${scale})` }} />;
+            })}
+          </div>
+        )}
+
+        {/* L3: Hero text */}
+        {heroOpacity > 0 && (
+          <div className="hero-text" style={{ opacity: heroOpacity }}>
+            <h1 className="hl hl-hero">{t.heroL1}<br />{t.heroL2}<br /><em>{t.heroL3}</em></h1>
+            <p className="sb">{t.heroSub}</p>
+            <div className="br">
+              <a href="#plans" className="bd">{t.heroBtn1}</a>
+              <a href="#howit" className="bg-btn">{t.heroBtn2}</a>
+            </div>
+            <div className="scroll-line">
+              <div className="scroll-line-fill" />
+            </div>
+          </div>
+        )}
+
+        <div className="scroll-driver" />
+        <footer className="fo">
+          <span>© 2026 AbbaVideo</span>
+          <div className="fl">
+            <a href="#">Instagram</a>
+            <Link to="/terms">{t.footerTerms}</Link>
+            <Link to="/privacy">{t.footerPrivacy}</Link>
+          </div>
+        </footer>
+      </div>
+    </>
+  );
+}
+
+const CSS = `
+:root{--bg:#FBFBFA;--tx:#1D1D1F;--tx2:#86868B;--tx3:#AEAEB2;--tw:#F5F5F7;--tw2:rgba(255,255,255,.5);--tw3:rgba(255,255,255,.22);--gr:linear-gradient(90deg,#D0D0D0,#B8B8B8,#A0A0A0,#B8B8B8,#D0D0D0);--fd:'Clash Display',sans-serif;--fb:'Satoshi',sans-serif}
+.lp{font-family:var(--fb);font-size:16px;-webkit-font-smoothing:antialiased;overflow-x:hidden;background:#050505}
+.lp a{color:inherit;text-decoration:none}
+.nv{position:fixed;top:0;left:0;width:100%;z-index:100;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;transition:background .4s}
+.nv.dark{background:rgba(5,5,5,.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+@media(min-width:768px){.nv{padding:16px 48px}}
+.nv-l{font-family:var(--fd);font-weight:600;font-size:17px;letter-spacing:-.02em;transition:color .4s;display:flex;align-items:center;gap:8px}
+.nv-logo{width:24px;height:24px;transition:filter .4s}
+.nv.light .nv-logo{filter:brightness(0)}
+.nv.dark .nv-logo{filter:brightness(100)}
+.nv-r{display:flex;align-items:center;gap:28px}
+.nv-r a{font-size:12px;transition:color .2s}
+.nv-c{padding:7px 18px;border-radius:100px;font-size:12px;font-weight:600;transition:background .4s,color .4s}
+/* Light mode nav (hero visible) */
+.nv.light .nv-l{color:var(--tx)}
+.nv.light .nv-r a{color:var(--tx3)}
+.nv.light .nv-r a:hover{color:var(--tx)}
+.nv.light .nv-c{background:var(--tx);color:var(--bg);border:none}
+/* Dark mode nav */
+.nv.dark .nv-l{color:#fff}
+.nv.dark .nv-r a{color:rgba(255,255,255,.7)}
+.nv.dark .nv-r a:hover{color:#fff}
+.nv.dark .nv-c{background:transparent;color:#F5F5F7;border:1px solid rgba(255,255,255,.35)}
+.nv.dark .nv-c:hover{border-color:rgba(255,255,255,.5)}
+.lang-btn{font-size:11px;font-weight:700;cursor:pointer;border-radius:4px;padding:3px 8px;letter-spacing:.03em;transition:opacity .2s}
+.lang-btn:hover{opacity:.7}
+.nv.light .lang-btn{background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.18);color:#1D1D1F}
+.nv.dark .lang-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);color:#F5F5F7}
+@media(max-width:600px){.nv-r a:not(.nv-c):not(.lang-btn){display:none}}
+
+.scroll-driver{height:900vh}
+
+/* L1 */
+.dark-layer{position:fixed;top:0;left:0;width:100%;height:100vh;z-index:1}
+.stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+
+/* L2 */
+.goo{position:fixed;top:0;left:0;width:100%;height:100vh;z-index:2;pointer-events:none;overflow:hidden;filter:blur(30px) contrast(8);background:#FBFBFA;transition:opacity .3s}
+.blob{position:absolute;border-radius:50%;background:#050505;will-change:transform}
+.blob.green{box-shadow:0 0 15px 8px #00DC82,0 0 40px 16px rgba(0,220,130,.4)}
+.blob.blue{box-shadow:0 0 15px 8px #32B4FF,0 0 40px 16px rgba(50,180,255,.4)}
+.blob.purple{box-shadow:0 0 15px 8px #9C6ADE,0 0 40px 16px rgba(156,106,222,.4)}
+.blob.magenta{box-shadow:0 0 15px 8px #E040FB,0 0 40px 16px rgba(224,64,251,.4)}
+.blob.pink{box-shadow:0 0 15px 8px #FF69B4,0 0 40px 16px rgba(255,105,180,.4)}
+.blob.coral{box-shadow:0 0 15px 8px #FF7B6B,0 0 40px 16px rgba(255,123,107,.4)}
+.blob.orange{box-shadow:0 0 15px 8px #FF8C42,0 0 40px 16px rgba(255,140,66,.4)}
+.blob.yellow{box-shadow:0 0 15px 8px #FFD43B,0 0 40px 16px rgba(255,212,59,.4)}
+
+/* L3 */
+.hero-text{position:fixed;top:0;left:0;width:100%;height:100vh;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;padding:20px}
+/* Scroll indicator line with gradient */
+.scroll-line{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);width:2px;height:48px;border-radius:2px;background:rgba(0,0,0,.06);overflow:hidden}
+.scroll-line-fill{width:100%;height:60%;border-radius:2px;background:linear-gradient(180deg,#00DC82,#32B4FF,#9C6ADE,#E040FB,#FF7B6B,#FF8C42,#FFD43B);animation:scrollFill 2s ease-in-out infinite}
+@keyframes scrollFill{0%{transform:translateY(-100%)}50%{transform:translateY(100%)}100%{transform:translateY(-100%)}}
+.hero-text a{pointer-events:auto}
+.hero-text .hl{color:var(--tx) !important}
+.hero-text .sb{color:var(--tx2) !important}
+.hero-text .bd{background:var(--tx) !important;color:var(--bg) !important}
+.hero-text .bg-btn{color:var(--tx) !important}
+
+.hl{font-family:var(--fd);font-weight:600;font-size:clamp(36px,6.5vw,72px);line-height:.92;letter-spacing:-.045em}
+.hl em{font-style:normal;background:var(--gr);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hm{font-size:clamp(26px,4.5vw,50px)}
+.sb{font-size:clamp(14px,1.5vw,17px);color:var(--tx2);line-height:1.5;max-width:380px;margin:20px auto 0}
+.br{margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+/* Buttons — dark on light (hero) */
+.bd{padding:11px 26px;border-radius:100px;font-size:14px;font-weight:600;background:var(--tx);color:var(--bg);transition:opacity .2s}
+.bd:hover{opacity:.8}
+.bg-btn{padding:11px 20px;font-size:13px;font-weight:600;color:var(--tx);border:1px solid rgba(0,0,0,.15);border-radius:100px;transition:border-color .2s}
+.bg-btn:hover{border-color:rgba(0,0,0,.4)}
+/* Buttons — light on dark (scenes) */
+.sc .bd{background:#F5F5F7;color:#0A0A0A}
+.sc .bg-btn{color:var(--tw);border-color:rgba(255,255,255,.15)}
+.sc .bg-btn:hover{border-color:rgba(255,255,255,.4)}
+.lb{font-size:11px;font-weight:600;color:var(--tw3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px}
+
+.sc{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;opacity:0;transform:translateY(24px);pointer-events:none;transition:opacity .5s cubic-bezier(.23,1,.32,1),transform .6s cubic-bezier(.23,1,.32,1)}
+.sc.on{opacity:1;transform:none;pointer-events:auto}
+.sc.up{opacity:0;transform:translateY(-24px)}
+.sc.dn{opacity:0;transform:translateY(24px)}
+.sc .hl{color:var(--tw)}
+
+.sc .hl,.sc .lb,.sc .fts,.sc .pl,.sc .pr,.sc .fw,.sc .prow{transition:opacity .6s cubic-bezier(.23,1,.32,1),transform .7s cubic-bezier(.23,1,.32,1)}
+.sc.on .hl{opacity:1;transform:none;transition-delay:0s}
+.sc.on .lb{opacity:1;transform:none;transition-delay:0s}
+.sc.on .fts{opacity:1;transform:none;transition-delay:.12s}
+.sc.on .pl{opacity:1;transform:none;transition-delay:.05s}
+.sc.on .pr{opacity:1;transform:none;transition-delay:.18s}
+.sc.on .fw{opacity:1;transform:none;transition-delay:.05s}
+.sc.on .prow{opacity:1;transform:none;transition-delay:.1s}
+.sc:not(.on) .hl{opacity:0;transform:translateY(20px)}
+.sc:not(.on) .lb{opacity:0;transform:translateY(10px)}
+.sc:not(.on) .fts{opacity:0;transform:translateY(20px)}
+.sc:not(.on) .pl{opacity:0;transform:translateX(-30px)}
+.sc:not(.on) .pr{opacity:0;transform:translateX(30px)}
+.sc:not(.on) .fw{opacity:0;transform:translateY(20px)}
+.sc:not(.on) .prow{opacity:0;transform:translateX(30px)}
+
+.fts{display:grid;gap:10px;grid-template-columns:1fr;width:100%;max-width:600px;margin:36px auto 0;text-align:left}
+@media(min-width:600px){.fts{grid-template-columns:1fr 1fr 1fr}}
+.ft{padding:22px 18px;border-radius:14px;background:rgba(255,255,255,.04);transition:opacity .5s,transform .6s cubic-bezier(.23,1,.32,1)}
+.sc.on .ft{opacity:1;transform:none}
+.sc.on .ft:nth-child(1){transition-delay:.14s}
+.sc.on .ft:nth-child(2){transition-delay:.22s}
+.sc.on .ft:nth-child(3){transition-delay:.3s}
+.sc:not(.on) .ft{opacity:0;transform:translateY(15px)}
+.ft-t{font-family:var(--fd);font-weight:600;font-size:15px;margin-bottom:4px;color:var(--tw)}
+.ft-d{font-size:12px;color:var(--tw2);line-height:1.4}
+
+.pw{max-width:720px;width:100%}
+.pg{display:grid;gap:40px;grid-template-columns:1fr;text-align:left;margin-top:30px}
+@media(min-width:768px){.pg{grid-template-columns:1fr 1fr;align-items:center}}
+.slr{display:flex;justify-content:space-between;margin-bottom:6px;font-size:10px;color:var(--tw3);font-weight:500}
+.slw{position:relative;height:36px;display:flex;align-items:center}
+.slw input{-webkit-appearance:none;appearance:none;width:100%;height:2px;background:rgba(255,255,255,.1);border-radius:10px;outline:none;z-index:2;position:relative;cursor:pointer}
+.slw input::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#F5F5F7;cursor:grab;box-shadow:0 1px 6px rgba(0,0,0,.3)}
+.slw input::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:50%;background:#F5F5F7;cursor:grab}
+.slf{position:absolute;top:50%;left:0;height:2px;transform:translateY(-50%);background:#F5F5F7;border-radius:10px;pointer-events:none;z-index:1}
+.psla{font-size:11px;color:var(--tw3);margin-top:16px;text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+.pval{font-family:var(--fd);font-weight:600;font-size:clamp(36px,5vw,56px);line-height:1;letter-spacing:-.04em;margin:6px 0}
+.pval span{background:var(--gr);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pper{font-size:13px;color:var(--tw2)}
+.ptier{display:inline-block;margin-top:12px;padding:3px 12px;border-radius:100px;background:rgba(255,255,255,.06);font-size:10px;font-weight:600;color:var(--tw2)}
+.pf{font-size:13px;color:var(--tw2);margin-bottom:8px}
+.pb{display:block;margin-top:16px;padding:12px;border-radius:10px;background:#F5F5F7 !important;color:#0A0A0A !important;font-size:13px;font-weight:600;text-align:center;transition:opacity .2s}
+.pb:hover{opacity:.85}
+.pn{margin-top:8px;font-size:11px;color:var(--tw3)}
+
+.prow{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;cursor:grab;padding-bottom:10px}
+.prow::-webkit-scrollbar{display:none}
+.pc{flex:0 0 clamp(160px,26vw,200px);border-radius:16px;border:1px solid rgba(255,255,255,.06);padding:20px 18px;aspect-ratio:3/4;display:flex;flex-direction:column;justify-content:space-between;transition:transform .4s cubic-bezier(.23,1,.32,1),border-color .3s;opacity:0;transform:translateY(12px)}
+.pc:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.12)}
+.sc.on .pc{opacity:1;transform:none}
+.sc.on .pc-anim0{transition-delay:.1s}
+.sc.on .pc-anim1{transition-delay:.18s}
+.sc.on .pc-anim2{transition-delay:.26s}
+.sc.on .pc-anim3{transition-delay:.34s}
+.sc.on .pc-anim4{transition-delay:.42s}
+.sc:not(.on) .pc{opacity:0;transform:translateY(12px)}
+.pc-placeholder{flex:1;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.04);margin-bottom:14px}
+.pct{font-size:9px;color:var(--tw3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:3px}
+.pcn{font-family:var(--fd);font-weight:600;font-size:15px;color:var(--tw);margin-bottom:6px}
+.pc-stat{font-size:10px;color:var(--tw3);font-weight:500}
+
+.fw{max-width:560px;width:100%;text-align:left}
+.faq-t{font-family:var(--fd);font-weight:600;font-size:clamp(20px,3vw,30px);letter-spacing:-.03em;margin-bottom:30px;color:var(--tw)}
+.fi{border-top:1px solid rgba(255,255,255,.08)}
+.fi:last-child{border-bottom:1px solid rgba(255,255,255,.08)}
+.fiq{display:flex;align-items:center;justify-content:space-between;padding:18px 0;cursor:pointer;font-size:15px;font-weight:600;color:var(--tw);transition:color .2s;background:none;border:none;width:100%;text-align:left;font-family:var(--fb)}
+.fiq:hover,.fiq.open{color:var(--tw2)}
+.fiq::after{content:'+';font-size:18px;font-weight:300;color:var(--tw3);transition:transform .3s;flex-shrink:0;margin-left:16px}
+.fiq.open::after{transform:rotate(45deg)}
+.fia{overflow:hidden;max-height:0;transition:max-height .4s cubic-bezier(.23,1,.32,1),padding .4s}
+.fia.open{max-height:200px;padding-bottom:18px}
+.fia p{font-size:14px;color:var(--tw2);line-height:1.5;max-width:460px}
+
+/* Dashboard mockup — light theme */
+.dash{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;overflow-x:auto;scrollbar-width:none}
+.dash::-webkit-scrollbar{display:none}
+@media(max-width:700px){.dash{grid-template-columns:repeat(4,200px)}}
+.dash-col{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;min-height:120px}
+.dash-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)}
+.dash-hd span:first-child{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tw3)}
+.dash-cnt{font-size:9px;font-weight:700;background:rgba(255,255,255,.08);color:var(--tw3);padding:1px 6px;border-radius:100px}
+.d-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px;margin-bottom:6px;opacity:0;transition:opacity .5s,transform .5s cubic-bezier(.23,1,.32,1);transform:translateY(8px)}
+.sc.on .d-card{opacity:1;transform:none}
+.sc.on .d-anim1{transition-delay:.15s}
+.sc.on .d-anim2{transition-delay:.3s}
+.sc.on .d-anim3{transition-delay:.45s}
+.sc.on .d-anim4{transition-delay:.6s}
+.sc.on .d-anim5{transition-delay:.75s}
+.sc:not(.on) .d-card{opacity:0;transform:translateY(8px)}
+.d-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.d-type{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--tw);background:rgba(255,255,255,.1);padding:2px 6px;border-radius:100px}
+.d-editor{font-size:9px;color:var(--tw3)}
+.d-title{font-size:12px;font-weight:600;color:var(--tw);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.d-sla{font-size:10px;font-weight:600;font-family:var(--fd);display:flex;align-items:center;gap:4px}
+.d-sla::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.d-sla-g{color:hsl(145,50%,50%)}.d-sla-g::before{background:hsl(145,50%,50%)}
+.d-sla-y{color:hsl(43,80%,50%)}.d-sla-y::before{background:hsl(43,80%,50%)}
+.d-sla-ok{color:hsl(145,50%,50%)}.d-sla-ok::before{background:hsl(145,50%,50%)}
+.d-sla-done{color:var(--tw3)}.d-sla-done::before{background:var(--tw3)}
+.d-bar{height:3px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;margin-top:6px}
+.d-fill{height:100%;border-radius:10px;background:var(--tw)}
+.d-fill-anim{width:0 !important}
+.sc.on .d-fill-anim{animation:dfill 2s .6s forwards}
+@keyframes dfill{to{width:62%}}
+.sc:not(.on) .d-fill-anim{animation:none}
+.d-actions{display:flex;gap:4px;margin-top:6px}
+.d-btn-rev{font-size:9px;font-weight:600;padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.12);color:var(--tw3)}
+.d-btn-ok{font-size:9px;font-weight:600;padding:4px 8px;border-radius:6px;background:#F5F5F7;color:#0A0A0A}
+
+/* Orbit */
+.orbit{position:relative;width:260px;height:260px;margin:0 auto}
+@media(min-width:600px){.orbit{width:320px;height:320px}}
+.orbit-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20px;color:rgba(255,255,255,.08);z-index:2}
+.orbit-spin{position:absolute;top:50%;left:50%;border-radius:50%;border:1px solid rgba(255,255,255,.06)}
+.orbit-r1{width:160px;height:160px;margin:-80px 0 0 -80px;animation:ospin 20s linear infinite}
+@media(min-width:600px){.orbit-r1{width:190px;height:190px;margin:-95px 0 0 -95px}}
+.orbit-r2{width:260px;height:260px;margin:-130px 0 0 -130px;animation:ospin 35s linear infinite reverse}
+@media(min-width:600px){.orbit-r2{width:320px;height:320px;margin:-160px 0 0 -160px}}
+@keyframes ospin{to{transform:rotate(360deg)}}
+/* Orbit items: wrapper positions on ring, inner stays upright */
+.orbit-r1{--r1:80px}.orbit-r2{--r2:130px}
+@media(min-width:600px){.orbit-r1{--r1:95px}.orbit-r2{--r2:160px}}
+.oi-wrap{position:absolute;top:50%;left:50%;width:0;height:0}
+/* Counter-rotate wrapper content to stay upright */
+.oi-icon{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+.oi-i1{animation:ocr1 20s linear infinite}
+.oi-i2{animation:ocr2 35s linear infinite}
+@keyframes ocr1{from{rotate:0deg}to{rotate:-360deg}}
+@keyframes ocr2{from{rotate:0deg}to{rotate:360deg}}
+/* Icon circle — plain gray */
+.oi{width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.6);position:relative;overflow:hidden}
+.oi::before{content:'';position:absolute;inset:-1px;border-radius:50%;background:conic-gradient(#00DC82,#32B4FF,#9C6ADE,#E040FB,#FF69B4,#FF7B6B,#FF8C42,#FFD43B,#00DC82);animation:oispin 4s linear infinite}
+.oi::after{content:'';position:absolute;inset:.5px;border-radius:50%;background:#0a0a0a}
+.oi span{position:relative;z-index:1}
+@keyframes oispin{to{transform:rotate(360deg)}}
+
+.dots{position:fixed;right:24px;top:50%;transform:translateY(-50%);z-index:90;display:flex;flex-direction:column;gap:10px}
+@media(max-width:600px){.dots{display:none}}
+
+/* ═══ MOBILE OPTIMIZATIONS ═══ */
+@media(max-width:600px){
+  /* Hero text — tighter spacing */
+  .hero-text{padding:16px}
+  .hl{font-size:clamp(32px,10vw,48px)}
+  .hm{font-size:clamp(22px,6vw,32px)}
+  .sb{font-size:13px;max-width:300px;margin-top:14px}
+  .br{margin-top:20px;gap:8px}
+  .bd{padding:10px 22px;font-size:13px}
+  .bg-btn{padding:10px 16px;font-size:12px}
+  .scroll-line{bottom:24px;height:36px}
+
+  /* Scenes — less padding */
+  .sc{padding:16px}
+
+  /* Blobs — bigger on mobile to cover screen faster */
+  .blob{min-width:50vw;min-height:50vw}
+
+  /* Goo — lighter filter for performance */
+  .goo{filter:blur(20px) contrast(6)}
+
+  /* Hero text fades faster on mobile */
+  .scroll-line{display:none}
+
+  /* Features — stack */
+  .fts{gap:8px;margin-top:24px}
+  .ft{padding:16px 14px}
+  .ft-t{font-size:13px}
+  .ft-d{font-size:11px}
+
+  /* Pricing — stack */
+  .pg{gap:24px;margin-top:20px}
+  .pval{font-size:clamp(32px,8vw,44px)}
+  .slr{font-size:9px}
+
+  /* Dashboard mockup — scroll hint */
+  .dash{gap:6px;padding-right:16px}
+  .dash-col{padding:10px;min-height:100px}
+  .d-title{font-size:11px}
+
+  /* Portfolio — smaller cards */
+  .prow{gap:10px}
+  .pc{flex:0 0 140px}
+  .pcn{font-size:14px}
+
+  /* FAQ */
+  .fw{max-width:100%}
+  .faq-t{font-size:clamp(18px,5vw,24px);margin-bottom:20px}
+  .fiq{font-size:14px;padding:14px 0}
+  .fia p{font-size:13px}
+
+  /* Orbit — smaller */
+  .orbit{width:220px;height:220px}
+  .orbit-r1{width:130px;height:130px;margin:-65px 0 0 -65px;--r1:65px}
+  .orbit-r2{width:220px;height:220px;margin:-110px 0 0 -110px;--r2:110px}
+  .oi{width:24px;height:24px;margin:-12px 0 0 -12px;font-size:8px}
+
+  /* Footer */
+  .fo{padding:20px 16px;flex-direction:column;align-items:center;text-align:center}
+  .fl{flex-wrap:wrap;justify-content:center;gap:12px}
+}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15);transition:background .3s,transform .3s}
+.dot.on{background:#fff;transform:scale(1.4)}
+
+.fo{position:relative;z-index:50;padding:30px 32px;border-top:1px solid rgba(255,255,255,.06);color:var(--tw3);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;background:#050505}
+@media(min-width:768px){.fo{padding:30px 48px}}
+.fo span{font-size:12px}
+.fl{display:flex;gap:20px}
+.fl a{font-size:12px;color:var(--tw3);transition:color .2s}
+.fl a:hover{color:var(--tw)}
+`;

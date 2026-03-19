@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 
 export default {
   darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  content: ["./src/**/*.{ts,tsx}", "./index.html"],
   prefix: "",
   theme: {
     container: {
@@ -14,9 +14,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        mono: ["Inter", "system-ui", "sans-serif"],
-        body: ["Inter", "sans-serif"],
+        sans: ["Satoshi", "system-ui", "sans-serif"],
+        mono: ["Satoshi", "system-ui", "sans-serif"],
+        body: ["Satoshi", "sans-serif"],
+        display: ["Clash Display", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -73,10 +74,10 @@ export default {
           green: "hsl(var(--queue-green))",
         },
         abba: {
-          dark: "#1A231B",
-          surface: "#2D3926",
-          lime: "#A0E870",
-          light: "#BAFF8D",
+          dark: "hsl(var(--foreground))",
+          surface: "hsl(var(--secondary))",
+          lime: "hsl(var(--primary))",
+          light: "hsl(var(--background))",
         },
       },
       borderRadius: {

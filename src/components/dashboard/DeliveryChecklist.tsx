@@ -27,6 +27,7 @@ const DeliveryChecklist = ({ userProjectId, deliveryId }: DeliveryChecklistProps
     currentItems.forEach((i) => { state[i.id] = i.checked; });
     await supabase
       .from('deliveries')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- checklist_state not in generated types
       .update({ checklist_state: state } as any)
       .eq('id', deliveryId);
   }, 500);
@@ -52,7 +53,7 @@ const DeliveryChecklist = ({ userProjectId, deliveryId }: DeliveryChecklistProps
       const briefing = briefingRes.data;
       if (!briefing) return;
 
-      const savedState = (deliveryRes.data as any)?.checklist_state as Record<string, boolean> | null;
+      const savedState = (deliveryRes.data as Record<string, unknown>)?.checklist_state as Record<string, boolean> | null;
 
       // Build dynamic checklist from briefing
       const checklist: ChecklistItem[] = [];
@@ -139,7 +140,7 @@ const DeliveryChecklist = ({ userProjectId, deliveryId }: DeliveryChecklistProps
       <div className="h-1 rounded-full bg-muted/40 overflow-hidden">
         <div
           className="h-full bg-primary rounded-full transition-all duration-300"
-          style={{ width: `${(completedCount / items.length) * 100}%` }}
+          style={{ width: `${items.length > 0 ? (completedCount / items.length) * 100 : 0}%` }}
         />
       </div>
 

@@ -125,7 +125,7 @@ const AdminClients = () => {
 
     setTotalCount(profilesCount || 0);
 
-    const profileUserIds = (profiles || []).map((p: any) => p.user_id);
+    const profileUserIds = (profiles || []).map((p) => p.user_id);
     if (profileUserIds.length === 0) { setClients([]); setLoading(false); return; }
 
     const { data: userProjects } = await supabase
@@ -133,18 +133,21 @@ const AdminClients = () => {
       .select('user_id, status, custom_project_id, client_type, subscription_tier')
       .in('user_id', profileUserIds);
 
-    const projectIds = [...new Set((userProjects || []).filter((up: any) => up.custom_project_id).map((up: any) => up.custom_project_id))];
+    const projectIds = [...new Set((userProjects || []).filter((up) => up.custom_project_id).map((up) => up.custom_project_id))];
     const { data: projects } = await supabase
       .from('custom_projects')
       .select('id, project_name, monthly_value')
       .in('id', projectIds.length > 0 ? projectIds : ['none']);
 
-    const projectMap = new Map<string, any>((projects || []).map((p: any) => [p.id, p]));
-    const upMap = new Map<string, any>((userProjects || []).map((up: any) => [up.user_id, up]));
+    type UserProjectRow = NonNullable<typeof userProjects>[number];
+    type ProjectRow = NonNullable<typeof projects>[number];
 
-    let rows: ClientRow[] = (profiles || []).map((p: any) => {
-      const up: any = upMap.get(p.user_id);
-      const proj: any = up?.custom_project_id ? projectMap.get(up.custom_project_id) : null;
+    const projectMap = new Map<string, ProjectRow>((projects || []).map((p) => [p.id, p]));
+    const upMap = new Map<string, UserProjectRow>((userProjects || []).map((up) => [up.user_id, up]));
+
+    let rows: ClientRow[] = (profiles || []).map((p) => {
+      const up = upMap.get(p.user_id);
+      const proj = up?.custom_project_id ? projectMap.get(up.custom_project_id) : null;
 
       const planValue = proj
         ? Number(proj.monthly_value)
@@ -196,6 +199,7 @@ const AdminClients = () => {
       return; // the page change will trigger the fetch
     }
     fetchClients(debouncedSearch, statusFilter, typeFilter, page);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchClients is stable and isFiltering is derived from deps already listed
   }, [page, debouncedSearch, statusFilter, typeFilter]);
 
   const handleStatusChange = async () => {
@@ -205,7 +209,7 @@ const AdminClients = () => {
 
     if (confirmAction.type === 'delete') {
       try {
-        const { data: sessionData } = await (supabase.auth as any).getSession();
+        const { data: sessionData } = await supabase.auth.getSession();
         const accessToken = sessionData?.session?.access_token;
         if (!accessToken) throw new Error('Sessão expirada');
 
@@ -223,8 +227,13 @@ const AdminClients = () => {
         );
 
         if (!response.ok) {
-          const err = await response.json().catch(() => ({}));
-          throw new Error(err?.error || `Erro ${response.status}`);
+          let err: Record<string, unknown> = {};
+          try {
+            err = await response.json();
+          } catch (parseError) {
+            console.error('Failed to parse delete-client error response:', parseError);
+          }
+          throw new Error((err?.error as string) || `Erro ${response.status}`);
         }
 
         toast.success('Cliente Excluído', { description: 'Conta e dados removidos com sucesso.' });
@@ -258,8 +267,13 @@ const AdminClients = () => {
           );
 
           if (!response.ok) {
-            const err = await response.json().catch(() => ({}));
-            throw new Error(err?.error || `Erro ${response.status}`);
+            let err: Record<string, unknown> = {};
+            try {
+              err = await response.json();
+            } catch (parseError) {
+              console.error('Failed to parse admin-manage-subscription error response:', parseError);
+            }
+            throw new Error((err?.error as string) || `Erro ${response.status}`);
           }
 
           toast.success(
@@ -275,7 +289,7 @@ const AdminClients = () => {
         // Custom/influencer — local update only
         const { error } = await supabase
           .from('user_projects')
-          .update({ status: newStatus } as any)
+          .update({ status: newStatus })
           .eq('user_id', confirmAction.userId);
 
         if (error) {

@@ -18,6 +18,7 @@ export function useDebouncedValue<T>(value: T, delay = 300): T {
 /**
  * Debounce a callback function.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- generic callback type requires any for proper inference
 export function useDebouncedCallback<T extends (...args: any[]) => any>(
   callback: T,
   delay = 300,

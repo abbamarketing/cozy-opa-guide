@@ -35,6 +35,7 @@ export default function Settings() {
       loadProfile();
       loadPreferences();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadProfile and loadPreferences are stable
   }, [user]);
 
   const loadProfile = async () => {
@@ -59,9 +60,10 @@ export default function Settings() {
       .maybeSingle();
 
     if (prefs) {
-      setEmailNotifications((prefs as any).notify_delivery_approved);
-      setPushNotifications((prefs as any).notify_delivery_revision);
-      setNotifyNewMessage((prefs as any).notify_new_message);
+      const typedPrefs = prefs as Record<string, unknown>;
+      setEmailNotifications(typedPrefs.notify_delivery_approved as boolean);
+      setPushNotifications(typedPrefs.notify_delivery_revision as boolean);
+      setNotifyNewMessage(typedPrefs.notify_new_message as boolean);
     }
     setPrefsLoading(false);
   };
@@ -98,6 +100,7 @@ export default function Settings() {
           notify_delivery_revision: pushNotifications,
           notify_new_message: notifyNewMessage,
           updated_at: new Date().toISOString(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic upsert payload
         } as any);
       if (error) {
         toast.error('Erro ao salvar preferências.', { description: error.message });
@@ -123,7 +126,7 @@ export default function Settings() {
       if (data?.url) {
         window.location.href = data.url;
       }
-    } catch (error: any) {
+    } catch (_error: unknown) {
       toast.error('Erro ao abrir portal de pagamento');
     } finally {
       setLoading(false);

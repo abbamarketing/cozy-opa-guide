@@ -48,7 +48,7 @@ export interface UserProjectData {
   priority_level?: number | null;
 }
 
-const GOD_MOCK_PROJECT: Omit<UserProjectData, 'user_id'> = {
+const createGodMockProject = (): Omit<UserProjectData, 'user_id'> => ({
   id: 'god-mode',
   status: 'active',
   client_type: 'god',
@@ -73,8 +73,7 @@ const GOD_MOCK_PROJECT: Omit<UserProjectData, 'user_id'> = {
   subscription_slug: null,
   custom_slug: null,
   monthly_quota: 999,
-  
-};
+});
 
 export const useUserProject = () => {
   const { user } = useAuth();
@@ -89,7 +88,7 @@ export const useUserProject = () => {
         .from('user_projects')
         .select('*, custom_project:custom_projects(*)')
         .eq('user_id', user!.id)
-        .in('status', ['active', 'pending_payment', 'trialing'] as any[])
+        .in('status', ['active', 'pending_payment', 'trialing'])
         .maybeSingle();
 
       if (err) throw new Error(err.message);
@@ -98,7 +97,7 @@ export const useUserProject = () => {
 
       if (isGodUser) {
         if (!user?.id) return null;
-        return { ...GOD_MOCK_PROJECT, user_id: user.id } as UserProjectData;
+        return { ...createGodMockProject(), user_id: user.id } as UserProjectData;
       }
 
       return null;

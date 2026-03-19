@@ -224,6 +224,7 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
       outro_url: outroUrl,
       completed: true,
       completed_at: new Date().toISOString(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic upsert payload
     } as any, { onConflict: 'user_id' });
 
     if (error) {
@@ -246,7 +247,7 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
       <div className="w-full max-w-lg relative z-10">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          <img src={abbaLogo} alt="AbbaVideo" className="h-10 w-10" />
+          <img src={abbaLogo} alt="AbbaVideo" className="h-10 w-10 theme-logo" />
           <span className="text-2xl font-bold">
             Abba<span className="text-primary">Video</span>
           </span>

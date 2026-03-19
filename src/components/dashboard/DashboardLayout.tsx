@@ -26,11 +26,13 @@ import {
   Palette,
   LogOut,
   ChevronDown,
-  
   Lock,
   Link2,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
+import { useTheme } from '@/hooks/useTheme';
 import { useProfile } from '@/hooks/useProfile';
 import { useUserProject, type UserProjectData } from '@/hooks/useUserProject';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -82,6 +84,7 @@ const DashboardHeader = ({ isPreviewMode }: { isPreviewMode?: boolean }) => {
   const { profile } = useProfile();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { isDark, toggle: toggleTheme } = useTheme();
 
   const initials = isPreviewMode
     ? 'CD'
@@ -97,18 +100,27 @@ const DashboardHeader = ({ isPreviewMode }: { isPreviewMode?: boolean }) => {
   const displayName = isPreviewMode ? 'Cliente Demo' : (profile?.full_name || 'Usuario');
 
   return (
-    <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-abba-surface bg-abba-dark/90 backdrop-blur-lg px-3 md:px-4 md:h-14">
+    <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-border bg-background/90 backdrop-blur-lg px-3 md:px-4 md:h-14">
       <div className="flex items-center gap-2">
         {!isMobile && <SidebarTrigger className="mr-1" />}
         <div className="flex items-center gap-1.5">
-           <img src={abbaLogo} alt="AbbaVideo" className="h-6 w-6" />
+           <img src={abbaLogo} alt="AbbaVideo" className="h-6 w-6 theme-logo" />
           <span className="text-sm font-sans font-bold tracking-tight">
-            Abba<span className="text-primary">Video</span>
+            Abba<span className="text-foreground">Video</span>
           </span>
         </div>
       </div>
 
       <div className="flex items-center gap-0.5">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 glass-micro rounded-full"
+          aria-label="Alternar tema"
+          onClick={toggleTheme}
+        >
+          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </Button>
         {!isPreviewMode && (
           <div className="glass-micro rounded-full">
             <NotificationBell />
@@ -185,7 +197,7 @@ const DashboardSidebar = ({
   const collapsed = state === 'collapsed';
 
   return (
-    <Sidebar collapsible="icon" className="bg-abba-dark border-r border-abba-surface">
+    <Sidebar collapsible="icon" className="bg-background border-r border-border">
       <SidebarContent className="pt-2">
         <SidebarGroup>
           <SidebarGroupContent>
@@ -196,10 +208,10 @@ const DashboardSidebar = ({
                     onClick={() => onTabChange(item.id, item.locked)}
                     className={`cursor-pointer relative rounded-xl ${
                       activeTab === item.id
-                        ? 'bg-abba-surface text-abba-lime font-semibold'
+                        ? 'bg-secondary text-primary font-semibold'
                         : item.locked
-                        ? 'text-white/30 hover:text-white/50 cursor-default'
-                        : 'text-white/60 hover:bg-abba-surface/60'
+                        ? 'text-muted-foreground/50 hover:text-muted-foreground/70 cursor-default'
+                        : 'text-muted-foreground hover:bg-secondary/60'
                     }`}
                   >
                     <item.icon className="h-4 w-4" />
@@ -207,7 +219,7 @@ const DashboardSidebar = ({
                       <span className="flex-1 font-sans">{item.label}</span>
                     )}
                     {!collapsed && item.locked && (
-                      <Lock className="h-3 w-3 text-white/30 shrink-0" />
+                      <Lock className="h-3 w-3 text-muted-foreground/50 shrink-0" />
                     )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -217,12 +229,12 @@ const DashboardSidebar = ({
         </SidebarGroup>
       </SidebarContent>
       {!collapsed && userProject && userProject.client_type === 'custom' && (
-        <div className="mt-auto p-2 border-t border-abba-surface">
+        <div className="mt-auto p-2 border-t border-border">
           <QuotaCard userProject={userProject} />
         </div>
       )}
       {!collapsed && userProject && (userProject.client_type === 'subscription' || userProject.client_type === 'influencer') && (
-        <div className="mt-auto p-2 border-t border-abba-surface space-y-2">
+        <div className="mt-auto p-2 border-t border-border space-y-2">
           {userProject.status === 'trialing' && (
             <TrialBanner
               trialEndDate={userProject.current_period_end}
@@ -247,7 +259,7 @@ const MobileBottomNav = ({
   onTabChange: (t: DashboardTab, locked?: boolean) => void;
   navItems: NavItem[];
 }) => (
-  <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-abba-surface bg-abba-dark/95 backdrop-blur-lg safe-area-bottom">
+  <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur-lg safe-area-bottom">
     <div className="flex items-stretch">
       {navItems.map((item) => {
         const isActive = activeTab === item.id;
@@ -258,23 +270,23 @@ const MobileBottomNav = ({
             {...(item.id === 'calendar' ? { 'data-tour': 'nav-calendar' } : {})}
             className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors min-h-[56px] ${
               isActive
-                ? 'text-abba-lime'
+                ? 'text-primary'
                 : item.locked
-                ? 'text-white/20'
+                ? 'text-muted-foreground/40'
                 : 'text-muted-foreground active:text-foreground'
             }`}
           >
             <div className="relative">
               <item.icon className="h-5 w-5" />
               {item.locked && (
-                <Lock className="h-2.5 w-2.5 absolute -top-1 -right-1 text-white/40" />
+                <Lock className="h-2.5 w-2.5 absolute -top-1 -right-1 text-muted-foreground" />
               )}
             </div>
             <span className="text-[10px] font-sans font-semibold tracking-wider leading-none">
               {item.shortLabel}
             </span>
             {isActive && (
-              <div className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1 w-6 rounded-full bg-abba-lime" />
+              <div className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1 w-6 rounded-full bg-primary" />
             )}
           </button>
         );
@@ -415,14 +427,14 @@ const DashboardLayout = ({ isPreviewMode, previewUserProject, previewDeliveries 
       {/* Upsell overlay for locked tabs */}
       {lockedTabAttempt && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-foreground/60 backdrop-blur-sm p-4"
           onClick={() => setLockedTabAttempt(null)}
         >
           <div
-            className="w-full max-w-sm rounded-[24px] bg-abba-surface p-6 space-y-4"
+            className="w-full max-w-sm rounded-[24px] bg-secondary p-6 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative overflow-hidden rounded-[16px] bg-abba-lime p-5 text-abba-dark">
+            <div className="relative overflow-hidden rounded-[16px] bg-primary p-5 text-primary-foreground">
               <div
                 className="absolute right-[-20px] top-[-20px] w-24 h-24 rounded-full border-[16px] border-black/10"
                 style={{ boxShadow: '0 0 0 14px rgba(0,0,0,0.06), 0 0 0 30px rgba(0,0,0,0.03)' }}
@@ -437,20 +449,20 @@ const DashboardLayout = ({ isPreviewMode, previewUserProject, previewDeliveries 
               </p>
             </div>
 
-            <p className="text-[13px] text-white/60 leading-relaxed">
+            <p className="text-[13px] text-muted-foreground leading-relaxed">
               Com um plano de assinatura você envia o bruto, a gente edita e entrega seus Reels, Shorts e TikToks toda semana — com SLA garantido.
             </p>
 
             <div className="space-y-2">
               <button
                 onClick={() => window.open('/', '_blank')}
-                className="w-full bg-abba-lime text-abba-dark font-bold rounded-full py-3 text-sm hover:opacity-90 transition-colors"
+                className="w-full bg-primary text-primary-foreground font-bold rounded-full py-3 text-sm hover:opacity-90 transition-colors"
               >
                 Ver planos de assinatura →
               </button>
               <button
                 onClick={() => setLockedTabAttempt(null)}
-                className="w-full text-white/40 text-sm py-2 hover:text-white/60 transition-colors"
+                className="w-full text-muted-foreground text-sm py-2 hover:text-muted-foreground transition-colors"
               >
                 Agora não
               </button>

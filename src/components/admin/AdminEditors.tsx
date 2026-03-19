@@ -56,13 +56,13 @@ const AdminEditors = () => {
     const { data: allDeliveries } = await supabase
       .from('deliveries')
       .select('editor_id, status, due_date, delivered_at')
-      .in('editor_id', editorsList.map((e: any) => e.id));
+      .in('editor_id', editorsList.map((e) => e.id));
 
-    const cards: EditorCard[] = editorsList.map((e: any) => {
-      const mine = (allDeliveries || []).filter((d: any) => d.editor_id === e.id);
-      const active = mine.filter((d: any) => ['pending', 'in_progress', 'revision'].includes(d.status)).length;
-      const completed = mine.filter((d: any) => d.status === 'approved');
-      const onTime = completed.filter((d: any) => {
+    const cards: EditorCard[] = editorsList.map((e) => {
+      const mine = (allDeliveries || []).filter((d) => d.editor_id === e.id);
+      const active = mine.filter((d) => ['pending', 'in_progress', 'revision'].includes(d.status)).length;
+      const completed = mine.filter((d) => d.status === 'approved');
+      const onTime = completed.filter((d) => {
         if (!d.due_date || !d.delivered_at) return true;
         return new Date(d.delivered_at) <= new Date(d.due_date);
       }).length;
@@ -96,36 +96,26 @@ const AdminEditors = () => {
     setCreating(true);
 
     try {
-      // Create auth user via edge function or admin API
-      // Since we can't use admin API directly from client, we'll use signUp
-      // and create the editor record
-      const tempPassword = `Editor_${Date.now()}!`;
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: result.data.email,
-        password: tempPassword,
-        options: {
-          data: { full_name: result.data.name },
+      // WARNING: supabase.auth.signUp() from the client will HIJACK the current admin session.
+      // This is a known Supabase limitation — the newly created user becomes the authenticated user.
+      // Use the `create-editor` edge function instead, which uses the service role key server-side
+      // to create the user without affecting the admin session.
+      // See: supabase/functions/create-editor/index.ts
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      if (!token) throw new Error('Sessão admin não encontrada');
+
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('create-editor', {
+        body: {
+          name: result.data.name,
+          email: result.data.email,
+          password: `Editor_${Date.now()}!`,
         },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (authError) throw authError;
-      if (!authData.user) throw new Error('Falha ao criar usuário');
-
-      // Note: The handle_new_user trigger creates profile + client role
-      // We need to add editor role and create editor record
-      // Since we're admin, we can insert into user_roles and editors
-      const userId = authData.user.id;
-
-      await supabase
-        .from('user_roles')
-        .insert({ user_id: userId, role: 'editor' });
-
-      await supabase
-        .from('editors')
-        .insert({
-          user_id: userId,
-          display_name: result.data.name,
-        });
+      if (fnError) throw new Error(fnError.message || 'Erro ao criar editor');
+      if (fnData?.error) throw new Error(fnData.error);
 
       toast.success('Editor criado com sucesso!', {
         description: `${result.data.name} receberá um email para confirmar a conta.`,
@@ -135,8 +125,9 @@ const AdminEditors = () => {
       setName('');
       setEmail('');
       fetchEditors();
-    } catch (err: any) {
-      toast.error(err.message || 'Erro ao criar editor');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro ao criar editor';
+      toast.error(message);
     } finally {
       setCreating(false);
     }
@@ -144,19 +135,31 @@ const AdminEditors = () => {
 
   const handleDeleteEditor = async () => {
     if (!editorToDelete) return;
-    // Desatribuir entregas ativas
-    await supabase
-      .from('deliveries')
-      .update({ editor_id: null })
-      .eq('editor_id', editorToDelete.id)
-      .in('status', ['pending', 'in_progress', 'revision']);
-    // Remover editor
-    await supabase.from('editors').delete().eq('id', editorToDelete.id);
-    // Remover role
-    await supabase.from('user_roles').delete().eq('user_id', editorToDelete.user_id);
-    toast.success('Editor removido. Entregas ativas foram desatribuídas.');
-    setEditorToDelete(null);
-    fetchEditors();
+    try {
+      // Desatribuir entregas ativas
+      const { error: unassignError } = await supabase
+        .from('deliveries')
+        .update({ editor_id: null })
+        .eq('editor_id', editorToDelete.id)
+        .in('status', ['pending', 'in_progress', 'revision']);
+      if (unassignError) throw new Error(`Erro ao desatribuir entregas: ${unassignError.message}`);
+
+      // Remover editor
+      const { error: deleteEditorError } = await supabase.from('editors').delete().eq('id', editorToDelete.id);
+      if (deleteEditorError) throw new Error(`Erro ao remover editor: ${deleteEditorError.message}`);
+
+      // Remover role
+      const { error: deleteRoleError } = await supabase.from('user_roles').delete().eq('user_id', editorToDelete.user_id);
+      if (deleteRoleError) throw new Error(`Erro ao remover permissões: ${deleteRoleError.message}`);
+
+      toast.success('Editor removido. Entregas ativas foram desatribuídas.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro ao remover editor';
+      toast.error(message);
+    } finally {
+      setEditorToDelete(null);
+      fetchEditors();
+    }
   };
 
   if (loading) {

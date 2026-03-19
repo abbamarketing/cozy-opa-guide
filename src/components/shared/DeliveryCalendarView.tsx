@@ -99,17 +99,17 @@ const DeliveryCalendarView = ({ deliveries, onSelect }: DeliveryCalendarViewProp
             type="single"
             value={mode}
             onValueChange={(v) => { if (v) setMode(v as CalendarMode); }}
-            className="border border-white/8 rounded-full p-0.5 bg-abba-surface/60"
+            className="border border-border rounded-full p-0.5 bg-secondary/60"
           >
             <ToggleGroupItem
               value="month"
-              className="h-6 px-2 rounded-full text-[10px] data-[state=on]:bg-abba-lime data-[state=on]:text-abba-dark"
+              className="h-6 px-2 rounded-full text-[10px] data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
             >
               Mês
             </ToggleGroupItem>
             <ToggleGroupItem
               value="week"
-              className="h-6 px-2 rounded-full text-[10px] data-[state=on]:bg-abba-lime data-[state=on]:text-abba-dark"
+              className="h-6 px-2 rounded-full text-[10px] data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
             >
               Semana
             </ToggleGroupItem>
@@ -118,9 +118,9 @@ const DeliveryCalendarView = ({ deliveries, onSelect }: DeliveryCalendarViewProp
       </div>
 
       {/* Grid */}
-      <div className="rounded-[20px] bg-abba-surface/40 border border-white/6 overflow-hidden">
+      <div className="rounded-[20px] bg-secondary/40 border border-border overflow-hidden">
         {/* Weekday headers */}
-        <div className="grid grid-cols-7 border-b border-white/6">
+        <div className="grid grid-cols-7 border-b border-border">
           {WEEKDAYS.map((wd) => (
             <div key={wd} className="py-2 text-center text-[10px] uppercase tracking-widest font-semibold text-muted-foreground">
               {wd}
@@ -139,9 +139,9 @@ const DeliveryCalendarView = ({ deliveries, onSelect }: DeliveryCalendarViewProp
             return (
               <div
                 key={key}
-                className={`min-h-[80px] md:min-h-[100px] border-b border-r border-white/6 p-1 transition-colors ${
+                className={`min-h-[80px] md:min-h-[100px] border-b border-r border-border p-1 transition-colors ${
                   !isCurrentMonth && mode === 'month' ? 'opacity-30' : ''
-                } ${isToday ? 'bg-primary/5' : 'hover:bg-white/[0.02]'}`}
+                } ${isToday ? 'bg-primary/5' : 'hover:bg-foreground/[0.02]'}`}
               >
                 {/* Day number */}
                 <div className="flex items-center justify-between px-0.5 mb-0.5">

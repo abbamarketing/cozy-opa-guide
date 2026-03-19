@@ -115,15 +115,15 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
       reset({
         project_name: editingProject.project_name,
         description: editingProject.description || '',
-        custom_slug: (editingProject as any).custom_slug || '',
+        custom_slug: (editingProject as unknown as Record<string, unknown>).custom_slug as string || '',
         youtube_videos: editingProject.youtube_videos,
         instagram_videos: editingProject.instagram_videos,
         include_thumbnails: editingProject.include_thumbnails,
         include_covers: editingProject.include_covers,
         include_script: editingProject.include_script,
         include_capture: editingProject.include_capture,
-        capture_lead_days: (editingProject as any).capture_lead_days || 30,
-        max_captures: (editingProject as any).max_captures || 1,
+        capture_lead_days: (editingProject as unknown as Record<string, unknown>).capture_lead_days as number || 30,
+        max_captures: (editingProject as unknown as Record<string, unknown>).max_captures as number || 1,
         monthly_value: Number(editingProject.monthly_value),
         payment_frequency: editingProject.payment_frequency,
         max_revisions: editingProject.max_revisions,
@@ -137,7 +137,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
         .order('sort_order')
         .then(({ data }) => {
           if (data) {
-            setSubtaskTemplates(data.map((t: any) => ({
+            setSubtaskTemplates(data.map((t) => ({
               id: t.id,
               name: t.name,
               delivery_types: t.delivery_types || [],
@@ -170,6 +170,7 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
         requires_approval: t.requires_approval,
         is_active: t.is_active,
       }));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic insert payload
       await supabase.from('project_subtask_templates').insert(inserts as any);
     }
   };
@@ -192,11 +193,13 @@ const ProjectCreatorModal = ({ open, onClose, onSaved, editingProject, clientCou
       const { created_by, ...updatePayload } = payload;
       ({ error } = await supabase
         .from('custom_projects')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic update payload
         .update(updatePayload as any)
         .eq('id', editingProject!.id));
     } else {
       const { data: inserted, error: insertError } = await supabase
         .from('custom_projects')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic insert payload
         .insert(payload as any)
         .select('id')
         .single();

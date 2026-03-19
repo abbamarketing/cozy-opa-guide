@@ -114,13 +114,13 @@ function KanbanColumnComponent<T extends { id: string; status: string }>({
   return (
     <div
       className={cn(
-'flex flex-col rounded-[20px] bg-abba-surface/40 border p-2 shrink-0 transition-colors overflow-hidden',
+'flex flex-col rounded-[20px] bg-secondary/40 border p-2 shrink-0 transition-colors overflow-hidden',
         isMobile
           ? 'w-[85vw] min-w-[85vw] snap-start'
           : 'min-w-[280px] max-w-[320px]',
         isOver
           ? 'border-primary/50 bg-primary/5'
-          : 'border-white/6'
+          : 'border-border'
       )}
     >
       <div className="mb-2 px-1">

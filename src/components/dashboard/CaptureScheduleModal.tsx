@@ -138,6 +138,7 @@ const CaptureScheduleModal = ({
         address: address.trim() || null,
         notes: notes.trim() || null,
         created_by: user.id,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic insert payload
       } as any);
 
       if (error) throw error;
@@ -147,8 +148,9 @@ const CaptureScheduleModal = ({
       onOpenChange(false);
       resetForm();
       onScheduled();
-    } catch (err: any) {
-      toast.error(err.message || 'Erro ao agendar captação');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro ao agendar captação';
+      toast.error(message);
     } finally {
       setSaving(false);
     }

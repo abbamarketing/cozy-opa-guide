@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 import { useDeliveries } from '@/hooks/useDeliveries';
+import type { UserProjectData } from '@/hooks/useUserProject';
 import {
   Dialog,
   DialogContent,
@@ -43,7 +44,7 @@ interface DeliveryDetailModalProps {
   onOpenChange: (open: boolean) => void;
   delivery: DeliveryData | null;
   onUpdated: () => void;
-  userProject?: any;
+  userProject?: UserProjectData | null;
 }
 
 interface RevisionRecord {
@@ -115,13 +116,22 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
 
       // Notificação para o editor
       if (delivery.editor_id) {
-        await supabase.from('notifications').insert({
-          user_id: delivery.editor_id,
-          type: 'delivery_approved',
-          title: 'Entrega aprovada',
-          message: `"${delivery.title}" foi aprovada pelo cliente.`,
-          link: '/editor',
-        });
+        // editor_id references editors.id (PK), need editors.user_id for notifications
+        const { data: editorRow } = await supabase
+          .from('editors')
+          .select('user_id')
+          .eq('id', delivery.editor_id)
+          .single();
+
+        if (editorRow?.user_id) {
+          await supabase.from('notifications').insert({
+            user_id: editorRow.user_id,
+            type: 'delivery_approved',
+            title: 'Entrega aprovada',
+            message: `"${delivery.title}" foi aprovada pelo cliente.`,
+            link: '/editor',
+          });
+        }
       }
 
       logger.info('Entrega aprovada', { delivery_id: delivery.id, title: delivery.title }, 'delivery');
@@ -131,8 +141,9 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
         onOpenChange(false);
         onUpdated();
       }, 2000);
-    } catch (err: any) {
-      toast.error(err.message || 'Erro ao aprovar');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro ao aprovar';
+      toast.error(message);
     } finally {
       setIsApproving(false);
     }
@@ -303,7 +314,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
                             <span>
                               {format(new Date(rev.created_at), "dd/MM 'às' HH:mm", { locale: ptBR })}
                             </span>
-                            {(rev as any).category && (() => {
+                            {(rev as Record<string, unknown>).category && (() => {
                               const catMap: Record<string, { icon: typeof Volume2; label: string }> = {
                                 audio: { icon: Volume2, label: 'Áudio' },
                                 visual: { icon: Palette, label: 'Visual' },
@@ -312,7 +323,7 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
                                 ritmo: { icon: Timer, label: 'Ritmo' },
                                 outro: { icon: Pin, label: 'Outro' },
                               };
-                              const cat = catMap[(rev as any).category];
+                              const cat = catMap[(rev as Record<string, unknown>).category as string];
                               if (!cat) return null;
                               const CatIcon = cat.icon;
                               return (

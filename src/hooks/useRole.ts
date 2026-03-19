@@ -10,6 +10,8 @@ export function useRole() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     if (isAuthLoading) return;
 
     if (!user?.id) {
@@ -25,6 +27,8 @@ export function useRole() {
         .select('role')
         .eq('user_id', user.id);
 
+      if (cancelled) return;
+
       if (!error && data) {
         setRoles(data.map(r => r.role as AppRole));
       }
@@ -32,6 +36,7 @@ export function useRole() {
     };
 
     fetchRoles();
+    return () => { cancelled = true; };
   }, [user?.id, isAuthLoading]);
 
   const isGod = () => roles.includes('god');

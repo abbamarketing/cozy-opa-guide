@@ -34,9 +34,10 @@ export function SlaCountdown({ slaDeadline, slaHours }: SlaCountdownProps) {
     };
 
     update();
-    const interval = setInterval(update, 60_000);
+    const intervalMs = (urgency === 'blink' || urgency === 'red') ? 10_000 : 60_000;
+    const interval = setInterval(update, intervalMs);
     return () => clearInterval(interval);
-  }, [slaDeadline, slaHours]);
+  }, [slaDeadline, slaHours, urgency]);
 
   const colorMap = {
     green: 'text-emerald-600',

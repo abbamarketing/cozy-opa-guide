@@ -56,11 +56,11 @@ export function AffiliateStats() {
     ? `${window.location.origin}/?ref=${affiliateCode.code}`
     : null;
 
-  const totalEarningsCents = commissions.reduce((sum: number, c: any) => sum + (c.amount_cents ?? 0), 0);
+  const totalEarningsCents = commissions.reduce((sum: number, c) => sum + (c.amount_cents ?? 0), 0);
   const pendingCents = commissions
-    .filter((c: any) => c.status === 'pending')
-    .reduce((sum: number, c: any) => sum + (c.amount_cents ?? 0), 0);
-  const activeReferrals = referrals.filter((r: any) => r.status === 'active').length;
+    .filter((c) => c.status === 'pending')
+    .reduce((sum: number, c) => sum + (c.amount_cents ?? 0), 0);
+  const activeReferrals = referrals.filter((r) => r.status === 'active').length;
 
   const copyLink = async () => {
     if (!referralLink) return;
@@ -138,7 +138,7 @@ export function AffiliateStats() {
         <Card className="p-4 space-y-3">
           <p className="text-sm font-semibold text-foreground">Histórico</p>
           <div className="space-y-2">
-            {commissions.map((c: any) => (
+            {commissions.map((c) => (
               <div key={c.id} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
                 <span className="text-sm text-muted-foreground capitalize">
                   {new Date(c.month).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}

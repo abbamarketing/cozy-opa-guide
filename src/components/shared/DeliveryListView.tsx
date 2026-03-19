@@ -111,6 +111,7 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoadingCl
       return sortDir === 'asc' ? cmp : -cmp;
     });
     return arr;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- getPersonName is stable and derived from props
   }, [deliveries, sortField, sortDir, clientNames]);
 
   const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
@@ -118,10 +119,10 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoadingCl
 
   if (isLoading) {
     return (
-      <div className="rounded-[20px] bg-abba-surface/40 border border-white/6 overflow-hidden">
+      <div className="rounded-[20px] bg-secondary/40 border border-border overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="border-white/6 hover:bg-transparent">
+            <TableRow className="border-border hover:bg-transparent">
               {['Título', 'Tipo', 'Status', personLabel, 'Prazo SLA'].map((h) => (
                 <TableHead key={h}><span className="text-[10px] uppercase tracking-widest font-semibold">{h}</span></TableHead>
               ))}
@@ -129,7 +130,7 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoadingCl
           </TableHeader>
           <TableBody>
             {[1, 2, 3, 4, 5].map((i) => (
-              <TableRow key={i} className="border-white/6">
+              <TableRow key={i} className="border-border">
                 <TableCell><Skeleton className="h-4 w-3/4" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-16" /></TableCell>
                 <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
@@ -145,7 +146,7 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoadingCl
 
   if (deliveries.length === 0) {
     return (
-      <div className="rounded-[20px] bg-abba-surface/40 border border-white/6 p-8 text-center">
+      <div className="rounded-[20px] bg-secondary/40 border border-border p-8 text-center">
         <Video className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
         <p className="text-xs text-muted-foreground">Nenhuma entrega encontrada</p>
       </div>
@@ -154,10 +155,10 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoadingCl
 
   return (
     <div className="space-y-3">
-      <div className="rounded-[20px] bg-abba-surface/40 border border-white/6 overflow-hidden">
+      <div className="rounded-[20px] bg-secondary/40 border border-border overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="border-white/6 hover:bg-transparent">
+            <TableRow className="border-border hover:bg-transparent">
               <TableHead className="cursor-pointer select-none" onClick={() => handleSort('title')}>
                 <span className="flex items-center gap-1 text-[10px] uppercase tracking-widest font-semibold">
                   Título <SortIcon field="title" sortField={sortField} sortDir={sortDir} />
@@ -197,7 +198,7 @@ const DeliveryListView = ({ deliveries, onSelect, role, clientNames, isLoadingCl
                 <TableRow
                   key={d.id}
                   onClick={() => onSelect(d)}
-                  className="cursor-pointer border-white/6 hover:bg-white/[0.03] transition-colors"
+                  className="cursor-pointer border-border hover:bg-foreground/[0.03] transition-colors"
                 >
                   <TableCell>
                     <div className="flex items-center gap-2 min-w-0">

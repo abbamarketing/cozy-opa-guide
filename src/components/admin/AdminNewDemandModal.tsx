@@ -70,23 +70,23 @@ const AdminNewDemandModal = ({ open, onOpenChange, onCreated }: AdminNewDemandMo
       supabase.from('editors').select('id, display_name, user_id').eq('status', 'available'),
     ]).then(async ([upRes, edRes]) => {
       const userProjects = upRes.data || [];
-      const userIds = [...new Set(userProjects.map((up: any) => up.user_id))];
+      const userIds = [...new Set(userProjects.map((up) => up.user_id))];
       let profileMap = new Map<string, string>();
       if (userIds.length > 0) {
         const { data: profiles } = await supabase
           .from('profiles')
           .select('user_id, full_name')
           .in('user_id', userIds);
-        profileMap = new Map((profiles || []).map((p: any) => [p.user_id, p.full_name || 'Sem nome']));
+        profileMap = new Map((profiles || []).map((p) => [p.user_id, p.full_name || 'Sem nome']));
       }
       setClients(
-        userProjects.map((up: any) => ({
+        userProjects.map((up) => ({
           user_project_id: up.id,
           user_id: up.user_id,
           full_name: profileMap.get(up.user_id) || 'Sem nome',
         }))
       );
-      setEditors((edRes.data || []).map((e: any) => ({ id: e.id, display_name: e.display_name })));
+      setEditors((edRes.data || []).map((e) => ({ id: e.id, display_name: e.display_name })));
       setLoadingOptions(false);
     });
   }, [open]);
@@ -120,10 +120,10 @@ const AdminNewDemandModal = ({ open, onOpenChange, onCreated }: AdminNewDemandMo
 
     const { error } = await supabase.from('deliveries').insert({
       title: title.trim(),
-      delivery_type: deliveryType as any,
+      delivery_type: deliveryType,
       user_project_id: clientId,
       editor_id: editorId,
-      status: 'in_progress' as any,
+      status: 'in_progress',
       due_date: dueDate.toISOString(),
       sla_deadline: dueDate.toISOString(),
       description: description.trim(),
@@ -138,24 +138,29 @@ const AdminNewDemandModal = ({ open, onOpenChange, onCreated }: AdminNewDemandMo
       return;
     }
 
-    // Notify editor
-    const editor = editors.find((e) => e.id === editorId);
-    await supabase.from('notifications').insert({
-      user_id: (await supabase.from('editors').select('user_id').eq('id', editorId).single()).data?.user_id || '',
-      type: 'new_assignment',
-      title: 'Nova Demanda Admin',
-      message: `Nova demanda atribuída pelo admin: "${title.trim()}"`,
-      link: '/editor',
-    });
+    // Notify editor — guard against empty user_id to avoid inserting invalid UUID
+    const editorRes = await supabase.from('editors').select('user_id').eq('id', editorId).single();
+    const editorUserId = editorRes.data?.user_id;
+    if (editorUserId?.trim()?.length) {
+      await supabase.from('notifications').insert({
+        user_id: editorUserId,
+        type: 'new_assignment',
+        title: 'Nova Demanda Admin',
+        message: `Nova demanda atribuída pelo admin: "${title.trim()}"`,
+        link: '/editor',
+      });
+    }
 
-    // Notify client
-    await supabase.from('notifications').insert({
-      user_id: client.user_id,
-      type: 'delivery_ready',
-      title: 'Nova Entrega Iniciada',
-      message: `Uma nova entrega foi iniciada para você: "${title.trim()}"`,
-      link: '/dashboard',
-    });
+    // Notify client — guard against empty user_id
+    if (client.user_id?.trim()?.length) {
+      await supabase.from('notifications').insert({
+        user_id: client.user_id,
+        type: 'delivery_ready',
+        title: 'Nova Entrega Iniciada',
+        message: `Uma nova entrega foi iniciada para você: "${title.trim()}"`,
+        link: '/dashboard',
+      });
+    }
 
     toast.success('Demanda criada com sucesso');
     reset();

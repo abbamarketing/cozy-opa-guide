@@ -33,8 +33,8 @@ const AdminCommissions = () => {
       if (error) throw error;
 
       // Fetch profile names for each unique user_id
-      const userIds = [...new Set((data ?? []).map((c: any) => c.affiliate_codes?.user_id).filter(Boolean))];
-      
+      const userIds = [...new Set((data ?? []).map((c) => (c.affiliate_codes as { code: string; user_id: string } | null)?.user_id).filter(Boolean))];
+
       let profileMap: Record<string, string> = {};
       if (userIds.length > 0) {
         const { data: profiles } = await supabase
@@ -47,32 +47,35 @@ const AdminCommissions = () => {
         }
       }
 
-      return (data ?? []).map((c: any) => ({
-        ...c,
-        influencer_name: profileMap[c.affiliate_codes?.user_id] || 'Desconhecido',
-        affiliate_code: c.affiliate_codes?.code || '—',
-      }));
+      return (data ?? []).map((c) => {
+        const codes = c.affiliate_codes as { code: string; user_id: string } | null;
+        return {
+          ...c,
+          influencer_name: profileMap[codes?.user_id ?? ''] || 'Desconhecido',
+          affiliate_code: codes?.code || '—',
+        };
+      });
     },
   });
 
-  const filtered = commissions.filter((c: any) => {
+  const filtered = commissions.filter((c) => {
     if (statusFilter === 'all') return true;
     return c.status === statusFilter;
   });
 
   const totalPending = commissions
-    .filter((c: any) => c.status === 'pending')
-    .reduce((sum: number, c: any) => sum + (c.amount_cents ?? 0), 0);
+    .filter((c) => c.status === 'pending')
+    .reduce((sum: number, c) => sum + (Number(c.amount_cents) || 0), 0);
 
   const totalPaid = commissions
-    .filter((c: any) => c.status === 'paid')
-    .reduce((sum: number, c: any) => sum + (c.amount_cents ?? 0), 0);
+    .filter((c) => c.status === 'paid')
+    .reduce((sum: number, c) => sum + (Number(c.amount_cents) || 0), 0);
 
   const markAsPaid = async (id: string) => {
     setPayingId(id);
     const { error } = await supabase
       .from('affiliate_commissions')
-      .update({ status: 'paid', paid_at: new Date().toISOString() } as any)
+      .update({ status: 'paid', paid_at: new Date().toISOString() })
       .eq('id', id);
 
     if (error) {
@@ -147,7 +150,7 @@ const AdminCommissions = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((c: any) => (
+              {filtered.map((c) => (
                 <TableRow key={c.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">

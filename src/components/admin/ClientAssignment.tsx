@@ -90,8 +90,8 @@ const ClientAssignment = () => {
           .from('custom_projects')
           .select('id, project_name');
 
-        const projectMap = new Map((allProjects || []).map((p: any) => [p.id, p.project_name]));
-        const upMap = new Map((userProjects || []).map((up: any) => [up.user_id, up]));
+        const projectMap = new Map((allProjects || []).map((p) => [p.id, p.project_name]));
+        const upMap = new Map((userProjects || []).map((up) => [up.user_id, up]));
 
         setActiveClients(assigned.map((a) => {
           const up = upMap.get(a.user_id);
@@ -137,7 +137,7 @@ const ClientAssignment = () => {
     // We need a custom_project_id — use the first active project as placeholder
     const placeholderProjectId = projects[0]?.id;
     if (!placeholderProjectId) {
-      toast.error('Nenhum projeto ativo encontrado para usar como base');
+      toast.error('Nenhum projeto ativo encontrado');
       setAssigning(false);
       return;
     }
@@ -158,7 +158,7 @@ const ClientAssignment = () => {
         instagram_reserved: 0, instagram_approved: 0,
         thumbnails_reserved: 0, thumbnails_approved: 0,
         covers_reserved: 0, covers_approved: 0,
-      } as any);
+      });
 
     if (insertError) {
       toast.error('Erro ao criar projeto influencer', { description: insertError.message });
@@ -168,7 +168,7 @@ const ClientAssignment = () => {
 
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({ assigned_project_id: placeholderProjectId } as any)
+      .update({ assigned_project_id: placeholderProjectId })
       .eq('user_id', selectedClient.user_id);
 
     if (updateError) {
@@ -209,7 +209,7 @@ const ClientAssignment = () => {
         instagram_approved: 0,
         thumbnails_approved: 0,
         covers_approved: 0,
-      } as any);
+      });
 
     if (insertError) {
       toast.error('Erro ao atribuir projeto', { description: insertError.message });
@@ -220,7 +220,7 @@ const ClientAssignment = () => {
     // 2. Update profile
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({ assigned_project_id: selectedProject.id } as any)
+      .update({ assigned_project_id: selectedProject.id })
       .eq('user_id', selectedClient.user_id);
 
     if (updateError) {

@@ -37,7 +37,7 @@ interface CalendarEvent {
   date: string; // yyyy-MM-dd
   type: 'delivery' | 'capture' | 'manual';
   color: string;
-  raw: any;
+  raw: Record<string, unknown>;
 }
 
 type ViewMode = 'month' | 'week' | 'day';
@@ -86,15 +86,13 @@ const AdminCalendar = () => {
   const [formEndTime, setFormEndTime] = useState('10:00');
   const [formNotes, setFormNotes] = useState('');
   const [formEditorId, setFormEditorId] = useState('');
-  const [formClientId, setFormClientId] = useState('');
   const [saving, setSaving] = useState(false);
 
   // Options
   const [editors, setEditors] = useState<{id: string; display_name: string}[]>([]);
-  const [clients, setClients] = useState<{user_id: string; full_name: string}[]>([]);
 
   // Editing
-  const [editingEvent, setEditingEvent] = useState<any>(null);
+  const [editingEvent, setEditingEvent] = useState<Record<string, unknown> | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -106,7 +104,7 @@ const AdminCalendar = () => {
 
     const mapped: CalendarEvent[] = [];
 
-    (delRes.data || []).forEach((d: any) => {
+    (delRes.data || []).forEach((d) => {
       if (!d.due_date) return;
       mapped.push({
         id: `del-${d.id}`,
@@ -119,15 +117,15 @@ const AdminCalendar = () => {
     });
 
     // Build a map of user_id -> full_name from profiles for capture sessions
-    const capUserIds = [...new Set((capRes.data || []).map((c: any) => c.user_projects?.user_id).filter(Boolean))];
-    let profileMap: Record<string, string> = {};
+    const capUserIds = [...new Set((capRes.data || []).map((c) => (c.user_projects as Record<string, unknown>)?.user_id as string).filter(Boolean))];
+    const profileMap: Record<string, string> = {};
     if (capUserIds.length > 0) {
       const { data: profs } = await supabase.from('profiles').select('user_id, full_name').in('user_id', capUserIds);
-      (profs || []).forEach((p: any) => { profileMap[p.user_id] = p.full_name || ''; });
+      (profs || []).forEach((p) => { profileMap[p.user_id] = p.full_name || ''; });
     }
 
-    (capRes.data || []).forEach((c: any) => {
-      const clientName = profileMap[c.user_projects?.user_id] || '';
+    (capRes.data || []).forEach((c) => {
+      const clientName = profileMap[(c.user_projects as Record<string, unknown>)?.user_id as string] || '';
       const locationLabel = c.location_name || 'Captação';
       const title = clientName ? `${clientName} — ${locationLabel}` : locationLabel;
       mapped.push({
@@ -140,7 +138,7 @@ const AdminCalendar = () => {
       });
     });
 
-    (manRes.data || []).forEach((m: any) => {
+    (manRes.data || []).forEach((m) => {
       mapped.push({
         id: `man-${m.id}`,
         title: m.title,
@@ -156,12 +154,8 @@ const AdminCalendar = () => {
   };
 
   const fetchOptions = async () => {
-    const [edRes, prRes] = await Promise.all([
-      supabase.from('editors').select('id, display_name').eq('status', 'available'),
-      supabase.from('profiles').select('user_id, full_name'),
-    ]);
-    setEditors(edRes.data || []);
-    setClients((prRes.data || []).filter((p: any) => p.full_name));
+    const { data } = await supabase.from('editors').select('id, display_name').eq('status', 'available');
+    setEditors(data || []);
   };
 
   useEffect(() => { fetchData(); fetchOptions(); }, []);
@@ -207,7 +201,7 @@ const AdminCalendar = () => {
   const resetForm = () => {
     setFormTitle(''); setFormType('gravacao'); setFormStartDate(undefined);
     setFormStartTime('09:00'); setFormEndTime('10:00');
-    setFormNotes(''); setFormEditorId(''); setFormClientId('');
+    setFormNotes(''); setFormEditorId('');
     setEditingEvent(null);
   };
 
@@ -216,24 +210,38 @@ const AdminCalendar = () => {
   const openEdit = (ev: CalendarEvent) => {
     if (ev.type !== 'manual') return;
     const r = ev.raw;
+
+    const parsedStart = r.starts_at ? new Date(r.starts_at) : null;
+    const parsedEnd = r.ends_at ? new Date(r.ends_at) : null;
+
+    if (!parsedStart || isNaN(parsedStart.getTime()) || !parsedEnd || isNaN(parsedEnd.getTime())) {
+      toast.error('Evento com datas inválidas — não é possível editar');
+      return;
+    }
+
     setFormTitle(r.title);
     setFormType(r.type || 'gravacao');
-    setFormStartDate(new Date(r.starts_at));
-    setFormStartTime(format(new Date(r.starts_at), 'HH:mm'));
-    setFormEndTime(format(new Date(r.ends_at), 'HH:mm'));
+    setFormStartDate(parsedStart);
+    setFormStartTime(format(parsedStart, 'HH:mm'));
+    setFormEndTime(format(parsedEnd, 'HH:mm'));
     setFormNotes(r.notes || '');
     setFormEditorId(r.related_editor_id || '');
-    setFormClientId(r.related_client_id || '');
     setEditingEvent(r);
     setCreateOpen(true);
   };
 
   const handleSave = async () => {
     if (!formTitle.trim() || !formStartDate) return;
-    setSaving(true);
 
     const startsAt = new Date(`${format(formStartDate, 'yyyy-MM-dd')}T${formStartTime}:00`);
     const endsAt = new Date(`${format(formStartDate, 'yyyy-MM-dd')}T${formEndTime}:00`);
+
+    if (endsAt <= startsAt) {
+      toast.error('Hora fim deve ser posterior à hora início');
+      return;
+    }
+
+    setSaving(true);
 
     const payload = {
       title: formTitle.trim(),
@@ -242,7 +250,7 @@ const AdminCalendar = () => {
       ends_at: endsAt.toISOString(),
       notes: formNotes.trim() || null,
       related_editor_id: formEditorId || null,
-      related_client_id: formClientId || null,
+      related_client_id: null,
       created_by: user?.id || '',
     };
 
@@ -297,13 +305,13 @@ const AdminCalendar = () => {
             type="single"
             value={mode}
             onValueChange={(v) => { if (v) setMode(v as ViewMode); }}
-            className="border border-white/8 rounded-full p-0.5 bg-abba-surface/60"
+            className="border border-border rounded-full p-0.5 bg-secondary/60"
           >
             {(['month', 'week', 'day'] as const).map((m) => (
               <ToggleGroupItem
                 key={m}
                 value={m}
-                className="h-6 px-2 rounded-full text-[10px] data-[state=on]:bg-abba-lime data-[state=on]:text-abba-dark"
+                className="h-6 px-2 rounded-full text-[10px] data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
               >
                 {m === 'month' ? 'Mês' : m === 'week' ? 'Semana' : 'Dia'}
               </ToggleGroupItem>
@@ -321,10 +329,10 @@ const AdminCalendar = () => {
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       ) : (
-        <div className="rounded-[20px] bg-abba-surface/40 border border-white/6 overflow-hidden">
+        <div className="rounded-[20px] bg-secondary/40 border border-border overflow-hidden">
           {/* Weekday headers (skip for day view) */}
           {mode !== 'day' && (
-            <div className="grid grid-cols-7 border-b border-white/6">
+            <div className="grid grid-cols-7 border-b border-border">
               {WEEKDAYS.map((wd) => (
                 <div key={wd} className="py-2 text-center text-[10px] uppercase tracking-widest font-semibold text-muted-foreground">
                   {wd}
@@ -346,10 +354,10 @@ const AdminCalendar = () => {
                 <div
                   key={key}
                   className={cn(
-                    'border-b border-r border-white/6 p-1.5 transition-colors',
+                    'border-b border-r border-border p-1.5 transition-colors',
                     mode === 'day' ? 'min-h-[300px]' : 'min-h-[80px] md:min-h-[100px]',
                     !isCurrentMonth && mode === 'month' ? 'opacity-30' : '',
-                    isToday ? 'bg-primary/5' : 'hover:bg-white/[0.02]',
+                    isToday ? 'bg-primary/5' : 'hover:bg-foreground/[0.02]',
                   )}
                 >
                   <div className="flex items-center justify-between px-0.5 mb-1">

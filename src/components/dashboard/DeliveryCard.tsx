@@ -110,14 +110,14 @@ const DeliveryCard = ({ delivery, onClick, clientType }: DeliveryCardProps) => {
   return (
     <div
       onClick={onClick}
-      className="cursor-pointer card-elevate rounded-[20px] bg-abba-surface border border-white/8 p-3 space-y-2 w-full max-w-full overflow-hidden"
+      className="cursor-pointer card-elevate rounded-[20px] bg-secondary border border-border p-3 space-y-2 w-full max-w-full overflow-hidden"
     >
       {/* Linha 1: ícone + título + status de fila */}
       <div className="flex items-start gap-2 min-w-0">
-        <Icon className="mt-0.5 h-4 w-4 shrink-0 text-abba-lime" />
+        <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
         <div className="min-w-0 flex-1 overflow-hidden">
           <p className="line-clamp-2 break-words text-sm font-sans font-semibold text-foreground">{delivery.title}</p>
-          <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-1.5 text-[11px] font-sans text-white/60">
+          <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-1.5 text-[11px] font-sans text-muted-foreground">
             <span>{displayLabel}</span>
             {delivery.editor_name && <span>· {delivery.editor_name}</span>}
             {delivery.status === 'queue' && (
@@ -138,18 +138,18 @@ const DeliveryCard = ({ delivery, onClick, clientType }: DeliveryCardProps) => {
             ) : (
               <Clock className={`h-3 w-3 ${sla.color}`} />
             )}
-            <span className="text-white/60">
+            <span className="text-muted-foreground">
               {format(new Date(delivery.due_date), "dd/MM HH'h'", { locale: ptBR })}
             </span>
             <span className={`ml-auto font-medium ${sla.color}`}>{sla.label}</span>
           </div>
 
-          <div className="h-[6px] w-full overflow-hidden rounded-full bg-white/5">
+          <div className="h-[6px] w-full overflow-hidden rounded-full bg-foreground/5">
             <div
               className="h-full rounded-full transition-all"
               style={{
                 width: `${sla.progressPercent}%`,
-                background: sla.level === 'danger' || sla.level === 'overdue' ? '#ef4444' : '#A0E870',
+                background: sla.level === 'danger' || sla.level === 'overdue' ? '#ef4444' : 'hsl(var(--primary))',
               }}
             />
           </div>
@@ -159,15 +159,15 @@ const DeliveryCard = ({ delivery, onClick, clientType }: DeliveryCardProps) => {
       {/* SLA para entrega concluída */}
       {delivery.due_date && isCompleted && (
         <div className="flex items-center gap-1.5 text-[11px] font-sans">
-          <Clock className="h-3 w-3 text-white/60" />
-          <span className="text-white/60">
+          <Clock className="h-3 w-3 text-muted-foreground" />
+          <span className="text-muted-foreground">
             {format(new Date(delivery.due_date), "dd/MM HH'h'", { locale: ptBR })}
           </span>
         </div>
       )}
 
       {/* Revisões */}
-      <p className="text-[11px] font-sans text-white/60">
+      <p className="text-[11px] font-sans text-muted-foreground">
         Revisões: {delivery.revision_count}/{delivery.max_revisions}
       </p>
     </div>

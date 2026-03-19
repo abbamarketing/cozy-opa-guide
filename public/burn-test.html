@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organic Transition</title>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#050505;overflow-x:hidden}
+.scroll{height:300vh}
+
+.hero{
+  position:fixed;top:0;left:0;width:100%;height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  background:#FBFBFA;color:#1D1D1F;z-index:5;
+  font-family:'Clash Display',system-ui;font-weight:600;
+  font-size:clamp(32px,6vw,64px);text-align:center;
+  line-height:.92;letter-spacing:-.04em;padding:20px;
+}
+
+/* The gooey container — this is the magic */
+.goo-wrap{
+  position:fixed;top:0;left:0;width:100%;height:100vh;
+  z-index:8;pointer-events:none;overflow:hidden;
+  filter:blur(30px) contrast(8);
+  background:#FBFBFA;
+  transition:opacity .4s;
+}
+
+/* Each blob — gradient circles that grow from bottom */
+.blob{
+  position:absolute;
+  border-radius:50%;
+  background:#050505;
+  transform:scale(0);
+  will-change:transform;
+}
+.blob.green{box-shadow:0 0 15px 8px #00DC82,0 0 40px 16px rgba(0,220,130,.4)}
+.blob.blue{box-shadow:0 0 15px 8px #32B4FF,0 0 40px 16px rgba(50,180,255,.4)}
+.blob.purple{box-shadow:0 0 15px 8px #9C6ADE,0 0 40px 16px rgba(156,106,222,.4)}
+.blob.magenta{box-shadow:0 0 15px 8px #E040FB,0 0 40px 16px rgba(224,64,251,.4)}
+.blob.pink{box-shadow:0 0 15px 8px #FF69B4,0 0 40px 16px rgba(255,105,180,.4)}
+.blob.coral{box-shadow:0 0 15px 8px #FF7B6B,0 0 40px 16px rgba(255,123,107,.4)}
+.blob.orange{box-shadow:0 0 15px 8px #FF8C42,0 0 40px 16px rgba(255,140,66,.4)}
+.blob.yellow{box-shadow:0 0 15px 8px #FFD43B,0 0 40px 16px rgba(255,212,59,.4)}
+}
+
+.dark{
+  position:fixed;top:0;left:0;width:100%;height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  z-index:1;color:#F5F5F7;
+  font-family:'Clash Display',system-ui;font-weight:600;
+  font-size:clamp(24px,4vw,40px);text-align:center;
+  letter-spacing:-.03em;opacity:0;transition:opacity .6s;
+}
+.dark.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="hero" id="hero">Seu vídeo editado<br>em 4 horas.</div>
+
+<div class="goo-wrap" id="goo">
+  <!-- Blobs at different positions along the bottom, varying sizes -->
+  <div class="blob green" style="width:35vw;height:35vw;bottom:-18vw;left:-5%"></div>
+  <div class="blob blue" style="width:28vw;height:28vw;bottom:-14vw;left:12%"></div>
+  <div class="blob purple" style="width:40vw;height:40vw;bottom:-20vw;left:25%"></div>
+  <div class="blob magenta" style="width:30vw;height:30vw;bottom:-15vw;left:40%"></div>
+  <div class="blob pink" style="width:45vw;height:45vw;bottom:-22vw;left:50%"></div>
+  <div class="blob coral" style="width:32vw;height:32vw;bottom:-16vw;left:65%"></div>
+  <div class="blob orange" style="width:38vw;height:38vw;bottom:-19vw;left:78%"></div>
+  <div class="blob yellow" style="width:34vw;height:34vw;bottom:-17vw;left:92%"></div>
+</div>
+
+<div class="dark" id="dark">Edição profissional era<br>cara, lenta e imprevisível.<br>Não mais.</div>
+
+<div class="scroll"></div>
+
+<script>
+const blobs = document.querySelectorAll('.blob');
+const goo = document.getElementById('goo');
+const hero = document.getElementById('hero');
+const dark = document.getElementById('dark');
+
+// Each blob grows at a different rate for organic feel
+const rates = [1.0, 1.3, 0.85, 1.15, 0.95, 1.25, 1.05, 0.9];
+
+window.addEventListener('scroll', () => {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const p = window.scrollY / max; // 0 to 1
+
+  blobs.forEach((blob, i) => {
+    // Stagger: each blob starts growing at slightly different scroll positions
+    const offset = i * 0.03;
+    const localP = Math.max(0, (p - offset) * 2.2) * rates[i];
+    const scale = Math.min(localP * 3, 4);
+    blob.style.transform = `scale(${scale})`;
+  });
+
+  // When blobs have fully covered — hide entire goo layer cleanly
+  if (p > 0.55) {
+    goo.style.opacity = '0';
+  } else {
+    goo.style.opacity = '1';
+  }
+
+  hero.style.opacity = Math.max(0, 1 - p * 4);
+  dark.classList.toggle('show', p > 0.35);
+}, { passive: true });
+</script>
+</body>
+</html>

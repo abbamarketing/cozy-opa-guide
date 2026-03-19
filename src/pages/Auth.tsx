@@ -36,8 +36,9 @@ const AuthPage = () => {
           description: (result.error as Error).message || 'Tente novamente.',
         });
       }
-    } catch (err: any) {
-      toast.error('Erro ao entrar', { description: err.message });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast.error('Erro ao entrar', { description: message });
     } finally {
       setLoading(false);
     }
@@ -61,7 +62,7 @@ const AuthPage = () => {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.1, duration: 0.4 }}
         >
-          <img src={abbaLogo} alt="AbbaVideo" className="h-12 w-12" />
+          <img src={abbaLogo} alt="AbbaVideo" className="h-12 w-12 theme-logo" />
           <div>
             <span className="text-2xl font-bold">
               Abba<span className="text-primary">Video</span>

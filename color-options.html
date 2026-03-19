@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AbbaVideo — Opções de cor</title>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Satoshi',sans-serif;background:#050505;color:#f2f2f2;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1{font-family:'Clash Display',sans-serif;font-weight:600;font-size:clamp(2rem,3vw,3rem);text-align:center;padding:6rem 2rem 1rem;letter-spacing:-.03em}
+.subtitle{text-align:center;font-size:1.3rem;color:rgba(255,255,255,.35);margin-bottom:4rem;padding:0 2rem}
+.grid{display:grid;grid-template-columns:1fr;gap:3rem;padding:0 2rem 6rem;max-width:1200px;margin:0 auto}
+@media(min-width:768px){.grid{grid-template-columns:1fr 1fr}}
+@media(min-width:1100px){.grid{grid-template-columns:1fr 1fr 1fr}}
+
+/* Each option card */
+.option{border-radius:1.6rem;overflow:hidden;border:1px solid rgba(255,255,255,.06);position:relative;cursor:pointer;transition:transform .4s cubic-bezier(.23,1,.32,1),box-shadow .4s}
+.option:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.option__preview{height:32rem;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+
+/* Heavy grain overlay on each preview */
+.option__preview::after{
+  content:'';position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;
+}
+
+.option__preview-text{position:relative;z-index:2;font-family:'Clash Display',sans-serif;font-weight:600;font-size:2.8rem;line-height:.95;text-align:center;letter-spacing:-.03em}
+.option__preview-sub{position:relative;z-index:2;font-size:1.2rem;margin-top:1.2rem;opacity:.6}
+.option__preview-btn{position:relative;z-index:2;margin-top:2rem;padding:.8rem 2rem;border-radius:10rem;font-weight:700;font-size:1.1rem;border:none;cursor:pointer;transition:transform .3s}
+.option__preview-btn:hover{transform:scale(1.05)}
+.option__preview-badge{position:relative;z-index:2;margin-bottom:1.6rem;font-size:.95rem;font-weight:600;padding:.4rem 1.2rem;border-radius:10rem}
+
+.option__info{padding:2rem;background:#0A0A0A}
+.option__name{font-family:'Clash Display',sans-serif;font-weight:600;font-size:1.6rem;margin-bottom:.6rem}
+.option__desc{font-size:1.2rem;color:rgba(255,255,255,.4);line-height:1.4}
+.option__colors{display:flex;gap:.6rem;margin-top:1.2rem}
+.option__swatch{width:2.4rem;height:2.4rem;border-radius:.6rem;border:1px solid rgba(255,255,255,.1)}
+
+/* ── OPTION A: Warm Amber/Gold ── */
+.opt-a .option__preview{background:radial-gradient(ellipse at 30% 40%,#3D2B10 0%,#1A1000 40%,#080500 100%)}
+.opt-a .option__preview-text{color:#F5C842}
+.opt-a .option__preview-badge{background:rgba(245,200,66,.1);color:#F5C842}
+.opt-a .option__preview-btn{background:linear-gradient(135deg,#F5C842,#E89A1E);color:#0A0500}
+.opt-a .option__preview::before{content:'';position:absolute;inset:0;z-index:1;background:radial-gradient(circle at 70% 60%,rgba(245,200,66,.12) 0%,transparent 60%)}
+
+/* ── OPTION B: Ice Blue / Silver ── */
+.opt-b .option__preview{background:radial-gradient(ellipse at 40% 30%,#0D1A2A 0%,#080E18 40%,#030508 100%)}
+.opt-b .option__preview-text{color:#A8C8E8}
+.opt-b .option__preview-badge{background:rgba(168,200,232,.08);color:#A8C8E8}
+.opt-b .option__preview-btn{background:linear-gradient(135deg,#A8C8E8,#6B8DB5);color:#050A10}
+.opt-b .option__preview::before{content:'';position:absolute;inset:0;z-index:1;background:radial-gradient(circle at 60% 70%,rgba(168,200,232,.08) 0%,transparent 50%)}
+
+/* ── OPTION C: Hot Pink Mono ── */
+.opt-c .option__preview{background:radial-gradient(ellipse at 50% 50%,#2A0A1A 0%,#140510 40%,#080208 100%)}
+.opt-c .option__preview-text{color:#FF4D8D}
+.opt-c .option__preview-badge{background:rgba(255,77,141,.08);color:#FF4D8D}
+.opt-c .option__preview-btn{background:linear-gradient(135deg,#FF4D8D,#CC2D6B);color:#0A0205}
+.opt-c .option__preview::before{content:'';position:absolute;inset:0;z-index:1;background:radial-gradient(circle at 40% 30%,rgba(255,77,141,.1) 0%,transparent 55%)}
+
+/* ── OPTION D: Copper / Bronze ── */
+.opt-d .option__preview{background:radial-gradient(ellipse at 35% 45%,#2A1A10 0%,#150C06 40%,#080400 100%)}
+.opt-d .option__preview-text{color:#D4906A}
+.opt-d .option__preview-badge{background:rgba(212,144,106,.08);color:#D4906A}
+.opt-d .option__preview-btn{background:linear-gradient(135deg,#D4906A,#A86840);color:#0A0500}
+.opt-d .option__preview::before{content:'';position:absolute;inset:0;z-index:1;background:radial-gradient(circle at 65% 55%,rgba(212,144,106,.1) 0%,transparent 55%)}
+
+/* ── OPTION E: Acid Lime ── */
+.opt-e .option__preview{background:radial-gradient(ellipse at 45% 35%,#0A1A08 0%,#060E04 40%,#020500 100%)}
+.opt-e .option__preview-text{color:#B8FF50}
+.opt-e .option__preview-badge{background:rgba(184,255,80,.06);color:#B8FF50}
+.opt-e .option__preview-btn{background:linear-gradient(135deg,#B8FF50,#7ACC20);color:#040800}
+.opt-e .option__preview::before{content:'';position:absolute;inset:0;z-index:1;background:radial-gradient(circle at 55% 65%,rgba(184,255,80,.08) 0%,transparent 50%)}
+
+/* ── OPTION F: Pure White Minimal ── */
+.opt-f .option__preview{background:#0A0A0A}
+.opt-f .option__preview-text{color:#FFFFFF}
+.opt-f .option__preview-badge{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6)}
+.opt-f .option__preview-btn{background:#FFFFFF;color:#050505}
+.opt-f .option__preview::before{content:'';position:absolute;inset:0;z-index:1;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.03) 0%,transparent 50%)}
+</style>
+</head>
+<body>
+
+<h1>Escolha a paleta de cor</h1>
+<p class="subtitle">Todas com efeito granulado pesado. Preto puro como base. Clique na que preferir.</p>
+
+<div class="grid">
+
+  <!-- A: Warm Amber -->
+  <div class="option opt-a">
+    <div class="option__preview">
+      <div class="option__preview-badge">SLA garantido</div>
+      <div class="option__preview-text">Seu vídeo pronto<br>em 4 horas.</div>
+      <div class="option__preview-sub">Fila ilimitada. Countdown em tempo real.</div>
+      <button class="option__preview-btn">R$490/mês — Começar</button>
+    </div>
+    <div class="option__info">
+      <div class="option__name">A — Warm Amber</div>
+      <div class="option__desc">Dourado quente com grain pesado. Luxo discreto, premium.</div>
+      <div class="option__colors">
+        <div class="option__swatch" style="background:#F5C842"></div>
+        <div class="option__swatch" style="background:#E89A1E"></div>
+        <div class="option__swatch" style="background:#3D2B10"></div>
+        <div class="option__swatch" style="background:#1A1000"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B: Ice Blue -->
+  <div class="option opt-b">
+    <div class="option__preview">
+      <div class="option__preview-badge">SLA garantido</div>
+      <div class="option__preview-text">Seu vídeo pronto<br>em 4 horas.</div>
+      <div class="option__preview-sub">Fila ilimitada. Countdown em tempo real.</div>
+      <button class="option__preview-btn">R$490/mês — Começar</button>
+    </div>
+    <div class="option__info">
+      <div class="option__name">B — Ice Blue</div>
+      <div class="option__desc">Azul gelado, metálico. Clean tech, profissional.</div>
+      <div class="option__colors">
+        <div class="option__swatch" style="background:#A8C8E8"></div>
+        <div class="option__swatch" style="background:#6B8DB5"></div>
+        <div class="option__swatch" style="background:#0D1A2A"></div>
+        <div class="option__swatch" style="background:#080E18"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C: Hot Pink -->
+  <div class="option opt-c">
+    <div class="option__preview">
+      <div class="option__preview-badge">SLA garantido</div>
+      <div class="option__preview-text">Seu vídeo pronto<br>em 4 horas.</div>
+      <div class="option__preview-sub">Fila ilimitada. Countdown em tempo real.</div>
+      <button class="option__preview-btn">R$490/mês — Começar</button>
+    </div>
+    <div class="option__info">
+      <div class="option__name">C — Hot Pink</div>
+      <div class="option__desc">Rosa vibrante com grain escuro. Energia e atitude.</div>
+      <div class="option__colors">
+        <div class="option__swatch" style="background:#FF4D8D"></div>
+        <div class="option__swatch" style="background:#CC2D6B"></div>
+        <div class="option__swatch" style="background:#2A0A1A"></div>
+        <div class="option__swatch" style="background:#140510"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- D: Copper -->
+  <div class="option opt-d">
+    <div class="option__preview">
+      <div class="option__preview-badge">SLA garantido</div>
+      <div class="option__preview-text">Seu vídeo pronto<br>em 4 horas.</div>
+      <div class="option__preview-sub">Fila ilimitada. Countdown em tempo real.</div>
+      <button class="option__preview-btn">R$490/mês — Começar</button>
+    </div>
+    <div class="option__info">
+      <div class="option__name">D — Copper</div>
+      <div class="option__desc">Cobre e bronze com textura. Orgânico, artesanal, quente.</div>
+      <div class="option__colors">
+        <div class="option__swatch" style="background:#D4906A"></div>
+        <div class="option__swatch" style="background:#A86840"></div>
+        <div class="option__swatch" style="background:#2A1A10"></div>
+        <div class="option__swatch" style="background:#150C06"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- E: Acid Lime -->
+  <div class="option opt-e">
+    <div class="option__preview">
+      <div class="option__preview-badge">SLA garantido</div>
+      <div class="option__preview-text">Seu vídeo pronto<br>em 4 horas.</div>
+      <div class="option__preview-sub">Fila ilimitada. Countdown em tempo real.</div>
+      <button class="option__preview-btn">R$490/mês — Começar</button>
+    </div>
+    <div class="option__info">
+      <div class="option__name">E — Acid Lime</div>
+      <div class="option__desc">Verde ácido com grain pesado. Cyberpunk, futurista.</div>
+      <div class="option__colors">
+        <div class="option__swatch" style="background:#B8FF50"></div>
+        <div class="option__swatch" style="background:#7ACC20"></div>
+        <div class="option__swatch" style="background:#0A1A08"></div>
+        <div class="option__swatch" style="background:#060E04"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- F: Pure White -->
+  <div class="option opt-f">
+    <div class="option__preview">
+      <div class="option__preview-badge">SLA garantido</div>
+      <div class="option__preview-text">Seu vídeo pronto<br>em 4 horas.</div>
+      <div class="option__preview-sub">Fila ilimitada. Countdown em tempo real.</div>
+      <button class="option__preview-btn">R$490/mês — Começar</button>
+    </div>
+    <div class="option__info">
+      <div class="option__name">F — Pure White</div>
+      <div class="option__desc">Branco puro no preto. Ultra minimalista. Sem distração.</div>
+      <div class="option__colors">
+        <div class="option__swatch" style="background:#FFFFFF"></div>
+        <div class="option__swatch" style="background:#999999"></div>
+        <div class="option__swatch" style="background:#1A1A1A"></div>
+        <div class="option__swatch" style="background:#0A0A0A"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

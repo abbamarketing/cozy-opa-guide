@@ -28,7 +28,7 @@ export default function ProtectedRoute({ requireRole }: ProtectedRouteProps) {
   if (requireRole && !isGod() && !hasRole(requireRole) && !hasRole('admin')) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-8">
-        <div className="bg-abba-surface p-8 rounded-[20px] max-w-md text-center">
+        <div className="bg-secondary p-8 rounded-[20px] max-w-md text-center">
           <h1 className="text-2xl font-bold text-destructive mb-4">
             Acesso Negado
           </h1>

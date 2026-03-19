@@ -39,6 +39,7 @@ const ProjectManager = () => {
     const { data, error } = await supabase
       .from('custom_projects')
       .select('*')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- deleted_at not in generated types
       .is('deleted_at' as any, null)
       .order('created_at', { ascending: false });
 
@@ -53,7 +54,7 @@ const ProjectManager = () => {
 
       if (userProjects) {
         const counts: Record<string, number> = {};
-        userProjects.forEach((up: any) => {
+        userProjects.forEach((up) => {
           counts[up.custom_project_id] = (counts[up.custom_project_id] || 0) + 1;
         });
         setClientCounts(counts);
@@ -67,6 +68,7 @@ const ProjectManager = () => {
   const handleToggleActive = async (project: CustomProject) => {
     const { error } = await supabase
       .from('custom_projects')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- active not in generated types
       .update({ active: !project.active } as any)
       .eq('id', project.id);
 
@@ -92,7 +94,7 @@ const ProjectManager = () => {
       .select('id')
       .eq('custom_project_id', project.id);
 
-    const upIds = (userProjects || []).map((up: any) => up.id);
+    const upIds = (userProjects || []).map((up) => up.id);
 
     if (upIds.length === 0) {
       setSimpleConfirmProject(project);
@@ -135,6 +137,7 @@ const ProjectManager = () => {
     setDeleting(true);
     const { error } = await supabase
       .from('custom_projects')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- deleted_at not in generated types
       .update({ deleted_at: new Date().toISOString() } as any)
       .eq('id', projectId);
 

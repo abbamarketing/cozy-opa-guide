@@ -1,7 +1,7 @@
 /**
  * Convert an array of objects to a CSV string and trigger download.
  */
-export function downloadCSV(data: Record<string, any>[], filename: string) {
+export function downloadCSV(data: Record<string, unknown>[], filename: string) {
   if (data.length === 0) return;
 
   const headers = Object.keys(data[0]);

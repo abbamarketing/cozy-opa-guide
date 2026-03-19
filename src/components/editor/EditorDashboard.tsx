@@ -394,6 +394,7 @@ const EditorDashboard = () => {
   const [deliveries, setDeliveries] = useState<EditorDelivery[]>([]);
   const [subscriptionQueue, setSubscriptionQueue] = useState<SubscriptionQueueItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [subscriptionQueueLoading, setSubscriptionQueueLoading] = useState(false);
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryData | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [activeColumn, setActiveColumn] = useState('todo');
@@ -416,9 +417,16 @@ const EditorDashboard = () => {
 
   const activeFilterCount = [clientFilter !== 'all', typeFilter !== 'all', lateOnly].filter(Boolean).length;
 
+  const handleSubscriptionItemClick = async (item: SubscriptionQueueItem) => {
+    const { data } = await supabase.from('deliveries').select('*, editors(display_name, user_id)').eq('id', item.id).single();
+    if (data) setSelectedDelivery(data as DeliveryData);
+  };
+
   const fetchSubscriptionQueue = useCallback(async () => {
     if (!editor) return;
+    setSubscriptionQueueLoading(true);
 
+    try {
     const { data, error } = await supabase
       .from('deliveries')
       .select(`
@@ -433,9 +441,14 @@ const EditorDashboard = () => {
       .order('priority_level', { ascending: false })
       .order('created_at', { ascending: true });
 
-    if (!error && data) {
+    if (error) {
+      toast.error('Erro ao carregar fila de assinaturas');
+      return;
+    }
+
+    if (data) {
       // Filter to subscription client_type only
-      const subItems = (data as any[]).filter((d) => d.user_project?.client_type === 'subscription');
+      const subItems = (data as Array<Record<string, unknown>>).filter((d) => (d.user_project as Record<string, unknown>)?.client_type === 'subscription');
       const userIds = [...new Set(subItems.map((d) => d.user_project?.user_id).filter(Boolean))];
 
       const { data: profiles } = await supabase
@@ -443,29 +456,37 @@ const EditorDashboard = () => {
         .select('user_id, full_name')
         .in('user_id', userIds);
 
-      const profileMap = new Map((profiles || []).map((p: any) => [p.user_id, p]));
+      const profileMap = new Map((profiles || []).map((p) => [p.user_id, p]));
 
       setSubscriptionQueue(
-        subItems.map((d) => ({
+        subItems.map((d) => {
+          const up = d.user_project as Record<string, unknown> | undefined;
+          return {
           id: d.id,
           title: d.title,
           delivery_type: d.delivery_type,
           status: d.status,
           created_at: d.created_at,
           due_date: d.due_date,
-          priority_level: d.priority_level ?? d.user_project?.priority_level ?? 1,
-          client_name: profileMap.get(d.user_project?.user_id)?.full_name || null,
-          subscription_tier: d.user_project?.subscription_tier || null,
-          sla_hours: d.user_project?.sla_hours || null,
+          priority_level: (d.priority_level as number) ?? (up?.priority_level as number) ?? 1,
+          client_name: profileMap.get(up?.user_id as string)?.full_name || null,
+          subscription_tier: (up?.subscription_tier as string) || null,
+          sla_hours: (up?.sla_hours as number) || null,
           description: d.description || null,
           raw_file_url: d.raw_file_url || null,
           raw_drive_link: d.raw_drive_link || null,
           client_notes: d.client_notes || null,
           is_exception: d.is_exception ?? null,
-          revision_count: d.revision_count ?? null,
-          max_revisions: d.max_revisions ?? null,
-        }))
+          revision_count: (d.revision_count as number) ?? null,
+          max_revisions: (d.max_revisions as number) ?? null,
+        };
+        })
       );
+    }
+    } catch (err) {
+      toast.error('Erro ao carregar fila de assinaturas');
+    } finally {
+      setSubscriptionQueueLoading(false);
     }
   }, [editor]);
 
@@ -493,20 +514,26 @@ const EditorDashboard = () => {
 
     const { data, error } = deliveriesResult;
 
-    if (!error && data) {
-      const userIds = [...new Set(data.map((d: any) => d.user_project?.user_id).filter(Boolean))];
+    if (error) {
+      toast.error('Erro ao carregar entregas');
+      setIsLoading(false);
+      return;
+    }
+
+    if (data) {
+      const userIds = [...new Set(data.map((d) => (d.user_project as Record<string, unknown>)?.user_id as string).filter(Boolean))];
 
       const [profilesRes, briefingsRes] = await Promise.all([
         supabase.from('profiles').select('user_id, full_name, avatar_url').in('user_id', userIds),
         supabase.from('onboarding_briefings').select('user_id, brand_colors, logo_url, primary_color, secondary_color').in('user_id', userIds),
       ]);
 
-      const profileMap = new Map((profilesRes.data || []).map((p: any) => [p.user_id, p]));
-      const briefingMap = new Map((briefingsRes.data || []).map((b: any) => [b.user_id, b]));
+      const profileMap = new Map((profilesRes.data || []).map((p) => [p.user_id, p]));
+      const briefingMap = new Map((briefingsRes.data || []).map((b) => [b.user_id, b]));
 
       setDeliveries(
-        data.map((d: any) => {
-          const userId = d.user_project?.user_id;
+        data.map((d) => {
+          const userId = (d.user_project as Record<string, unknown>)?.user_id as string;
           const prof = profileMap.get(userId);
           const briefing = briefingMap.get(userId);
           const colors: string[] = [];
@@ -611,6 +638,19 @@ const EditorDashboard = () => {
       const nextItem = subscriptionQueue.find((d) => d.status === 'queue');
       if (!nextItem) return;
 
+      // Race condition guard: verify delivery is still in 'queue' status
+      const { data: currentDelivery } = await supabase
+        .from('deliveries')
+        .select('status')
+        .eq('id', nextItem.id)
+        .single();
+
+      if (currentDelivery?.status !== 'queue') {
+        toast.warning('Esta entrega ja foi iniciada');
+        fetchDeliveries();
+        return;
+      }
+
       const slaHours = nextItem.sla_hours ?? 72;
       const newDeadline = countWeekdayHours(new Date(), slaHours);
 
@@ -620,7 +660,7 @@ const EditorDashboard = () => {
           status: 'in_progress',
           sla_deadline: newDeadline.toISOString(),
           due_date: newDeadline.toISOString(),
-        } as any)
+        })
         .eq('id', nextItem.id);
 
       if (error) {
@@ -648,7 +688,7 @@ const EditorDashboard = () => {
     const newStatus = col.statuses[0];
     if (delivery.status === newStatus) { setDraggedId(null); return; }
 
-    const updateData: Record<string, any> = { status: newStatus };
+    const updateData: Record<string, unknown> = { status: newStatus };
     if (newStatus === 'review') {
       updateData.delivered_at = new Date().toISOString();
     }
@@ -676,7 +716,7 @@ const EditorDashboard = () => {
     const newStatus = targetCol.statuses[0];
     if (delivery.status === newStatus) return;
 
-    const updateData: Record<string, any> = { status: newStatus };
+    const updateData: Record<string, unknown> = { status: newStatus };
     if (newStatus === 'review') {
       updateData.delivered_at = new Date().toISOString();
     }
@@ -729,7 +769,7 @@ const EditorDashboard = () => {
         <header className="sticky top-0 z-30 border-b border-border/50 bg-background/80 backdrop-blur-md">
           <div className="flex h-14 items-center justify-between px-4">
             <div className="flex items-center gap-2">
-              <img src={abbaLogo} alt="AbbaVideo" className="h-7 w-7" />
+              <img src={abbaLogo} alt="AbbaVideo" className="h-7 w-7 theme-logo" />
               <Badge variant="secondary" className="text-xs">
                 {pendingCount} pendente{pendingCount !== 1 ? 's' : ''}
               </Badge>
@@ -867,9 +907,18 @@ const EditorDashboard = () => {
               </Tooltip>
             </div>
             <div className="space-y-2">
-              {subscriptionQueue.map((item) => (
-                <SubscriptionQueueCard key={item.id} item={item} onClick={() => setSelectedDelivery(item as unknown as DeliveryData)} />
-              ))}
+              {subscriptionQueueLoading ? (
+                [1, 2].map((i) => (
+                  <div key={i} className="rounded-xl border border-border/30 bg-card p-3 space-y-2">
+                    <Skeleton className="h-3.5 w-3/4" />
+                    <Skeleton className="h-2.5 w-1/2" />
+                  </div>
+                ))
+              ) : (
+                subscriptionQueue.map((item) => (
+                  <SubscriptionQueueCard key={item.id} item={item} onClick={() => handleSubscriptionItemClick(item)} />
+                ))
+              )}
             </div>
           </div>
         )}
@@ -949,7 +998,7 @@ const EditorDashboard = () => {
       <header className="sticky top-0 z-30 border-b border-border/50 bg-background/80 backdrop-blur-md">
         <div className="flex h-14 items-center justify-between px-4">
           <div className="flex items-center gap-3">
-            <img src={abbaLogo} alt="AbbaVideo" className="h-7 w-7" />
+            <img src={abbaLogo} alt="AbbaVideo" className="h-7 w-7 theme-logo" />
             <span className="text-sm font-bold">
               Abba<span className="text-primary">Video</span>
             </span>
@@ -1056,9 +1105,18 @@ const EditorDashboard = () => {
             </div>
           </div>
           <div className="grid grid-cols-2 xl:grid-cols-3 gap-2 mb-4">
-            {subscriptionQueue.map((item) => (
-              <SubscriptionQueueCard key={item.id} item={item} onClick={() => setSelectedDelivery(item as unknown as DeliveryData)} />
-            ))}
+            {subscriptionQueueLoading ? (
+              [1, 2, 3].map((i) => (
+                <div key={i} className="rounded-xl border border-border/30 bg-card p-3 space-y-2">
+                  <Skeleton className="h-3.5 w-3/4" />
+                  <Skeleton className="h-2.5 w-1/2" />
+                </div>
+              ))
+            ) : (
+              subscriptionQueue.map((item) => (
+                <SubscriptionQueueCard key={item.id} item={item} onClick={() => handleSubscriptionItemClick(item)} />
+              ))
+            )}
           </div>
         </div>
       )}
@@ -1105,7 +1163,7 @@ const EditorDashboard = () => {
               onStatusChange={async (itemId, newStatus) => {
                 const col = COLUMNS.find((c) => c.statuses.includes(newStatus));
                 if (!col?.editorCanDrop) throw new Error('Cannot drop here');
-                const updateData: Record<string, any> = { status: newStatus };
+                const updateData: Record<string, unknown> = { status: newStatus };
                 if (newStatus === 'review') updateData.delivered_at = new Date().toISOString();
                 const { error } = await supabase.from('deliveries').update(updateData).eq('id', itemId);
                 if (error) { toast.error('Erro ao mover entrega'); throw error; }

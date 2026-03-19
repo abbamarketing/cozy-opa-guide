@@ -36,6 +36,7 @@ const AffiliateManager = ({ userId, fullName }: AffiliateManagerProps) => {
 
   useEffect(() => {
     fetchCode();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchCode is stable
   }, [userId]);
 
   const fetchCode = async () => {
@@ -56,7 +57,7 @@ const AffiliateManager = ({ userId, fullName }: AffiliateManagerProps) => {
     }
     setActing(true);
 
-    let code = generateAffiliateCode(fullName);
+    const code = generateAffiliateCode(fullName);
     let suffix = 1;
     let inserted = false;
 
@@ -64,7 +65,7 @@ const AffiliateManager = ({ userId, fullName }: AffiliateManagerProps) => {
       const tryCode = suffix === 1 ? code : `${code.slice(0, 17)}-${suffix}`;
       const { data, error } = await supabase
         .from('affiliate_codes')
-        .insert({ user_id: userId, code: tryCode } as any)
+        .insert({ user_id: userId, code: tryCode })
         .select('id, code, active')
         .single();
 
@@ -87,7 +88,7 @@ const AffiliateManager = ({ userId, fullName }: AffiliateManagerProps) => {
     setActing(true);
     const { error } = await supabase
       .from('affiliate_codes')
-      .update({ active } as any)
+      .update({ active })
       .eq('id', affiliateCode.id);
 
     if (error) {

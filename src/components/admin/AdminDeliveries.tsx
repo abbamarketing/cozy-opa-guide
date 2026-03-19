@@ -107,15 +107,15 @@ const AdminDeliveries = () => {
     setTotalCount(deliveriesRes.count || 0);
 
     if (deliveriesRes.data) {
-      const userIds = [...new Set(deliveriesRes.data.map((d: any) => d.user_project?.user_id).filter(Boolean))];
+      const userIds = [...new Set(deliveriesRes.data.map((d) => (d.user_project as Record<string, unknown>)?.user_id as string).filter(Boolean))];
       const { data: profiles } = userIds.length > 0
         ? await supabase.from('profiles').select('user_id, full_name').in('user_id', userIds)
         : { data: [] };
 
-      const profileMap = new Map((profiles || []).map((p: any) => [p.user_id, p.full_name]));
+      const profileMap = new Map((profiles || []).map((p) => [p.user_id, p.full_name]));
 
       setDeliveries(
-        deliveriesRes.data.map((d: any) => ({
+        deliveriesRes.data.map((d) => ({
           id: d.id,
           title: d.title,
           status: d.status,
@@ -123,7 +123,7 @@ const AdminDeliveries = () => {
           due_date: d.due_date,
           editor_id: d.editor_id,
           editor_name: d.editor_id ? editorMap.get(d.editor_id) || null : null,
-          client_name: profileMap.get(d.user_project?.user_id) || null,
+          client_name: profileMap.get((d.user_project as Record<string, unknown>)?.user_id as string) || null,
           user_project_id: d.user_project_id,
         }))
       );
@@ -148,19 +148,23 @@ const AdminDeliveries = () => {
     const newStatus = colStatuses[0];
     const { error } = await supabase
       .from('deliveries')
-      .update({ status: newStatus } as any)
+      .update({ status: newStatus })
       .eq('id', draggedId);
 
-    if (error) toast.error('Erro ao mover');
-    else { toast.success('Status atualizado'); fetchData(); }
+    if (error) {
+      toast.error('Erro ao mover');
+      return;
+    }
+    toast.success('Status atualizado');
     setDraggedId(null);
+    fetchData();
   };
 
   const handleReassign = async (deliveryId: string, editorId: string) => {
     setActionLoading(deliveryId);
     const { error } = await supabase
       .from('deliveries')
-      .update({ editor_id: editorId } as any)
+      .update({ editor_id: editorId })
       .eq('id', deliveryId);
 
     if (error) toast.error('Erro ao reatribuir');
@@ -172,7 +176,7 @@ const AdminDeliveries = () => {
     setActionLoading(deliveryId);
     const { error } = await supabase
       .from('deliveries')
-      .update({ status: 'cancelled' } as any)
+      .update({ status: 'cancelled' })
       .eq('id', deliveryId);
 
     if (error) toast.error('Erro ao cancelar');
@@ -233,7 +237,11 @@ const AdminDeliveries = () => {
                   <UserCheck className="mr-2 h-3.5 w-3.5" /> {e.display_name}
                 </DropdownMenuItem>
               ))}
-              <DropdownMenuItem onClick={() => handleCancel(d.id)} className="text-destructive">
+              <DropdownMenuItem
+                onClick={() => handleCancel(d.id)}
+                className="text-destructive"
+                disabled={d.status === 'approved' || d.status === 'cancelled'}
+              >
                 <XCircle className="mr-2 h-3.5 w-3.5" /> Cancelar
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -445,7 +453,7 @@ const AdminDeliveries = () => {
           onStatusChange={async (itemId, newStatus) => {
             const { error } = await supabase
               .from('deliveries')
-              .update({ status: newStatus } as any)
+              .update({ status: newStatus })
               .eq('id', itemId);
             if (error) { toast.error('Erro ao mover'); throw error; }
             toast.success('Status atualizado');

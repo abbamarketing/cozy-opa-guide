@@ -67,6 +67,7 @@ const Index = () => {
         }
       })();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- isClient is derived from roles which is already a dep
   }, [profileLoading, authLoading, user, profile, roles, checkProjectStatus]);
 
   // Realtime subscription for clients without project
@@ -84,6 +85,7 @@ const Index = () => {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- isClient is derived from roles which is already a dep
   }, [user, roles, assignedProjectId, checkProjectStatus]);
 
   // Apply affiliate referral code to profile after login
@@ -149,7 +151,7 @@ const Index = () => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-6">
       <div className="mb-8 flex items-center gap-3">
-        <img src={abbaLogo} alt="AbbaVideo" className="h-10 w-10" />
+        <img src={abbaLogo} alt="AbbaVideo" className="h-10 w-10 theme-logo" />
         <span className="text-2xl font-bold">
           Abba<span className="text-primary">Video</span>
         </span>

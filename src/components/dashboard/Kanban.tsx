@@ -93,6 +93,7 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
 
     setHasScheduledCapture(!!captures && captures.length > 0);
     setCaptureCheckDone(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- capture_lead_days rarely changes and including it would cause unnecessary re-renders
   }, [requiresCapture, userProject.id, userProject.current_period_start, userProject.current_period_end]);
 
   useEffect(() => {
@@ -173,7 +174,7 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
                   <Button
                     size="sm"
                     disabled={!canCreateDelivery}
-                    className="gap-1.5 bg-abba-lime text-[#111] font-bold rounded-full hover:bg-abba-light"
+                    className="gap-1.5 bg-primary text-primary-foreground font-bold rounded-full hover:bg-primary/90"
                     onClick={handleNewClick}
                     data-tour="new-delivery-btn"
                   >
@@ -202,13 +203,13 @@ const Kanban = ({ userProject, mockDeliveries }: KanbanProps) => {
         {isLoading ? (
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
             {ALL_COLUMNS.filter(c => c.id !== 'queue' || isSubscription).map((c) => (
-              <div key={c.id} className="rounded-[20px] bg-abba-surface/40 border border-white/6 p-2.5 min-w-[240px] space-y-2">
+              <div key={c.id} className="rounded-[20px] bg-secondary/40 border border-border p-2.5 min-w-[240px] space-y-2">
                 <div className="flex items-center justify-between px-1 mb-1">
                   <Skeleton className="h-3 w-20" />
                   <Skeleton className="h-5 w-5 rounded-md" />
                 </div>
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="rounded-[20px] bg-abba-surface border border-white/8 p-3 space-y-2">
+                  <div key={i} className="rounded-[20px] bg-secondary border border-border p-3 space-y-2">
                     <Skeleton className="h-3.5 w-3/4" />
                     <Skeleton className="h-2.5 w-1/2" />
                     <Skeleton className="h-2.5 w-1/3" />

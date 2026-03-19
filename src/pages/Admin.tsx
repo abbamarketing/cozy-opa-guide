@@ -97,7 +97,7 @@ const Admin = () => {
                 </SheetTrigger>
                 <SheetContent side="left" className="w-64 p-0">
                   <div className="flex items-center gap-2 border-b border-border/50 px-4 py-4">
-                    <img src={abbaLogo} alt="AbbaVideo" className="h-7 w-7" />
+                    <img src={abbaLogo} alt="AbbaVideo" className="h-7 w-7 theme-logo" />
                     <span className="text-sm font-bold">
                       Abba<span className="text-primary">Video</span>
                     </span>
@@ -132,7 +132,7 @@ const Admin = () => {
                 </SheetContent>
               </Sheet>
             )}
-            <img src={abbaLogo} alt="AbbaVideo" className="h-8 w-8" />
+            <img src={abbaLogo} alt="AbbaVideo" className="h-8 w-8 theme-logo" />
             <span className="text-lg font-bold hidden md:inline">
               Abba<span className="text-primary">Video</span>
             </span>
@@ -143,7 +143,7 @@ const Admin = () => {
               </div>
             )}
             {isGod() ? (
-              <span className="text-[10px] font-bold uppercase tracking-widest bg-abba-lime text-[#111] px-2 py-0.5 rounded-full ml-1">GOD</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground px-2 py-0.5 rounded-full ml-1">GOD</span>
             ) : (
               <span className="text-xs text-muted-foreground font-sans ml-1 hidden md:inline">Admin</span>
             )}

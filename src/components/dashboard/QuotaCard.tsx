@@ -38,13 +38,13 @@ const QuotaRow = ({ label, icon, used, total }: QuotaLine) => {
         {icon}
         <span className={`text-xs font-sans ${pct >= 90 ? 'text-destructive' : 'text-foreground'}`}>{label}</span>
       </div>
-      <div className="w-full rounded-full overflow-hidden bg-white/5" style={{ height: '6px' }}>
+      <div className="w-full rounded-full overflow-hidden bg-foreground/5" style={{ height: '6px' }}>
         <div
-          className="h-full rounded-full transition-all bg-abba-lime"
+          className="h-full rounded-full transition-all bg-primary"
           style={{ width: `${Math.min(pct, 100)}%` }}
         />
       </div>
-      <p className="text-[10px] font-sans text-white/60">{used}/{total}</p>
+      <p className="text-[10px] font-sans text-muted-foreground">{used}/{total}</p>
     </div>
   );
 };
@@ -64,16 +64,16 @@ const SubscriptionStatusCard = ({ userProject }: QuotaCardProps) => {
       {/* Plano + SLA */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <Crown className="h-4 w-4 text-abba-lime" />
-          <span className="text-sm font-sans font-semibold text-abba-lime">{tierLabel}</span>
+          <Crown className="h-4 w-4 text-primary" />
+          <span className="text-sm font-sans font-semibold text-primary">{tierLabel}</span>
         </div>
-        <Badge variant="outline" className="text-[10px] bg-abba-lime/10 text-abba-lime border-abba-lime/30 rounded-full px-2 py-0.5">
+        <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/30 rounded-full px-2 py-0.5">
           <Zap className="h-3 w-3 mr-0.5" />
           SLA {slaHours}h
         </Badge>
       </div>
       {/* Renovação */}
-      <p className="text-[10px] font-sans text-white/60">
+      <p className="text-[10px] font-sans text-muted-foreground">
         Renova em {format(periodEnd, "dd 'de' MMM", { locale: ptBR })}
         {daysUntilRenewal > 0 ? ` · ${daysUntilRenewal} dias` : ' · hoje'}
       </p>
@@ -85,15 +85,15 @@ const SubscriptionStatusCard = ({ userProject }: QuotaCardProps) => {
       <div data-tour="quota-card">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full rounded-[20px] bg-abba-surface border border-white/8 p-2.5 flex items-center justify-between gap-3"
+          className="w-full rounded-[20px] bg-secondary border border-border p-2.5 flex items-center justify-between gap-3"
         >
           <div className="flex items-center gap-1.5">
-            <Crown className="h-3.5 w-3.5 text-abba-lime" />
-            <span className="text-xs font-sans font-semibold text-abba-lime">{tierLabel}</span>
+            <Crown className="h-3.5 w-3.5 text-primary" />
+            <span className="text-xs font-sans font-semibold text-primary">{tierLabel}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-sans text-white/60">SLA {slaHours}h</span>
-            {expanded ? <ChevronUp className="h-3.5 w-3.5 text-white/60" /> : <ChevronDown className="h-3.5 w-3.5 text-white/60" />}
+            <span className="text-[10px] font-sans text-muted-foreground">SLA {slaHours}h</span>
+            {expanded ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" /> : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />}
           </div>
         </button>
         {expanded && (
@@ -119,6 +119,7 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const isMobile = useIsMobile();
   const project = userProject.custom_project;
+  if (!project) return null;
   const periodEnd = new Date(userProject.current_period_end);
   const daysUntilRenewal = differenceInDays(periodEnd, new Date());
 
@@ -136,7 +137,7 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
   if (project.instagram_videos > 0) {
     quotas.push({
       label: 'IG',
-      icon: <Camera className="h-3.5 w-3.5 text-abba-lime" />,
+      icon: <Camera className="h-3.5 w-3.5 text-primary" />,
       used: userProject.instagram_reserved + userProject.instagram_approved,
       total: project.instagram_videos,
     });
@@ -145,25 +146,25 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
   if (project.include_thumbnails) {
     quotas.push({
       label: 'Thumb',
-      icon: <Image className="h-3.5 w-3.5 text-white/60" />,
+      icon: <Image className="h-3.5 w-3.5 text-muted-foreground" />,
       used: userProject.thumbnails_reserved + userProject.thumbnails_approved,
-      total: (project as any).thumbnail_limit ?? project.youtube_videos,
+      total: (project as unknown as Record<string, unknown>).thumbnail_limit as number ?? project.youtube_videos,
     });
   }
 
   if (project.include_covers) {
     quotas.push({
       label: 'Capa',
-      icon: <Layers className="h-3.5 w-3.5 text-white/60" />,
+      icon: <Layers className="h-3.5 w-3.5 text-muted-foreground" />,
       used: userProject.covers_reserved + userProject.covers_approved,
-      total: (project as any).cover_limit ?? project.instagram_videos,
+      total: (project as unknown as Record<string, unknown>).cover_limit as number ?? project.instagram_videos,
     });
   }
 
   if (project.include_capture) {
     quotas.push({
       label: 'Captação',
-      icon: <MapPin className="h-3.5 w-3.5 text-abba-lime" />,
+      icon: <MapPin className="h-3.5 w-3.5 text-primary" />,
       used: (userProject.captures_reserved || 0) + (userProject.captures_approved || 0),
       total: project.max_captures || 1,
     });
@@ -174,29 +175,29 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
       <div data-tour="quota-card">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full rounded-[20px] bg-abba-surface border border-white/8 p-2.5 flex items-center gap-3"
+          className="w-full rounded-[20px] bg-secondary border border-border p-2.5 flex items-center gap-3"
         >
-          <p className="text-xs font-sans font-semibold text-abba-lime truncate shrink-0">
+          <p className="text-xs font-sans font-semibold text-primary truncate shrink-0">
             {project.project_name}
           </p>
           <div className="flex-1 flex items-center gap-2 overflow-hidden">
             {quotas.slice(0, 3).map((q) => (
               <div key={q.label} className="flex items-center gap-1 shrink-0">
                 {q.icon}
-                <span className="text-[10px] font-sans text-white/60">
+                <span className="text-[10px] font-sans text-muted-foreground">
                   {q.used}/{q.total}
                 </span>
               </div>
             ))}
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-[10px] font-sans text-white/60">
+            <span className="text-[10px] font-sans text-muted-foreground">
               {daysUntilRenewal > 0 ? `${daysUntilRenewal}d` : 'hoje'}
             </span>
             {expanded ? (
-              <ChevronUp className="h-3.5 w-3.5 text-white/60" />
+              <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
             ) : (
-              <ChevronDown className="h-3.5 w-3.5 text-white/60" />
+              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
             )}
           </div>
         </button>
@@ -206,8 +207,8 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
               {quotas.map((q) => (
                 <QuotaRow key={q.label} {...q} />
               ))}
-              <Separator className="bg-white/10" />
-              <div className="flex items-center justify-between text-[10px] font-sans text-white/60">
+              <Separator className="bg-border" />
+              <div className="flex items-center justify-between text-[10px] font-sans text-muted-foreground">
                 <span>
                   Período: {format(new Date(userProject.current_period_start), 'dd/MM', { locale: ptBR })} – {format(periodEnd, 'dd/MM', { locale: ptBR })}
                 </span>
@@ -227,18 +228,18 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
           className="flex items-center justify-between w-full text-left"
         >
           <div>
-            <p className="text-[10px] font-sans font-semibold uppercase tracking-widest text-abba-lime">
+            <p className="text-[10px] font-sans font-semibold uppercase tracking-widest text-primary">
               SEU PROJETO
             </p>
-            <p className="text-sm font-sans font-semibold text-abba-lime mt-0.5">
+            <p className="text-sm font-sans font-semibold text-primary mt-0.5">
               {project.project_name}
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-sans text-white/60">
+            <span className="text-[10px] font-sans text-muted-foreground">
               Renova em {daysUntilRenewal > 0 ? `${daysUntilRenewal}d` : 'hoje'}
             </span>
-            {expanded ? <ChevronUp className="h-4 w-4 text-white/60" /> : <ChevronDown className="h-4 w-4 text-white/60" />}
+            {expanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
           </div>
         </button>
 
@@ -249,8 +250,8 @@ const CustomQuotaCard = ({ userProject }: QuotaCardProps) => {
                 <QuotaRow key={q.label} {...q} />
               ))}
             </div>
-            <Separator className="bg-white/10" />
-            <div className="flex items-center justify-between text-[10px] font-sans text-white/60">
+            <Separator className="bg-border" />
+            <div className="flex items-center justify-between text-[10px] font-sans text-muted-foreground">
               <span>
                 Período: {format(new Date(userProject.current_period_start), 'dd/MM', { locale: ptBR })} – {format(periodEnd, 'dd/MM', { locale: ptBR })}
               </span>

@@ -26,7 +26,7 @@ interface DeliveryChatProps {
 }
 
 // Regex to match MM:SS or H:MM:SS patterns
-const TIMESTAMP_REGEX = /\b(\d{1,2}:\d{2}(?::\d{2})?)\b/g;
+const TIMESTAMP_REGEX = /\b(\d{1,2}:\d{2}(?::\d{2})?)\b/;
 
 /** Render message text with clickable timestamp highlights */
 const renderMessageWithTimestamps = (text: string) => {
@@ -37,8 +37,6 @@ const renderMessageWithTimestamps = (text: string) => {
     <>
       {parts.map((part, i) => {
         if (TIMESTAMP_REGEX.test(part)) {
-          // Reset regex lastIndex
-          TIMESTAMP_REGEX.lastIndex = 0;
           return (
             <button
               key={i}
@@ -93,31 +91,43 @@ const DeliveryChat = ({ deliveryId, showTimestampInput = false }: DeliveryChatPr
   }, [deliveryId]);
 
   useEffect(() => {
-    fetchMessages();
+    let isMounted = true;
 
-    const channel = supabase
-      .channel(`chat-${deliveryId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'delivery_messages',
-          filter: `delivery_id=eq.${deliveryId}`,
-        },
-        (payload) => {
-          const msg = payload.new as ChatMessage;
-          setMessages((prev) => [...prev, msg]);
-        },
-      )
-      .subscribe();
+    const setup = async () => {
+      await fetchMessages();
+      if (!isMounted) return;
 
-    channelRef.current = channel;
+      const channel = supabase
+        .channel(`chat-${deliveryId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'delivery_messages',
+            filter: `delivery_id=eq.${deliveryId}`,
+          },
+          (payload) => {
+            if (!isMounted) return;
+            const msg = payload.new as ChatMessage;
+            setMessages((prev) => [...prev, msg]);
+          },
+        )
+        .subscribe();
+
+      channelRef.current = channel;
+    };
+
+    setup();
 
     return () => {
-      if (channelRef.current) supabase.removeChannel(channelRef.current);
+      isMounted = false;
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+      }
     };
-  }, [deliveryId, fetchMessages]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchMessages is defined inline in the effect
+  }, [deliveryId]);
 
   useEffect(() => {
     if (scrollRef.current) {

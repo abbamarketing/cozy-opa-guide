@@ -117,6 +117,7 @@ const NewDeliveryModal = ({
     if (isSubscriptionLike && !form.getValues('delivery_type')) {
       form.setValue('delivery_type', 'instagram_video');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- form is stable from useForm
   }, [isSubscriptionLike]);
 
   const selectedType = form.watch('delivery_type');
@@ -282,7 +283,7 @@ const NewDeliveryModal = ({
         fullDescription += `\n\n---\n${aiScript ? 'Ideias para roteiro IA' : 'Roteiro'}:\n${scriptContent}`;
       }
 
-      const insertData: Record<string, any> = {
+      const insertData: Record<string, unknown> = {
         user_project_id: userProject.id,
         delivery_type: values.delivery_type,
         title: values.title,
@@ -324,8 +325,9 @@ const NewDeliveryModal = ({
       onOpenChange(false);
       resetForm();
       onCreated();
-    } catch (err: any) {
-      toast.error(err.message || 'Erro ao criar solicitação');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro ao criar solicitação';
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -397,7 +399,7 @@ const NewDeliveryModal = ({
             {/* For subscription/influencer: show SLA info */}
             {isSubscriptionLike && (
               <div className="flex items-center gap-3 rounded-lg border border-border/50 p-3">
-                <Zap className="h-4 w-4 shrink-0 text-abba-lime" />
+                <Zap className="h-4 w-4 shrink-0 text-primary" />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-card-foreground">Vídeo</p>
                   <p className="text-[10px] text-muted-foreground">
@@ -457,7 +459,7 @@ const NewDeliveryModal = ({
             />
 
             {/* 4. Roteiro (condicional — only custom projects with include_script) */}
-            {!isSubscriptionLike && project.include_script && (
+            {!isSubscriptionLike && project?.include_script && (
               <div className="space-y-3 rounded-lg border border-border/50 p-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm">Roteiro</Label>
