@@ -453,7 +453,7 @@ const AdminDeliveries = () => {
           onStatusChange={async (itemId, newStatus) => {
             const { error } = await supabase
               .from('deliveries')
-              .update({ status: newStatus })
+              .update({ status: newStatus as "pending" | "in_progress" | "review" | "revision" | "approved" | "cancelled" | "queue" })
               .eq('id', itemId);
             if (error) { toast.error('Erro ao mover'); throw error; }
             toast.success('Status atualizado');

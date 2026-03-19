@@ -142,9 +142,9 @@ Deno.serve(async (req) => {
       JSON.stringify({ success: true, message: `Assinatura ${action === "suspend" ? "pausada" : "reativada"} com sucesso` }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("admin-manage-subscription error:", err);
-    return new Response(JSON.stringify({ error: err.message || "Erro interno" }), {
+    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : "Erro interno" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

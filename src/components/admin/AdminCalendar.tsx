@@ -31,13 +31,28 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 /* ───── Types ───── */
+interface CalendarEventRaw {
+  id: string;
+  title: string;
+  type: string;
+  starts_at: string;
+  ends_at: string;
+  notes: string | null;
+  related_editor_id: string | null;
+  status?: string;
+  delivery_type?: string;
+  client_name?: string;
+  location_name?: string;
+  [key: string]: unknown;
+}
+
 interface CalendarEvent {
   id: string;
   title: string;
   date: string; // yyyy-MM-dd
   type: 'delivery' | 'capture' | 'manual';
   color: string;
-  raw: Record<string, unknown>;
+  raw: CalendarEventRaw;
 }
 
 type ViewMode = 'month' | 'week' | 'day';

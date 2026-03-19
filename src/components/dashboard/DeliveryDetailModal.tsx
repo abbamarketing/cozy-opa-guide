@@ -52,6 +52,8 @@ interface RevisionRecord {
   notes: string;
   timestamp_marker: string | null;
   created_at: string;
+  category?: string | null;
+  [key: string]: unknown;
 }
 
 const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProject }: DeliveryDetailModalProps) => {
