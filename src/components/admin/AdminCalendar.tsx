@@ -127,7 +127,7 @@ const AdminCalendar = () => {
         date: format(startOfDay(new Date(d.due_date)), 'yyyy-MM-dd'),
         type: 'delivery',
         color: deliveryColor,
-        raw: d,
+        raw: d as unknown as CalendarEventRaw,
       });
     });
 
