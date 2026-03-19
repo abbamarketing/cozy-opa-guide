@@ -149,7 +149,7 @@ const AdminCalendar = () => {
         date: c.scheduled_date,
         type: 'capture',
         color: captureColor,
-        raw: { ...c, client_name: clientName },
+        raw: { ...c, client_name: clientName } as unknown as CalendarEventRaw,
       });
     });
 
