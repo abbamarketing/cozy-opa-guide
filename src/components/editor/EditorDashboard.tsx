@@ -448,8 +448,8 @@ const EditorDashboard = () => {
 
     if (data) {
       // Filter to subscription client_type only
-      const subItems = (data as Array<Record<string, unknown>>).filter((d) => (d.user_project as Record<string, unknown>)?.client_type === 'subscription');
-      const userIds = [...new Set(subItems.map((d) => d.user_project?.user_id).filter(Boolean))];
+      const subItems = (data as any[]).filter((d: any) => d.user_project?.client_type === 'subscription');
+      const userIds = [...new Set(subItems.map((d: any) => d.user_project?.user_id).filter(Boolean))] as string[];
 
       const { data: profiles } = await supabase
         .from('profiles')
