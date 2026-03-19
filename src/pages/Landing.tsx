@@ -336,15 +336,15 @@ export default function Landing() {
               <p className="lb">{t.s1Label}</p>
               <h2 className="hl hm" style={{ marginBottom: 40 }}>{t.s1Title} <em>{t.s1Em}</em></h2>
               <div className="orbit">
-                <div className="orbit-center">▶</div>
+                <div className="orbit-center">{'\u25B6\uFE0E'}</div>
                 <div className="orbit-spin orbit-r1">
-                  {['✂','♫','Aa'].map((icon, i) => {
+                  {['\u2702\uFE0E','\u266B\uFE0E','Aa'].map((icon, i) => {
                     const angle = (i / 3) * 360;
                     return <div key={i} className="oi-wrap" style={{ transform: `rotate(${angle}deg) translateX(var(--r1))` }}><div className="oi"><span style={{ transform: `rotate(-${angle}deg)` }} className="oi-icon oi-i1">{icon}</span></div></div>;
                   })}
                 </div>
                 <div className="orbit-spin orbit-r2">
-                  {['▶','◎','⊞'].map((icon, i) => {
+                  {['\u25B6\uFE0E','\u25CE\uFE0E','\u229E\uFE0E'].map((icon, i) => {
                     const angle = (i / 3) * 360;
                     return <div key={i} className="oi-wrap" style={{ transform: `rotate(${angle}deg) translateX(var(--r2))` }}><div className="oi"><span style={{ transform: `rotate(-${angle}deg)` }} className="oi-icon oi-i2">{icon}</span></div></div>;
                   })}
@@ -512,7 +512,7 @@ export default function Landing() {
 
 const CSS = `
 :root{--bg:#FBFBFA;--tx:#1D1D1F;--tx2:#86868B;--tx3:#AEAEB2;--tw:#F5F5F7;--tw2:rgba(255,255,255,.5);--tw3:rgba(255,255,255,.22);--gr:linear-gradient(90deg,#D0D0D0,#B8B8B8,#A0A0A0,#B8B8B8,#D0D0D0);--fd:'Clash Display',sans-serif;--fb:'Satoshi',sans-serif}
-.lp{font-family:var(--fb);font-size:16px;-webkit-font-smoothing:antialiased;overflow-x:hidden;background:#050505}
+.lp{font-family:var(--fb);font-size:16px;-webkit-font-smoothing:antialiased;overflow-x:hidden;background:#050505;-webkit-overflow-scrolling:touch;overscroll-behavior:none}
 .lp a{color:inherit;text-decoration:none}
 .nv{position:fixed;top:0;left:0;width:100%;z-index:100;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;transition:background .4s}
 .nv.dark{background:rgba(5,5,5,.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
@@ -541,14 +541,14 @@ const CSS = `
 .nv.dark .lang-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);color:#F5F5F7}
 @media(max-width:600px){.nv-r a:not(.nv-c):not(.lang-btn){display:none}}
 
-.scroll-driver{height:900vh}
+.scroll-driver{height:900vh;height:900dvh}
 
 /* L1 */
-.dark-layer{position:fixed;top:0;left:0;width:100%;height:100vh;z-index:1}
+.dark-layer{position:fixed;top:0;left:0;width:100%;height:100vh;height:100dvh;z-index:1}
 .stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 
 /* L2 */
-.goo{position:fixed;top:0;left:0;width:100%;height:100vh;z-index:2;pointer-events:none;overflow:hidden;filter:blur(30px) contrast(8);background:#FBFBFA;transition:opacity .3s}
+.goo{position:fixed;top:0;left:0;width:100%;height:100vh;height:100dvh;z-index:2;pointer-events:none;overflow:hidden;filter:blur(30px) contrast(8);background:#FBFBFA;transition:opacity .3s}
 .blob{position:absolute;border-radius:50%;background:#050505;will-change:transform}
 .blob.green{box-shadow:0 0 15px 8px #00DC82,0 0 40px 16px rgba(0,220,130,.4)}
 .blob.blue{box-shadow:0 0 15px 8px #32B4FF,0 0 40px 16px rgba(50,180,255,.4)}
@@ -560,7 +560,7 @@ const CSS = `
 .blob.yellow{box-shadow:0 0 15px 8px #FFD43B,0 0 40px 16px rgba(255,212,59,.4)}
 
 /* L3 */
-.hero-text{position:fixed;top:0;left:0;width:100%;height:100vh;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;padding:20px}
+.hero-text{position:fixed;top:0;left:0;width:100%;height:100vh;height:100dvh;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;padding:20px}
 /* Scroll indicator line with gradient */
 .scroll-line{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);width:2px;height:48px;border-radius:2px;background:rgba(0,0,0,.06);overflow:hidden}
 .scroll-line-fill{width:100%;height:60%;border-radius:2px;background:linear-gradient(180deg,#00DC82,#32B4FF,#9C6ADE,#E040FB,#FF7B6B,#FF8C42,#FFD43B);animation:scrollFill 2s ease-in-out infinite}
@@ -751,8 +751,8 @@ const CSS = `
   /* Blobs — bigger on mobile to cover screen faster */
   .blob{min-width:50vw;min-height:50vw}
 
-  /* Goo — lighter filter for performance */
-  .goo{filter:blur(20px) contrast(6)}
+  /* Goo — much lighter filter for mobile GPU performance */
+  .goo{filter:blur(15px) contrast(5);will-change:auto}
 
   /* Hero text fades faster on mobile */
   .scroll-line{display:none}
