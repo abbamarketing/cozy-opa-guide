@@ -118,19 +118,19 @@ const AdminNewDemandModal = ({ open, onOpenChange, onCreated }: AdminNewDemandMo
     const client = clients.find((c) => c.user_project_id === clientId);
     if (!client) { toast.error('Cliente não encontrado'); setSaving(false); return; }
 
-    const { error } = await supabase.from('deliveries').insert({
+    const { error } = await supabase.from('deliveries').insert([{
       title: title.trim(),
-      delivery_type: deliveryType,
+      delivery_type: deliveryType as "youtube_video" | "instagram_video" | "thumbnail" | "cover",
       user_project_id: clientId,
       editor_id: editorId,
-      status: 'in_progress',
+      status: 'in_progress' as const,
       due_date: dueDate.toISOString(),
       sla_deadline: dueDate.toISOString(),
       description: description.trim(),
       client_notes: internalNotes.trim() || null,
       is_exception: true,
       exception_notes: 'Criado pelo admin',
-    });
+    }]);
 
     if (error) {
       toast.error('Erro ao criar demanda: ' + error.message);

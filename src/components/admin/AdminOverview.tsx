@@ -86,7 +86,7 @@ const AdminOverview = () => {
       let subscriptionMRR = 0;
       const activeProjects = activeProjectsRes.data;
       if (activeProjects && activeProjects.length > 0) {
-        const projectIds = [...new Set(activeProjects.map((p) => p.custom_project_id).filter(Boolean))];
+        const projectIds = [...new Set(activeProjects.map((p) => p.custom_project_id).filter(Boolean))] as string[];
         const { data: projects } = projectIds.length > 0
           ? await supabase.from('custom_projects').select('id, monthly_value').in('id', projectIds)
           : { data: [] as { id: string; monthly_value: number }[] };

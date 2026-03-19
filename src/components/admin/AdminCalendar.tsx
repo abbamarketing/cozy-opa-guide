@@ -31,13 +31,28 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 /* ───── Types ───── */
+interface CalendarEventRaw {
+  id: string;
+  title: string;
+  type: string;
+  starts_at: string;
+  ends_at: string;
+  notes: string | null;
+  related_editor_id: string | null;
+  status?: string;
+  delivery_type?: string;
+  client_name?: string;
+  location_name?: string;
+  [key: string]: unknown;
+}
+
 interface CalendarEvent {
   id: string;
   title: string;
   date: string; // yyyy-MM-dd
   type: 'delivery' | 'capture' | 'manual';
   color: string;
-  raw: Record<string, unknown>;
+  raw: CalendarEventRaw;
 }
 
 type ViewMode = 'month' | 'week' | 'day';
@@ -112,7 +127,7 @@ const AdminCalendar = () => {
         date: format(startOfDay(new Date(d.due_date)), 'yyyy-MM-dd'),
         type: 'delivery',
         color: deliveryColor,
-        raw: d,
+        raw: d as unknown as CalendarEventRaw,
       });
     });
 
@@ -134,7 +149,7 @@ const AdminCalendar = () => {
         date: c.scheduled_date,
         type: 'capture',
         color: captureColor,
-        raw: { ...c, client_name: clientName },
+        raw: { ...c, client_name: clientName } as unknown as CalendarEventRaw,
       });
     });
 
@@ -145,7 +160,7 @@ const AdminCalendar = () => {
         date: format(startOfDay(new Date(m.starts_at)), 'yyyy-MM-dd'),
         type: 'manual',
         color: getManualColor(m.type),
-        raw: m,
+        raw: m as unknown as CalendarEventRaw,
       });
     });
 
@@ -255,7 +270,7 @@ const AdminCalendar = () => {
     };
 
     if (editingEvent) {
-      const { error } = await supabase.from('calendar_events').update(payload).eq('id', editingEvent.id);
+      const { error } = await supabase.from('calendar_events').update(payload).eq('id', editingEvent.id as string);
       if (error) { toast.error('Erro ao atualizar: ' + error.message); setSaving(false); return; }
       toast.success('Evento atualizado');
     } else {
