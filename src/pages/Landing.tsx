@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import abbaLogo from '@/assets/abba-logo.png';
 
@@ -253,54 +253,100 @@ export default function Landing() {
   const [faq, setFaq] = useState<number | null>(null);
   const [lang, setLang] = useState<Lang>('pt');
   const [videoModal, setVideoModal] = useState<{ name: string; type: string; video: string } | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const touchTargetRef = useRef<{ value: number }>({ value: 0 });
 
   const t = T[lang];
   const tier = t.tiers[slider];
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 600);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
 
   useEffect(() => {
     const r = new URLSearchParams(window.location.search).get('ref');
     if (r?.trim()) localStorage.setItem('affiliate_ref', r.trim().toLowerCase());
   }, []);
 
-  // IntersectionObserver for mobile sections
+  // Unified scroll: native scroll on desktop, touch-hijack on mobile
   useEffect(() => {
-    if (!isMobile) return;
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) e.target.classList.add('mob-visible');
-      });
-    }, { threshold: 0.15 });
-    document.querySelectorAll('.mob-section').forEach(el => observer.observe(el));
-    return () => observer.disconnect();
-  }, [isMobile]);
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    let target = 0;
+    let current = 0;
+    let touchStartY = 0;
+    let raf = 0;
+    const sensitivity = 0.0012; // how fast touch moves progress
+    const lerp = 0.08; // smoothing factor
 
-  const onScroll = useCallback(() => {
-    if (isMobile) return;
-    const max = document.documentElement.scrollHeight - window.innerHeight;
-    setSp(max > 0 ? window.scrollY / max : 0);
-  }, [isMobile]);
+    const update = () => {
+      current += (target - current) * lerp;
+      if (Math.abs(current - target) < 0.0001) current = target;
+      setSp(current);
+      raf = requestAnimationFrame(update);
+    };
 
-  useEffect(() => {
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [onScroll]);
+    if (isTouchDevice) {
+      // Prevent native scroll — we control everything via touch
+      const preventDefault = (e: TouchEvent) => {
+        // Allow scroll inside .prow (portfolio horizontal scroll) and range inputs
+        const t = e.target as HTMLElement;
+        if (t.closest('.prow') || t.closest('input[type="range"]') || t.closest('.vm-backdrop')) return;
+        e.preventDefault();
+      };
+      const onTouchStart = (e: TouchEvent) => { touchStartY = e.touches[0].clientY; };
+      const onTouchMove = (e: TouchEvent) => {
+        const t = e.target as HTMLElement;
+        if (t.closest('.prow') || t.closest('input[type="range"]') || t.closest('.vm-backdrop')) return;
+        const dy = touchStartY - e.touches[0].clientY;
+        touchStartY = e.touches[0].clientY;
+        target = Math.max(0, Math.min(1, target + dy * sensitivity));
+        touchTargetRef.current.value = target;
+      };
 
-  // Scroll to scene by index (since anchor links don't work with fixed layout)
+      document.addEventListener('touchstart', onTouchStart, { passive: true });
+      document.addEventListener('touchmove', onTouchMove, { passive: false });
+      document.addEventListener('touchmove', preventDefault, { passive: false });
+      raf = requestAnimationFrame(update);
+
+      return () => {
+        document.removeEventListener('touchstart', onTouchStart);
+        document.removeEventListener('touchmove', onTouchMove);
+        document.removeEventListener('touchmove', preventDefault);
+        cancelAnimationFrame(raf);
+      };
+    } else {
+      // Desktop: use native scroll
+      const onScroll = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        setSp(max > 0 ? window.scrollY / max : 0);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      return () => window.removeEventListener('scroll', onScroll);
+    }
+  }, []);
+
+  // Scroll to scene by index — works on both desktop and mobile
   const scrollToScene = useCallback((sceneIndex: number) => {
-    const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
     const heroPhase = 0.2;
     const scenePhase = 0.8;
     const targetProgress = heroPhase + (sceneIndex / TOTAL_SCENES) * scenePhase + 0.01;
-    window.scrollTo({ top: targetProgress * totalHeight, behavior: 'smooth' });
-  }, []);
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouchDevice) {
+      // Set the touch target directly — the lerp loop will smoothly animate to it
+      touchTargetRef.current.value = targetProgress;
+      // Also trigger a re-render to kick the animation
+      setSp(prev => prev); // no-op but triggers effect
+      // Smoothly animate by setting sp directly over frames
+      let start = sp;
+      let frame = 0;
+      const animate = () => {
+        frame++;
+        const t = Math.min(1, frame / 30); // ~0.5s at 60fps
+        const eased = 1 - Math.pow(1 - t, 3);
+        setSp(start + (targetProgress - start) * eased);
+        if (t < 1) requestAnimationFrame(animate);
+      };
+      requestAnimationFrame(animate);
+    } else {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      window.scrollTo({ top: targetProgress * totalHeight, behavior: 'smooth' });
+    }
+  }, [sp]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -328,232 +374,7 @@ export default function Landing() {
 
   const sc = (i: number) => `sc${i === scene ? ' on' : i < scene ? ' up' : ' dn'}`;
 
-  // ═══ MOBILE RENDER ═══
-  if (isMobile) {
-    return (
-      <>
-        <style>{CSS}</style>
-        <style>{`
-          .mob{font-family:var(--fb);background:#050505;color:#F5F5F5;-webkit-font-smoothing:antialiased}
-          .mob-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(5,5,5,.9);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06)}
-          .mob-nav a{font-family:var(--fd);font-weight:600;font-size:14px;color:#F5F5F5;text-decoration:none;display:flex;align-items:center;gap:6px}
-          .mob-nav img{width:20px;height:20px;filter:brightness(100)}
-          .mob-nav-r{display:flex;gap:8px;align-items:center}
-          .mob-nav-r .lang-btn{background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);padding:4px 10px;border-radius:12px;font-size:10px;font-weight:600;cursor:pointer}
-          .mob-nav-r .nv-c{padding:6px 14px;background:#F5F5F5;color:#0A0A0A;border-radius:100px;font-size:11px;font-weight:600;text-decoration:none}
-
-          .mob-hero{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 60px;background:#FBFBFA;position:relative}
-          .mob-hero .hl{color:#1D1D1F}
-          .mob-hero .sb{color:rgba(0,0,0,.4)}
-          .mob-hero .bd{background:#1D1D1F;color:#F5F5F5}
-          .mob-hero .bg-btn{color:rgba(0,0,0,.4);border-color:rgba(0,0,0,.1)}
-          .mob-hero .nv-logo-h{filter:brightness(0)}
-
-          .mob-section{padding:64px 24px;opacity:0;transform:translateY(32px);transition:opacity .7s cubic-bezier(.23,1,.32,1),transform .8s cubic-bezier(.23,1,.32,1)}
-          .mob-section.mob-visible{opacity:1;transform:none}
-          .mob-divider{width:40px;height:2px;background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.1),rgba(255,255,255,.04));border-radius:1px;margin:0 auto 48px}
-
-          .mob .lb{font-family:var(--fb);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.25);margin-bottom:12px}
-          .mob .hl{font-family:var(--fd);font-weight:700;line-height:.92;letter-spacing:-.04em;margin-bottom:16px}
-          .mob .hm{font-size:clamp(24px,7vw,36px)}
-          .mob .hl em{font-style:normal;color:rgba(255,255,255,.3)}
-
-          .mob .fts{display:flex;flex-direction:column;gap:8px;margin-top:16px}
-          .mob .ft{padding:14px;border:1px solid rgba(255,255,255,.06);border-radius:12px}
-          .mob .ft-t{font-family:var(--fd);font-weight:600;font-size:13px;color:#F5F5F5;margin-bottom:3px}
-          .mob .ft-d{font-size:11px;color:rgba(255,255,255,.35);line-height:1.4}
-
-          .mob .prow{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;-webkit-overflow-scrolling:touch}
-          .mob .prow::-webkit-scrollbar{display:none}
-          .mob .pc{flex:0 0 130px;border-radius:12px;border:1px solid rgba(255,255,255,.06);padding:12px;cursor:pointer;transition:border-color .3s}
-          .mob .pc:active{border-color:rgba(255,255,255,.15)}
-          .mob .pc-thumb{border-radius:8px;overflow:hidden;aspect-ratio:3/4;position:relative;margin-bottom:8px;background:#0A0A0A}
-          .mob .pc-video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
-          .mob .pc-overlay{position:absolute;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center}
-          .mob .pc-play{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;border:1px solid rgba(255,255,255,.2)}
-          .mob .pcn{font-family:var(--fd);font-weight:600;font-size:12px;color:#F5F5F5}
-          .mob .pct{font-size:8px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-top:2px}
-
-          .mob .orbit{width:160px;height:160px;margin:0 auto}
-          .mob .orbit-r1{width:100px;height:100px;margin:-50px 0 0 -50px;--r1:50px}
-          .mob .orbit-r2{width:160px;height:160px;margin:-80px 0 0 -80px;--r2:80px}
-          .mob .oi{width:20px;height:20px;margin:-10px 0 0 -10px;font-size:7px}
-
-          .mob .dash{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;-webkit-overflow-scrolling:touch}
-          .mob .dash::-webkit-scrollbar{display:none}
-          .mob .dash-col{min-width:140px;flex:0 0 140px}
-
-          .mob .pg{display:flex;flex-direction:column;gap:16px;margin-top:16px}
-          .mob .pl{flex-direction:column;align-items:flex-start;gap:4px}
-          .mob .pval{font-size:clamp(28px,8vw,40px)}
-
-          .mob .fw{width:100%}
-          .mob .faq-t{font-family:var(--fd);font-weight:700;font-size:clamp(20px,6vw,28px);color:#F5F5F5;margin-bottom:20px}
-          .mob .fi{border-bottom:1px solid rgba(255,255,255,.06)}
-          .mob .fiq{font-size:13px;padding:14px 0}
-          .mob .fia p{font-size:12px}
-
-          .mob-cta{padding:80px 24px;text-align:center}
-          .mob-cta .hl{margin-bottom:20px}
-          .mob-cta-btn{display:inline-block;padding:14px 32px;background:#F5F5F5;color:#0A0A0A;border-radius:100px;font-family:var(--fb);font-weight:600;font-size:14px;text-decoration:none;margin-top:20px}
-          .mob-cta-sub{font-size:12px;color:rgba(255,255,255,.3);margin-top:12px}
-
-          .mob .fo{padding:20px 16px;border-top:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;background:#050505}
-          .mob .fo span{font-size:11px;color:rgba(255,255,255,.2)}
-          .mob .fl{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-          .mob .fl a{font-size:11px;color:rgba(255,255,255,.3);text-decoration:none}
-        `}</style>
-        <div className="mob">
-          <nav className="mob-nav">
-            <a href="#"><img src={abbaLogo} alt="" className="nv-logo-h" />AbbaVideo</a>
-            <div className="mob-nav-r">
-              <button onClick={() => setLang(lang === 'pt' ? 'en' : 'pt')} className="lang-btn">{lang === 'pt' ? 'EN' : 'PT'}</button>
-              <a href="#m-plans" className="nv-c">{t.navCta}</a>
-            </div>
-          </nav>
-
-          {/* Hero */}
-          <div className="mob-hero">
-            <h1 className="hl" style={{ fontSize: 'clamp(36px,10vw,52px)' }}>{t.heroL1}<br/>{t.heroL2}<br/><em>{t.heroL3}</em></h1>
-            <p className="sb" style={{ fontSize: 13, maxWidth: 280, marginTop: 14 }}>{t.heroSub}</p>
-            <div className="br" style={{ marginTop: 20, display: 'flex', gap: 8 }}>
-              <a href="#m-plans" className="bd" style={{ padding: '10px 22px', borderRadius: 100, fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'inline-block' }}>{t.heroBtn1}</a>
-              <a href="#m-howit" className="bg-btn" style={{ padding: '10px 16px', borderRadius: 100, fontSize: 12, border: '1px solid', textDecoration: 'none', display: 'inline-block' }}>{t.heroBtn2}</a>
-            </div>
-          </div>
-
-          {/* Statement */}
-          <div className="mob-section"><div className="mob-divider" /><p className="lb">{t.s0Label}</p><h2 className="hl hm">{t.s0Title1}<br/>{t.s0Title2} <em>{t.s0Em}</em></h2></div>
-
-          {/* Expertise + Orbit */}
-          <div className="mob-section">
-            <p className="lb">{t.s1Label}</p>
-            <h2 className="hl hm" style={{ marginBottom: 24 }}>{t.s1Title} <em>{t.s1Em}</em></h2>
-            <div className="orbit">
-              <div className="orbit-center">{'\u25B6\uFE0E'}</div>
-              <div className="orbit-spin orbit-r1">
-                {['\u2702\uFE0E','\u266B\uFE0E','Aa'].map((icon, i) => {
-                  const angle = (i / 3) * 360;
-                  return <div key={i} className="oi-wrap" style={{ transform: `rotate(${angle}deg) translateX(var(--r1))` }}><div className="oi"><span style={{ transform: `rotate(-${angle}deg)` }} className="oi-icon oi-i1">{icon}</span></div></div>;
-                })}
-              </div>
-              <div className="orbit-spin orbit-r2">
-                {['\u25B6\uFE0E','\u25CE\uFE0E','\u229E\uFE0E'].map((icon, i) => {
-                  const angle = (i / 3) * 360;
-                  return <div key={i} className="oi-wrap" style={{ transform: `rotate(${angle}deg) translateX(var(--r2))` }}><div className="oi"><span style={{ transform: `rotate(-${angle}deg)` }} className="oi-icon oi-i2">{icon}</span></div></div>;
-                })}
-              </div>
-            </div>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,.35)', marginTop: 24, maxWidth: 300 }}>{t.s1Desc}</p>
-          </div>
-
-          {/* Portfolio */}
-          <div className="mob-section">
-            <p className="lb">{t.s2Label}</p><h2 className="hl hm" style={{ marginBottom: 20 }}><em>{t.s2Em}</em></h2>
-            <div className="prow">
-              {t.portfolio.map((p, i) => (
-                <div key={p.name} className="pc" onClick={() => setVideoModal(p)}>
-                  <div className="pc-thumb">
-                    <video className="pc-video" src={p.video + '#t=1'} muted playsInline preload="metadata" />
-                    <div className="pc-overlay"><div className="pc-play">{'\u25B6\uFE0E'}</div></div>
-                  </div>
-                  <div className="pc-info"><div className="pcn">{p.name}</div><div className="pct">{p.type}</div></div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* How it works */}
-          <div className="mob-section" id="m-howit">
-            <p className="lb">{t.s3Label}</p><h2 className="hl hm">{t.s3Title} <em>{t.s3Em}</em></h2>
-            <div className="fts">
-              <div className="ft"><div className="ft-t">{t.s3Step1T}</div><div className="ft-d">{t.s3Step1D}</div></div>
-              <div className="ft"><div className="ft-t">{t.s3Step2T}</div><div className="ft-d">{t.s3Step2D}</div></div>
-              <div className="ft"><div className="ft-t">{t.s3Step3T}</div><div className="ft-d">{t.s3Step3D}</div></div>
-            </div>
-          </div>
-
-          {/* Demo */}
-          <div className="mob-section">
-            <p className="lb">{t.s4Label}</p>
-            <h2 className="hl hm" style={{ marginBottom: 16 }}>{t.s4Title} <em>{t.s4Em}</em></h2>
-            <div className="dash">
-              <div className="dash-col"><div className="dash-hd"><span>{t.s4Col1}</span><span className="dash-cnt">2</span></div><div className="d-card"><div className="d-top"><span className="d-type">Reel</span></div><div className="d-title">Rotina de manhã</div><div className="d-sla d-sla-g">{t.s4InQueue}</div></div></div>
-              <div className="dash-col"><div className="dash-hd"><span>{t.s4Col2}</span><span className="dash-cnt">1</span></div><div className="d-card"><div className="d-top"><span className="d-type">TikTok</span></div><div className="d-title">Trend challenge</div><div className="d-sla d-sla-y">3h 42min</div></div></div>
-              <div className="dash-col"><div className="dash-hd"><span>{t.s4Col3}</span><span className="dash-cnt">1</span></div><div className="d-card"><div className="d-top"><span className="d-type">Reel</span></div><div className="d-title">Dica #12</div><div className="d-sla d-sla-ok">{t.s4Ready}</div></div></div>
-              <div className="dash-col"><div className="dash-hd"><span>{t.s4Col4}</span><span className="dash-cnt">1</span></div><div className="d-card"><div className="d-top"><span className="d-type">Short</span></div><div className="d-title">Unboxing</div><div className="d-sla d-sla-done">✓</div></div></div>
-            </div>
-          </div>
-
-          {/* Value prop */}
-          <div className="mob-section" style={{ textAlign: 'center' }}>
-            <h2 className="hl hm">{t.s5L1}<br/>{t.s5L2}<br/><em>{t.s5Em}</em></h2>
-          </div>
-
-          {/* Pricing */}
-          <div className="mob-section" id="m-plans">
-            <p className="lb" style={{ textAlign: 'center' }}>{t.s6Label}</p>
-            <h2 className="hl hm" style={{ textAlign: 'center' }}>{t.s6Title} <em>{t.s6Em}</em></h2>
-            <div className="pg">
-              <div className="pl">
-                <div className="slr"><span>72h</span><span>4h</span></div>
-                <div className="slw"><input type="range" min={0} max={4} step={1} value={slider} onChange={e => setSlider(+e.target.value)} /><div className="slf" style={{ width: `${(slider / 4) * 100}%` }} /></div>
-                <div className="psla">{tier.sla}</div>
-                <div className="pval"><span>{tier.price}</span></div>
-                <div className="pper">{t.s6PerMonth}</div>
-                <div className="ptier">{tier.tier}</div>
-              </div>
-              <div className="pr">
-                <div className="pf">{t.s6F1}</div>
-                <div className="pf">{t.s6F2}</div>
-                <div className="pf">{t.s6F3}</div>
-                <div className="pf">{t.s6F4}</div>
-                <Link to="/auth" className="pb">{tier.btn}</Link>
-                <div className="pn">{t.s6Cancel}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* FAQ */}
-          <div className="mob-section">
-            <h2 className="faq-t">{t.s7Title}</h2>
-            {t.faq.map((item, i) => <div key={i} className="fi">
-              <button className={`fiq${faq === i ? ' open' : ''}`} onClick={() => setFaq(faq === i ? null : i)}>{item.q}</button>
-              <div className={`fia${faq === i ? ' open' : ''}`}><p>{item.a}</p></div>
-            </div>)}
-          </div>
-
-          {/* CTA */}
-          <div className="mob-cta">
-            <h2 className="hl hm">{t.s8L1}<br/>{t.s8L2}<br/>{t.s8L3} <em>{t.s8Em}</em></h2>
-            <a href="#m-plans" className="mob-cta-btn">{t.s8Btn}</a>
-            <p className="mob-cta-sub">{t.s8Sub}</p>
-          </div>
-
-          {/* Video Modal */}
-          {videoModal && (
-            <div className="vm-backdrop" onClick={() => setVideoModal(null)}>
-              <div className="vm-container" onClick={e => e.stopPropagation()} style={{ maxWidth: '92vw' }}>
-                <button className="vm-close" onClick={() => setVideoModal(null)}>&times;</button>
-                <video className="vm-video" src={videoModal.video} controls autoPlay playsInline />
-                <div className="vm-info"><span className="vm-name">{videoModal.name}</span><span className="vm-type">{videoModal.type}</span></div>
-              </div>
-            </div>
-          )}
-
-          <footer className="fo">
-            <span>© 2026 AbbaVideo</span>
-            <div className="fl">
-              <a href="https://instagram.com/abbamarketing" target="_blank" rel="noopener noreferrer">Instagram</a>
-              <Link to="/terms">{t.footerTerms}</Link>
-              <Link to="/privacy">{t.footerPrivacy}</Link>
-            </div>
-          </footer>
-        </div>
-      </>
-    );
-  }
-
+  // ═══ RENDER ═══
   return (
     <>
       <style>{CSS}</style>
