@@ -268,14 +268,17 @@ export default function Landing() {
   // Unified scroll: native scroll on desktop, touch-hijack on mobile
   useEffect(() => {
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    let target = 0;
     let current = 0;
     let touchStartY = 0;
     let raf = 0;
-    const sensitivity = 0.0012; // how fast touch moves progress
-    const lerp = 0.12; // smoothing factor (faster for snap feel)
+    const sensitivity = 0.0012;
+    const lerp = 0.12;
+
+    // target lives in the ref so scrollToScene can set it from outside
+    touchTargetRef.current.value = 0;
 
     const update = () => {
+      const target = touchTargetRef.current.value;
       current += (target - current) * lerp;
       if (Math.abs(current - target) < 0.0001) current = target;
       setSp(current);
@@ -312,22 +315,18 @@ export default function Landing() {
       const onTouchEnd = () => {
         if (Math.abs(touchAccum) > snapThreshold) {
           const heroPhase = 0.2;
-          const sceneSize = 0.8 / 9; // TOTAL_SCENES = 9
+          const sceneSize = 0.8 / 9;
           const direction = touchAccum > 0 ? 1 : -1;
+          let next = 0;
 
           if (current < heroPhase && direction > 0) {
-            // In hero, snap to first scene
-            target = heroPhase + sceneSize * 0.5;
+            next = heroPhase + sceneSize * 0.5;
           } else if (current >= heroPhase) {
-            // In scenes, snap to next/prev scene
-            const currentScene = Math.floor((current - heroPhase) / sceneSize);
-            const nextScene = Math.max(0, Math.min(8, currentScene + direction));
-            target = heroPhase + nextScene * sceneSize + sceneSize * 0.5;
-          } else {
-            target = 0;
+            const curScene = Math.floor((current - heroPhase) / sceneSize);
+            const nextScene = Math.max(0, Math.min(8, curScene + direction));
+            next = heroPhase + nextScene * sceneSize + sceneSize * 0.5;
           }
-          target = Math.max(0, Math.min(1, target));
-          touchTargetRef.current.value = target;
+          touchTargetRef.current.value = Math.max(0, Math.min(1, next));
         }
         touchAccum = 0;
       };
@@ -361,26 +360,12 @@ export default function Landing() {
     const targetProgress = heroPhase + (sceneIndex / TOTAL_SCENES) * scenePhase + 0.01;
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     if (isTouchDevice) {
-      // Set the touch target directly — the lerp loop will smoothly animate to it
       touchTargetRef.current.value = targetProgress;
-      // Also trigger a re-render to kick the animation
-      setSp(prev => prev); // no-op but triggers effect
-      // Smoothly animate by setting sp directly over frames
-      let start = sp;
-      let frame = 0;
-      const animate = () => {
-        frame++;
-        const t = Math.min(1, frame / 30); // ~0.5s at 60fps
-        const eased = 1 - Math.pow(1 - t, 3);
-        setSp(start + (targetProgress - start) * eased);
-        if (t < 1) requestAnimationFrame(animate);
-      };
-      requestAnimationFrame(animate);
     } else {
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
       window.scrollTo({ top: targetProgress * totalHeight, behavior: 'smooth' });
     }
-  }, [sp]);
+  }, []);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
