@@ -283,9 +283,9 @@ export default function Landing() {
     if (isTouchDevice) {
       // Prevent native scroll — we control everything via touch
       const preventDefault = (e: TouchEvent) => {
-        // Allow scroll inside .prow (portfolio horizontal scroll) and range inputs
         const t = e.target as HTMLElement;
-        if (t.closest('.prow') || t.closest('.slw') || t.closest('input[type="range"]') || t.closest('.vm-backdrop')) return;
+        // Allow native touch on interactive elements
+        if (t.closest('a') || t.closest('button') || t.closest('.prow') || t.closest('.slw') || t.closest('input') || t.closest('.vm-backdrop') || t.closest('.nv') || t.closest('.fi') || t.closest('.pc') || t.closest('.lang-btn')) return;
         e.preventDefault();
       };
       const onTouchStart = (e: TouchEvent) => { touchStartY = e.touches[0].clientY; };
