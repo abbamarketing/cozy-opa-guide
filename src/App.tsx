@@ -45,10 +45,12 @@ const PageLoader = () => (
 
 const LANDING_DOMAINS = new Set(["video.abba.marketing"]);
 
+const MARKETING_ALLOWED_PATHS = new Set(["/landing", "/auth", "/terms", "/privacy"]);
+
 const MarketingDomainRedirect = () => {
   const location = useLocation();
 
-  if (!LANDING_DOMAINS.has(window.location.hostname) || location.pathname === "/landing") {
+  if (!LANDING_DOMAINS.has(window.location.hostname) || MARKETING_ALLOWED_PATHS.has(location.pathname)) {
     return null;
   }
 
