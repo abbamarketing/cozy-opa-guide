@@ -454,7 +454,7 @@ export default function Landing() {
               <div className="bento">
                 {t.portfolio.map((p, i) => (
                   <div key={p.name} className={`bc bc-${i} pc-anim${i}`} onClick={() => setVideoModal(p)}>
-                    <video className="bc-vid" src={p.video + '#t=1'} muted playsInline preload="metadata" />
+                    <div className="bc-bg" />
                     <div className="bc-ov">
                       <div className="bc-play">{'\u25B6\uFE0E'}</div>
                       <div className="bc-meta">
@@ -768,7 +768,7 @@ const CSS = `
 .sc.on .pc-anim3{transition-delay:.34s}
 .sc.on .pc-anim4{transition-delay:.42s}
 .sc:not(.on) .bc{opacity:0;transform:translateY(12px)}
-.bc-vid{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.bc-bg{position:absolute;inset:0;background:rgba(255,255,255,.04)}
 .bc-ov{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.7) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,.05) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:background .3s}
 .bc:hover .bc-ov{background:linear-gradient(0deg,rgba(0,0,0,.8) 0%,rgba(0,0,0,.25) 40%,rgba(0,0,0,.2) 100%)}
 .bc-play{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;padding-left:2px;border:1px solid rgba(255,255,255,.15);transition:transform .3s,background .3s,opacity .3s;opacity:0}
