@@ -28,10 +28,6 @@ const Index = () => {
   const [assignedProjectId, setAssignedProjectId] = useState<string | null | undefined>(undefined);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
 
-  // Always redirect to landing on marketing domains
-  if (LANDING_DOMAINS.includes(window.location.hostname)) {
-    return <Navigate to="/landing" replace />;
-  }
 
   const checkProjectStatus = useCallback(async () => {
     if (!user) return;
