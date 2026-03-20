@@ -747,9 +747,8 @@ const CSS = `
   .bg-btn{padding:8px 14px;font-size:11px}
   .scroll-line{display:none}
 
-  /* Scenes — compact, allow scroll for long content */
-  .sc{padding:12px 16px;align-items:flex-start;justify-content:flex-start;padding-top:10vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
-  .sc>div{width:100%}
+  /* Scenes — centered, scrollable if overflow */
+  .sc{padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 
   /* Blobs — bigger to cover faster */
   .blob{min-width:55vw;min-height:55vw}
