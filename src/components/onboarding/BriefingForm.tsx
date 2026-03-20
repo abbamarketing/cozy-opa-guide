@@ -133,7 +133,8 @@ const BriefingForm = ({ onComplete }: BriefingFormProps) => {
           return;
         }
         const { data: urlData } = supabase.storage.from('brand-logos').getPublicUrl(path);
-        update('logo_url', urlData.publicUrl);
+        // Use callback to ensure state is set before advancing
+        setFormData(prev => ({ ...prev, logo_url: urlData.publicUrl }));
       }
       setCurrentStep(2);
     } else if (currentStep === 2) {
