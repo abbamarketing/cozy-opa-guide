@@ -45,16 +45,15 @@ const PageLoader = () => (
 
 const LANDING_DOMAINS = new Set(["video.abba.marketing"]);
 
-const MARKETING_ALLOWED_PATHS = new Set(["/landing", "/auth", "/terms", "/privacy"]);
-
 const MarketingDomainRedirect = () => {
   const location = useLocation();
 
-  if (!LANDING_DOMAINS.has(window.location.hostname) || MARKETING_ALLOWED_PATHS.has(location.pathname)) {
-    return null;
+  // On marketing domains, only redirect the bare root "/" to /landing
+  if (LANDING_DOMAINS.has(window.location.hostname) && location.pathname === "/") {
+    return <Navigate to={`/landing${location.search}${location.hash}`} replace />;
   }
 
-  return <Navigate to={`/landing${location.search}${location.hash}`} replace />;
+  return null;
 };
 
 class AppErrorBoundary extends React.Component<
