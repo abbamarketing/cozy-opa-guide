@@ -283,23 +283,30 @@ export default function Landing() {
     };
 
     if (isTouchDevice) {
-      // Prevent native scroll — we control everything via touch
-      const preventDefault = (e: TouchEvent) => {
-        const t = e.target as HTMLElement;
-        // Allow native touch on interactive elements
-        if (t.closest('a') || t.closest('button') || t.closest('.prow') || t.closest('.slw') || t.closest('input') || t.closest('.vm-backdrop') || t.closest('.nv') || t.closest('.fi') || t.closest('.pc') || t.closest('.lang-btn')) return;
-        e.preventDefault();
-      };
-      const onTouchStart = (e: TouchEvent) => { touchStartY = e.touches[0].clientY; };
+      let isScrolling = false;
       let touchAccum = 0;
-      const snapThreshold = 30; // px of touch movement to trigger snap
+      const snapThreshold = 30;
+
+      const onTouchStart = (e: TouchEvent) => {
+        touchStartY = e.touches[0].clientY;
+        isScrolling = false;
+        touchAccum = 0;
+      };
 
       const onTouchMove = (e: TouchEvent) => {
         const t = e.target as HTMLElement;
-        if (t.closest('.prow') || t.closest('.slw') || t.closest('input[type="range"]') || t.closest('.vm-backdrop')) return;
+        // Allow native scroll on these elements
+        if (t.closest('.prow') || t.closest('.slw') || t.closest('input') || t.closest('.vm-backdrop')) return;
+
         const dy = touchStartY - e.touches[0].clientY;
         touchStartY = e.touches[0].clientY;
         touchAccum += dy;
+
+        // Only hijack scroll after 5px of movement (avoid blocking taps)
+        if (Math.abs(touchAccum) > 5) {
+          isScrolling = true;
+          e.preventDefault();
+        }
       };
 
       const onTouchEnd = () => {
@@ -327,14 +334,12 @@ export default function Landing() {
 
       document.addEventListener('touchstart', onTouchStart, { passive: true });
       document.addEventListener('touchmove', onTouchMove, { passive: false });
-      document.addEventListener('touchmove', preventDefault, { passive: false });
       document.addEventListener('touchend', onTouchEnd, { passive: true });
       raf = requestAnimationFrame(update);
 
       return () => {
         document.removeEventListener('touchstart', onTouchStart);
         document.removeEventListener('touchmove', onTouchMove);
-        document.removeEventListener('touchmove', preventDefault);
         document.removeEventListener('touchend', onTouchEnd);
         cancelAnimationFrame(raf);
       };
