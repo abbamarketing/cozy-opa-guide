@@ -20,11 +20,6 @@ const LANDING_DOMAINS = ['video.abba.marketing'];
 
 const Index = () => {
   const { user, isLoading: authLoading } = useAuth();
-
-  // Always redirect to landing on marketing domains
-  if (LANDING_DOMAINS.includes(window.location.hostname)) {
-    return <Navigate to="/landing" replace />;
-  }
   const { profile, roles, primaryRole, isLoading: profileLoading } = useProfile();
   const { isClient } = useRole();
   const [projectStatus, setProjectStatus] = useState<string | null>(null);
@@ -32,6 +27,11 @@ const Index = () => {
   const [checkingProject, setCheckingProject] = useState(false);
   const [assignedProjectId, setAssignedProjectId] = useState<string | null | undefined>(undefined);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
+
+  // Always redirect to landing on marketing domains
+  if (LANDING_DOMAINS.includes(window.location.hostname)) {
+    return <Navigate to="/landing" replace />;
+  }
 
   const checkProjectStatus = useCallback(async () => {
     if (!user) return;
