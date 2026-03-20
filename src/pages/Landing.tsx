@@ -734,64 +734,78 @@ const CSS = `
 
 /* ═══ MOBILE OPTIMIZATIONS ═══ */
 @media(max-width:600px){
-  /* Hero text — tighter spacing */
-  .hero-text{padding:16px}
+  /* Scroll — shorter on mobile for faster scene changes */
+  .scroll-driver{height:600dvh}
+
+  /* Hero — compact */
+  .hero-text{padding:16px 20px}
   .hl{font-size:clamp(32px,10vw,48px)}
-  .hm{font-size:clamp(22px,6vw,32px)}
-  .sb{font-size:13px;max-width:300px;margin-top:14px}
-  .br{margin-top:20px;gap:8px}
-  .bd{padding:10px 22px;font-size:13px}
-  .bg-btn{padding:10px 16px;font-size:12px}
-  .scroll-line{bottom:24px;height:36px}
-
-  /* Scenes — less padding */
-  .sc{padding:16px}
-
-  /* Blobs — bigger on mobile to cover screen faster */
-  .blob{min-width:50vw;min-height:50vw}
-
-  /* Goo — much lighter filter for mobile GPU performance */
-  .goo{filter:blur(15px) contrast(5);will-change:auto}
-
-  /* Hero text fades faster on mobile */
+  .hm{font-size:clamp(20px,5.5vw,28px)}
+  .sb{font-size:12px;max-width:260px;margin-top:12px}
+  .br{margin-top:16px;gap:6px}
+  .bd{padding:8px 18px;font-size:12px}
+  .bg-btn{padding:8px 14px;font-size:11px}
   .scroll-line{display:none}
 
-  /* Features — stack */
-  .fts{gap:8px;margin-top:24px}
-  .ft{padding:16px 14px}
-  .ft-t{font-size:13px}
-  .ft-d{font-size:11px}
+  /* Scenes — compact, allow scroll for long content */
+  .sc{padding:12px 16px;align-items:flex-start;justify-content:flex-start;padding-top:10vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .sc>div{width:100%}
 
-  /* Pricing — stack */
-  .pg{gap:24px;margin-top:20px}
-  .pval{font-size:clamp(32px,8vw,44px)}
-  .slr{font-size:9px}
+  /* Blobs — bigger to cover faster */
+  .blob{min-width:55vw;min-height:55vw}
 
-  /* Dashboard mockup — scroll hint */
-  .dash{gap:6px;padding-right:16px}
-  .dash-col{padding:10px;min-height:100px}
-  .d-title{font-size:11px}
+  /* Goo — lighter for mobile GPU */
+  .goo{filter:blur(12px) contrast(4);will-change:auto}
 
-  /* Portfolio — smaller cards */
-  .prow{gap:10px}
-  .pc{flex:0 0 140px}
+  /* Features — smaller, tighter */
+  .fts{gap:6px;margin-top:16px}
+  .ft{padding:12px}
+  .ft-t{font-size:12px}
+  .ft-d{font-size:10px}
+
+  /* Pricing — stack vertically */
+  .pg{gap:16px;margin-top:16px;flex-direction:column}
+  .pl{flex-direction:column;gap:4px;align-items:flex-start}
+  .pval{font-size:clamp(28px,8vw,40px)}
+  .slr{font-size:8px}
+
+  /* Dashboard mockup — compact */
+  .dash{gap:4px;padding-right:12px}
+  .dash-col{padding:8px;min-height:80px}
+  .d-title{font-size:10px}
+  .d-card{padding:6px;border-radius:6px}
+  .d-name{font-size:9px}
+  .d-bar{height:2px}
+
+  /* Portfolio — vertical scroll, bigger cards */
+  .prow{flex-direction:column;gap:12px;overflow-x:visible;padding-bottom:0}
+  .pc{flex:none;width:100%;aspect-ratio:auto;flex-direction:row;padding:12px;gap:12px}
+  .pc-video{width:100px;height:140px;flex:none;border-radius:8px;margin-bottom:0}
   .pcn{font-size:14px}
+  .pct{font-size:10px}
 
-  /* FAQ */
+  /* FAQ — tighter */
   .fw{max-width:100%}
-  .faq-t{font-size:clamp(18px,5vw,24px);margin-bottom:20px}
-  .fiq{font-size:14px;padding:14px 0}
-  .fia p{font-size:13px}
+  .faq-t{font-size:clamp(16px,5vw,22px);margin-bottom:16px}
+  .fiq{font-size:13px;padding:12px 0}
+  .fia p{font-size:12px}
 
-  /* Orbit — smaller */
-  .orbit{width:220px;height:220px}
-  .orbit-r1{width:130px;height:130px;margin:-65px 0 0 -65px;--r1:65px}
-  .orbit-r2{width:220px;height:220px;margin:-110px 0 0 -110px;--r2:110px}
-  .oi{width:24px;height:24px;margin:-12px 0 0 -12px;font-size:8px}
+  /* Orbit — much smaller */
+  .orbit{width:180px;height:180px}
+  .orbit-r1{width:110px;height:110px;margin:-55px 0 0 -55px;--r1:55px}
+  .orbit-r2{width:180px;height:180px;margin:-90px 0 0 -90px;--r2:90px}
+  .oi{width:22px;height:22px;margin:-11px 0 0 -11px;font-size:7px}
+
+  /* Nav — smaller */
+  .nv{padding:8px 12px}
+  .nv-logo{font-size:14px}
+  .nv-logo img{width:20px;height:20px}
+  .nv-c{padding:6px 14px;font-size:11px}
 
   /* Footer */
-  .fo{padding:20px 16px;flex-direction:column;align-items:center;text-align:center}
-  .fl{flex-wrap:wrap;justify-content:center;gap:12px}
+  .fo{padding:16px;flex-direction:column;align-items:center;text-align:center;gap:10px}
+  .fl{flex-wrap:wrap;justify-content:center;gap:10px}
+  .fl a{font-size:11px}
 }
 .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15);transition:background .3s,transform .3s}
 .dot.on{background:#fff;transform:scale(1.4)}
