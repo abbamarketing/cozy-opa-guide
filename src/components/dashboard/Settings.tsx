@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { useUserProject } from '@/hooks/useUserProject';
@@ -16,6 +17,7 @@ import BrandProfile from '@/components/dashboard/BrandProfile';
 
 export default function Settings() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { userProject } = useUserProject();
   const [loading, setLoading] = useState(false);
   const [activeSection, setActiveSection] = useState('profile');
@@ -79,6 +81,7 @@ export default function Settings() {
       if (error) {
         toast.error('Erro ao atualizar', { description: error.message });
       } else {
+        await queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
         toast.success('Perfil atualizado');
       }
     } catch (err) {
