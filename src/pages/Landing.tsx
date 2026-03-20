@@ -727,7 +727,7 @@ const CSS = `
 
 .prow{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;cursor:grab;padding-bottom:10px}
 .prow::-webkit-scrollbar{display:none}
-.pc{flex:0 0 auto;border-radius:12px;position:relative;cursor:pointer;overflow:hidden;transition:transform .4s cubic-bezier(.23,1,.32,1);opacity:0;transform:translateY(12px)}
+.pc{flex:0 0 140px;height:220px;border-radius:12px;position:relative;cursor:pointer;overflow:hidden;transition:transform .4s cubic-bezier(.23,1,.32,1);opacity:0;transform:translateY(12px)}
 .pc:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.12)}
 .sc.on .pc{opacity:1;transform:none}
 .sc.on .pc-anim0{transition-delay:.1s}
