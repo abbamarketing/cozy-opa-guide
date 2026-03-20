@@ -108,6 +108,7 @@ const T = {
       { q: 'O que inclui?', a: 'Corte, legenda, ritmo, identidade visual. Até 90s.' },
       { q: 'Não gostei.', a: 'Marca o segundo, descreve o ajuste. Sem limite. Sem custo extra.' },
       { q: 'Cancelar?', a: 'Quando quiser. Sem multa.' },
+      { q: 'Tem garantia?', a: 'O plano Standard tem 7 dias de garantia. Se não gostar, devolvemos 100% do valor. Sem burocracia.' },
     ],
 
     // Portfolio
@@ -222,6 +223,7 @@ const T = {
       { q: 'What\'s included?', a: 'Cut, subtitles, pacing, brand identity. Up to 90s.' },
       { q: 'I didn\'t like it.', a: 'Mark the second, describe the change. No limit. No extra cost.' },
       { q: 'Cancel?', a: 'Anytime. No penalty.' },
+      { q: 'Money-back guarantee?', a: 'The Standard plan has a 7-day guarantee. If you don\'t like it, we refund 100%. No hassle.' },
     ],
 
     // Portfolio
@@ -548,6 +550,7 @@ export default function Landing() {
                   <div className="pf">{t.s6F4}</div>
                   <Link to="/auth" className="pb">{tier.btn}</Link>
                   <div className="pn">{t.s6Cancel}</div>
+                  {slider === 0 && <div className="pn" style={{ marginTop: 6 }}>{lang === 'pt' ? '7 dias de garantia. Não gostou? Devolvemos 100%.' : '7-day guarantee. Not happy? 100% refund.'}</div>}
                 </div>
               </div>
             </div></div>
