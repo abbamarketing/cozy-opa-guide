@@ -285,13 +285,13 @@ export default function Landing() {
       const preventDefault = (e: TouchEvent) => {
         // Allow scroll inside .prow (portfolio horizontal scroll) and range inputs
         const t = e.target as HTMLElement;
-        if (t.closest('.prow') || t.closest('input[type="range"]') || t.closest('.vm-backdrop')) return;
+        if (t.closest('.prow') || t.closest('.slw') || t.closest('input[type="range"]') || t.closest('.vm-backdrop')) return;
         e.preventDefault();
       };
       const onTouchStart = (e: TouchEvent) => { touchStartY = e.touches[0].clientY; };
       const onTouchMove = (e: TouchEvent) => {
         const t = e.target as HTMLElement;
-        if (t.closest('.prow') || t.closest('input[type="range"]') || t.closest('.vm-backdrop')) return;
+        if (t.closest('.prow') || t.closest('.slw') || t.closest('input[type="range"]') || t.closest('.vm-backdrop')) return;
         const dy = touchStartY - e.touches[0].clientY;
         touchStartY = e.touches[0].clientY;
         target = Math.max(0, Math.min(1, target + dy * sensitivity));
@@ -427,15 +427,13 @@ export default function Landing() {
               <div className="prow">
                 {t.portfolio.map((p, i) => (
                   <div key={p.name} className={`pc pc-anim${i}`} onClick={() => setVideoModal(p)}>
-                    <div className="pc-thumb">
-                      <video className="pc-video" src={p.video + '#t=1'} muted playsInline preload="metadata" />
-                      <div className="pc-overlay">
-                        <div className="pc-play">{'\u25B6\uFE0E'}</div>
+                    <video className="pc-video" src={p.video + '#t=1'} muted playsInline preload="metadata" />
+                    <div className="pc-overlay">
+                      <div className="pc-play">{'\u25B6\uFE0E'}</div>
+                      <div className="pc-meta">
+                        <div className="pcn">{p.name}</div>
+                        <div className="pct">{p.type}</div>
                       </div>
-                    </div>
-                    <div className="pc-info">
-                      <div className="pcn">{p.name}</div>
-                      <div className="pct">{p.type}</div>
                     </div>
                   </div>
                 ))}
@@ -713,8 +711,9 @@ const CSS = `
 .slr{display:flex;justify-content:space-between;margin-bottom:6px;font-size:10px;color:var(--tw3);font-weight:500}
 .slw{position:relative;height:36px;display:flex;align-items:center}
 .slw input{-webkit-appearance:none;appearance:none;width:100%;height:2px;background:rgba(255,255,255,.1);border-radius:10px;outline:none;z-index:2;position:relative;cursor:pointer}
-.slw input::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#F5F5F7;cursor:grab;box-shadow:0 1px 6px rgba(0,0,0,.3)}
-.slw input::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:50%;background:#F5F5F7;cursor:grab}
+.slw input::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#F5F5F7;cursor:grab;box-shadow:0 1px 6px rgba(0,0,0,.3);touch-action:pan-x}
+.slw input::-moz-range-thumb{width:24px;height:24px;border:none;border-radius:50%;background:#F5F5F7;cursor:grab}
+.slw input{touch-action:pan-x}
 .slf{position:absolute;top:50%;left:0;height:2px;transform:translateY(-50%);background:#F5F5F7;border-radius:10px;pointer-events:none;z-index:1}
 .psla{font-size:11px;color:var(--tw3);margin-top:16px;text-transform:uppercase;letter-spacing:.06em;font-weight:500}
 .pval{font-family:var(--fd);font-weight:600;font-size:clamp(36px,5vw,56px);line-height:1;letter-spacing:-.04em;margin:6px 0}
@@ -728,7 +727,7 @@ const CSS = `
 
 .prow{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;cursor:grab;padding-bottom:10px}
 .prow::-webkit-scrollbar{display:none}
-.pc{flex:0 0 clamp(160px,26vw,200px);border-radius:16px;border:1px solid rgba(255,255,255,.06);padding:20px 18px;aspect-ratio:3/4;display:flex;flex-direction:column;justify-content:space-between;transition:transform .4s cubic-bezier(.23,1,.32,1),border-color .3s;opacity:0;transform:translateY(12px)}
+.pc{flex:0 0 auto;border-radius:12px;position:relative;cursor:pointer;overflow:hidden;transition:transform .4s cubic-bezier(.23,1,.32,1);opacity:0;transform:translateY(12px)}
 .pc:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.12)}
 .sc.on .pc{opacity:1;transform:none}
 .sc.on .pc-anim0{transition-delay:.1s}
@@ -737,15 +736,14 @@ const CSS = `
 .sc.on .pc-anim3{transition-delay:.34s}
 .sc.on .pc-anim4{transition-delay:.42s}
 .sc:not(.on) .pc{opacity:0;transform:translateY(12px)}
-.pc-thumb{position:relative;flex:1;border-radius:10px;overflow:hidden;background:#0A0A0A}
-.pc-video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
-.pc-overlay{position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}
-.pc:hover .pc-overlay{opacity:1}
-.pc-play{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;padding-left:2px;border:1px solid rgba(255,255,255,.2);transition:transform .3s,background .3s}
-.pc:hover .pc-play{transform:scale(1.1);background:rgba(255,255,255,.25)}
-.pc-info{padding-top:10px}
-.pcn{font-family:var(--fd);font-weight:600;font-size:14px;color:var(--tw);margin-bottom:2px}
-.pct{font-size:9px;color:var(--tw3);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.pc-video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;border-radius:12px}
+.pc-overlay{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.7) 0%,rgba(0,0,0,0) 50%,rgba(0,0,0,.1) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;transition:background .3s}
+.pc:hover .pc-overlay{background:linear-gradient(0deg,rgba(0,0,0,.8) 0%,rgba(0,0,0,.2) 50%,rgba(0,0,0,.2) 100%)}
+.pc-play{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;padding-left:2px;border:1px solid rgba(255,255,255,.2);transition:transform .3s,background .3s;opacity:.7}
+.pc:hover .pc-play{transform:scale(1.1);background:rgba(255,255,255,.25);opacity:1}
+.pc-meta{position:absolute;bottom:10px;left:12px;right:12px}
+.pcn{font-family:var(--fd);font-weight:600;font-size:13px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+.pct{font-size:8px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-top:1px}
 
 /* Video Modal */
 .vm-backdrop{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:20px;animation:vmFadeIn .3s}
@@ -803,6 +801,7 @@ const CSS = `
 .d-fill-anim{width:0 !important}
 .sc.on .d-fill-anim{animation:dfill 2s .6s forwards}
 @keyframes dfill{to{width:62%}}
+@keyframes dashScroll{0%{transform:translateX(0)}100%{transform:translateX(-40%)}}
 .sc:not(.on) .d-fill-anim{animation:none}
 .d-actions{display:flex;gap:4px;margin-top:6px}
 .d-btn-rev{font-size:9px;font-weight:600;padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.12);color:var(--tw3)}
@@ -882,16 +881,15 @@ const CSS = `
   .d-name{font-size:9px}
   .d-bar{height:2px}
 
-  /* Portfolio — horizontal scroll, compact */
-  .prow{gap:10px}
-  .pc{flex:0 0 130px;padding:14px 12px}
-  .pc-thumb{border-radius:8px}
-  .pc-overlay{opacity:1;background:rgba(0,0,0,.2)}
-  .pc-play{width:32px;height:32px;font-size:11px}
-  .pc-info{padding-top:8px}
-  .pcn{font-size:12px}
-  .pct{font-size:8px}
+  /* Portfolio — compact */
+  .prow{gap:8px}
+  .pc-play{width:28px;height:28px;font-size:10px}
+  .pcn{font-size:11px}
+  .pct{font-size:7px}
   .vm-container{max-width:92vw}
+
+  /* Dashboard — auto-scroll on mobile */
+  .dash{animation:dashScroll 8s ease-in-out infinite alternate}
 
   /* FAQ — tighter */
   .fw{max-width:100%}
