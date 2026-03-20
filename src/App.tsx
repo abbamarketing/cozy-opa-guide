@@ -108,10 +108,8 @@ const App = () => (
                 
               </Route>
 
-              {/* Any authenticated user */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/" element={<Index />} />
-              </Route>
+              {/* Index handles its own auth check and redirects */}
+              <Route path="/" element={<Index />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
