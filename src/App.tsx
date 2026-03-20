@@ -1,6 +1,6 @@
 import React, { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -43,6 +43,18 @@ const PageLoader = () => (
   </div>
 );
 
+const LANDING_DOMAINS = new Set(["video.abba.marketing"]);
+
+const MarketingDomainRedirect = () => {
+  const location = useLocation();
+
+  if (!LANDING_DOMAINS.has(window.location.hostname) || location.pathname === "/landing") {
+    return null;
+  }
+
+  return <Navigate to={`/landing${location.search}${location.hash}`} replace />;
+};
+
 class AppErrorBoundary extends React.Component<
   { children: React.ReactNode },
   { hasError: boolean }
@@ -79,6 +91,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <MarketingDomainRedirect />
           <Suspense fallback={<PageLoader />}>
             <Routes>
               {/* Public routes */}
