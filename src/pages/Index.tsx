@@ -123,6 +123,11 @@ const Index = () => {
     applyAffiliateRef();
   }, [user, profile]);
 
+  // Always redirect to landing on marketing domains
+  if (LANDING_DOMAINS.includes(window.location.hostname)) {
+    return <Navigate to="/landing" replace />;
+  }
+
   // Loading states
   if (authLoading || profileLoading || checkingProject) {
     return (
