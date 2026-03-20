@@ -1,5 +1,5 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, Menu, CalendarDays, DollarSign, Eye, Headphones } from 'lucide-react';
+import { LayoutDashboard, Users, Package, Film, BarChart3, FolderKanban, ScrollText, Menu, CalendarDays, DollarSign, Eye, Headphones, UserCog } from 'lucide-react';
 import abbaLogo from '@/assets/abba-logo.png';
 import { useRole } from '@/hooks/useRole';
 import { useAuth } from '@/lib/auth';
@@ -20,31 +20,41 @@ import AdminCalendar from '@/components/admin/AdminCalendar';
 import AdminCommissions from '@/components/admin/AdminCommissions';
 import AdminSupport from '@/components/admin/AdminSupport';
 import AdminTour, { restartAdminTour } from '@/components/admin/AdminTour';
+import AdminTeam from '@/components/admin/AdminTeam';
 
 import NotificationBell from '@/components/shared/NotificationBell';
 import { useQuery } from '@tanstack/react-query';
+import { useTeamPermissions } from '@/hooks/useTeamPermissions';
 
-const TABS = [
-  { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard },
-  { id: 'clientes', label: 'Clientes', icon: Users },
-  { id: 'entregas', label: 'Entregas', icon: Package },
-  { id: 'editores', label: 'Editores', icon: Film },
-  { id: 'metricas', label: 'Métricas', icon: BarChart3 },
-  { id: 'projetos', label: 'Projetos', icon: FolderKanban },
-  { id: 'calendario', label: 'Calendário', icon: CalendarDays },
-  { id: 'comissoes', label: 'Comissões', icon: DollarSign },
-  { id: 'suporte', label: 'Suporte', icon: Headphones },
-  { id: 'logs', label: 'Logs', icon: ScrollText },
+const ALL_TABS = [
+  { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard, godOnly: false },
+  { id: 'clientes', label: 'Clientes', icon: Users, godOnly: false },
+  { id: 'entregas', label: 'Entregas', icon: Package, godOnly: false },
+  { id: 'editores', label: 'Editores', icon: Film, godOnly: false },
+  { id: 'metricas', label: 'Métricas', icon: BarChart3, godOnly: false },
+  { id: 'projetos', label: 'Projetos', icon: FolderKanban, godOnly: false },
+  { id: 'calendario', label: 'Calendário', icon: CalendarDays, godOnly: false },
+  { id: 'comissoes', label: 'Comissões', icon: DollarSign, godOnly: false },
+  { id: 'suporte', label: 'Suporte', icon: Headphones, godOnly: false },
+  { id: 'logs', label: 'Logs', icon: ScrollText, godOnly: false },
+  { id: 'equipe', label: 'Equipe', icon: UserCog, godOnly: true },
 ];
 
 const Admin = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const { isGod } = useRole();
+  const { hasTab } = useTeamPermissions();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'overview';
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Build filtered tabs: god-only tabs only for god users; other tabs filtered by team permissions
+  const TABS = ALL_TABS.filter(tab => {
+    if (tab.godOnly) return isGod();
+    return hasTab(tab.id);
+  });
 
   const { data: openTicketCount = 0 } = useQuery({
     queryKey: ['admin-open-ticket-count'],
@@ -78,6 +88,7 @@ const Admin = () => {
       case 'comissoes': return <AdminCommissions />;
       case 'suporte': return <AdminSupport />;
       case 'logs': return <LogViewer />;
+      case 'equipe': return <AdminTeam />;
       default: return <AdminOverview />;
     }
   };
