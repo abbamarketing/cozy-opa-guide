@@ -287,7 +287,7 @@ export default function Landing() {
       const preventDefault = (e: TouchEvent) => {
         const t = e.target as HTMLElement;
         // Allow native touch on interactive elements
-        if (t.closest('a') || t.closest('button') || t.closest('.bento') || t.closest('.slw') || t.closest('input') || t.closest('.vm-backdrop') || t.closest('.nv') || t.closest('.fi') || t.closest('.pc') || t.closest('.lang-btn')) return;
+        if (t.closest('a') || t.closest('button') || t.closest('.prow') || t.closest('.slw') || t.closest('input') || t.closest('.vm-backdrop') || t.closest('.nv') || t.closest('.fi') || t.closest('.pc') || t.closest('.lang-btn')) return;
         e.preventDefault();
       };
       const onTouchStart = (e: TouchEvent) => { touchStartY = e.touches[0].clientY; };
@@ -296,7 +296,7 @@ export default function Landing() {
 
       const onTouchMove = (e: TouchEvent) => {
         const t = e.target as HTMLElement;
-        if (t.closest('.bento') || t.closest('.slw') || t.closest('input[type="range"]') || t.closest('.vm-backdrop')) return;
+        if (t.closest('.prow') || t.closest('.slw') || t.closest('input[type="range"]') || t.closest('.vm-backdrop')) return;
         const dy = touchStartY - e.touches[0].clientY;
         touchStartY = e.touches[0].clientY;
         touchAccum += dy;
@@ -453,15 +453,15 @@ export default function Landing() {
 
             <div className={sc(2)}><div style={{ width: '100%', maxWidth: 820 }}>
               <p className="lb">{t.s2Label}</p><h2 className="hl hm" style={{ marginBottom: 32 }}><em>{t.s2Em}</em></h2>
-              <div className="bento">
+              <div className="prow">
                 {t.portfolio.map((p, i) => (
-                  <div key={p.name} className={`bc bc-${i} pc-anim${i}`} onClick={() => setVideoModal(p)}>
-                    <div className="bc-bg" />
-                    <div className="bc-ov">
-                      <div className="bc-play">{'\u25B6\uFE0E'}</div>
-                      <div className="bc-meta">
-                        <div className="bc-name">{p.name}</div>
-                        <div className="bc-type">{p.type}</div>
+                  <div key={p.name} className={`pc pc-anim${i}`} onClick={() => setVideoModal(p)}>
+                    <video className="pc-vid" src={p.video + '#t=1'} muted playsInline preload="metadata" />
+                    <div className="pc-ov">
+                      <div className="pc-play">{'\u25B6\uFE0E'}</div>
+                      <div className="pc-meta">
+                        <div className="pc-name">{p.name}</div>
+                        <div className="pc-type">{p.type}</div>
                       </div>
                     </div>
                   </div>
@@ -708,21 +708,21 @@ const CSS = `
 .sc.dn{opacity:0;transform:translateY(24px)}
 .sc .hl{color:var(--tw)}
 
-.sc .hl,.sc .lb,.sc .fts,.sc .pl,.sc .pr,.sc .fw,.sc .bento{transition:opacity .6s cubic-bezier(.23,1,.32,1),transform .7s cubic-bezier(.23,1,.32,1)}
+.sc .hl,.sc .lb,.sc .fts,.sc .pl,.sc .pr,.sc .fw,.sc .prow{transition:opacity .6s cubic-bezier(.23,1,.32,1),transform .7s cubic-bezier(.23,1,.32,1)}
 .sc.on .hl{opacity:1;transform:none;transition-delay:0s}
 .sc.on .lb{opacity:1;transform:none;transition-delay:0s}
 .sc.on .fts{opacity:1;transform:none;transition-delay:.12s}
 .sc.on .pl{opacity:1;transform:none;transition-delay:.05s}
 .sc.on .pr{opacity:1;transform:none;transition-delay:.18s}
 .sc.on .fw{opacity:1;transform:none;transition-delay:.05s}
-.sc.on .bento{opacity:1;transform:none;transition-delay:.1s}
+.sc.on .prow{opacity:1;transform:none;transition-delay:.1s}
 .sc:not(.on) .hl{opacity:0;transform:translateY(20px)}
 .sc:not(.on) .lb{opacity:0;transform:translateY(10px)}
 .sc:not(.on) .fts{opacity:0;transform:translateY(20px)}
 .sc:not(.on) .pl{opacity:0;transform:translateX(-30px)}
 .sc:not(.on) .pr{opacity:0;transform:translateX(30px)}
 .sc:not(.on) .fw{opacity:0;transform:translateY(20px)}
-.sc:not(.on) .bento{opacity:0;transform:translateX(30px)}
+.sc:not(.on) .prow{opacity:0;transform:translateX(30px)}
 
 .fts{display:grid;gap:10px;grid-template-columns:1fr;width:100%;max-width:600px;margin:36px auto 0;text-align:left}
 @media(min-width:600px){.fts{grid-template-columns:1fr 1fr 1fr}}
@@ -755,30 +755,25 @@ const CSS = `
 .pb:hover{opacity:.85}
 .pn{margin-top:8px;font-size:11px;color:var(--tw3)}
 
-/* Bento grid */
-.bento{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:100px;gap:8px;width:100%}
-.bc{border-radius:12px;position:relative;cursor:pointer;overflow:hidden;opacity:0;transform:translateY(12px);transition:transform .4s cubic-bezier(.23,1,.32,1)}
-.bc-0{grid-column:1;grid-row:span 3}
-.bc-1{grid-column:2;grid-row:span 2}
-.bc-2{grid-column:3;grid-row:span 3}
-.bc-3{grid-column:2;grid-row:span 2}
-.bc-4{grid-column:1/3;grid-row:span 2}
+.prow{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+.prow::-webkit-scrollbar{display:none}
+.pc{flex:0 0 150px;height:240px;border-radius:14px;position:relative;cursor:pointer;overflow:hidden;opacity:0;transform:translateY(12px);transition:transform .4s cubic-bezier(.23,1,.32,1)}
 .pc:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.12)}
-.sc.on .bc{opacity:1;transform:none}
+.sc.on .pc{opacity:1;transform:none}
 .sc.on .pc-anim0{transition-delay:.1s}
 .sc.on .pc-anim1{transition-delay:.18s}
 .sc.on .pc-anim2{transition-delay:.26s}
 .sc.on .pc-anim3{transition-delay:.34s}
 .sc.on .pc-anim4{transition-delay:.42s}
-.sc:not(.on) .bc{opacity:0;transform:translateY(12px)}
-.bc-bg{position:absolute;inset:0;background:rgba(255,255,255,.04)}
-.bc-ov{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.7) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,.05) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:background .3s}
-.bc:hover .bc-ov{background:linear-gradient(0deg,rgba(0,0,0,.8) 0%,rgba(0,0,0,.25) 40%,rgba(0,0,0,.2) 100%)}
-.bc-play{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;padding-left:2px;border:1px solid rgba(255,255,255,.15);transition:transform .3s,background .3s,opacity .3s;opacity:0}
-.bc:hover .bc-play{transform:scale(1.1);background:rgba(255,255,255,.2);opacity:1}
-.bc-meta{position:absolute;bottom:10px;left:12px;right:12px}
-.bc-name{font-family:var(--fd);font-weight:600;font-size:13px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5)}
-.bc-type{font-size:8px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:2px}
+.sc:not(.on) .pc{opacity:0;transform:translateY(12px)}
+.pc-vid{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.pc-ov{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.7) 0%,rgba(0,0,0,0) 40%);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:background .3s}
+.pc:hover .pc-ov{background:linear-gradient(0deg,rgba(0,0,0,.8) 0%,rgba(0,0,0,.3) 40%)}
+.pc-play{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;padding-left:2px;border:1px solid rgba(255,255,255,.15);transition:transform .3s,opacity .3s;opacity:.6}
+.pc:hover .pc-play{transform:scale(1.1);opacity:1}
+.pc-meta{position:absolute;bottom:10px;left:12px;right:12px}
+.pc-name{font-family:var(--fd);font-weight:600;font-size:13px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+.pc-type{font-size:8px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:2px}
 
 /* Video Modal */
 .vm-backdrop{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:20px;animation:vmFadeIn .3s}
@@ -916,12 +911,12 @@ const CSS = `
   .d-name{font-size:9px}
   .d-bar{height:2px}
 
-  /* Bento — 2 columns on mobile */
-  .bento{grid-template-columns:repeat(2,1fr);grid-auto-rows:80px}
-  .bc-4{grid-column:1/3}
-  .bc-play{opacity:1;width:24px;height:24px;font-size:9px}
-  .bc-name{font-size:11px}
-  .bc-type{font-size:7px}
+  /* Portfolio — smaller on mobile */
+  .prow{gap:8px}
+  .pc{flex:0 0 120px;height:200px;border-radius:10px}
+  .pc-play{opacity:1;width:28px;height:28px;font-size:10px}
+  .pc-name{font-size:11px}
+  .pc-type{font-size:7px}
   .vm-container{max-width:92vw}
 
   /* Dashboard — 2x2 grid, no scroll needed */
