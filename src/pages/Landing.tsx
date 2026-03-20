@@ -885,7 +885,7 @@ const CSS = `
   .br{margin-top:16px;gap:6px}
   .bd{padding:8px 18px;font-size:12px}
   .bg-btn{padding:8px 14px;font-size:11px}
-  .scroll-line{display:none}
+  .scroll-line{bottom:24px;height:36px}
 
   /* Scenes — centered, scrollable if overflow */
   .sc{padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
