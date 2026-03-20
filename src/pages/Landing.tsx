@@ -252,6 +252,7 @@ export default function Landing() {
   const [slider, setSlider] = useState(0);
   const [faq, setFaq] = useState<number | null>(null);
   const [lang, setLang] = useState<Lang>('pt');
+  const [videoModal, setVideoModal] = useState<{ name: string; type: string; video: string } | null>(null);
 
   const t = T[lang];
   const tier = t.tiers[slider];
@@ -357,9 +358,14 @@ export default function Landing() {
               <p className="lb">{t.s2Label}</p><h2 className="hl hm" style={{ marginBottom: 32 }}><em>{t.s2Em}</em></h2>
               <div className="prow">
                 {t.portfolio.map((p, i) => (
-                  <div key={p.name} className={`pc pc-anim${i}`}>
-                    <video className="pc-video" src={p.video} muted loop playsInline preload="metadata" onMouseEnter={e => (e.target as HTMLVideoElement).play()} onMouseLeave={e => { const v = e.target as HTMLVideoElement; v.pause(); v.currentTime = 0; }} />
-                    <div>
+                  <div key={p.name} className={`pc pc-anim${i}`} onClick={() => setVideoModal(p)}>
+                    <div className="pc-thumb">
+                      <video className="pc-video" src={p.video + '#t=1'} muted playsInline preload="metadata" />
+                      <div className="pc-overlay">
+                        <div className="pc-play">{'\u25B6\uFE0E'}</div>
+                      </div>
+                    </div>
+                    <div className="pc-info">
                       <div className="pcn">{p.name}</div>
                       <div className="pct">{p.type}</div>
                     </div>
@@ -491,6 +497,20 @@ export default function Landing() {
             </div>
             <div className="scroll-line">
               <div className="scroll-line-fill" />
+            </div>
+          </div>
+        )}
+
+        {/* Video Modal */}
+        {videoModal && (
+          <div className="vm-backdrop" onClick={() => setVideoModal(null)}>
+            <div className="vm-container" onClick={e => e.stopPropagation()}>
+              <button className="vm-close" onClick={() => setVideoModal(null)}>&times;</button>
+              <video className="vm-video" src={videoModal.video} controls autoPlay playsInline />
+              <div className="vm-info">
+                <span className="vm-name">{videoModal.name}</span>
+                <span className="vm-type">{videoModal.type}</span>
+              </div>
             </div>
           </div>
         )}
@@ -649,9 +669,27 @@ const CSS = `
 .sc.on .pc-anim3{transition-delay:.34s}
 .sc.on .pc-anim4{transition-delay:.42s}
 .sc:not(.on) .pc{opacity:0;transform:translateY(12px)}
-.pc-video{flex:1;border-radius:10px;width:100%;object-fit:cover;background:#0A0A0A;margin-bottom:12px;cursor:pointer}
+.pc-thumb{position:relative;flex:1;border-radius:10px;overflow:hidden;background:#0A0A0A}
+.pc-video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.pc-overlay{position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}
+.pc:hover .pc-overlay{opacity:1}
+.pc-play{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;padding-left:2px;border:1px solid rgba(255,255,255,.2);transition:transform .3s,background .3s}
+.pc:hover .pc-play{transform:scale(1.1);background:rgba(255,255,255,.25)}
+.pc-info{padding-top:10px}
 .pcn{font-family:var(--fd);font-weight:600;font-size:14px;color:var(--tw);margin-bottom:2px}
 .pct{font-size:9px;color:var(--tw3);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+
+/* Video Modal */
+.vm-backdrop{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:20px;animation:vmFadeIn .3s}
+@keyframes vmFadeIn{from{opacity:0}to{opacity:1}}
+.vm-container{position:relative;max-width:400px;width:100%;animation:vmSlideIn .4s cubic-bezier(.23,1,.32,1)}
+@keyframes vmSlideIn{from{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:none}}
+.vm-video{width:100%;border-radius:16px;background:#000;display:block;max-height:80vh;object-fit:contain}
+.vm-close{position:absolute;top:-40px;right:0;background:none;border:none;color:rgba(255,255,255,.6);font-size:28px;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:color .2s,background .2s}
+.vm-close:hover{color:#fff;background:rgba(255,255,255,.1)}
+.vm-info{display:flex;justify-content:space-between;align-items:center;padding:12px 4px 0}
+.vm-name{font-family:var(--fd);font-weight:600;font-size:14px;color:#fff}
+.vm-type{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
 .pc-stat{font-size:10px;color:var(--tw3);font-weight:500}
 
 .fw{max-width:560px;width:100%;text-align:left}
@@ -776,12 +814,16 @@ const CSS = `
   .d-name{font-size:9px}
   .d-bar{height:2px}
 
-  /* Portfolio — vertical scroll, bigger cards */
-  .prow{flex-direction:column;gap:12px;overflow-x:visible;padding-bottom:0}
-  .pc{flex:none;width:100%;aspect-ratio:auto;flex-direction:row;padding:12px;gap:12px}
-  .pc-video{width:100px;height:140px;flex:none;border-radius:8px;margin-bottom:0}
-  .pcn{font-size:14px}
-  .pct{font-size:10px}
+  /* Portfolio — horizontal scroll, compact */
+  .prow{gap:10px}
+  .pc{flex:0 0 130px;padding:14px 12px}
+  .pc-thumb{border-radius:8px}
+  .pc-overlay{opacity:1;background:rgba(0,0,0,.2)}
+  .pc-play{width:32px;height:32px;font-size:11px}
+  .pc-info{padding-top:8px}
+  .pcn{font-size:12px}
+  .pct{font-size:8px}
+  .vm-container{max-width:92vw}
 
   /* FAQ — tighter */
   .fw{max-width:100%}
