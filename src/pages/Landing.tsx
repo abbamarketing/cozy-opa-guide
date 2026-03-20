@@ -630,7 +630,7 @@ const CSS = `
 
 /* L1 */
 .dark-layer{position:fixed;top:0;left:0;width:100%;height:100vh;height:100dvh;z-index:1}
-.stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:visible}
 
 /* L2 */
 .goo{position:fixed;top:0;left:0;width:100%;height:100vh;height:100dvh;z-index:2;pointer-events:none;overflow:hidden;filter:blur(30px) contrast(8);background:#FBFBFA;transition:opacity .3s}
@@ -874,22 +874,21 @@ const CSS = `
   .slr{font-size:8px}
 
   /* Dashboard mockup — compact */
-  .dash{gap:4px;padding-right:12px}
-  .dash-col{padding:8px;min-height:80px}
+  .dash{grid-template-columns:repeat(2,1fr);gap:6px;overflow:visible}
+  .dash-col{padding:10px;min-height:auto}
   .d-title{font-size:10px}
   .d-card{padding:6px;border-radius:6px}
   .d-name{font-size:9px}
   .d-bar{height:2px}
 
-  /* Portfolio — compact */
-  .prow{gap:8px}
+  /* Portfolio — compact, ensure scroll works */
+  .prow{gap:8px;-webkit-overflow-scrolling:touch;touch-action:pan-x}
   .pc-play{width:28px;height:28px;font-size:10px}
   .pcn{font-size:11px}
   .pct{font-size:7px}
   .vm-container{max-width:92vw}
 
-  /* Dashboard — auto-scroll on mobile */
-  .dash{animation:dashScroll 8s ease-in-out infinite alternate}
+  /* Dashboard — 2x2 grid, no scroll needed */
 
   /* FAQ — tighter */
   .fw{max-width:100%}
