@@ -80,7 +80,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <MarketingDomainRedirect />
+          
           <Suspense fallback={<PageLoader />}>
             <Routes>
               {/* Public routes */}
