@@ -43,18 +43,6 @@ const PageLoader = () => (
   </div>
 );
 
-const LANDING_DOMAINS = new Set(["video.abba.marketing"]);
-
-const MarketingDomainRedirect = () => {
-  const location = useLocation();
-
-  // On marketing domains, only redirect the bare root "/" to /landing
-  if (LANDING_DOMAINS.has(window.location.hostname) && location.pathname === "/") {
-    return <Navigate to={`/landing${location.search}${location.hash}`} replace />;
-  }
-
-  return null;
-};
 
 class AppErrorBoundary extends React.Component<
   { children: React.ReactNode },
