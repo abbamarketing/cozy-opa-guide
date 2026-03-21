@@ -16,7 +16,7 @@ const ROLE_CONFIG: Record<string, { label: string; description: string; icon: Re
   client: { label: 'Cliente', description: 'Acompanhe suas entregas e projetos', icon: User, path: '/dashboard' },
 };
 
-const LANDING_DOMAINS = ['video.abba.marketing'];
+
 
 const Index = () => {
   const { user, isLoading: authLoading } = useAuth();
@@ -123,10 +123,6 @@ const Index = () => {
     applyAffiliateRef();
   }, [user, profile]);
 
-  // Always redirect to landing on marketing domains
-  if (LANDING_DOMAINS.includes(window.location.hostname)) {
-    return <Navigate to="/landing" replace />;
-  }
 
   // Loading states
   if (authLoading || profileLoading || checkingProject) {
