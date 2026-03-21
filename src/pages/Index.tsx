@@ -28,6 +28,8 @@ const Index = () => {
   const [checkingProject, setCheckingProject] = useState(false);
   const [assignedProjectId, setAssignedProjectId] = useState<string | null | undefined>(undefined);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [redirectingToCheckout, setRedirectingToCheckout] = useState(false);
+  const subscribeAttempted = useRef(false);
 
 
   const checkProjectStatus = useCallback(async () => {
