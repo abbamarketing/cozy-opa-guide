@@ -1,6 +1,7 @@
 const ALLOWED_ORIGINS = [
   "https://abbavideo.com.br",
   "https://www.abbavideo.com.br",
+  "https://video.abba.marketing",
   "https://cozy-opa-guide.lovable.app",
 ];
 
