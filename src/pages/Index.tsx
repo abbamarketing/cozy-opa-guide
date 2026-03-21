@@ -126,9 +126,52 @@ const Index = () => {
     applyAffiliateRef();
   }, [user, profile]);
 
+  // Auto-subscribe: if user came from LP with a plan selection, call subscribe edge function
+  useEffect(() => {
+    if (!user || !isClient() || subscribeAttempted.current) return;
+    const selectedPlan = localStorage.getItem('selected_plan');
+    if (!selectedPlan) return;
+
+    subscribeAttempted.current = true;
+    setRedirectingToCheckout(true);
+    localStorage.removeItem('selected_plan');
+
+    (async () => {
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData?.session?.access_token;
+        if (!accessToken) throw new Error('Sessão expirada');
+
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/subscribe`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: JSON.stringify({ tier: selectedPlan }),
+          },
+        );
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data?.error || `Erro ${response.status}`);
+        if (data?.url) {
+          window.location.href = data.url;
+          return;
+        }
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Tente novamente';
+        toast.error('Erro ao iniciar assinatura', { description: message });
+      }
+      setRedirectingToCheckout(false);
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, roles]);
 
   // Loading states
-  if (authLoading || profileLoading || checkingProject) {
+  if (authLoading || profileLoading || checkingProject || redirectingToCheckout) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
