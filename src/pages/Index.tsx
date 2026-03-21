@@ -16,7 +16,7 @@ const ROLE_CONFIG: Record<string, { label: string; description: string; icon: Re
   client: { label: 'Cliente', description: 'Acompanhe suas entregas e projetos', icon: User, path: '/dashboard' },
 };
 
-const LANDING_DOMAINS = ['video.abba.marketing'];
+
 
 const Index = () => {
   const { user, isLoading: authLoading } = useAuth();
