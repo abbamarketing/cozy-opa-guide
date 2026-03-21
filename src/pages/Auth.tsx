@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import abbaLogo from '@/assets/abba-logo.png';
@@ -11,6 +11,15 @@ import { toast } from 'sonner';
 const AuthPage = () => {
   const { user, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+
+  // Store plan choice before OAuth redirect
+  useEffect(() => {
+    const plan = searchParams.get('plan');
+    if (plan) {
+      localStorage.setItem('selected_plan', plan);
+    }
+  }, [searchParams]);
 
   if (authLoading) {
     return (

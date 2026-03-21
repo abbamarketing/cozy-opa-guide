@@ -538,7 +538,7 @@ export default function Landing() {
                   <div className="pf">{t.s6F2}</div>
                   <div className="pf">{t.s6F3}</div>
                   <div className="pf">{t.s6F4}</div>
-                  <Link to="/auth" className="pb">{tier.btn}</Link>
+                  <Link to={`/auth?plan=${tier.tier.toLowerCase()}`} className="pb">{tier.btn}</Link>
                   <div className="pn">{t.s6Cancel}</div>
                   {slider === 0 && <div className="pn" style={{ marginTop: 6 }}>{lang === 'pt' ? '7 dias de garantia. Não gostou? Devolvemos 100%.' : '7-day guarantee. Not happy? 100% refund.'}</div>}
                 </div>
