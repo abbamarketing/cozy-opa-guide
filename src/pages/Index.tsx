@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
@@ -7,6 +7,7 @@ import { useRole } from '@/hooks/useRole';
 import { Loader2, Shield, Film, User } from 'lucide-react';
 import abbaLogo from '@/assets/abba-logo.png';
 import { Card } from '@/components/ui/card';
+import { toast } from 'sonner';
 
 
 const ROLE_CONFIG: Record<string, { label: string; description: string; icon: React.ComponentType<{ className?: string }>; path: string }> = {
