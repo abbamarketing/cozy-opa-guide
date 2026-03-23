@@ -8,6 +8,16 @@ import { logger } from '@/lib/logger';
 import { useDeliveries } from '@/hooks/useDeliveries';
 import type { UserProjectData } from '@/hooks/useUserProject';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -30,6 +40,7 @@ import {
   Wrench,
   MessageSquare,
   Volume2, Palette, Scissors, FileText, Timer, Pin,
+  Pencil, Trash2,
 } from 'lucide-react';
 import type { DeliveryData } from './DeliveryCard';
 import { typeConfig, statusConfig } from './DeliveryCard';
@@ -62,8 +73,12 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
   const [revisions, setRevisions] = useState<RevisionRecord[]>([]);
   const [showRevisionModal, setShowRevisionModal] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
   
-
   useEffect(() => {
     if (!delivery || !open) return;
     const fetchRevisions = async () => {
@@ -98,6 +113,43 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
   const isApproved = delivery.status === 'approved';
   const canRevise = canReview && delivery.revision_count < delivery.max_revisions;
   const isVideoType = delivery.delivery_type === 'youtube_video' || delivery.delivery_type === 'instagram_video';
+  const canEditOrDelete = delivery.status === 'pending' || delivery.status === 'queue';
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase.from('deliveries').delete().eq('id', delivery.id);
+      if (error) throw error;
+      toast.success('Entrega excluída');
+      onOpenChange(false);
+      onUpdated();
+    } catch {
+      toast.error('Erro ao excluir entrega');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      await updateDelivery.mutateAsync({
+        id: delivery.id,
+        updates: { title: editTitle, description: editDescription || null },
+      });
+      toast.success('Entrega atualizada');
+      setIsEditing(false);
+      onUpdated();
+    } catch {
+      toast.error('Erro ao atualizar entrega');
+    }
+  };
+
+  const startEditing = () => {
+    setEditTitle(delivery.title);
+    setEditDescription(delivery.description || '');
+    setIsEditing(true);
+  };
 
   const downloadExpiry = delivery.approved_at
     ? addDays(new Date(delivery.approved_at), 90)
@@ -170,11 +222,49 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
                 <div className="flex items-start gap-2">
                   <Icon className="mt-1 h-5 w-5 shrink-0 text-primary" />
                   <div className="min-w-0 flex-1">
-                    <DialogTitle className="text-base sm:text-lg leading-snug break-words">{delivery.title}</DialogTitle>
-                    <div className="flex items-center gap-2 mt-1.5">
-                      <Badge variant="outline" className="text-[10px] shrink-0">{config.label}</Badge>
-                      <Badge variant={status.variant} className="shrink-0">{status.label}</Badge>
-                    </div>
+                    {isEditing ? (
+                      <div className="space-y-2">
+                        <input
+                          className="w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-primary"
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          placeholder="Título da entrega"
+                        />
+                        <textarea
+                          className="w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary"
+                          rows={2}
+                          value={editDescription}
+                          onChange={(e) => setEditDescription(e.target.value)}
+                          placeholder="Descrição (opcional)"
+                        />
+                        <div className="flex gap-2">
+                          <Button size="sm" className="gap-1.5 text-xs" onClick={handleSaveEdit} disabled={!editTitle.trim()}>
+                            <Check className="h-3 w-3" /> Salvar
+                          </Button>
+                          <Button size="sm" variant="ghost" className="text-xs" onClick={() => setIsEditing(false)}>
+                            Cancelar
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <DialogTitle className="text-base sm:text-lg leading-snug break-words">{delivery.title}</DialogTitle>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <Badge variant="outline" className="text-[10px] shrink-0">{config.label}</Badge>
+                          <Badge variant={status.variant} className="shrink-0">{status.label}</Badge>
+                          {canEditOrDelete && (
+                            <div className="flex items-center gap-1 ml-auto">
+                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={startEditing}>
+                                <Pencil className="h-3 w-3 text-muted-foreground" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setShowDeleteConfirm(true)}>
+                                <Trash2 className="h-3 w-3 text-destructive" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </DialogHeader>
@@ -459,6 +549,29 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
           }}
         />
       )}
+
+      {/* Delete confirmation */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir entrega?</AlertDialogTitle>
+            <AlertDialogDescription>
+              A entrega "{delivery.title}" será excluída permanentemente. Essa ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
