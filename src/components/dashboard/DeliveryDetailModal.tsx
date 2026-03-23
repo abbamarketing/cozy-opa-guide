@@ -240,9 +240,6 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
                               <Button variant="ghost" size="icon" className="h-6 w-6" onClick={startEditing}>
                                 <Pencil className="h-3 w-3 text-muted-foreground" />
                               </Button>
-                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setShowDeleteConfirm(true)}>
-                                <Trash2 className="h-3 w-3 text-destructive" />
-                              </Button>
                             </div>
                           )}
                         </div>
@@ -533,28 +530,6 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
         />
       )}
 
-      {/* Delete confirmation */}
-      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Excluir entrega?</AlertDialogTitle>
-            <AlertDialogDescription>
-              A entrega "{delivery.title}" será excluída permanentemente. Essa ação não pode ser desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 };
