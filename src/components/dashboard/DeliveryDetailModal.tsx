@@ -113,21 +113,6 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
   const isVideoType = delivery.delivery_type === 'youtube_video' || delivery.delivery_type === 'instagram_video';
   const canEditOrDelete = delivery.status === 'pending' || delivery.status === 'queue';
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      const { error } = await supabase.from('deliveries').delete().eq('id', delivery.id);
-      if (error) throw error;
-      toast.success('Entrega excluída');
-      onOpenChange(false);
-      onUpdated();
-    } catch {
-      toast.error('Erro ao excluir entrega');
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteConfirm(false);
-    }
-  };
 
   const handleSaveEdit = async () => {
     try {
