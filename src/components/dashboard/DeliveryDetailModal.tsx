@@ -8,16 +8,6 @@ import { logger } from '@/lib/logger';
 import { useDeliveries } from '@/hooks/useDeliveries';
 import type { UserProjectData } from '@/hooks/useUserProject';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -40,7 +30,7 @@ import {
   Wrench,
   MessageSquare,
   Volume2, Palette, Scissors, FileText, Timer, Pin,
-  Pencil, Trash2,
+  Pencil,
 } from 'lucide-react';
 import type { DeliveryData } from './DeliveryCard';
 import { typeConfig, statusConfig } from './DeliveryCard';
@@ -73,8 +63,6 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
   const [revisions, setRevisions] = useState<RevisionRecord[]>([]);
   const [showRevisionModal, setShowRevisionModal] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
@@ -115,21 +103,6 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
   const isVideoType = delivery.delivery_type === 'youtube_video' || delivery.delivery_type === 'instagram_video';
   const canEditOrDelete = delivery.status === 'pending' || delivery.status === 'queue';
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      const { error } = await supabase.from('deliveries').delete().eq('id', delivery.id);
-      if (error) throw error;
-      toast.success('Entrega excluída');
-      onOpenChange(false);
-      onUpdated();
-    } catch {
-      toast.error('Erro ao excluir entrega');
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteConfirm(false);
-    }
-  };
 
   const handleSaveEdit = async () => {
     try {
@@ -256,9 +229,6 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
                             <div className="flex items-center gap-1 ml-auto">
                               <Button variant="ghost" size="icon" className="h-6 w-6" onClick={startEditing}>
                                 <Pencil className="h-3 w-3 text-muted-foreground" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setShowDeleteConfirm(true)}>
-                                <Trash2 className="h-3 w-3 text-destructive" />
                               </Button>
                             </div>
                           )}
@@ -550,28 +520,6 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
         />
       )}
 
-      {/* Delete confirmation */}
-      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Excluir entrega?</AlertDialogTitle>
-            <AlertDialogDescription>
-              A entrega "{delivery.title}" será excluída permanentemente. Essa ação não pode ser desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 };

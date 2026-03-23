@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Clients can delete their pending deliveries" ON public.deliveries;
