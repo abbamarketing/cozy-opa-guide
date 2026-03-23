@@ -113,6 +113,43 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
   const isApproved = delivery.status === 'approved';
   const canRevise = canReview && delivery.revision_count < delivery.max_revisions;
   const isVideoType = delivery.delivery_type === 'youtube_video' || delivery.delivery_type === 'instagram_video';
+  const canEditOrDelete = delivery.status === 'pending' || delivery.status === 'queue';
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase.from('deliveries').delete().eq('id', delivery.id);
+      if (error) throw error;
+      toast.success('Entrega excluída');
+      onOpenChange(false);
+      onUpdated();
+    } catch {
+      toast.error('Erro ao excluir entrega');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      await updateDelivery.mutateAsync({
+        id: delivery.id,
+        updates: { title: editTitle, description: editDescription || null },
+      });
+      toast.success('Entrega atualizada');
+      setIsEditing(false);
+      onUpdated();
+    } catch {
+      toast.error('Erro ao atualizar entrega');
+    }
+  };
+
+  const startEditing = () => {
+    setEditTitle(delivery.title);
+    setEditDescription(delivery.description || '');
+    setIsEditing(true);
+  };
 
   const downloadExpiry = delivery.approved_at
     ? addDays(new Date(delivery.approved_at), 90)
