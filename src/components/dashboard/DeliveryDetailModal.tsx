@@ -8,16 +8,6 @@ import { logger } from '@/lib/logger';
 import { useDeliveries } from '@/hooks/useDeliveries';
 import type { UserProjectData } from '@/hooks/useUserProject';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -40,7 +30,7 @@ import {
   Wrench,
   MessageSquare,
   Volume2, Palette, Scissors, FileText, Timer, Pin,
-  Pencil, Trash2,
+  Pencil,
 } from 'lucide-react';
 import type { DeliveryData } from './DeliveryCard';
 import { typeConfig, statusConfig } from './DeliveryCard';
