@@ -222,11 +222,49 @@ const DeliveryDetailModal = ({ open, onOpenChange, delivery, onUpdated, userProj
                 <div className="flex items-start gap-2">
                   <Icon className="mt-1 h-5 w-5 shrink-0 text-primary" />
                   <div className="min-w-0 flex-1">
-                    <DialogTitle className="text-base sm:text-lg leading-snug break-words">{delivery.title}</DialogTitle>
-                    <div className="flex items-center gap-2 mt-1.5">
-                      <Badge variant="outline" className="text-[10px] shrink-0">{config.label}</Badge>
-                      <Badge variant={status.variant} className="shrink-0">{status.label}</Badge>
-                    </div>
+                    {isEditing ? (
+                      <div className="space-y-2">
+                        <input
+                          className="w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-primary"
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          placeholder="Título da entrega"
+                        />
+                        <textarea
+                          className="w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary"
+                          rows={2}
+                          value={editDescription}
+                          onChange={(e) => setEditDescription(e.target.value)}
+                          placeholder="Descrição (opcional)"
+                        />
+                        <div className="flex gap-2">
+                          <Button size="sm" className="gap-1.5 text-xs" onClick={handleSaveEdit} disabled={!editTitle.trim()}>
+                            <Check className="h-3 w-3" /> Salvar
+                          </Button>
+                          <Button size="sm" variant="ghost" className="text-xs" onClick={() => setIsEditing(false)}>
+                            Cancelar
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <DialogTitle className="text-base sm:text-lg leading-snug break-words">{delivery.title}</DialogTitle>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <Badge variant="outline" className="text-[10px] shrink-0">{config.label}</Badge>
+                          <Badge variant={status.variant} className="shrink-0">{status.label}</Badge>
+                          {canEditOrDelete && (
+                            <div className="flex items-center gap-1 ml-auto">
+                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={startEditing}>
+                                <Pencil className="h-3 w-3 text-muted-foreground" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setShowDeleteConfirm(true)}>
+                                <Trash2 className="h-3 w-3 text-destructive" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </DialogHeader>
