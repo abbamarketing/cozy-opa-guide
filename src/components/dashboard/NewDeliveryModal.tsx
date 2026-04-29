@@ -288,6 +288,12 @@ const NewDeliveryModal = ({
       return;
     }
 
+    // Validate brand profile selection
+    if (!selectedBrandId) {
+      toast.error('Cadastre uma marca em "Minha Marca" antes de criar entregas');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -319,6 +325,7 @@ const NewDeliveryModal = ({
         sla_deadline: dueDate,
         priority_level: priorityLevel,
         max_revisions: isSubscriptionLike ? 2 : (project?.max_revisions ?? 2),
+        brand_profile_id: selectedBrandId,
       };
 
       // Raw material fields
