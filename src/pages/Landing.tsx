@@ -528,27 +528,26 @@ export default function Landing() {
             <div className={sc(6)} id="plans"><div className="pw" style={{ textAlign: 'center' }}>
               <p className="lb">{t.s6Label}</p>
 
-              <div className="p6-headline">
+              <div className="p6-card">
                 <span className="p6-from">{t.s6Title}</span>
-                <h2 className="p6-price">{t.s6Price}<em>{t.s6Em}</em></h2>
+                <h2 className="p6-price">{t.s6Price}</h2>
+                <p className="p6-em">{t.s6Em}</p>
                 <p className="p6-sub">{t.s6Sub}</p>
-              </div>
 
-              <ul className="p6-feats">
-                <li>{t.s6F1.replace('✓ ', '')}</li>
-                <li>{t.s6F2.replace('✓ ', '')}</li>
-                <li>{t.s6F3.replace('✓ ', '')}</li>
-                <li>{t.s6F4.replace('✓ ', '')}</li>
-              </ul>
+                <ul className="p6-feats">
+                  <li><span className="p6-check" aria-hidden="true">✓</span>{t.s6F1.replace('✓ ', '')}</li>
+                  <li><span className="p6-check" aria-hidden="true">✓</span>{t.s6F2.replace('✓ ', '')}</li>
+                  <li><span className="p6-check" aria-hidden="true">✓</span>{t.s6F3.replace('✓ ', '')}</li>
+                  <li><span className="p6-check" aria-hidden="true">✓</span>{t.s6F4.replace('✓ ', '')}</li>
+                </ul>
 
-              <div className="p6-cta-wrap">
                 <a
                   href="https://wa.me/5511999999999?text=Olá! Quero conhecer os planos da AbbaVideo."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p6-link"
+                  className="p6-btn"
                 >
-                  {t.s6Btn} <span aria-hidden="true">→</span>
+                  {t.s6Btn}
                 </a>
                 <p className="p6-note">{t.s6Cancel}</p>
               </div>
