@@ -269,30 +269,21 @@ const EditorManagement = () => {
   const confirmRemove = async (editor: EditorData) => {
     setRemoving(true);
 
-    // Release queued/revision deliveries
-    await supabase
-      .from('deliveries')
-      .update({ editor_id: null })
-      .eq('editor_id', editor.id)
-      .in('status', ['queue', 'revision']);
-
-    // Remove editor role
-    await supabase
-      .from('user_roles')
-      .delete()
-      .eq('user_id', editor.user_id)
-      .eq('role', 'editor');
-
-    // Set editor status to inactive
-    await supabase
-      .from('editors')
-      .update({ status: 'inactive' })
-      .eq('id', editor.id);
-
-    toast.success('Editor removido');
-    setConfirmRemoveEditor(null);
-    setRemoving(false);
-    fetchEditors();
+    try {
+      const { data, error } = await supabase.functions.invoke('delete-editor', {
+        body: { editor_id: editor.id },
+      });
+      if (error) throw new Error(await parseFunctionErrorMessage(error));
+      if (data?.error) throw new Error(data.error);
+      toast.success('Editor excluído');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro ao excluir editor';
+      toast.error(message);
+    } finally {
+      setConfirmRemoveEditor(null);
+      setRemoving(false);
+      fetchEditors();
+    }
   };
 
   /* ─── View Details ─── */
