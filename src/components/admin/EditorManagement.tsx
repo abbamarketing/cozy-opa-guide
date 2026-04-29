@@ -336,6 +336,29 @@ const EditorManagement = () => {
     setEditEditor(editor);
     setEditName(editor.display_name);
     setEditEmail('');
+    setEditPassword('');
+  };
+
+  const handleChangePassword = async () => {
+    if (!editEditor) return;
+    if (editPassword.length < 8) {
+      toast.error('A senha deve ter pelo menos 8 caracteres');
+      return;
+    }
+    setSavingPassword(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('update-editor-password', {
+        body: { editor_id: editEditor.id, password: editPassword },
+      });
+      if (error) throw new Error(await parseFunctionErrorMessage(error));
+      if (data?.error) throw new Error(data.error);
+      toast.success('Senha atualizada', { description: `Nova senha: ${editPassword}` });
+      setEditPassword('');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao atualizar senha');
+    } finally {
+      setSavingPassword(false);
+    }
   };
 
   const handleSaveEdit = async () => {
