@@ -189,7 +189,7 @@ const GuidedTour = ({ steps, completedKey, stepKey, ready, onComplete }: GuidedT
 
           <div className={cn(isWelcomeOrEnd && 'text-center')}>
             <h4 className="text-sm font-bold text-foreground">{currentStep.title}</h4>
-            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{currentStep.content}</p>
+            <p className="text-xs text-foreground/85 mt-1 leading-relaxed">{currentStep.content}</p>
           </div>
 
           <div className="flex items-center justify-between pt-1">
