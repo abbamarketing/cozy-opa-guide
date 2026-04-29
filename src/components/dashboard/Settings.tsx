@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { User, Bell, CreditCard, Palette, Loader2, ExternalLink } from 'lucide-react';
-import BrandProfile from '@/components/dashboard/BrandProfile';
+import BrandProfile from '@/components/dashboard/BrandProfilesManager';
 
 export default function Settings() {
   const { user } = useAuth();
