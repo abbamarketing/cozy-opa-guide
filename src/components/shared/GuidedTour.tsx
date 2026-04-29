@@ -193,7 +193,7 @@ const GuidedTour = ({ steps, completedKey, stepKey, ready, onComplete }: GuidedT
           </div>
 
           <div className="flex items-center justify-between pt-1">
-            <span className="text-[10px] text-muted-foreground font-mono">
+            <span className="text-[10px] text-muted-foreground font-mono font-medium">
               Passo {step + 1} de {steps.length}
             </span>
             <div className="flex items-center gap-1.5">
