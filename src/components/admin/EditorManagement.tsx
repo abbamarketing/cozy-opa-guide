@@ -741,9 +741,9 @@ const EditorManagement = () => {
       <Dialog open={!!confirmRemoveEditor} onOpenChange={(open) => { if (!open) setConfirmRemoveEditor(null); }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirmar Remoção</DialogTitle>
+            <DialogTitle>Excluir Editor</DialogTitle>
             <DialogDescription>
-              Remover <strong>"{confirmRemoveEditor?.display_name}"</strong> como editor? Entregas na fila serão liberadas para reatribuição.
+              Excluir permanentemente <strong>"{confirmRemoveEditor?.display_name}"</strong>? A conta de acesso será removida e todas as entregas atribuídas serão liberadas. <strong>Esta ação é irreversível.</strong>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -753,7 +753,7 @@ const EditorManagement = () => {
               disabled={removing}
               onClick={() => confirmRemoveEditor && confirmRemove(confirmRemoveEditor)}
             >
-              {removing ? 'Removendo…' : 'Remover'}
+              {removing ? 'Excluindo…' : 'Excluir definitivamente'}
             </Button>
           </DialogFooter>
         </DialogContent>
