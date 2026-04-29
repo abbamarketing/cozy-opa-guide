@@ -68,7 +68,8 @@ const T = {
 
     // Scene 6
     s6Label: 'Planos',
-    s6Title: 'A partir de R$490',
+    s6Title: 'A partir de',
+    s6Price: 'R$490',
     s6Em: 'por mês.',
     s6Sub: 'Escolha o prazo no WhatsApp. A gente monta com você.',
     s6PerMonth: 'por mês',
@@ -184,7 +185,8 @@ const T = {
 
     // Scene 6
     s6Label: 'Pricing',
-    s6Title: 'From R$490',
+    s6Title: 'From',
+    s6Price: 'R$490',
     s6Em: 'per month.',
     s6Sub: 'Pick your turnaround on WhatsApp. We build it with you.',
     s6PerMonth: 'per month',
@@ -525,25 +527,34 @@ export default function Landing() {
 
             <div className={sc(6)} id="plans"><div className="pw">
               <p className="lb" style={{ textAlign: 'center' }}>{t.s6Label}</p>
-              <h2 className="hl hm" style={{ textAlign: 'center' }}>{t.s6Title} <em>{t.s6Em}</em></h2>
-              <p style={{ textAlign: 'center', marginTop: 12, fontSize: 15, color: 'var(--tw3)', maxWidth: 520, marginLeft: 'auto', marginRight: 'auto' }}>{t.s6Sub}</p>
-              <div style={{ marginTop: 36, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, maxWidth: 420, marginLeft: 'auto', marginRight: 'auto' }}>
-                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <div className="pf">{t.s6F1}</div>
-                  <div className="pf">{t.s6F2}</div>
-                  <div className="pf">{t.s6F3}</div>
-                  <div className="pf">{t.s6F4}</div>
+              <div className="p6-card">
+                <div className="p6-price-wrap">
+                  <span className="p6-from">{t.s6Title}</span>
+                  <span className="p6-price">{t.s6Price}</span>
+                  <span className="p6-per"><em>{t.s6Em}</em></span>
                 </div>
+                <p className="p6-sub">{t.s6Sub}</p>
+
+                <div className="p6-feats">
+                  <div className="p6-feat"><span className="p6-chk">✓</span><span>{t.s6F1.replace('✓ ', '')}</span></div>
+                  <div className="p6-feat"><span className="p6-chk">✓</span><span>{t.s6F2.replace('✓ ', '')}</span></div>
+                  <div className="p6-feat"><span className="p6-chk">✓</span><span>{t.s6F3.replace('✓ ', '')}</span></div>
+                  <div className="p6-feat"><span className="p6-chk">✓</span><span>{t.s6F4.replace('✓ ', '')}</span></div>
+                </div>
+
                 <a
                   href="https://wa.me/5511999999999?text=Olá! Quero conhecer os planos da AbbaVideo."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="pb"
-                  style={{ marginTop: 8 }}
+                  className="p6-btn"
                 >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.83 9.83 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.82 11.82 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.88 11.88 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 0 0-3.48-8.413"/>
+                  </svg>
                   {t.s6Btn}
                 </a>
-                <div className="pn">{t.s6Cancel}</div>
+
+                <p className="p6-note">{t.s6Cancel}</p>
               </div>
             </div></div>
 
@@ -746,6 +757,78 @@ const CSS = `
 .pb{display:block;margin-top:16px;padding:12px;border-radius:10px;background:#F5F5F7 !important;color:#0A0A0A !important;font-size:13px;font-weight:600;text-align:center;transition:opacity .2s}
 .pb:hover{opacity:.85}
 .pn{margin-top:8px;font-size:11px;color:var(--tw3)}
+
+/* Scene 6 — Plans card (redesigned) */
+.p6-card{
+  position:relative;
+  max-width:560px;width:100%;margin:28px auto 0;
+  padding:48px 36px 36px;
+  border-radius:28px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, rgba(255,255,255,.04) 0%, rgba(255,255,255,.015) 100%);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.04) inset,
+    0 30px 60px -20px rgba(0,0,0,.5),
+    0 8px 24px -8px rgba(0,0,0,.3);
+  backdrop-filter:blur(8px);
+  text-align:center;
+  transition:opacity .6s cubic-bezier(.23,1,.32,1),transform .7s cubic-bezier(.23,1,.32,1);
+}
+.sc.on .p6-card{opacity:1;transform:none;transition-delay:.05s}
+.sc:not(.on) .p6-card{opacity:0;transform:translateY(20px)}
+.p6-card::before{
+  content:'';position:absolute;inset:0;border-radius:28px;padding:1px;
+  background:linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,.08));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  pointer-events:none;
+}
+.p6-price-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.p6-from{font-size:13px;color:var(--tw3);text-transform:uppercase;letter-spacing:.08em;font-weight:500}
+.p6-price{
+  font-family:var(--fd);font-weight:600;
+  font-size:clamp(64px,9vw,96px);line-height:1;letter-spacing:-.05em;
+  background:var(--gr);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.p6-per{font-family:var(--fd);font-size:clamp(20px,2.4vw,26px);color:var(--tw);letter-spacing:-.02em}
+.p6-per em{font-style:italic;color:var(--tw2);font-weight:400}
+.p6-sub{margin-top:18px;font-size:15px;color:var(--tw2);line-height:1.5;max-width:380px;margin-left:auto;margin-right:auto}
+
+.p6-feats{
+  display:grid;grid-template-columns:1fr;gap:10px;
+  margin:32px auto 0;max-width:380px;text-align:left;
+}
+@media(min-width:520px){.p6-feats{grid-template-columns:1fr 1fr;max-width:460px}}
+.p6-feat{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;border-radius:12px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.05);
+  font-size:13px;color:var(--tw);line-height:1.3;
+}
+.p6-chk{
+  flex-shrink:0;width:20px;height:20px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--gr);color:#0A0A0A;font-size:11px;font-weight:700;
+}
+
+.p6-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  margin-top:32px;padding:16px 32px;border-radius:100px;
+  background:#25D366;color:#0A0A0A !important;
+  font-family:var(--fd);font-size:15px;font-weight:600;letter-spacing:-.01em;
+  box-shadow:0 8px 24px -6px rgba(37,211,102,.5),0 0 0 1px rgba(255,255,255,.08) inset;
+  transition:transform .25s cubic-bezier(.23,1,.32,1),box-shadow .25s,background .2s;
+}
+.p6-btn:hover{transform:translateY(-2px);background:#2eea73;box-shadow:0 12px 32px -6px rgba(37,211,102,.6),0 0 0 1px rgba(255,255,255,.12) inset}
+.p6-btn svg{flex-shrink:0}
+.p6-note{margin-top:18px;font-size:12px;color:var(--tw3)}
+
+@media(max-width:520px){
+  .p6-card{padding:36px 22px 28px;border-radius:22px}
+}
 
 .prow{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;-webkit-overflow-scrolling:touch}
 .prow::-webkit-scrollbar{display:none}
