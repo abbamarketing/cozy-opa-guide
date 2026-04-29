@@ -93,6 +93,10 @@ const DEFAULT_FORM = {
   can_manage_projects: false,
   can_export_data: false,
   notes: '',
+  // Used only when creating a new editor account from scratch
+  new_editor_name: '',
+  new_editor_email: '',
+  new_editor_password: '',
 };
 
 type FormState = typeof DEFAULT_FORM;
