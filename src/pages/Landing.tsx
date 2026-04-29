@@ -754,59 +754,71 @@ const CSS = `
 .pb:hover{opacity:.85}
 .pn{margin-top:8px;font-size:11px;color:var(--tw3)}
 
-/* Scene 6 — Plans (minimal) */
+/* Scene 6 — Plans (typographic / minimal) */
+.p6-headline{
+  margin-top:18px;
+  transition:opacity .6s cubic-bezier(.23,1,.32,1) .05s,transform .7s cubic-bezier(.23,1,.32,1) .05s;
+}
+.sc:not(.on) .p6-headline{opacity:0;transform:translateY(16px)}
+.sc.on .p6-headline{opacity:1;transform:none}
+
+.p6-from{
+  display:block;
+  font-family:var(--fb);font-size:14px;color:var(--tw3);
+  letter-spacing:.02em;margin-bottom:14px;
+}
 .p6-price{
   font-family:var(--fd);font-weight:600;
-  background:var(--gr);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  font-size:clamp(80px,12vw,160px);line-height:.95;letter-spacing:-.06em;
+  margin:0;color:var(--tw);
+  display:flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;
+}
+.p6-price em{
+  font-style:italic;font-weight:400;
+  font-size:clamp(20px,2.4vw,28px);letter-spacing:-.02em;
+  color:var(--tw3);
 }
 .p6-sub{
-  margin:18px auto 0;max-width:480px;
-  font-size:15px;color:var(--tw3);line-height:1.55;
-  transition:opacity .6s cubic-bezier(.23,1,.32,1) .1s,transform .7s cubic-bezier(.23,1,.32,1) .1s;
+  margin:22px auto 0;max-width:440px;
+  font-size:15px;color:var(--tw2);line-height:1.5;
 }
-.sc:not(.on) .p6-sub{opacity:0;transform:translateY(12px)}
-.sc.on .p6-sub{opacity:1;transform:none}
 
 .p6-feats{
-  list-style:none;padding:0;margin:34px auto 0;max-width:560px;
-  display:flex;flex-wrap:wrap;justify-content:center;gap:8px 10px;
+  list-style:none;padding:0;margin:48px auto 0;max-width:680px;
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
+  gap:6px 0;
+  font-size:13px;color:var(--tw3);
   transition:opacity .6s cubic-bezier(.23,1,.32,1) .18s,transform .7s cubic-bezier(.23,1,.32,1) .18s;
 }
 .sc:not(.on) .p6-feats{opacity:0;transform:translateY(12px)}
 .sc.on .p6-feats{opacity:1;transform:none}
-.p6-feats li{
-  position:relative;
-  padding:8px 16px 8px 32px;border-radius:100px;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.06);
-  font-size:13px;color:var(--tw2);line-height:1.2;white-space:nowrap;
-}
-.p6-feats li::before{
-  content:'';position:absolute;left:14px;top:50%;
-  width:6px;height:6px;border-radius:50%;
-  background:var(--gr);transform:translateY(-50%);
+.p6-feats li{padding:0 18px;position:relative;line-height:1.4}
+.p6-feats li + li::before{
+  content:'';position:absolute;left:-1px;top:50%;transform:translateY(-50%);
+  width:2px;height:2px;border-radius:50%;background:var(--tw3);
 }
 
 .p6-cta-wrap{
-  margin-top:40px;display:flex;flex-direction:column;align-items:center;gap:14px;
+  margin-top:48px;display:flex;flex-direction:column;align-items:center;gap:12px;
   transition:opacity .6s cubic-bezier(.23,1,.32,1) .26s,transform .7s cubic-bezier(.23,1,.32,1) .26s;
 }
 .sc:not(.on) .p6-cta-wrap{opacity:0;transform:translateY(12px)}
 .sc.on .p6-cta-wrap{opacity:1;transform:none}
-.p6-btn{
-  display:inline-flex;align-items:center;justify-content:center;
-  padding:14px 36px;border-radius:100px;
-  background:#F5F5F7;color:#0A0A0A !important;
-  font-family:var(--fb);font-size:14px;font-weight:600;letter-spacing:-.01em;
-  transition:opacity .2s,transform .25s cubic-bezier(.23,1,.32,1);
+.p6-link{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--fb);font-size:16px;font-weight:500;color:var(--tw);
+  padding:6px 0;border-bottom:1px solid rgba(255,255,255,.2);
+  transition:border-color .2s,gap .25s cubic-bezier(.23,1,.32,1);
 }
-.p6-btn:hover{opacity:.85;transform:translateY(-1px)}
+.p6-link:hover{border-color:var(--tw);gap:12px}
+.p6-link span{transition:transform .25s cubic-bezier(.23,1,.32,1)}
+.p6-link:hover span{transform:translateX(2px)}
 .p6-note{font-size:12px;color:var(--tw3);margin:0}
 
 @media(max-width:520px){
-  .p6-feats li{font-size:12px;padding:7px 14px 7px 28px}
-  .p6-feats li::before{left:12px}
+  .p6-feats{flex-direction:column;gap:8px 0}
+  .p6-feats li{padding:0}
+  .p6-feats li + li::before{display:none}
 }
 
 .prow{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;-webkit-overflow-scrolling:touch}
