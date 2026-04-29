@@ -223,20 +223,28 @@ export default function BrandProfile({ briefingId: briefingIdProp, onSaved }: Br
     };
 
     let error;
+    let savedId = briefingId;
     if (briefingId) {
       ({ error } = await supabase
         .from('onboarding_briefings')
         .update(payload)
         .eq('id', briefingId));
     } else {
-      ({ error } = await supabase
+      const { data: inserted, error: insErr } = await supabase
         .from('onboarding_briefings')
         .insert({
           ...payload,
           user_id: user!.id,
           user_project_id: userProject?.id || null,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic insert payload
-        } as any));
+        } as any)
+        .select('id')
+        .single();
+      error = insErr;
+      if (inserted) {
+        savedId = inserted.id;
+        setBriefingId(inserted.id);
+      }
     }
 
     setSaving(false);
@@ -244,7 +252,8 @@ export default function BrandProfile({ briefingId: briefingIdProp, onSaved }: Br
     if (error) {
       toast.error('Erro ao salvar', { description: error.message });
     } else {
-      toast.success('Briefing de marca atualizado!');
+      toast.success('Marca salva!');
+      if (savedId && onSaved) onSaved(savedId);
     }
   };
 
