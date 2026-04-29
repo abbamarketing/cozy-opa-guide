@@ -164,7 +164,7 @@ const GuidedTour = ({ steps, completedKey, stepKey, ready, onComplete }: GuidedT
 
       <div ref={tooltipRef} style={getTooltipStyle()}
         className={cn(
-          'z-[100000] w-[320px] max-w-[90vw] rounded-2xl border border-white/10 bg-[hsl(220,20%,12%)] shadow-2xl backdrop-blur-xl',
+          'z-[100000] w-[320px] max-w-[90vw] rounded-2xl border border-border bg-card text-card-foreground shadow-2xl',
           'animate-in fade-in-0 zoom-in-95 duration-200',
         )}
       >
