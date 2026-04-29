@@ -68,7 +68,8 @@ const T = {
 
     // Scene 6
     s6Label: 'Planos',
-    s6Title: 'A partir de R$490',
+    s6Title: 'A partir de',
+    s6Price: 'R$490',
     s6Em: 'por mês.',
     s6Sub: 'Escolha o prazo no WhatsApp. A gente monta com você.',
     s6PerMonth: 'por mês',
@@ -184,7 +185,8 @@ const T = {
 
     // Scene 6
     s6Label: 'Pricing',
-    s6Title: 'From R$490',
+    s6Title: 'From',
+    s6Price: 'R$490',
     s6Em: 'per month.',
     s6Sub: 'Pick your turnaround on WhatsApp. We build it with you.',
     s6PerMonth: 'per month',
