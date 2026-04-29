@@ -12,10 +12,14 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
-  Video, Camera, Image, Layers, Clock, GripVertical, MoreHorizontal, UserCheck, XCircle, Loader2, Download, Plus,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Video, Camera, Image, Layers, Clock, GripVertical, MoreHorizontal, UserCheck, XCircle, Trash2, Loader2, Download, Plus,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { downloadCSV } from '@/lib/csv';
@@ -79,6 +83,7 @@ const AdminDeliveries = () => {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [activeColumn, setActiveColumn] = useState('todo');
   const [demandModalOpen, setDemandModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<AdminDelivery | null>(null);
   const [page, setPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>(() =>
@@ -184,6 +189,19 @@ const AdminDeliveries = () => {
     setActionLoading(null);
   };
 
+  const handleDelete = async (delivery: AdminDelivery) => {
+    setActionLoading(delivery.id);
+    // Clean up dependent rows first (no cascade FKs)
+    await supabase.from('delivery_messages').delete().eq('delivery_id', delivery.id);
+    await supabase.from('delivery_revisions').delete().eq('delivery_id', delivery.id);
+    await supabase.from('delivery_subtasks').delete().eq('delivery_id', delivery.id);
+    const { error } = await supabase.from('deliveries').delete().eq('id', delivery.id);
+    if (error) toast.error('Erro ao excluir: ' + error.message);
+    else { toast.success('Entrega excluída'); fetchData(); }
+    setDeleteTarget(null);
+    setActionLoading(null);
+  };
+
   const exportCSV = () => {
     const statusLabels: Record<string, string> = {
       pending: 'Pendente', in_progress: 'Em produção', review: 'Revisão', revision: 'Revisão solicitada', approved: 'Aprovado', cancelled: 'Cancelado',
@@ -237,12 +255,19 @@ const AdminDeliveries = () => {
                   <UserCheck className="mr-2 h-3.5 w-3.5" /> {e.display_name}
                 </DropdownMenuItem>
               ))}
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => handleCancel(d.id)}
                 className="text-destructive"
                 disabled={d.status === 'approved' || d.status === 'cancelled'}
               >
                 <XCircle className="mr-2 h-3.5 w-3.5" /> Cancelar
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setDeleteTarget(d)}
+                className="text-destructive"
+              >
+                <Trash2 className="mr-2 h-3.5 w-3.5" /> Excluir definitivamente
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -490,6 +515,26 @@ const AdminDeliveries = () => {
           </Button>
         </div>
       )}
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir entrega definitivamente?</AlertDialogTitle>
+            <AlertDialogDescription>
+              A entrega <strong>"{deleteTarget?.title}"</strong> será removida permanentemente, junto com mensagens, revisões e subtarefas. Esta ação é irreversível.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteTarget && handleDelete(deleteTarget)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -18,8 +18,8 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import {
-  Plus, Loader2, Video, CheckCircle, Clock, Eye, Pencil, Power,
-  Copy, AlertTriangle, User, BarChart3, Package, Trash2,
+  Plus, Loader2, Video, CheckCircle, Clock, Eye, Pencil,
+  Copy, BarChart3, Package, Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -114,6 +114,8 @@ const EditorManagement = () => {
   // Edit form
   const [editName, setEditName] = useState('');
   const [editEmail, setEditEmail] = useState('');
+  const [editPassword, setEditPassword] = useState('');
+  const [savingPassword, setSavingPassword] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // Remove states
@@ -147,17 +149,24 @@ const EditorManagement = () => {
       .select('editor_id, status, due_date, delivered_at')
       .in('editor_id', editorsList.map((e) => e.id));
 
+    const now = new Date();
     const cards: EditorData[] = editorsList.map((e) => {
       const prof = profileMap.get(e.user_id);
       const mine = (allDeliveries || []).filter((d) => d.editor_id === e.id);
-      const active = mine.filter((d) =>
+      const activeList = mine.filter((d) =>
         ['pending', 'in_progress', 'revision'].includes(d.status)
-      ).length;
+      );
+      const active = activeList.length;
       const completed = mine.filter((d) => d.status === 'approved');
-      const onTime = completed.filter((d) => {
+      // SLA pool: completed + currently active. Active counts only when it has a due_date.
+      const completedOnTime = completed.filter((d) => {
         if (!d.due_date || !d.delivered_at) return true;
         return new Date(d.delivered_at) <= new Date(d.due_date);
       }).length;
+      const activeWithDue = activeList.filter((d) => d.due_date);
+      const activeOnTime = activeWithDue.filter((d) => new Date(d.due_date as string) >= now).length;
+      const slaPool = completed.length + activeWithDue.length;
+      const onTime = completedOnTime + activeOnTime;
 
       return {
         id: e.id,
@@ -167,11 +176,11 @@ const EditorManagement = () => {
         portfolio_url: e.portfolio_url,
         specialty: e.specialty,
         avatar_url: prof?.avatar_url || null,
-        email: null, // Not available from profiles table directly
+        email: null,
         active_deliveries: active,
         completed_deliveries: completed.length,
         total_deliveries: mine.length,
-        on_time_rate: completed.length > 0 ? Math.round((onTime / completed.length) * 100) : 100,
+        on_time_rate: slaPool > 0 ? Math.round((onTime / slaPool) * 100) : 100,
       };
     });
 
@@ -240,52 +249,27 @@ const EditorManagement = () => {
 
   /* ─── Remove Editor ─── */
   const handleRemoveEditor = async (editor: EditorData) => {
-    const { count: inProd, data: inProdData } = await supabase
-      .from('deliveries')
-      .select('title', { count: 'exact' })
-      .eq('editor_id', editor.id)
-      .eq('status', 'in_progress');
-
-    if ((inProd ?? 0) > 0) {
-      setBlockedEditor({
-        editor,
-        count: inProd ?? 0,
-        titles: (inProdData || []).map((d) => d.title),
-      });
-      setBlockedModalOpen(true);
-      return;
-    }
-
     setConfirmRemoveEditor(editor);
   };
 
   const confirmRemove = async (editor: EditorData) => {
     setRemoving(true);
 
-    // Release queued/revision deliveries
-    await supabase
-      .from('deliveries')
-      .update({ editor_id: null })
-      .eq('editor_id', editor.id)
-      .in('status', ['queue', 'revision']);
-
-    // Remove editor role
-    await supabase
-      .from('user_roles')
-      .delete()
-      .eq('user_id', editor.user_id)
-      .eq('role', 'editor');
-
-    // Set editor status to inactive
-    await supabase
-      .from('editors')
-      .update({ status: 'inactive' })
-      .eq('id', editor.id);
-
-    toast.success('Editor removido');
-    setConfirmRemoveEditor(null);
-    setRemoving(false);
-    fetchEditors();
+    try {
+      const { data, error } = await supabase.functions.invoke('delete-editor', {
+        body: { editor_id: editor.id },
+      });
+      if (error) throw new Error(await parseFunctionErrorMessage(error));
+      if (data?.error) throw new Error(data.error);
+      toast.success('Editor excluído');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro ao excluir editor';
+      toast.error(message);
+    } finally {
+      setConfirmRemoveEditor(null);
+      setRemoving(false);
+      fetchEditors();
+    }
   };
 
   /* ─── View Details ─── */
@@ -336,6 +320,29 @@ const EditorManagement = () => {
     setEditEditor(editor);
     setEditName(editor.display_name);
     setEditEmail('');
+    setEditPassword('');
+  };
+
+  const handleChangePassword = async () => {
+    if (!editEditor) return;
+    if (editPassword.length < 8) {
+      toast.error('A senha deve ter pelo menos 8 caracteres');
+      return;
+    }
+    setSavingPassword(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('update-editor-password', {
+        body: { editor_id: editEditor.id, password: editPassword },
+      });
+      if (error) throw new Error(await parseFunctionErrorMessage(error));
+      if (data?.error) throw new Error(data.error);
+      toast.success('Senha atualizada', { description: `Nova senha: ${editPassword}` });
+      setEditPassword('');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao atualizar senha');
+    } finally {
+      setSavingPassword(false);
+    }
   };
 
   const handleSaveEdit = async () => {
@@ -445,14 +452,6 @@ const EditorManagement = () => {
               </Button>
               <Button variant="outline" size="sm" className="flex-1 gap-1.5 text-xs" onClick={() => openEdit(e)}>
                 <Pencil className="h-3.5 w-3.5" /> Editar
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="gap-1.5 text-xs"
-                onClick={() => handleToggleStatus(e)}
-              >
-                <Power className={`h-3.5 w-3.5 ${e.status === 'available' ? 'text-primary' : 'text-muted-foreground'}`} />
               </Button>
               <Button
                 variant="ghost"
@@ -670,17 +669,39 @@ const EditorManagement = () => {
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <Label>Status</Label>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">
-                  {editEditor?.status === 'available' ? 'Ativo' : 'Inativo'}
-                </span>
-                <Switch
-                  checked={editEditor?.status === 'available'}
-                  onCheckedChange={() => editEditor && handleToggleStatus(editEditor)}
+            <div className="space-y-2 rounded-lg border border-border/40 p-3">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Alterar senha
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Mínimo 8 caracteres"
+                  value={editPassword}
+                  onChange={(e) => setEditPassword(e.target.value)}
+                  className="font-mono text-sm"
+                  maxLength={64}
                 />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditPassword(generatePassword())}
+                  title="Gerar senha"
+                  type="button"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
               </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="w-full gap-2"
+                onClick={handleChangePassword}
+                disabled={savingPassword || editPassword.length < 8}
+              >
+                {savingPassword ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                Salvar nova senha
+              </Button>
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
@@ -720,9 +741,9 @@ const EditorManagement = () => {
       <Dialog open={!!confirmRemoveEditor} onOpenChange={(open) => { if (!open) setConfirmRemoveEditor(null); }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirmar Remoção</DialogTitle>
+            <DialogTitle>Excluir Editor</DialogTitle>
             <DialogDescription>
-              Remover <strong>"{confirmRemoveEditor?.display_name}"</strong> como editor? Entregas na fila serão liberadas para reatribuição.
+              Excluir permanentemente <strong>"{confirmRemoveEditor?.display_name}"</strong>? A conta de acesso será removida e todas as entregas atribuídas serão liberadas. <strong>Esta ação é irreversível.</strong>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -732,7 +753,7 @@ const EditorManagement = () => {
               disabled={removing}
               onClick={() => confirmRemoveEditor && confirmRemove(confirmRemoveEditor)}
             >
-              {removing ? 'Removendo…' : 'Remover'}
+              {removing ? 'Excluindo…' : 'Excluir definitivamente'}
             </Button>
           </DialogFooter>
         </DialogContent>
