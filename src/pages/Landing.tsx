@@ -68,14 +68,16 @@ const T = {
 
     // Scene 6
     s6Label: 'Planos',
-    s6Title: 'Escolha o',
-    s6Em: 'prazo.',
+    s6Title: 'A partir de R$490',
+    s6Em: 'por mês.',
+    s6Sub: 'Escolha o prazo no WhatsApp. A gente monta com você.',
     s6PerMonth: 'por mês',
     s6Cancel: 'Cancele quando quiser. Sem multa.',
     s6F1: '✓ Reels, Shorts e TikTok até 90s',
     s6F2: '✓ Sem cota mensal',
     s6F3: '✓ Identidade visual de cada cliente',
     s6F4: '✓ Brand kits ilimitados',
+    s6Btn: 'Falar no WhatsApp',
 
     // Scene 7
     s7Title: 'Dúvidas.',
@@ -182,14 +184,16 @@ const T = {
 
     // Scene 6
     s6Label: 'Pricing',
-    s6Title: 'Choose your',
-    s6Em: 'turnaround.',
+    s6Title: 'From R$490',
+    s6Em: 'per month.',
+    s6Sub: 'Pick your turnaround on WhatsApp. We build it with you.',
     s6PerMonth: 'per month',
     s6Cancel: 'Cancel anytime. No penalty.',
     s6F1: '✓ Reels, Shorts & TikTok up to 90s',
     s6F2: '✓ No monthly cap',
-    s6F3: '✓ Your brand identity',
-    s6F4: '✓ Brief saved',
+    s6F3: '✓ Brand identity for each client',
+    s6F4: '✓ Unlimited brand kits',
+    s6Btn: 'Talk on WhatsApp',
 
     // Scene 7
     s7Title: 'Questions.',
@@ -522,24 +526,24 @@ export default function Landing() {
             <div className={sc(6)} id="plans"><div className="pw">
               <p className="lb" style={{ textAlign: 'center' }}>{t.s6Label}</p>
               <h2 className="hl hm" style={{ textAlign: 'center' }}>{t.s6Title} <em>{t.s6Em}</em></h2>
-              <div className="pg">
-                <div className="pl">
-                  <div className="slr"><span>72h</span><span>4h</span></div>
-                  <div className="slw"><input type="range" min={0} max={4} step={1} value={slider} onChange={e => setSlider(+e.target.value)} /><div className="slf" style={{ width: `${(slider / 4) * 100}%` }} /></div>
-                  <div className="psla">{tier.sla}</div>
-                  <div className="pval"><span>{tier.price}</span></div>
-                  <div className="pper">{t.s6PerMonth}</div>
-                  <div className="ptier">{tier.tier}</div>
-                </div>
-                <div className="pr">
+              <p style={{ textAlign: 'center', marginTop: 12, fontSize: 15, color: 'var(--tw3)', maxWidth: 520, marginLeft: 'auto', marginRight: 'auto' }}>{t.s6Sub}</p>
+              <div style={{ marginTop: 36, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, maxWidth: 420, marginLeft: 'auto', marginRight: 'auto' }}>
+                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
                   <div className="pf">{t.s6F1}</div>
                   <div className="pf">{t.s6F2}</div>
                   <div className="pf">{t.s6F3}</div>
                   <div className="pf">{t.s6F4}</div>
-                  <Link to={`/auth?plan=${tier.tier.toLowerCase()}`} className="pb">{tier.btn}</Link>
-                  <div className="pn">{t.s6Cancel}</div>
-                  
                 </div>
+                <a
+                  href="https://wa.me/5511999999999?text=Olá! Quero conhecer os planos da AbbaVideo."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="pb"
+                  style={{ marginTop: 8 }}
+                >
+                  {t.s6Btn}
+                </a>
+                <div className="pn">{t.s6Cancel}</div>
               </div>
             </div></div>
 
