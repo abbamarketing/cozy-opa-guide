@@ -83,6 +83,7 @@ const AdminDeliveries = () => {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [activeColumn, setActiveColumn] = useState('todo');
   const [demandModalOpen, setDemandModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<AdminDelivery | null>(null);
   const [page, setPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>(() =>
