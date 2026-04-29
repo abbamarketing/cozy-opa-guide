@@ -527,10 +527,12 @@ export default function Landing() {
 
             <div className={sc(6)} id="plans"><div className="pw" style={{ textAlign: 'center' }}>
               <p className="lb">{t.s6Label}</p>
-              <h2 className="hl hm" style={{ marginTop: 6 }}>
-                {t.s6Title} <span className="p6-price">{t.s6Price}</span> <em>{t.s6Em}</em>
-              </h2>
-              <p className="p6-sub">{t.s6Sub}</p>
+
+              <div className="p6-headline">
+                <span className="p6-from">{t.s6Title}</span>
+                <h2 className="p6-price">{t.s6Price}<em>{t.s6Em}</em></h2>
+                <p className="p6-sub">{t.s6Sub}</p>
+              </div>
 
               <ul className="p6-feats">
                 <li>{t.s6F1.replace('✓ ', '')}</li>
@@ -544,9 +546,9 @@ export default function Landing() {
                   href="https://wa.me/5511999999999?text=Olá! Quero conhecer os planos da AbbaVideo."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p6-btn"
+                  className="p6-link"
                 >
-                  {t.s6Btn}
+                  {t.s6Btn} <span aria-hidden="true">→</span>
                 </a>
                 <p className="p6-note">{t.s6Cancel}</p>
               </div>
