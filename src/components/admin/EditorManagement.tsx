@@ -114,6 +114,8 @@ const EditorManagement = () => {
   // Edit form
   const [editName, setEditName] = useState('');
   const [editEmail, setEditEmail] = useState('');
+  const [editPassword, setEditPassword] = useState('');
+  const [savingPassword, setSavingPassword] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // Remove states
