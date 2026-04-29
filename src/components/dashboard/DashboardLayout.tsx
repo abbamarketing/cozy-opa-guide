@@ -11,7 +11,7 @@ import { TrialBanner } from '@/components/dashboard/TrialBanner';
 import { AffiliateStats } from '@/components/dashboard/AffiliateStats';
 import DeliveryHistory from '@/components/dashboard/DeliveryHistory';
 
-import BrandProfile from '@/components/dashboard/BrandProfile';
+import BrandProfile from '@/components/dashboard/BrandProfilesManager';
 import SettingsComponent from '@/components/dashboard/Settings';
 
 import NotificationBell from '@/components/shared/NotificationBell';

@@ -57,7 +57,12 @@ const defaultBrand: BrandData = {
 const LOGO_ACCEPTED = '.png,.jpg,.jpeg,.svg';
 const LOGO_MAX_SIZE = 5 * 1024 * 1024;
 
-export default function BrandProfile() {
+interface BrandProfileProps {
+  briefingId?: string | null;
+  onSaved?: (id: string) => void;
+}
+
+export default function BrandProfile({ briefingId: briefingIdProp, onSaved }: BrandProfileProps = {}) {
   const { user } = useAuth();
   const { userProject } = useUserProject();
   const [brand, setBrand] = useState<BrandData>(defaultBrand);
@@ -65,20 +70,35 @@ export default function BrandProfile() {
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [channelsInput, setChannelsInput] = useState('');
-  const [briefingId, setBriefingId] = useState<string | null>(null);
+  const [briefingId, setBriefingId] = useState<string | null>(briefingIdProp ?? null);
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user) loadBrand();
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadBrand depends on user which is already a dep
-  }, [user]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadBrand depends on user/briefingIdProp which are deps below
+  }, [user, briefingIdProp]);
 
   const loadBrand = async () => {
     setLoading(true);
-    const { data } = await supabase
+
+    if (briefingIdProp === null) {
+      setBriefingId(null);
+      setBrand(defaultBrand);
+      setChannelsInput('');
+      setLoading(false);
+      return;
+    }
+
+    let query = supabase
       .from('onboarding_briefings')
       .select('*')
-      .eq('user_id', user!.id)
+      .eq('user_id', user!.id);
+
+    if (briefingIdProp) {
+      query = query.eq('id', briefingIdProp);
+    }
+
+    const { data } = await query
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -110,6 +130,10 @@ export default function BrandProfile() {
         },
       });
       setChannelsInput((data.reference_channels || []).join(', '));
+    } else {
+      setBriefingId(null);
+      setBrand(defaultBrand);
+      setChannelsInput('');
     }
     setLoading(false);
   };
@@ -199,20 +223,28 @@ export default function BrandProfile() {
     };
 
     let error;
+    let savedId = briefingId;
     if (briefingId) {
       ({ error } = await supabase
         .from('onboarding_briefings')
         .update(payload)
         .eq('id', briefingId));
     } else {
-      ({ error } = await supabase
+      const { data: inserted, error: insErr } = await supabase
         .from('onboarding_briefings')
         .insert({
           ...payload,
           user_id: user!.id,
           user_project_id: userProject?.id || null,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic insert payload
-        } as any));
+        } as any)
+        .select('id')
+        .single();
+      error = insErr;
+      if (inserted) {
+        savedId = inserted.id;
+        setBriefingId(inserted.id);
+      }
     }
 
     setSaving(false);
@@ -220,7 +252,8 @@ export default function BrandProfile() {
     if (error) {
       toast.error('Erro ao salvar', { description: error.message });
     } else {
-      toast.success('Briefing de marca atualizado!');
+      toast.success('Marca salva!');
+      if (savedId && onSaved) onSaved(savedId);
     }
   };
 

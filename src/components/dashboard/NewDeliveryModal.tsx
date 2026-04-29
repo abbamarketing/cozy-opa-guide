@@ -31,7 +31,8 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, Video, Camera, Image, Layers, Upload, Link, Clock, X, AlertTriangle, Zap } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2, Video, Camera, Image, Layers, Upload, Link, Clock, X, AlertTriangle, Zap, Building2 } from 'lucide-react';
 import type { UserProjectData } from '@/hooks/useUserProject';
 
 interface NewDeliveryModalProps {
@@ -100,6 +101,10 @@ const NewDeliveryModal = ({
   const [isException, setIsException] = useState(false);
   const [exceptionNotes, setExceptionNotes] = useState('');
 
+  // Brand profile selection (mandatory)
+  const [brandProfiles, setBrandProfiles] = useState<{ id: string; brand_name: string; display_label: string | null; is_primary: boolean }[]>([]);
+  const [selectedBrandId, setSelectedBrandId] = useState<string>('');
+
   const project = userProject.custom_project;
   const isSubscriptionLike = userProject.client_type === 'subscription' || userProject.client_type === 'influencer';
 
@@ -119,6 +124,27 @@ const NewDeliveryModal = ({
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- form is stable from useForm
   }, [isSubscriptionLike]);
+
+  // Load brand profiles when modal opens
+  useEffect(() => {
+    if (!open || !user) return;
+    (async () => {
+      const { data } = await supabase
+        .from('onboarding_briefings')
+        .select('id, brand_name, display_label, is_primary')
+        .eq('user_id', user.id)
+        .order('is_primary', { ascending: false })
+        .order('created_at', { ascending: true });
+      const list = (data ?? []) as typeof brandProfiles;
+      setBrandProfiles(list);
+      // Default to primary or first available
+      if (list.length > 0 && !selectedBrandId) {
+        const primary = list.find(b => b.is_primary) ?? list[0];
+        setSelectedBrandId(primary.id);
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- selectedBrandId intentionally not a dep
+  }, [open, user]);
 
   const selectedType = form.watch('delivery_type');
   const isVideo = selectedType === 'youtube_video' || selectedType === 'instagram_video';
@@ -262,6 +288,12 @@ const NewDeliveryModal = ({
       return;
     }
 
+    // Validate brand profile selection
+    if (!selectedBrandId) {
+      toast.error('Cadastre uma marca em "Minha Marca" antes de criar entregas');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -293,6 +325,7 @@ const NewDeliveryModal = ({
         sla_deadline: dueDate,
         priority_level: priorityLevel,
         max_revisions: isSubscriptionLike ? 2 : (project?.max_revisions ?? 2),
+        brand_profile_id: selectedBrandId,
       };
 
       // Raw material fields
@@ -343,6 +376,32 @@ const NewDeliveryModal = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            {/* 0. Marca (obrigatório) */}
+            <div className="space-y-2">
+              <Label className="text-sm flex items-center gap-1.5">
+                <Building2 className="h-3.5 w-3.5 text-primary" />
+                Marca
+              </Label>
+              {brandProfiles.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground">
+                  Você precisa cadastrar pelo menos uma marca em <strong className="text-foreground">Minha Marca</strong> antes de criar entregas.
+                </div>
+              ) : (
+                <Select value={selectedBrandId} onValueChange={setSelectedBrandId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a marca desta entrega" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {brandProfiles.map(b => (
+                      <SelectItem key={b.id} value={b.id}>
+                        {b.display_label || b.brand_name}{b.is_primary ? ' • Principal' : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+
             {/* 1. Tipo de Entrega — apenas para clientes custom */}
             {!isSubscriptionLike && (
               <FormField
