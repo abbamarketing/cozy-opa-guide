@@ -12,10 +12,14 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
-  Video, Camera, Image, Layers, Clock, GripVertical, MoreHorizontal, UserCheck, XCircle, Loader2, Download, Plus,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Video, Camera, Image, Layers, Clock, GripVertical, MoreHorizontal, UserCheck, XCircle, Trash2, Loader2, Download, Plus,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { downloadCSV } from '@/lib/csv';
