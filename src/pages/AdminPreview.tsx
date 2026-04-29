@@ -234,7 +234,7 @@ export default function AdminPreview() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Preview banner */}
-      <div className="sticky top-0 z-[60] flex items-center justify-between gap-4 px-4 py-2 bg-secondary border-b border-border backdrop-blur flex-wrap">
+      <div className="relative z-[60] flex items-center justify-between gap-4 px-4 py-2 bg-secondary border-b border-border flex-wrap">
         <div className="flex items-center gap-3">
           <Eye className="h-4 w-4 shrink-0 text-muted-foreground" />
           <div>
