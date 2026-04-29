@@ -125,6 +125,27 @@ const NewDeliveryModal = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps -- form is stable from useForm
   }, [isSubscriptionLike]);
 
+  // Load brand profiles when modal opens
+  useEffect(() => {
+    if (!open || !user) return;
+    (async () => {
+      const { data } = await supabase
+        .from('onboarding_briefings')
+        .select('id, brand_name, display_label, is_primary')
+        .eq('user_id', user.id)
+        .order('is_primary', { ascending: false })
+        .order('created_at', { ascending: true });
+      const list = (data ?? []) as typeof brandProfiles;
+      setBrandProfiles(list);
+      // Default to primary or first available
+      if (list.length > 0 && !selectedBrandId) {
+        const primary = list.find(b => b.is_primary) ?? list[0];
+        setSelectedBrandId(primary.id);
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- selectedBrandId intentionally not a dep
+  }, [open, user]);
+
   const selectedType = form.watch('delivery_type');
   const isVideo = selectedType === 'youtube_video' || selectedType === 'instagram_video';
 
