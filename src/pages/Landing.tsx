@@ -808,13 +808,15 @@ const CSS = `
 .p6-btn{
   display:inline-flex;align-items:center;justify-content:center;
   margin-top:32px;padding:13px 28px;
-  font-family:var(--fb);font-size:14px;font-weight:500;color:#fff;
-  background:rgba(255,255,255,.10);
-  border:1px solid rgba(255,255,255,.28);
+  font-family:var(--fb);font-size:14px;font-weight:600;color:#080808 !important;
+  background:rgba(245,245,247,.94);
+  border:1px solid rgba(255,255,255,.72);
   border-radius:999px;
-  transition:background .2s,border-color .2s;
+  box-shadow:0 10px 24px -18px rgba(255,255,255,.45);
+  transition:background .2s,border-color .2s,transform .2s;
 }
-.p6-btn:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.45)}
+.p6-btn:visited{color:#080808 !important}
+.p6-btn:hover{background:#fff;border-color:#fff;transform:translateY(-1px)}
 .p6-note{margin:14px 0 0;font-size:11px;color:var(--tw3)}
 
 @media(max-width:520px){
