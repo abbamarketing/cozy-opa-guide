@@ -224,10 +224,34 @@ const AdminTeam = () => {
     setForm(prev => ({ ...prev, [key]: !prev[key as keyof FormState] }));
   };
 
+  const ensureEditorRecord = async (userId: string, displayName: string) => {
+    const { data: existing } = await db
+      .from('editors')
+      .select('id')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (existing) return;
+    await db.from('editors').insert({ user_id: userId, display_name: displayName || 'Editor' });
+    // Promote role to 'editor' if currently just 'client'
+    await db.from('user_roles').delete().eq('user_id', userId).eq('role', 'client');
+    await db.from('user_roles').insert({ user_id: userId, role: 'editor' });
+    await supabase.from('profiles').update({ role: 'editor' }).eq('user_id', userId);
+  };
+
   const handleSave = async () => {
-    if (!editingId && !selectedProfile) {
-      toast.error('Selecione um usuário');
+    const isCreatingNewEditor =
+      !editingId && !selectedProfile && form.display_role === 'editor';
+
+    if (!editingId && !selectedProfile && !isCreatingNewEditor) {
+      toast.error('Selecione um usuário existente');
       return;
+    }
+
+    if (isCreatingNewEditor) {
+      if (!form.new_editor_name.trim() || !form.new_editor_email.trim() || form.new_editor_password.length < 6) {
+        toast.error('Preencha nome, email e senha (mín. 6 caracteres)');
+        return;
+      }
     }
 
     setSaving(true);
@@ -257,15 +281,43 @@ const AdminTeam = () => {
       if (error) {
         toast.error('Erro ao salvar: ' + error.message);
       } else {
+        // If role is editor, ensure editors record exists
+        const editing = members.find(m => m.id === editingId);
+        if (form.display_role === 'editor' && editing) {
+          await ensureEditorRecord(editing.user_id, editing.full_name ?? 'Editor');
+        }
         toast.success('Membro atualizado');
         setModalOpen(false);
         fetchMembers();
       }
     } else {
+      let targetUserId = selectedProfile?.id ?? null;
+      let targetName = selectedProfile?.full_name ?? '';
+
+      // Create new editor account via edge function
+      if (isCreatingNewEditor) {
+        const { data, error: fnError } = await supabase.functions.invoke('create-editor', {
+          body: {
+            name: form.new_editor_name.trim(),
+            email: form.new_editor_email.trim().toLowerCase(),
+            password: form.new_editor_password,
+          },
+        });
+
+        if (fnError || !data?.success) {
+          const msg = (data?.error as string) ?? fnError?.message ?? 'Erro desconhecido';
+          toast.error('Erro ao criar editor: ' + msg);
+          setSaving(false);
+          return;
+        }
+        targetUserId = data.user_id;
+        targetName = form.new_editor_name.trim();
+      }
+
       const { error } = await db
         .from('team_members')
         .insert({
-          user_id: selectedProfile!.id,
+          user_id: targetUserId,
           display_role: form.display_role,
           permissions,
           notes: form.notes || null,
@@ -275,7 +327,11 @@ const AdminTeam = () => {
       if (error) {
         toast.error('Erro ao adicionar: ' + error.message);
       } else {
-        toast.success('Membro adicionado');
+        // If editor (existing user selected), ensure editors record
+        if (form.display_role === 'editor' && !isCreatingNewEditor && targetUserId) {
+          await ensureEditorRecord(targetUserId, targetName);
+        }
+        toast.success(isCreatingNewEditor ? 'Editor criado e adicionado à equipe' : 'Membro adicionado');
         setModalOpen(false);
         fetchMembers();
       }
