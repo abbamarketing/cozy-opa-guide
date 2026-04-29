@@ -526,24 +526,24 @@ export default function Landing() {
             <div className={sc(6)} id="plans"><div className="pw">
               <p className="lb" style={{ textAlign: 'center' }}>{t.s6Label}</p>
               <h2 className="hl hm" style={{ textAlign: 'center' }}>{t.s6Title} <em>{t.s6Em}</em></h2>
-              <div className="pg">
-                <div className="pl">
-                  <div className="slr"><span>72h</span><span>4h</span></div>
-                  <div className="slw"><input type="range" min={0} max={4} step={1} value={slider} onChange={e => setSlider(+e.target.value)} /><div className="slf" style={{ width: `${(slider / 4) * 100}%` }} /></div>
-                  <div className="psla">{tier.sla}</div>
-                  <div className="pval"><span>{tier.price}</span></div>
-                  <div className="pper">{t.s6PerMonth}</div>
-                  <div className="ptier">{tier.tier}</div>
-                </div>
-                <div className="pr">
+              <p style={{ textAlign: 'center', marginTop: 12, fontSize: 15, color: 'var(--tw3)', maxWidth: 520, marginLeft: 'auto', marginRight: 'auto' }}>{t.s6Sub}</p>
+              <div style={{ marginTop: 36, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, maxWidth: 420, marginLeft: 'auto', marginRight: 'auto' }}>
+                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
                   <div className="pf">{t.s6F1}</div>
                   <div className="pf">{t.s6F2}</div>
                   <div className="pf">{t.s6F3}</div>
                   <div className="pf">{t.s6F4}</div>
-                  <Link to={`/auth?plan=${tier.tier.toLowerCase()}`} className="pb">{tier.btn}</Link>
-                  <div className="pn">{t.s6Cancel}</div>
-                  
                 </div>
+                <a
+                  href="https://wa.me/5511999999999?text=Olá! Quero conhecer os planos da AbbaVideo."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="pb"
+                  style={{ marginTop: 8 }}
+                >
+                  {t.s6Btn}
+                </a>
+                <div className="pn">{t.s6Cancel}</div>
               </div>
             </div></div>
 
