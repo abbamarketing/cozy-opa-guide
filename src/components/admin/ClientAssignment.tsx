@@ -111,6 +111,8 @@ const ClientAssignment = () => {
       .from('custom_projects')
       .select('*')
       .eq('active', true)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- deleted_at not in generated types
+      .is('deleted_at' as any, null)
       .order('project_name');
 
     setProjects((projectsData as unknown as CustomProject[]) || []);
