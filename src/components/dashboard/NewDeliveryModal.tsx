@@ -31,7 +31,8 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, Video, Camera, Image, Layers, Upload, Link, Clock, X, AlertTriangle, Zap } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2, Video, Camera, Image, Layers, Upload, Link, Clock, X, AlertTriangle, Zap, Building2 } from 'lucide-react';
 import type { UserProjectData } from '@/hooks/useUserProject';
 
 interface NewDeliveryModalProps {
