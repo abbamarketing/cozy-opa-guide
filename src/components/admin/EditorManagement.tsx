@@ -447,14 +447,6 @@ const EditorManagement = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="gap-1.5 text-xs"
-                onClick={() => handleToggleStatus(e)}
-              >
-                <Power className={`h-3.5 w-3.5 ${e.status === 'available' ? 'text-primary' : 'text-muted-foreground'}`} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
                 className="gap-1.5 text-xs text-destructive hover:text-destructive"
                 onClick={() => handleRemoveEditor(e)}
               >
