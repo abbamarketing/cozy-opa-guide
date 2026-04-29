@@ -108,7 +108,6 @@ const T = {
       { q: 'O que inclui?', a: 'Corte, legenda, ritmo, identidade visual. Até 90s.' },
       { q: 'Não gostei.', a: 'Marca o segundo, descreve o ajuste. Sem limite. Sem custo extra.' },
       { q: 'Cancelar?', a: 'Quando quiser. Sem multa.' },
-      { q: 'Tem garantia?', a: 'O plano Standard tem 7 dias de garantia. Se não gostar, devolvemos 100% do valor. Sem burocracia.' },
     ],
 
     // Portfolio
@@ -223,7 +222,6 @@ const T = {
       { q: 'What\'s included?', a: 'Cut, subtitles, pacing, brand identity. Up to 90s.' },
       { q: 'I didn\'t like it.', a: 'Mark the second, describe the change. No limit. No extra cost.' },
       { q: 'Cancel?', a: 'Anytime. No penalty.' },
-      { q: 'Money-back guarantee?', a: 'The Standard plan has a 7-day guarantee. If you don\'t like it, we refund 100%. No hassle.' },
     ],
 
     // Portfolio
