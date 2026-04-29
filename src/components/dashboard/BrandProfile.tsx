@@ -57,7 +57,12 @@ const defaultBrand: BrandData = {
 const LOGO_ACCEPTED = '.png,.jpg,.jpeg,.svg';
 const LOGO_MAX_SIZE = 5 * 1024 * 1024;
 
-export default function BrandProfile() {
+interface BrandProfileProps {
+  briefingId?: string | null;
+  onSaved?: (id: string) => void;
+}
+
+export default function BrandProfile({ briefingId: briefingIdProp, onSaved }: BrandProfileProps = {}) {
   const { user } = useAuth();
   const { userProject } = useUserProject();
   const [brand, setBrand] = useState<BrandData>(defaultBrand);
@@ -65,13 +70,13 @@ export default function BrandProfile() {
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [channelsInput, setChannelsInput] = useState('');
-  const [briefingId, setBriefingId] = useState<string | null>(null);
+  const [briefingId, setBriefingId] = useState<string | null>(briefingIdProp ?? null);
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user) loadBrand();
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadBrand depends on user which is already a dep
-  }, [user]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadBrand depends on user/briefingIdProp which are deps below
+  }, [user, briefingIdProp]);
 
   const loadBrand = async () => {
     setLoading(true);
