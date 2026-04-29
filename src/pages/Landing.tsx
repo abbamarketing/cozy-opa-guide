@@ -758,6 +758,78 @@ const CSS = `
 .pb:hover{opacity:.85}
 .pn{margin-top:8px;font-size:11px;color:var(--tw3)}
 
+/* Scene 6 — Plans card (redesigned) */
+.p6-card{
+  position:relative;
+  max-width:560px;width:100%;margin:28px auto 0;
+  padding:48px 36px 36px;
+  border-radius:28px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, rgba(255,255,255,.04) 0%, rgba(255,255,255,.015) 100%);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.04) inset,
+    0 30px 60px -20px rgba(0,0,0,.5),
+    0 8px 24px -8px rgba(0,0,0,.3);
+  backdrop-filter:blur(8px);
+  text-align:center;
+  transition:opacity .6s cubic-bezier(.23,1,.32,1),transform .7s cubic-bezier(.23,1,.32,1);
+}
+.sc.on .p6-card{opacity:1;transform:none;transition-delay:.05s}
+.sc:not(.on) .p6-card{opacity:0;transform:translateY(20px)}
+.p6-card::before{
+  content:'';position:absolute;inset:0;border-radius:28px;padding:1px;
+  background:linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,.08));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  pointer-events:none;
+}
+.p6-price-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.p6-from{font-size:13px;color:var(--tw3);text-transform:uppercase;letter-spacing:.08em;font-weight:500}
+.p6-price{
+  font-family:var(--fd);font-weight:600;
+  font-size:clamp(64px,9vw,96px);line-height:1;letter-spacing:-.05em;
+  background:var(--gr);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.p6-per{font-family:var(--fd);font-size:clamp(20px,2.4vw,26px);color:var(--tw);letter-spacing:-.02em}
+.p6-per em{font-style:italic;color:var(--tw2);font-weight:400}
+.p6-sub{margin-top:18px;font-size:15px;color:var(--tw2);line-height:1.5;max-width:380px;margin-left:auto;margin-right:auto}
+
+.p6-feats{
+  display:grid;grid-template-columns:1fr;gap:10px;
+  margin:32px auto 0;max-width:380px;text-align:left;
+}
+@media(min-width:520px){.p6-feats{grid-template-columns:1fr 1fr;max-width:460px}}
+.p6-feat{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;border-radius:12px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.05);
+  font-size:13px;color:var(--tw);line-height:1.3;
+}
+.p6-chk{
+  flex-shrink:0;width:20px;height:20px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--gr);color:#0A0A0A;font-size:11px;font-weight:700;
+}
+
+.p6-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  margin-top:32px;padding:16px 32px;border-radius:100px;
+  background:#25D366;color:#0A0A0A !important;
+  font-family:var(--fd);font-size:15px;font-weight:600;letter-spacing:-.01em;
+  box-shadow:0 8px 24px -6px rgba(37,211,102,.5),0 0 0 1px rgba(255,255,255,.08) inset;
+  transition:transform .25s cubic-bezier(.23,1,.32,1),box-shadow .25s,background .2s;
+}
+.p6-btn:hover{transform:translateY(-2px);background:#2eea73;box-shadow:0 12px 32px -6px rgba(37,211,102,.6),0 0 0 1px rgba(255,255,255,.12) inset}
+.p6-btn svg{flex-shrink:0}
+.p6-note{margin-top:18px;font-size:12px;color:var(--tw3)}
+
+@media(max-width:520px){
+  .p6-card{padding:36px 22px 28px;border-radius:22px}
+}
+
 .prow{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;-webkit-overflow-scrolling:touch}
 .prow::-webkit-scrollbar{display:none}
 .pc{flex:0 0 150px;height:240px;border-radius:14px;position:relative;cursor:pointer;overflow:hidden;opacity:0;transform:translateY(12px);transition:transform .4s cubic-bezier(.23,1,.32,1)}
