@@ -164,13 +164,13 @@ const GuidedTour = ({ steps, completedKey, stepKey, ready, onComplete }: GuidedT
 
       <div ref={tooltipRef} style={getTooltipStyle()}
         className={cn(
-          'z-[100000] w-[320px] max-w-[90vw] rounded-2xl border border-white/10 bg-[hsl(220,20%,12%)] shadow-2xl backdrop-blur-xl',
+          'z-[100000] w-[320px] max-w-[90vw] rounded-2xl border border-border bg-card text-card-foreground shadow-2xl',
           'animate-in fade-in-0 zoom-in-95 duration-200',
         )}
       >
         {!isCentered && targetRect && (
           <div className={cn(
-            'absolute w-3 h-3 rotate-45 bg-[hsl(220,20%,12%)] border border-white/10',
+            'absolute w-3 h-3 rotate-45 bg-card border border-border',
             currentStep.placement === 'bottom' && '-top-1.5 left-1/2 -translate-x-1/2 border-b-0 border-r-0',
             currentStep.placement === 'top' && '-bottom-1.5 left-1/2 -translate-x-1/2 border-t-0 border-l-0',
             currentStep.placement === 'right' && '-left-1.5 top-1/2 -translate-y-1/2 border-r-0 border-b-0',
@@ -189,11 +189,11 @@ const GuidedTour = ({ steps, completedKey, stepKey, ready, onComplete }: GuidedT
 
           <div className={cn(isWelcomeOrEnd && 'text-center')}>
             <h4 className="text-sm font-bold text-foreground">{currentStep.title}</h4>
-            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{currentStep.content}</p>
+            <p className="text-xs text-foreground/85 mt-1 leading-relaxed">{currentStep.content}</p>
           </div>
 
           <div className="flex items-center justify-between pt-1">
-            <span className="text-[10px] text-muted-foreground font-mono">
+            <span className="text-[10px] text-muted-foreground font-mono font-medium">
               Passo {step + 1} de {steps.length}
             </span>
             <div className="flex items-center gap-1.5">
@@ -210,7 +210,7 @@ const GuidedTour = ({ steps, completedKey, stepKey, ready, onComplete }: GuidedT
 
           {!isLast && (
             <button onClick={completeTour}
-              className="block w-full text-center text-[10px] text-muted-foreground/60 hover:text-muted-foreground transition-colors pt-1"
+              className="block w-full text-center text-[10px] text-muted-foreground hover:text-foreground transition-colors pt-1"
             >
               Pular tour
             </button>
