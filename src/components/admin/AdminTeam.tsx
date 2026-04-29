@@ -583,6 +583,53 @@ const AdminTeam = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {form.display_role === 'editor' && (
+                <p className="text-xs text-muted-foreground">
+                  Editores aparecem na fila de produção e recebem entregas. Se o usuário não existir, preencha os campos abaixo para criar a conta.
+                </p>
+              )}
+            </div>
+
+            {/* Create new editor account (only when role=editor and no profile selected) */}
+            {!editingId && form.display_role === 'editor' && !selectedProfile && (
+              <div className="space-y-3 p-3 rounded-[var(--radius)] border border-dashed border-border bg-secondary/30">
+                <p className="text-xs font-medium text-foreground">Criar nova conta de editor</p>
+                <div className="space-y-2">
+                  <Label className="text-foreground text-xs">Nome</Label>
+                  <Input
+                    className="bg-background border-border text-foreground"
+                    placeholder="Nome completo"
+                    value={form.new_editor_name}
+                    onChange={e => setForm(prev => ({ ...prev, new_editor_name: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-foreground text-xs">Email</Label>
+                  <Input
+                    type="email"
+                    className="bg-background border-border text-foreground"
+                    placeholder="email@exemplo.com"
+                    value={form.new_editor_email}
+                    onChange={e => setForm(prev => ({ ...prev, new_editor_email: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-foreground text-xs">Senha provisória (mín. 6)</Label>
+                  <Input
+                    type="text"
+                    className="bg-background border-border text-foreground font-mono text-xs"
+                    placeholder="••••••••"
+                    value={form.new_editor_password}
+                    onChange={e => setForm(prev => ({ ...prev, new_editor_password: e.target.value }))}
+                  />
+                </div>
+              </div>
+            )}
+                      {r.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Admin tabs */}
