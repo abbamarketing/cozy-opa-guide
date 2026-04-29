@@ -376,6 +376,32 @@ const NewDeliveryModal = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            {/* 0. Marca (obrigatório) */}
+            <div className="space-y-2">
+              <Label className="text-sm flex items-center gap-1.5">
+                <Building2 className="h-3.5 w-3.5 text-primary" />
+                Marca
+              </Label>
+              {brandProfiles.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground">
+                  Você precisa cadastrar pelo menos uma marca em <strong className="text-foreground">Minha Marca</strong> antes de criar entregas.
+                </div>
+              ) : (
+                <Select value={selectedBrandId} onValueChange={setSelectedBrandId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a marca desta entrega" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {brandProfiles.map(b => (
+                      <SelectItem key={b.id} value={b.id}>
+                        {b.display_label || b.brand_name}{b.is_primary ? ' • Principal' : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+
             {/* 1. Tipo de Entrega — apenas para clientes custom */}
             {!isSubscriptionLike && (
               <FormField
