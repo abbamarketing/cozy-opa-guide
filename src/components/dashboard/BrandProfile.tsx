@@ -80,10 +80,25 @@ export default function BrandProfile({ briefingId: briefingIdProp, onSaved }: Br
 
   const loadBrand = async () => {
     setLoading(true);
-    const { data } = await supabase
+
+    if (briefingIdProp === null) {
+      setBriefingId(null);
+      setBrand(defaultBrand);
+      setChannelsInput('');
+      setLoading(false);
+      return;
+    }
+
+    let query = supabase
       .from('onboarding_briefings')
       .select('*')
-      .eq('user_id', user!.id)
+      .eq('user_id', user!.id);
+
+    if (briefingIdProp) {
+      query = query.eq('id', briefingIdProp);
+    }
+
+    const { data } = await query
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -115,6 +130,10 @@ export default function BrandProfile({ briefingId: briefingIdProp, onSaved }: Br
         },
       });
       setChannelsInput((data.reference_channels || []).join(', '));
+    } else {
+      setBriefingId(null);
+      setBrand(defaultBrand);
+      setChannelsInput('');
     }
     setLoading(false);
   };
