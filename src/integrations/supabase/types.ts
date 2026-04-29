@@ -1467,6 +1467,10 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      editor_has_delivery_in_user_project: {
+        Args: { _user_id: string; _user_project_id: string }
+        Returns: boolean
+      }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
