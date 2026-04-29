@@ -93,6 +93,10 @@ const DEFAULT_FORM = {
   can_manage_projects: false,
   can_export_data: false,
   notes: '',
+  // Used only when creating a new editor account from scratch
+  new_editor_name: '',
+  new_editor_email: '',
+  new_editor_password: '',
 };
 
 type FormState = typeof DEFAULT_FORM;
@@ -197,6 +201,9 @@ const AdminTeam = () => {
       can_manage_projects: !!(perms.can_manage_projects),
       can_export_data: !!(perms.can_export_data),
       notes: member.notes ?? '',
+      new_editor_name: '',
+      new_editor_email: '',
+      new_editor_password: '',
     });
     setSelectedProfile({ id: member.user_id, full_name: member.full_name, avatar_url: member.avatar_url, email: null });
     setEmailSearch(member.full_name ?? '');
@@ -217,10 +224,34 @@ const AdminTeam = () => {
     setForm(prev => ({ ...prev, [key]: !prev[key as keyof FormState] }));
   };
 
+  const ensureEditorRecord = async (userId: string, displayName: string) => {
+    const { data: existing } = await db
+      .from('editors')
+      .select('id')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (existing) return;
+    await db.from('editors').insert({ user_id: userId, display_name: displayName || 'Editor' });
+    // Promote role to 'editor' if currently just 'client'
+    await db.from('user_roles').delete().eq('user_id', userId).eq('role', 'client');
+    await db.from('user_roles').insert({ user_id: userId, role: 'editor' });
+    await supabase.from('profiles').update({ role: 'editor' }).eq('user_id', userId);
+  };
+
   const handleSave = async () => {
-    if (!editingId && !selectedProfile) {
-      toast.error('Selecione um usuário');
+    const isCreatingNewEditor =
+      !editingId && !selectedProfile && form.display_role === 'editor';
+
+    if (!editingId && !selectedProfile && !isCreatingNewEditor) {
+      toast.error('Selecione um usuário existente');
       return;
+    }
+
+    if (isCreatingNewEditor) {
+      if (!form.new_editor_name.trim() || !form.new_editor_email.trim() || form.new_editor_password.length < 6) {
+        toast.error('Preencha nome, email e senha (mín. 6 caracteres)');
+        return;
+      }
     }
 
     setSaving(true);
@@ -250,15 +281,43 @@ const AdminTeam = () => {
       if (error) {
         toast.error('Erro ao salvar: ' + error.message);
       } else {
+        // If role is editor, ensure editors record exists
+        const editing = members.find(m => m.id === editingId);
+        if (form.display_role === 'editor' && editing) {
+          await ensureEditorRecord(editing.user_id, editing.full_name ?? 'Editor');
+        }
         toast.success('Membro atualizado');
         setModalOpen(false);
         fetchMembers();
       }
     } else {
+      let targetUserId = selectedProfile?.id ?? null;
+      let targetName = selectedProfile?.full_name ?? '';
+
+      // Create new editor account via edge function
+      if (isCreatingNewEditor) {
+        const { data, error: fnError } = await supabase.functions.invoke('create-editor', {
+          body: {
+            name: form.new_editor_name.trim(),
+            email: form.new_editor_email.trim().toLowerCase(),
+            password: form.new_editor_password,
+          },
+        });
+
+        if (fnError || !data?.success) {
+          const msg = (data?.error as string) ?? fnError?.message ?? 'Erro desconhecido';
+          toast.error('Erro ao criar editor: ' + msg);
+          setSaving(false);
+          return;
+        }
+        targetUserId = data.user_id;
+        targetName = form.new_editor_name.trim();
+      }
+
       const { error } = await db
         .from('team_members')
         .insert({
-          user_id: selectedProfile!.id,
+          user_id: targetUserId,
           display_role: form.display_role,
           permissions,
           notes: form.notes || null,
@@ -268,7 +327,11 @@ const AdminTeam = () => {
       if (error) {
         toast.error('Erro ao adicionar: ' + error.message);
       } else {
-        toast.success('Membro adicionado');
+        // If editor (existing user selected), ensure editors record
+        if (form.display_role === 'editor' && !isCreatingNewEditor && targetUserId) {
+          await ensureEditorRecord(targetUserId, targetName);
+        }
+        toast.success(isCreatingNewEditor ? 'Editor criado e adicionado à equipe' : 'Membro adicionado');
         setModalOpen(false);
         fetchMembers();
       }
@@ -520,7 +583,48 @@ const AdminTeam = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {form.display_role === 'editor' && (
+                <p className="text-xs text-muted-foreground">
+                  Editores aparecem na fila de produção e recebem entregas. Se o usuário não existir, preencha os campos abaixo para criar a conta.
+                </p>
+              )}
             </div>
+
+            {/* Create new editor account (only when role=editor and no profile selected) */}
+            {!editingId && form.display_role === 'editor' && !selectedProfile && (
+              <div className="space-y-3 p-3 rounded-[var(--radius)] border border-dashed border-border bg-secondary/30">
+                <p className="text-xs font-medium text-foreground">Criar nova conta de editor</p>
+                <div className="space-y-2">
+                  <Label className="text-foreground text-xs">Nome</Label>
+                  <Input
+                    className="bg-background border-border text-foreground"
+                    placeholder="Nome completo"
+                    value={form.new_editor_name}
+                    onChange={e => setForm(prev => ({ ...prev, new_editor_name: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-foreground text-xs">Email</Label>
+                  <Input
+                    type="email"
+                    className="bg-background border-border text-foreground"
+                    placeholder="email@exemplo.com"
+                    value={form.new_editor_email}
+                    onChange={e => setForm(prev => ({ ...prev, new_editor_email: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-foreground text-xs">Senha provisória (mín. 6)</Label>
+                  <Input
+                    type="text"
+                    className="bg-background border-border text-foreground font-mono text-xs"
+                    placeholder="••••••••"
+                    value={form.new_editor_password}
+                    onChange={e => setForm(prev => ({ ...prev, new_editor_password: e.target.value }))}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Admin tabs */}
             <div className="space-y-2">
