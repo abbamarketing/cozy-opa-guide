@@ -201,6 +201,9 @@ const AdminTeam = () => {
       can_manage_projects: !!(perms.can_manage_projects),
       can_export_data: !!(perms.can_export_data),
       notes: member.notes ?? '',
+      new_editor_name: '',
+      new_editor_email: '',
+      new_editor_password: '',
     });
     setSelectedProfile({ id: member.user_id, full_name: member.full_name, avatar_url: member.avatar_url, email: null });
     setEmailSearch(member.full_name ?? '');
