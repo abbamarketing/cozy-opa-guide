@@ -15,21 +15,21 @@ const T = {
     heroL1: 'Luz.',
     heroL2: 'Câmera.',
     heroL3: 'Ação.',
-    heroSub: 'Seu vídeo editado em até 4 horas.',
+    heroSub: 'Os vídeos dos seus clientes em até 4 horas.',
     heroBtn1: 'Ver planos',
     heroBtn2: 'Como funciona →',
 
     // Scene 0
     s0Label: 'A real',
-    s0Title1: 'Edição boa era cara',
-    s0Title2: 'e lenta.',
+    s0Title1: 'Editor sobrecarregado,',
+    s0Title2: 'cliente cobrando prazo.',
     s0Em: 'Resolvemos.',
 
     // Scene 1
     s1Label: 'Especialidade',
     s1Title: 'Feitos pra',
     s1Em: 'short video.',
-    s1Desc: 'Corte, legenda, ritmo e identidade visual. Até 90 segundos. É só o que a gente faz. E a gente faz muito bem.',
+    s1Desc: 'Corte, legenda, ritmo e identidade visual de cada cliente. Até 90 segundos. É só o que a gente faz. E a gente faz muito bem.',
 
     // Scene 2
     s2Label: 'Portfólio',
@@ -41,7 +41,7 @@ const T = {
     s3Title: 'Envie. Acompanhe.',
     s3Em: 'Receba.',
     s3Step1T: 'Envie',
-    s3Step1D: 'Upload ou link. Briefing já salvo.',
+    s3Step1D: 'Upload ou link. Brand kit de cada cliente já salvo.',
     s3Step2T: 'Acompanhe',
     s3Step2D: 'Countdown do prazo. Status ao vivo.',
     s3Step3T: 'Receba',
@@ -62,8 +62,8 @@ const T = {
     s4Approve: '✓ Aprovar',
 
     // Scene 5
-    s5L1: 'Manda tudo.',
-    s5L2: 'A gente edita tudo.',
+    s5L1: 'Todos os clientes.',
+    s5L2: 'Toda a edição.',
     s5Em: 'Um preço fixo por mês.',
 
     // Scene 6
@@ -74,8 +74,8 @@ const T = {
     s6Cancel: 'Cancele quando quiser. Sem multa.',
     s6F1: '✓ Reels, Shorts e TikTok até 90s',
     s6F2: '✓ Sem cota mensal',
-    s6F3: '✓ Sua identidade visual',
-    s6F4: '✓ Briefing salvo',
+    s6F3: '✓ Identidade visual de cada cliente',
+    s6F4: '✓ Brand kits ilimitados',
 
     // Scene 7
     s7Title: 'Dúvidas.',
@@ -103,9 +103,9 @@ const T = {
 
     // FAQ
     faq: [
-      { q: 'Fila ilimitada?', a: 'Peça sem limite. Entregamos na ordem, dentro do prazo contratado. Um sai, outro entra.' },
+      { q: 'Fila ilimitada?', a: 'Peça sem limite, de quantos clientes quiser. Entregamos na ordem, dentro do prazo. Um sai, outro entra.' },
       { q: 'Como funciona o prazo?', a: 'Horas úteis a partir do envio. Countdown no dashboard.' },
-      { q: 'O que inclui?', a: 'Corte, legenda, ritmo, identidade visual. Até 90s.' },
+      { q: 'O que inclui?', a: 'Corte, legenda, ritmo, identidade visual de cada cliente. Até 90s.' },
       { q: 'Não gostei.', a: 'Marca o segundo, descreve o ajuste. Sem limite. Sem custo extra.' },
       { q: 'Cancelar?', a: 'Quando quiser. Sem multa.' },
     ],
