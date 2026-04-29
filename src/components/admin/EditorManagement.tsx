@@ -174,11 +174,11 @@ const EditorManagement = () => {
         portfolio_url: e.portfolio_url,
         specialty: e.specialty,
         avatar_url: prof?.avatar_url || null,
-        email: null, // Not available from profiles table directly
+        email: null,
         active_deliveries: active,
         completed_deliveries: completed.length,
         total_deliveries: mine.length,
-        on_time_rate: completed.length > 0 ? Math.round((onTime / completed.length) * 100) : 100,
+        on_time_rate: slaPool > 0 ? Math.round((onTime / slaPool) * 100) : 100,
       };
     });
 
