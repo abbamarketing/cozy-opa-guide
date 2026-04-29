@@ -685,17 +685,39 @@ const EditorManagement = () => {
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <Label>Status</Label>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">
-                  {editEditor?.status === 'available' ? 'Ativo' : 'Inativo'}
-                </span>
-                <Switch
-                  checked={editEditor?.status === 'available'}
-                  onCheckedChange={() => editEditor && handleToggleStatus(editEditor)}
+            <div className="space-y-2 rounded-lg border border-border/40 p-3">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Alterar senha
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Mínimo 8 caracteres"
+                  value={editPassword}
+                  onChange={(e) => setEditPassword(e.target.value)}
+                  className="font-mono text-sm"
+                  maxLength={64}
                 />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditPassword(generatePassword())}
+                  title="Gerar senha"
+                  type="button"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
               </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="w-full gap-2"
+                onClick={handleChangePassword}
+                disabled={savingPassword || editPassword.length < 8}
+              >
+                {savingPassword ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                Salvar nova senha
+              </Button>
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
