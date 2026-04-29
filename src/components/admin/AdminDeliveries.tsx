@@ -189,6 +189,19 @@ const AdminDeliveries = () => {
     setActionLoading(null);
   };
 
+  const handleDelete = async (delivery: AdminDelivery) => {
+    setActionLoading(delivery.id);
+    // Clean up dependent rows first (no cascade FKs)
+    await supabase.from('delivery_messages').delete().eq('delivery_id', delivery.id);
+    await supabase.from('delivery_revisions').delete().eq('delivery_id', delivery.id);
+    await supabase.from('delivery_subtasks').delete().eq('delivery_id', delivery.id);
+    const { error } = await supabase.from('deliveries').delete().eq('id', delivery.id);
+    if (error) toast.error('Erro ao excluir: ' + error.message);
+    else { toast.success('Entrega excluída'); fetchData(); }
+    setDeleteTarget(null);
+    setActionLoading(null);
+  };
+
   const exportCSV = () => {
     const statusLabels: Record<string, string> = {
       pending: 'Pendente', in_progress: 'Em produção', review: 'Revisão', revision: 'Revisão solicitada', approved: 'Aprovado', cancelled: 'Cancelado',
