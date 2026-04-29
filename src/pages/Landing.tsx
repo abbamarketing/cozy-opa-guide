@@ -870,9 +870,8 @@ const CSS = `
 .fia p{font-size:14px;color:var(--tw2);line-height:1.5;max-width:460px}
 
 /* Dashboard mockup — light theme */
-.dash{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;overflow-x:auto;scrollbar-width:none}
-.dash::-webkit-scrollbar{display:none}
-@media(max-width:700px){.dash{grid-template-columns:repeat(4,200px)}}
+.dash{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:700px) and (min-width:601px){.dash{grid-template-columns:repeat(4,1fr);gap:6px}}
 .dash-col{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;min-height:120px}
 .dash-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)}
 .dash-hd span:first-child{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tw3)}
