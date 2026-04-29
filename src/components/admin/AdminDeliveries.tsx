@@ -255,12 +255,19 @@ const AdminDeliveries = () => {
                   <UserCheck className="mr-2 h-3.5 w-3.5" /> {e.display_name}
                 </DropdownMenuItem>
               ))}
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => handleCancel(d.id)}
                 className="text-destructive"
                 disabled={d.status === 'approved' || d.status === 'cancelled'}
               >
                 <XCircle className="mr-2 h-3.5 w-3.5" /> Cancelar
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setDeleteTarget(d)}
+                className="text-destructive"
+              >
+                <Trash2 className="mr-2 h-3.5 w-3.5" /> Excluir definitivamente
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
