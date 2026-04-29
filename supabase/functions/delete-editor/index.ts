@@ -47,24 +47,41 @@ Deno.serve(async (req) => {
     if (editorError || !editor) return json({ error: "Editor not found" }, 404);
     const editorUserId = editor.user_id;
 
-    // Unassign all deliveries
-    await admin
+    // Remove references that block the editor/auth user deletion
+    const { error: deliveriesError } = await admin
       .from("deliveries")
       .update({ editor_id: null })
       .eq("editor_id", editorId);
+    if (deliveriesError) return json({ error: deliveriesError.message }, 500);
 
-    // Delete editor row
-    await admin.from("editors").delete().eq("id", editorId);
+    const { error: projectsError } = await admin
+      .from("user_projects")
+      .update({ editor_id: null })
+      .eq("editor_id", editorId);
+    if (projectsError) return json({ error: projectsError.message }, 500);
 
-    // Delete user_roles
-    await admin.from("user_roles").delete().eq("user_id", editorUserId);
+    const { error: customProjectsError } = await admin
+      .from("custom_projects")
+      .update({ created_by: userData.user.id })
+      .eq("created_by", editorUserId);
+    if (customProjectsError) return json({ error: customProjectsError.message }, 500);
 
-    // Delete profile
-    await admin.from("profiles").delete().eq("user_id", editorUserId);
+    // Delete editor-related rows before removing the auth user
+    const { error: editorDeleteError } = await admin.from("editors").delete().eq("id", editorId);
+    if (editorDeleteError) return json({ error: editorDeleteError.message }, 500);
+
+    const { error: rolesError } = await admin.from("user_roles").delete().eq("user_id", editorUserId);
+    if (rolesError) return json({ error: rolesError.message }, 500);
+
+    const { error: profileError } = await admin.from("profiles").delete().eq("user_id", editorUserId);
+    if (profileError) return json({ error: profileError.message }, 500);
 
     // Delete auth user
     const { error: delErr } = await admin.auth.admin.deleteUser(editorUserId);
-    if (delErr) console.error("auth delete error:", delErr);
+    if (delErr) {
+      console.error("auth delete error:", delErr);
+      return json({ error: delErr.message }, 500);
+    }
 
     return json({ success: true });
   } catch (err) {
