@@ -210,7 +210,7 @@ const GuidedTour = ({ steps, completedKey, stepKey, ready, onComplete }: GuidedT
 
           {!isLast && (
             <button onClick={completeTour}
-              className="block w-full text-center text-[10px] text-muted-foreground/60 hover:text-muted-foreground transition-colors pt-1"
+              className="block w-full text-center text-[10px] text-muted-foreground hover:text-foreground transition-colors pt-1"
             >
               Pular tour
             </button>
