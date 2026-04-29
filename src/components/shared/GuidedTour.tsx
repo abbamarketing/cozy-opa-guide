@@ -170,7 +170,7 @@ const GuidedTour = ({ steps, completedKey, stepKey, ready, onComplete }: GuidedT
       >
         {!isCentered && targetRect && (
           <div className={cn(
-            'absolute w-3 h-3 rotate-45 bg-[hsl(220,20%,12%)] border border-white/10',
+            'absolute w-3 h-3 rotate-45 bg-card border border-border',
             currentStep.placement === 'bottom' && '-top-1.5 left-1/2 -translate-x-1/2 border-b-0 border-r-0',
             currentStep.placement === 'top' && '-bottom-1.5 left-1/2 -translate-x-1/2 border-t-0 border-l-0',
             currentStep.placement === 'right' && '-left-1.5 top-1/2 -translate-y-1/2 border-r-0 border-b-0',
