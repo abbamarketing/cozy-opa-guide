@@ -625,12 +625,6 @@ const AdminTeam = () => {
                 </div>
               </div>
             )}
-                      {r.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
 
             {/* Admin tabs */}
             <div className="space-y-2">
