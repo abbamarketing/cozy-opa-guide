@@ -18,8 +18,8 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import {
-  Plus, Loader2, Video, CheckCircle, Clock, Eye, Pencil, Power,
-  Copy, AlertTriangle, User, BarChart3, Package, Trash2,
+  Plus, Loader2, Video, CheckCircle, Clock, Eye, Pencil,
+  Copy, BarChart3, Package, Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
