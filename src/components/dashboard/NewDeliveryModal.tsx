@@ -101,6 +101,10 @@ const NewDeliveryModal = ({
   const [isException, setIsException] = useState(false);
   const [exceptionNotes, setExceptionNotes] = useState('');
 
+  // Brand profile selection (mandatory)
+  const [brandProfiles, setBrandProfiles] = useState<{ id: string; brand_name: string; display_label: string | null; is_primary: boolean }[]>([]);
+  const [selectedBrandId, setSelectedBrandId] = useState<string>('');
+
   const project = userProject.custom_project;
   const isSubscriptionLike = userProject.client_type === 'subscription' || userProject.client_type === 'influencer';
 
