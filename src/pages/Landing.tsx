@@ -546,6 +546,7 @@ export default function Landing() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p6-btn"
+                  onClick={() => { try { (window as any).fbq?.('track', 'Contact'); } catch {} }}
                 >
                   {t.s6Btn}
                 </a>
