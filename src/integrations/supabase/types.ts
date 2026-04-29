@@ -381,6 +381,7 @@ export type Database = {
       deliveries: {
         Row: {
           approved_at: string | null
+          brand_profile_id: string | null
           checklist_state: Json | null
           client_notes: string | null
           created_at: string
@@ -409,6 +410,7 @@ export type Database = {
         }
         Insert: {
           approved_at?: string | null
+          brand_profile_id?: string | null
           checklist_state?: Json | null
           client_notes?: string | null
           created_at?: string
@@ -437,6 +439,7 @@ export type Database = {
         }
         Update: {
           approved_at?: string | null
+          brand_profile_id?: string | null
           checklist_state?: Json | null
           client_notes?: string | null
           created_at?: string
@@ -464,6 +467,13 @@ export type Database = {
           user_project_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "deliveries_brand_profile_id_fkey"
+            columns: ["brand_profile_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_briefings"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "deliveries_editor_id_fkey"
             columns: ["editor_id"]
@@ -777,8 +787,10 @@ export type Database = {
           completed_at: string | null
           content_style: string | null
           created_at: string
+          display_label: string | null
           id: string
           intro_url: string | null
+          is_primary: boolean
           jump_cuts: boolean | null
           legend_style: string | null
           logo_url: string | null
@@ -805,8 +817,10 @@ export type Database = {
           completed_at?: string | null
           content_style?: string | null
           created_at?: string
+          display_label?: string | null
           id?: string
           intro_url?: string | null
+          is_primary?: boolean
           jump_cuts?: boolean | null
           legend_style?: string | null
           logo_url?: string | null
@@ -833,8 +847,10 @@ export type Database = {
           completed_at?: string | null
           content_style?: string | null
           created_at?: string
+          display_label?: string | null
           id?: string
           intro_url?: string | null
+          is_primary?: boolean
           jump_cuts?: boolean | null
           legend_style?: string | null
           logo_url?: string | null
