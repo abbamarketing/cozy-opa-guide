@@ -234,7 +234,7 @@ const AdminDeliveries = () => {
           {!isMobile && <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />}
           <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-card-foreground">{d.title}</p>
+            <p className="line-clamp-2 break-words text-sm font-medium text-card-foreground">{d.title}</p>
             <p className="text-[10px] text-muted-foreground">
               {d.client_name || '—'} · {d.editor_name || 'Sem editor'}
             </p>
