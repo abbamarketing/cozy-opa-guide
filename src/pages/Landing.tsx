@@ -68,14 +68,16 @@ const T = {
 
     // Scene 6
     s6Label: 'Planos',
-    s6Title: 'Escolha o',
-    s6Em: 'prazo.',
+    s6Title: 'A partir de R$490',
+    s6Em: 'por mês.',
+    s6Sub: 'Escolha o prazo no WhatsApp. A gente monta com você.',
     s6PerMonth: 'por mês',
     s6Cancel: 'Cancele quando quiser. Sem multa.',
     s6F1: '✓ Reels, Shorts e TikTok até 90s',
     s6F2: '✓ Sem cota mensal',
     s6F3: '✓ Identidade visual de cada cliente',
     s6F4: '✓ Brand kits ilimitados',
+    s6Btn: 'Falar no WhatsApp',
 
     // Scene 7
     s7Title: 'Dúvidas.',
@@ -182,14 +184,16 @@ const T = {
 
     // Scene 6
     s6Label: 'Pricing',
-    s6Title: 'Choose your',
-    s6Em: 'turnaround.',
+    s6Title: 'From R$490',
+    s6Em: 'per month.',
+    s6Sub: 'Pick your turnaround on WhatsApp. We build it with you.',
     s6PerMonth: 'per month',
     s6Cancel: 'Cancel anytime. No penalty.',
     s6F1: '✓ Reels, Shorts & TikTok up to 90s',
     s6F2: '✓ No monthly cap',
-    s6F3: '✓ Your brand identity',
-    s6F4: '✓ Brief saved',
+    s6F3: '✓ Brand identity for each client',
+    s6F4: '✓ Unlimited brand kits',
+    s6Btn: 'Talk on WhatsApp',
 
     // Scene 7
     s7Title: 'Questions.',
