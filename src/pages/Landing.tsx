@@ -542,7 +542,7 @@ export default function Landing() {
                 </ul>
 
                 <a
-                  href="https://wa.me/5511999999999?text=Olá! Quero conhecer os planos da AbbaVideo."
+                  href="https://wa.me/5538999117106?text=Olá! Quero conhecer os planos da AbbaVideo."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p6-btn"

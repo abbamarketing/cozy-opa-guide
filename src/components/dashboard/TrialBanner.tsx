@@ -31,7 +31,7 @@ export function TrialBanner({ trialEndDate, onUpgrade }: TrialBannerProps) {
           Assinar Standard
         </button>
         <a
-          href="https://wa.me/5511999999999?text=Olá! Quero conhecer os planos da AbbaVideo."
+          href="https://wa.me/5538999117106?text=Olá! Quero conhecer os planos da AbbaVideo."
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
