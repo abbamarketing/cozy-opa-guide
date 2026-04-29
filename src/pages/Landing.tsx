@@ -528,27 +528,26 @@ export default function Landing() {
             <div className={sc(6)} id="plans"><div className="pw" style={{ textAlign: 'center' }}>
               <p className="lb">{t.s6Label}</p>
 
-              <div className="p6-headline">
+              <div className="p6-card">
                 <span className="p6-from">{t.s6Title}</span>
-                <h2 className="p6-price">{t.s6Price}<em>{t.s6Em}</em></h2>
+                <h2 className="p6-price">{t.s6Price}</h2>
+                <p className="p6-em">{t.s6Em}</p>
                 <p className="p6-sub">{t.s6Sub}</p>
-              </div>
 
-              <ul className="p6-feats">
-                <li>{t.s6F1.replace('✓ ', '')}</li>
-                <li>{t.s6F2.replace('✓ ', '')}</li>
-                <li>{t.s6F3.replace('✓ ', '')}</li>
-                <li>{t.s6F4.replace('✓ ', '')}</li>
-              </ul>
+                <ul className="p6-feats">
+                  <li><span className="p6-check" aria-hidden="true">✓</span>{t.s6F1.replace('✓ ', '')}</li>
+                  <li><span className="p6-check" aria-hidden="true">✓</span>{t.s6F2.replace('✓ ', '')}</li>
+                  <li><span className="p6-check" aria-hidden="true">✓</span>{t.s6F3.replace('✓ ', '')}</li>
+                  <li><span className="p6-check" aria-hidden="true">✓</span>{t.s6F4.replace('✓ ', '')}</li>
+                </ul>
 
-              <div className="p6-cta-wrap">
                 <a
                   href="https://wa.me/5511999999999?text=Olá! Quero conhecer os planos da AbbaVideo."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p6-link"
+                  className="p6-btn"
                 >
-                  {t.s6Btn} <span aria-hidden="true">→</span>
+                  {t.s6Btn}
                 </a>
                 <p className="p6-note">{t.s6Cancel}</p>
               </div>
@@ -754,71 +753,72 @@ const CSS = `
 .pb:hover{opacity:.85}
 .pn{margin-top:8px;font-size:11px;color:var(--tw3)}
 
-/* Scene 6 — Plans (typographic / minimal) */
-.p6-headline{
-  margin-top:18px;
+/* Scene 6 — Plans (card) */
+.p6-card{
+  margin:24px auto 0;max-width:440px;
+  padding:40px 28px 32px;
+  border-radius:24px;
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.04);
   transition:opacity .6s cubic-bezier(.23,1,.32,1) .05s,transform .7s cubic-bezier(.23,1,.32,1) .05s;
 }
-.sc:not(.on) .p6-headline{opacity:0;transform:translateY(16px)}
-.sc.on .p6-headline{opacity:1;transform:none}
+.sc:not(.on) .p6-card{opacity:0;transform:translateY(16px)}
+.sc.on .p6-card{opacity:1;transform:none}
 
 .p6-from{
   display:block;
-  font-family:var(--fb);font-size:14px;color:var(--tw3);
-  letter-spacing:.02em;margin-bottom:14px;
+  font-family:var(--fb);font-size:11px;color:var(--tw3);
+  letter-spacing:.18em;text-transform:uppercase;margin-bottom:18px;
 }
 .p6-price{
   font-family:var(--fd);font-weight:600;
-  font-size:clamp(80px,12vw,160px);line-height:.95;letter-spacing:-.06em;
-  margin:0;color:var(--tw);
-  display:flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;
+  font-size:clamp(64px,11vw,96px);line-height:1;letter-spacing:-.05em;
+  margin:0;
+  background:linear-gradient(180deg,#fff 0%,rgba(255,255,255,.55) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
 }
-.p6-price em{
-  font-style:italic;font-weight:400;
-  font-size:clamp(20px,2.4vw,28px);letter-spacing:-.02em;
-  color:var(--tw3);
+.p6-em{
+  margin:8px 0 0;font-family:var(--fd);font-style:italic;font-weight:400;
+  font-size:18px;color:var(--tw3);letter-spacing:-.01em;
 }
 .p6-sub{
-  margin:22px auto 0;max-width:440px;
-  font-size:15px;color:var(--tw2);line-height:1.5;
+  margin:22px auto 0;max-width:340px;
+  font-size:14px;color:var(--tw2);line-height:1.55;
 }
 
 .p6-feats{
-  list-style:none;padding:0;margin:48px auto 0;max-width:680px;
-  display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
-  gap:6px 0;
-  font-size:13px;color:var(--tw3);
-  transition:opacity .6s cubic-bezier(.23,1,.32,1) .18s,transform .7s cubic-bezier(.23,1,.32,1) .18s;
+  list-style:none;padding:0;margin:32px 0 0;
+  display:flex;flex-direction:column;gap:10px;
 }
-.sc:not(.on) .p6-feats{opacity:0;transform:translateY(12px)}
-.sc.on .p6-feats{opacity:1;transform:none}
-.p6-feats li{padding:0 18px;position:relative;line-height:1.4}
-.p6-feats li + li::before{
-  content:'';position:absolute;left:-1px;top:50%;transform:translateY(-50%);
-  width:2px;height:2px;border-radius:50%;background:var(--tw3);
+.p6-feats li{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-radius:12px;
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.06);
+  font-size:14px;color:var(--tw);text-align:left;
+}
+.p6-check{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:50%;
+  background:rgba(255,255,255,.06);
+  font-size:11px;color:var(--tw2);flex-shrink:0;
 }
 
-.p6-cta-wrap{
-  margin-top:48px;display:flex;flex-direction:column;align-items:center;gap:12px;
-  transition:opacity .6s cubic-bezier(.23,1,.32,1) .26s,transform .7s cubic-bezier(.23,1,.32,1) .26s;
+.p6-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-top:32px;padding:13px 28px;
+  font-family:var(--fb);font-size:14px;font-weight:500;color:var(--tw);
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;
+  transition:background .2s,border-color .2s;
 }
-.sc:not(.on) .p6-cta-wrap{opacity:0;transform:translateY(12px)}
-.sc.on .p6-cta-wrap{opacity:1;transform:none}
-.p6-link{
-  display:inline-flex;align-items:center;gap:8px;
-  font-family:var(--fb);font-size:16px;font-weight:500;color:var(--tw);
-  padding:6px 0;border-bottom:1px solid rgba(255,255,255,.2);
-  transition:border-color .2s,gap .25s cubic-bezier(.23,1,.32,1);
-}
-.p6-link:hover{border-color:var(--tw);gap:12px}
-.p6-link span{transition:transform .25s cubic-bezier(.23,1,.32,1)}
-.p6-link:hover span{transform:translateX(2px)}
-.p6-note{font-size:12px;color:var(--tw3);margin:0}
+.p6-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.24)}
+.p6-note{margin:14px 0 0;font-size:11px;color:var(--tw3)}
 
 @media(max-width:520px){
-  .p6-feats{flex-direction:column;gap:8px 0}
-  .p6-feats li{padding:0}
-  .p6-feats li + li::before{display:none}
+  .p6-card{padding:32px 20px 28px;border-radius:20px}
 }
 
 .prow{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;-webkit-overflow-scrolling:touch}
