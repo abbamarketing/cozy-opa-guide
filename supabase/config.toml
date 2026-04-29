@@ -25,3 +25,7 @@ project_id = "iqrypgqdhpanqjqnxtap"
     verify_jwt = false
   [functions.admin-manage-subscription]
     verify_jwt = false
+  [functions.delete-editor]
+    verify_jwt = false
+  [functions.update-editor-password]
+    verify_jwt = false
