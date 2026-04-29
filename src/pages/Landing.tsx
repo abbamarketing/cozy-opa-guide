@@ -808,13 +808,13 @@ const CSS = `
 .p6-btn{
   display:inline-flex;align-items:center;justify-content:center;
   margin-top:32px;padding:13px 28px;
-  font-family:var(--fb);font-size:14px;font-weight:500;color:var(--tw);
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.14);
+  font-family:var(--fb);font-size:14px;font-weight:500;color:#fff;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.28);
   border-radius:999px;
   transition:background .2s,border-color .2s;
 }
-.p6-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.24)}
+.p6-btn:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.45)}
 .p6-note{margin:14px 0 0;font-size:11px;color:var(--tw3)}
 
 @media(max-width:520px){
