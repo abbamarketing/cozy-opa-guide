@@ -147,17 +147,24 @@ const EditorManagement = () => {
       .select('editor_id, status, due_date, delivered_at')
       .in('editor_id', editorsList.map((e) => e.id));
 
+    const now = new Date();
     const cards: EditorData[] = editorsList.map((e) => {
       const prof = profileMap.get(e.user_id);
       const mine = (allDeliveries || []).filter((d) => d.editor_id === e.id);
-      const active = mine.filter((d) =>
+      const activeList = mine.filter((d) =>
         ['pending', 'in_progress', 'revision'].includes(d.status)
-      ).length;
+      );
+      const active = activeList.length;
       const completed = mine.filter((d) => d.status === 'approved');
-      const onTime = completed.filter((d) => {
+      // SLA pool: completed + currently active. Active counts only when it has a due_date.
+      const completedOnTime = completed.filter((d) => {
         if (!d.due_date || !d.delivered_at) return true;
         return new Date(d.delivered_at) <= new Date(d.due_date);
       }).length;
+      const activeWithDue = activeList.filter((d) => d.due_date);
+      const activeOnTime = activeWithDue.filter((d) => new Date(d.due_date as string) >= now).length;
+      const slaPool = completed.length + activeWithDue.length;
+      const onTime = completedOnTime + activeOnTime;
 
       return {
         id: e.id,
