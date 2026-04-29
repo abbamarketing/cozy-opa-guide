@@ -249,22 +249,6 @@ const EditorManagement = () => {
 
   /* ─── Remove Editor ─── */
   const handleRemoveEditor = async (editor: EditorData) => {
-    const { count: inProd, data: inProdData } = await supabase
-      .from('deliveries')
-      .select('title', { count: 'exact' })
-      .eq('editor_id', editor.id)
-      .eq('status', 'in_progress');
-
-    if ((inProd ?? 0) > 0) {
-      setBlockedEditor({
-        editor,
-        count: inProd ?? 0,
-        titles: (inProdData || []).map((d) => d.title),
-      });
-      setBlockedModalOpen(true);
-      return;
-    }
-
     setConfirmRemoveEditor(editor);
   };
 
