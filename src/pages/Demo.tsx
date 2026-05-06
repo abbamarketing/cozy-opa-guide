@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Eye } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { Eye, Video, Calendar, CheckCircle2, Palette, Settings } from 'lucide-react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import type { UserProjectData } from '@/hooks/useUserProject';
 import type { DeliveryData } from '@/components/dashboard/DeliveryCard';
@@ -128,10 +128,15 @@ const MOCK_DELIVERIES: DeliveryData[] = [
   },
 ];
 
-// ─── Mock projects por plano ────────────────────────────────────────────────
-const baseMock = {
+// ─── Mock project fixo (plano Pro) ──────────────────────────────────────────
+const MOCK_PROJECT: UserProjectData = {
   id: 'demo-project',
   user_id: 'demo-user',
+  client_type: 'subscription',
+  status: 'active',
+  subscription_tier: 'pro',
+  sla_hours: 48,
+  studio_access: false,
   youtube_reserved: 1,
   youtube_approved: 2,
   instagram_reserved: 0,
@@ -144,76 +149,51 @@ const baseMock = {
   captures_approved: 0,
   current_period_start: new Date(Date.now() - 15 * 86400000).toISOString(),
   current_period_end: new Date(Date.now() + 15 * 86400000).toISOString(),
-  stripe_subscription_id: null,
+  stripe_subscription_id: 'sub_demo',
   tour_completed: true,
-  studio_access: false,
+  custom_project: null,
   subscription_slug: null,
   custom_slug: null,
-  monthly_quota: null,
+  monthly_quota: 11,
+  priority_level: null,
 };
 
-const MOCK_PROJECTS: Record<string, UserProjectData> = {
-  standard: {
-    ...baseMock,
-    client_type: 'subscription',
-    status: 'active',
-    subscription_tier: 'standard',
-    sla_hours: 72,
-    monthly_quota: 7,
-    custom_project: null,
-    stripe_subscription_id: 'sub_demo',
-  },
-  pro: {
-    ...baseMock,
-    client_type: 'subscription',
-    status: 'active',
-    subscription_tier: 'pro',
-    sla_hours: 48,
-    monthly_quota: 11,
-    custom_project: null,
-    stripe_subscription_id: 'sub_demo',
-  },
-  business: {
-    ...baseMock,
-    client_type: 'subscription',
-    status: 'active',
-    subscription_tier: 'business',
-    sla_hours: 24,
-    monthly_quota: 22,
-    custom_project: null,
-    stripe_subscription_id: 'sub_demo',
-  },
-  premium: {
-    ...baseMock,
-    client_type: 'subscription',
-    status: 'active',
-    subscription_tier: 'premium',
-    sla_hours: 8,
-    monthly_quota: 66,
-    custom_project: null,
-    stripe_subscription_id: 'sub_demo',
-  },
-};
+// ─── Tabs do dashboard ──────────────────────────────────────────────────────
+type DashboardTab = 'deliveries' | 'calendar' | 'history' | 'brand' | 'settings';
 
-const PLAN_LABELS: Record<string, string> = {
-  standard: 'Standard',
-  pro: 'Pro',
-  business: 'Business',
-  premium: 'Premium',
+const TABS: { id: DashboardTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: 'deliveries', label: 'Entregas', icon: Video },
+  { id: 'calendar', label: 'Calendário', icon: Calendar },
+  { id: 'history', label: 'Histórico', icon: CheckCircle2 },
+  { id: 'brand', label: 'Marca', icon: Palette },
+  { id: 'settings', label: 'Config', icon: Settings },
+];
+
+const TAB_LABELS: Record<DashboardTab, string> = {
+  deliveries: 'Minhas Entregas',
+  calendar: 'Calendário',
+  history: 'Histórico',
+  brand: 'Minha Marca',
+  settings: 'Configurações',
 };
 
 export default function Demo() {
-  const [selectedPlan, setSelectedPlan] = useState('pro');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = (searchParams.get('tab') as DashboardTab) || 'deliveries';
+
+  const setTab = (tab: DashboardTab) => {
+    setSearchParams({ tab });
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Demo banner — interativo (permite trocar plano) */}
+      {/* Demo banner — navegação entre tabs */}
       <div className="relative z-[60] flex items-center justify-between gap-4 px-4 py-2 bg-secondary border-b border-border flex-wrap">
         <div className="flex items-center gap-3">
           <Eye className="h-4 w-4 shrink-0 text-muted-foreground" />
           <div>
             <span className="text-sm font-bold text-foreground">
-              Demo — {PLAN_LABELS[selectedPlan]}
+              Demo — {TAB_LABELS[activeTab]}
             </span>
             <span className="text-xs text-muted-foreground ml-2 hidden sm:inline">
               Visualização pública · sem interação
@@ -222,19 +202,24 @@ export default function Demo() {
         </div>
 
         <div className="flex items-center gap-1 flex-wrap">
-          {Object.keys(PLAN_LABELS).map((plan) => (
-            <button
-              key={plan}
-              onClick={() => setSelectedPlan(plan)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                selectedPlan === plan
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-              }`}
-            >
-              {PLAN_LABELS[plan]}
-            </button>
-          ))}
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setTab(tab.id)}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                }`}
+              >
+                <Icon className="h-3 w-3" />
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -246,7 +231,7 @@ export default function Demo() {
       >
         <DashboardLayout
           isPreviewMode
-          previewUserProject={MOCK_PROJECTS[selectedPlan]}
+          previewUserProject={MOCK_PROJECT}
           previewDeliveries={MOCK_DELIVERIES}
         />
       </div>
