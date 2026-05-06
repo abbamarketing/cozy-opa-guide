@@ -25,6 +25,7 @@ const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const Waiting = lazy(() => import("./pages/Waiting"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Demo = lazy(() => import("./pages/Demo"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -88,6 +89,7 @@ const App = () => (
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/demo" element={<Demo />} />
 
               {/* Admin only */}
               <Route element={<ProtectedRoute requireRole="admin" />}>
